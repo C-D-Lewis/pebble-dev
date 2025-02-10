@@ -7,7 +7,7 @@
   ],
   "private": true,
   "dependencies": {
-    "pebble-isometric": "file:///Users/chrislewis/Dropbox/Pebble-Dev/4.0/lib/pebble-isometric"
+    "pebble-isometric": "file:.."
   },
   "pebble": {
     "displayName": "test-app",
