@@ -1,0 +1,32 @@
+{
+  "name": "pebble-dash-api",
+  "author": "Chris Lewis",
+  "version": "1.7.0",
+  "files": [
+    "dist.zip"
+  ],
+  "repository": "C-D-Lewis/dash-api",
+  "license": "MIT",
+  "description": "Allows apps to access some Android APIs through a shared Android app",
+  "keywords": [
+    "pebble-package"
+  ],
+  "dependencies": {
+    "pebble-events": "^1.1.0",
+    "pebble-packet": "^1.3.0"
+  },
+  "pebble": {
+    "projectType": "package",
+    "sdkVersion": "3",
+    "targetPlatforms": [
+      "aplite",
+      "basalt",
+      "chalk",
+      "diorite",
+      "emery"
+    ],
+    "resources": {
+      "media": []
+    }
+  }
+}

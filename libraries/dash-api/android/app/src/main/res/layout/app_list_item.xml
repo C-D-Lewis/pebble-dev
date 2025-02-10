@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="60dp">
+
+    <TextView
+        android:id="@+id/app_name"
+        android:text="Empty Row"
+        android:textSize="20sp"
+        android:textColor="#000000"
+        android:paddingTop="5dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="5dp"
+        android:layout_gravity="center_vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <TextView
+        android:id="@+id/app_uuid"
+        android:text="uuid-uuid-uuid-uuid"
+        android:textSize="12sp"
+        android:textColor="#999999"
+        android:paddingLeft="10dp"
+        android:paddingRight="5dp"
+        android:layout_below="@id/app_name"
+        android:layout_gravity="center_vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <android.support.v7.widget.SwitchCompat
+        android:id="@+id/app_switch"
+        android:layout_gravity="center_vertical"
+        android:layout_width="fill_parent"
+        android:paddingTop="5dp"
+        android:textOn="On"
+        android:textOff="Off"
+        android:text=""
+        app:showText="false"
+        android:paddingRight="5dp"
+        android:paddingLeft="5dp"
+        android:layout_toRightOf="@id/app_name"
+        android:layout_height="match_parent"/>
+
+</RelativeLayout>

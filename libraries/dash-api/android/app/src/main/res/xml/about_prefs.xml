@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <Preference
+        android:title="Dash API Server v1.7"
+        android:summary="By Chris Lewis"/>
+
+    <Preference
+        android:title="Developers"
+        android:summary="This app powers all Pebble apps that use the Dash API library to get access to various aspects of Android. Keep this installed to enable those apps to continue functioning as expected!\n\nDevelopers can learn more about using this library in their own apps on GitHub: C-D-Lewis/dash-api"/>
+
+</PreferenceScreen>
