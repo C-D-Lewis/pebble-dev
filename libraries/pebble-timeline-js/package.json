@@ -1,0 +1,24 @@
+{
+  "name": "pebble-timeline-js",
+  "author": "Chris Lewis",
+  "version": "2.0.1",
+  "main": "src/js/index.js",
+  "keywords": [
+    "pebble-package"
+  ],
+  "dependencies": {},
+  "pebble": {
+    "projectType": "package",
+    "sdkVersion": "3",
+    "targetPlatforms": [
+      "aplite",
+      "basalt",
+      "chalk",
+      "diorite",
+      "emery"
+    ],
+    "resources": {
+      "media": []
+    }
+  }
+}
