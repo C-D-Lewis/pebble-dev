@@ -1,0 +1,33 @@
+{
+  "name": "test-app",
+  "author": "MakeAwesomeHappen",
+  "version": "1.0.0",
+  "keywords": [
+    "pebble-app"
+  ],
+  "private": true,
+  "dependencies": {
+    "pebble-isometric": "file:///Users/chrislewis/Dropbox/Pebble-Dev/4.0/lib/pebble-isometric"
+  },
+  "pebble": {
+    "displayName": "test-app",
+    "uuid": "adde8929-4573-40bd-9f2c-33b96e9e86b1",
+    "sdkVersion": "3",
+    "enableMultiJS": true,
+    "targetPlatforms": [
+      "aplite",
+      "basalt",
+      "chalk",
+      "diorite"
+    ],
+    "watchapp": {
+      "watchface": false
+    },
+    "messageKeys": [
+      "dummy"
+    ],
+    "resources": {
+      "media": []
+    }
+  }
+}

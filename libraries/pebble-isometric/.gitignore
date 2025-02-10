@@ -1,0 +1,4 @@
+build
+dist.zip
+.lock*
+node_modules
