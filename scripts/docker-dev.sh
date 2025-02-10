@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# Intended for use with a Docker image named 'pebble'
-
 set -eu
 
 docker run -it --rm \
