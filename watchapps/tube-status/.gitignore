@@ -1,0 +1,8 @@
+config.json
+build
+node_modules
+*.log
+*.DS_Store
+*.lock*
+assets
+pid
