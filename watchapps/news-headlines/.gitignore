@@ -1,0 +1,10 @@
+config.json
+build
+node_modules
+*.log
+*.DS_Store
+*.lock*
+assets/
+backend/PinServerOutputChecker
+releases
+pid

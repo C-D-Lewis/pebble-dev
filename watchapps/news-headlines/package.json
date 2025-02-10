@@ -1,0 +1,67 @@
+{
+  "name": "News Headlines",
+  "version": "4.6.0",
+  "author": "Chris Lewis",
+  "private": true,
+  "dependencies": {},
+  "keywords": [
+    "pebble-app"
+  ],
+  "pebble": {
+    "sdkVersion": "3",
+    "resources": {
+      "media": [
+        {
+          "type": "pbi",
+          "name": "GEAR",
+          "file": "images/spanner.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "APP_ICON_LARGE",
+          "file": "images/app_icon_small.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "THUMB",
+          "file": "images/thumb.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "THUMB_ICON",
+          "file": "images/thumb_icon.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LAUNCHER_ICON_TINY",
+          "file": "images/launcher.png",
+          "menuIcon": true
+        }
+      ],
+      "publishedMedia": [
+        {
+          "name": "LAUNCHER_ICON",
+          "id": 1,
+          "glance": "LAUNCHER_ICON_TINY"
+        }
+      ]
+    },
+    "projectType": "native",
+    "uuid": "945eb327-7659-440b-9ac0-e96dd5e45cc2",
+    "messageKeys": {},
+    "enableMultiJS": true,
+    "displayName": "News Headlines",
+    "watchapp": {
+      "onlyShownOnCommunication": false,
+      "hiddenApp": false,
+      "watchface": false
+    },
+    "targetPlatforms": [
+      "aplite",
+      "basalt",
+      "chalk",
+      "diorite"
+    ],
+    "capabilities": []
+  }
+}

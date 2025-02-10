@@ -1,0 +1,15 @@
+{
+  "name": "news-headlines-backend",
+  "version": "1.0.0",
+  "description": "News Headlines backend server",
+  "scripts": {
+    "start": "node src/main.js",
+    "deploy": "ssh pi@$SERVER_PI \"cd /home/pi/servers/news-headlines/backend && git pull origin master && sudo reboot\""
+  },
+  "dependencies": {
+    "express": "4.10.0",
+    "moment-timezone": "0.5.5",
+    "pebble-timeline-js-node": "^1.1.0",
+    "request": "2.74.0"
+  }
+}
