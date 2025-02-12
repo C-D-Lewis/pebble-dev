@@ -1,0 +1,84 @@
+../src/include/cl_util.c: In function 'cl_text_layer_create':
+../src/include/cl_util.c:24:5: error: passing argument 2 of 'text_layer_set_font' from incompatible pointer type [-Werror]
+In file included from ../src/include/cl_util.h:5:0,
+                 from ../src/include/cl_util.c:1:
+/home/pebble/.pebble-sdk/SDKs/current/sdk-core/pebble/basalt/include/pebble.h:6507:6: note: expected 'GFont' but argument is of type 'struct FontInfo **'
+cc1: all warnings being treated as errors
+Waf: Leaving directory `/pebble/watchfaces/cards/build'
+Build failed
+ -> task in 'basalt/pebble-app.elf' failed (exit status 1): 
+	{task 140333620997264: c cl_util.c -> cl_util.c.16.o}
+['arm-none-eabi-gcc', '-std=c99', '-mcpu=cortex-m3', '-mthumb', '-ffunction-sections', '-fdata-sections', '-g', '-fPIE', '-Os', '-D_TIME_H_', '-Wall', '-Wextra', '-Werror', '-Wno-unused-parameter', '-Wno-error=unused-function', '-Wno-error=unused-variable', '-I/home/pebble/.pebble-sdk/SDKs/current/sdk-core/pebble/basalt/include', '-I/pebble/watchfaces/cards/build', '-I/pebble/watchfaces/cards', '-I/pebble/watchfaces/cards/build/include', '-I/pebble/watchfaces/cards/include', '-I/pebble/watchfaces/cards/build/src', '-I/pebble/watchfaces/cards/src', '-I/pebble/watchfaces/cards/build/basalt', '-I/pebble/watchfaces/cards/basalt', '-DRELEASE', '-DPBL_PLATFORM_BASALT', '-DPBL_COLOR', '-DPBL_RECT', '-DPBL_MICROPHONE', '-DPBL_SMARTSTRAP', '-DPBL_HEALTH', '-DPBL_COMPASS', '-DPBL_SMARTSTRAP_POWER', '-DPBL_DISPLAY_WIDTH=144', '-DPBL_DISPLAY_HEIGHT=168', '-DPBL_SDK_3', '-D__FILE_NAME__="cl_util.c"', '../src/include/cl_util.c', '-c', '-o', 'src/include/cl_util.c.16.o']
+Build failed.
+Exit code for ./watchfaces/cards/: 1
+
+This project is very outdated, and cannot be handled by this SDK.
+Exit code for ./watchfaces/cmd-time-typed/: 1
+
+This project is very outdated, and cannot be handled by this SDK.
+Exit code for ./watchfaces/cmd-time/: 1
+
+An invalid value of '2' was found in the 'sdkVersion' field of the project's package.json. The latest supported value for this field is '3'.
+Exit code for ./watchfaces/divider-large-2/: 1
+
+Couldn't open project info.
+Exit code for ./watchfaces/divider-large/: 1
+
+An invalid value of '2' was found in the 'sdkVersion' field of the project's package.json. The latest supported value for this field is '3'.
+Exit code for ./watchfaces/divider-small-2/: 1
+
+Couldn't open project info.
+Exit code for ./watchfaces/divider-small/: 1
+
+An invalid value of '2' was found in the 'sdkVersion' field of the project's package.json. The latest supported value for this field is '3'.
+Exit code for ./watchfaces/eclipse/: 1
+
+Build failed
+Traceback (most recent call last):
+  File "/home/pebble/.pebble-sdk/SDKs/current/sdk-core/pebble/.waf-1.7.11-951087d39789950ed009f0c86ce75e7b/waflib/Task.py", line 123, in process
+    ret=self.run()
+  File "/home/pebble/.pebble-sdk/SDKs/current/sdk-core/pebble/.waf-1.7.11-951087d39789950ed009f0c86ce75e7b/waflib/Task.py", line 47, in run
+    return m1(self)
+  File "/home/pebble/.pebble-sdk/SDKs/current/sdk-core/pebble/.waf-1.7.11-951087d39789950ed009f0c86ce75e7b/waflib/extras/generate_resource_ball.py", line 13, in run
+    reso=resource_generator.generate_object(self,self.definition)
+  File "/home/pebble/.pebble-sdk/SDKs/current/sdk-core/pebble/common/waftools/resources/resource_map/resource_generator.py", line 76, in generate_object
+    return cls.generate_object(task, definition)
+  File "/home/pebble/.pebble-sdk/SDKs/current/sdk-core/pebble/common/waftools/resources/resource_map/resource_generator_font.py", line 42, in generate_object
+    font_data = cls.build_font_data(task.inputs[0].abspath(), definition)
+  File "/home/pebble/.pebble-sdk/SDKs/current/sdk-core/pebble/common/waftools/resources/resource_map/resource_generator_font.py", line 68, in build_font_data
+    font.build_tables()
+  File "/home/pebble/.pebble-sdk/SDKs/current/sdk-core/pebble/common/tools/font/fontgen.py", line 434, in build_tables
+    gindex, glyph_indices_lookup)
+  File "/home/pebble/.pebble-sdk/SDKs/current/sdk-core/pebble/common/tools/font/fontgen.py", line 383, in add_glyph
+    glyph_bits = self.glyph_bits(codepoint, gindex)
+  File "/home/pebble/.pebble-sdk/SDKs/current/sdk-core/pebble/common/tools/font/fontgen.py", line 329, in glyph_bits
+    format(codepoint, size, self.max_glyph_size, self.ttf_path))
+Exception: Glyph too large! codepoint 8240: 310 > 256. Font /pebble/watchfaces/eventful/resources/fonts/DS-DIGIB.TTF
+
+Build failed.
+Exit code for ./watchfaces/eventful/: 1
+
+An invalid value of '2' was found in the 'sdkVersion' field of the project's package.json. The latest supported value for this field is '3'.
+Exit code for ./watchfaces/events/: 1
+
+An invalid value of '2' was found in the 'sdkVersion' field of the project's package.json. The latest supported value for this field is '3'.
+Exit code for ./watchfaces/index/: 1
+
+AttributeError: 'task_gen' object has no attribute 'js_entry_file'
+Build failed.
+Exit code for ./watchfaces/isotime-appstore/: 1
+
+An invalid value of '2' was found in the 'sdkVersion' field of the project's package.json. The latest supported value for this field is '3'.
+Exit code for ./watchfaces/kitty-watchface/: 1
+
+An invalid value of '2' was found in the 'sdkVersion' field of the project's package.json. The latest supported value for this field is '3'.
+Exit code for ./watchfaces/past-present-future-extended/: 1
+
+An invalid value of '2' was found in the 'sdkVersion' field of the project's package.json. The latest supported value for this field is '3'.
+Exit code for ./watchfaces/past-present-future/: 1
+
+An invalid value of '2' was found in the 'sdkVersion' field of the project's package.json. The latest supported value for this field is '3'.
+Exit code for ./watchfaces/seven-segments-date/: 1
+
+An invalid value of '2' was found in the 'sdkVersion' field of the project's package.json. The latest supported value for this field is '3'.
+Exit code for ./watchfaces/seven-segments/: 1

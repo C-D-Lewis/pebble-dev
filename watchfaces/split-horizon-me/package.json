@@ -1,0 +1,58 @@
+{
+  "version": "1.0.0",
+  "author": "Chris Lewis",
+  "private": true,
+  "dependencies": {},
+  "keywords": [
+    "pebble-app"
+  ],
+  "pebble": {
+    "sdkVersion": "3",
+    "resources": {
+      "media": [
+        {
+          "type": "font",
+          "name": "FONT_IMAGINE_43",
+          "file": "fonts/imagine.ttf"
+        },
+        {
+          "type": "font",
+          "name": "FONT_IMAGINE_25",
+          "file": "fonts/imagine.ttf"
+        },
+        {
+          "type": "font",
+          "name": "FONT_IMAGINE_20",
+          "file": "fonts/imagine.ttf"
+        },
+        {
+          "menuIcon": true,
+          "type": "png",
+          "name": "IMAGE_MENU_ICON",
+          "file": "images/menu_icon.png"
+        }
+      ]
+    },
+    "projectType": "native",
+    "uuid": "baeca7e6-8772-41fa-b7ae-d1a8f6eaae0e",
+    "messageKeys": {
+      "dummy": 0
+    },
+    "enableMultiJS": false,
+    "displayName": "Split Horizon: Minutes Edition",
+    "watchapp": {
+      "onlyShownOnCommunication": false,
+      "hiddenApp": false,
+      "watchface": true
+    },
+    "targetPlatforms": [
+      "aplite",
+      "basalt",
+      "chalk",
+      "diorite",
+      "emery"
+    ],
+    "capabilities": []
+  },
+  "name": "SplitHorizonME"
+}

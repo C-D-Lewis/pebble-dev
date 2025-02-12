@@ -4,18 +4,22 @@ Repository with Pebble watchfaces, watchapps, and libraries - old and new.
 
 Projects here are mostly too old for the latest Pebble SDK.
 
-## Buildable projects
+## Watchfaces
 
-### Watchfaces
+* ✅ `brackets`
+* ✅ `dual-gauge`
+* ⚠️ `split-horizon-se` (crashes, InverterLayerCompat.c)
+* ✅ `split-horizon-pe`
+* ❌ `split-horizon-me` (old inverter layer)
+* ✅ `starfield-smooth`
+* ✅ `startfield-demo`
+* ✅ `time-dots-appstore`
 
-* `brackets`
-* `dual-gauge`
-* `split-horizen-se` (crashes, InverterLayerCompat.c)
-* `starfield-smooth`
-* `startfield-demo`
-* `time-dots-appstore`
+Others currently untested.
 
-### Watchapps
+## Watchapps
+
+Others currently untested.
 
 ## Develop in Docker
 
