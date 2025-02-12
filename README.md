@@ -6,23 +6,49 @@ Projects here are mostly too old for the latest Pebble SDK.
 
 ## Watchfaces
 
+* ⚠️ `split-horizon-se` (crashes, InverterLayerCompat.c)
 * ✅ `brackets`
 * ✅ `dual-gauge`
-* ❌ `cards` (custom fonts)
-* ❌ `cmd-time` (old inverter layer)
-* ❌ `cmd-time-typed` (old inverter layer)
-* ⚠️ `split-horizon-se` (crashes, InverterLayerCompat.c)
 * ✅ `split-horizon-pe`
-* ❌ `split-horizon-me` (old inverter layer)
 * ✅ `starfield-smooth`
 * ✅ `startfield-demo`
 * ✅ `time-dots-appstore`
-
-Others currently untested.
+* ❌ `cards` (custom fonts)
+* ❌ `cmd-time-typed` (old inverter layer)
+* ❌ `cmd-time` (old inverter layer)
+* ❌ `split-horizon-me` (old inverter layer)
+* ❔ divider-large
+* ❔ divider-large-2
+* ❔ divider-small
+* ❔ divider-small-2
+* ❔ eclipse
+* ❔ eventful
+* ❔ events
+* ❔ index
+* ❔ isotime-appstore
+* ❔ kitty-watchface
+* ❔ past-present-future
+* ❔ past-present-future-extended
+* ❔ seven-segments
+* ❔ seven-segments-date
 
 ## Watchapps
 
-Others currently untested.
+* ❔ bbc-news
+* ❔ block-world
+* ❔ data-toggle-android
+* ❔ data-toggle-pebble
+* ❔ modular-app-base
+* ❔ news-headlines
+* ❔ pebble-spark-base
+* ❔ pebble-spark-link
+* ❔ pebble-spark-link-2
+* ❔ pebble-subcard
+* ❔ pebble-tinker
+* ❔ pebble-trends
+* ❔ pebblejs-spark-base
+* ❔ pge-examples
+* ❔ tube-status
 
 ## Develop in Docker
 
