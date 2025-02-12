@@ -4,6 +4,18 @@ Repository with Pebble watchfaces, watchapps, and libraries - old and new.
 
 Projects here are mostly too old for the latest Pebble SDK.
 
+## Buildable projects
+
+### Watchfaces
+
+* `brackets`
+* `dual-gauge`
+* `starfield-smooth`
+* `split-horizen-se` (crashes, InverterLayerCompat.c)
+* `time-dots-appstore`
+
+### Watchapps
+
 ## Develop in Docker
 
 If you have a Docker image locally called `pebble-sdk`, the script
@@ -17,6 +29,22 @@ Such an image can be built with
 docker build -t pebble-sdk .
 ```
 
+Then run it pointing to a Pebble project directory:
+
+```
+./scripts/docker-dev.sh watchfaces/starfield-smooth
+```
+
+### Debugging
+
+Here are some errors encountered in old projects and the fixes I found:
+
+`Missing node_modules directory`
+
+Caused by invalid `name` in `package.json`
+
+
 ## Todo
 
 * Finish importing all previous Pebble projects
+* Fixup old projects
