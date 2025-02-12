@@ -1,0 +1,42 @@
+{
+  "version": "1.0.0",
+  "author": "Chris Lewis",
+  "private": true,
+  "dependencies": {},
+  "keywords": [
+    "pebble-app"
+  ],
+  "pebble": {
+    "sdkVersion": "3",
+    "resources": {
+      "media": [
+        {
+          "type": "font",
+          "name": "FONT_LUCIDA_16",
+          "file": "fonts/lucida.ttf"
+        }
+      ]
+    },
+    "projectType": "native",
+    "uuid": "d51a97f0-c6a5-4f83-8777-daa32a17c583",
+    "messageKeys": {
+      "dummy": 0
+    },
+    "enableMultiJS": false,
+    "displayName": "CMD Time Typed",
+    "watchapp": {
+      "onlyShownOnCommunication": false,
+      "hiddenApp": false,
+      "watchface": true
+    },
+    "targetPlatforms": [
+      "aplite",
+      "basalt",
+      "chalk",
+      "diorite",
+      "emery"
+    ],
+    "capabilities": []
+  },
+  "name": "CMD Time Typed"
+}

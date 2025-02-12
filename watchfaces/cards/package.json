@@ -1,0 +1,106 @@
+{
+  "version": "1.4.0",
+  "author": "Chris Lewis",
+  "private": true,
+  "dependencies": {},
+  "keywords": [
+    "pebble-app"
+  ],
+  "pebble": {
+    "sdkVersion": "3",
+    "resources": {
+      "media": [
+        {
+          "type": "png",
+          "name": "CARD",
+          "file": "images/card.png"
+        },
+        {
+          "type": "png",
+          "name": "BATTERY",
+          "file": "images/battery.png"
+        },
+        {
+          "type": "png",
+          "name": "BT",
+          "file": "images/bt.png"
+        },
+        {
+          "type": "png",
+          "name": "UNKNOWN",
+          "file": "images/unknown.png"
+        },
+        {
+          "type": "png",
+          "name": "SUN",
+          "file": "images/sun.png"
+        },
+        {
+          "type": "png",
+          "name": "CLOUD",
+          "file": "images/cloud.png"
+        },
+        {
+          "type": "png",
+          "name": "RAIN",
+          "file": "images/rain.png"
+        },
+        {
+          "type": "png",
+          "name": "MOON",
+          "file": "images/moon.png"
+        },
+        {
+          "type": "png",
+          "name": "CLOUD_NIGHT",
+          "file": "images/cloud_night.png"
+        },
+        {
+          "type": "png",
+          "name": "WIND",
+          "file": "images/wind.png"
+        },
+        {
+          "type": "png",
+          "name": "WIND_NIGHT",
+          "file": "images/wind_night.png"
+        },
+        {
+          "type": "png",
+          "name": "THUNDER",
+          "file": "images/thunder.png"
+        },
+        {
+          "type": "png",
+          "name": "MIST",
+          "file": "images/mist.png"
+        },
+        {
+          "type": "png",
+          "name": "MIST_NIGHT",
+          "file": "images/mist_night.png"
+        }
+      ]
+    },
+    "projectType": "native",
+    "uuid": "6cf63859-5f22-4c3a-9a76-e5d9db3f5ac9",
+    "messageKeys": {
+      "KEY_CONDITIONS": 1,
+      "KEY_LOCATION": 0,
+      "KEY_TEMPERATURE": 2
+    },
+    "enableMultiJS": false,
+    "displayName": "Cards",
+    "watchapp": {
+      "onlyShownOnCommunication": false,
+      "hiddenApp": false,
+      "watchface": true
+    },
+    "targetPlatforms": [
+      "aplite",
+      "basalt"
+    ],
+    "capabilities": []
+  },
+  "name": "Cards"
+}

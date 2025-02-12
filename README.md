@@ -8,6 +8,9 @@ Projects here are mostly too old for the latest Pebble SDK.
 
 * ✅ `brackets`
 * ✅ `dual-gauge`
+* ❌ `cards` (custom fonts)
+* ❌ `cmd-time` (old inverter layer)
+* ❌ `cmd-time-typed` (old inverter layer)
 * ⚠️ `split-horizon-se` (crashes, InverterLayerCompat.c)
 * ✅ `split-horizon-pe`
 * ❌ `split-horizon-me` (old inverter layer)
