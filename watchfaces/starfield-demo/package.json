@@ -1,0 +1,36 @@
+{
+  "version": "1.0.0",
+  "author": "Chris Lewis",
+  "private": true,
+  "dependencies": {},
+  "keywords": [
+    "pebble-app"
+  ],
+  "pebble": {
+    "sdkVersion": "3",
+    "resources": {
+      "media": []
+    },
+    "projectType": "native",
+    "uuid": "acf7a359-90d6-4cfb-9757-2e782a966505",
+    "messageKeys": {
+      "dummy": 0
+    },
+    "enableMultiJS": false,
+    "displayName": "Starfield Demo",
+    "watchapp": {
+      "onlyShownOnCommunication": false,
+      "hiddenApp": false,
+      "watchface": false
+    },
+    "targetPlatforms": [
+      "aplite",
+      "basalt",
+      "chalk",
+      "diorite",
+      "emery"
+    ],
+    "capabilities": []
+  },
+  "name": "Starfield Demo"
+}

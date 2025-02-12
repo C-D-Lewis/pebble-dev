@@ -10,8 +10,9 @@ Projects here are mostly too old for the latest Pebble SDK.
 
 * `brackets`
 * `dual-gauge`
-* `starfield-smooth`
 * `split-horizen-se` (crashes, InverterLayerCompat.c)
+* `starfield-smooth`
+* `startfield-demo`
 * `time-dots-appstore`
 
 ### Watchapps
@@ -39,9 +40,13 @@ Then run it pointing to a Pebble project directory:
 
 Here are some errors encountered in old projects and the fixes I found:
 
-`Missing node_modules directory`
+#### `Missing node_modules directory`
 
 Caused by invalid `name` in `package.json`
+
+#### `This project is very outdated, and cannot be handled by this SDK.`
+
+Missing `wscript`. Running `pebble convert-project` helped.
 
 
 ## Todo
