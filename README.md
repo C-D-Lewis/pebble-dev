@@ -50,6 +50,15 @@ Projects here are mostly too old for the latest Pebble SDK.
 * ❔ `pebblejs-spark-base`
 * ❔ `pge-examples`
 
+## Other
+
+Some projects live in their own repositories:
+
+* [thin](https://github.com/C-D-Lewis/thin)
+* [dashboard](https://github.com/C-D-Lewis/dashboard)
+* [beam-up](https://github.com/C-D-Lewis/beam-up)
+* [pge](https://github.com/C-D-Lewis/pge)
+
 ## Develop in Docker
 
 If you have a Docker image locally called `pebble-sdk`, the script
