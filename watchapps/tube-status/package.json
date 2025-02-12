@@ -1,6 +1,6 @@
 {
-  "name": "Tube Status",
-  "version": "3.4",
+  "name": "tube-status",
+  "version": "3.4.0",
   "author": "Chris Lewis",
   "private": true,
   "dependencies": {

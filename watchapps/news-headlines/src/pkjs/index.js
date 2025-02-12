@@ -1,5 +1,3 @@
-var config = require('./config.json');
-
 var DEBUG = false;  // Turn off for release
 var VERSION = '4.6';  // Match package.json
 var MAX_ITEMS = 20;   // Max feed items the app will display
@@ -541,7 +539,8 @@ Pebble.addEventListener('appmessage', function(dict) {
 
     // Get this image
     download(gCategory, function(responseText) {
-      downloadImage(responseText, hash, gImgSession);
+      // Unused
+      // downloadImage(responseText, hash, gImgSession);
     });
   }
 

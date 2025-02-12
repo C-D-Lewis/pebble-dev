@@ -1,5 +1,3 @@
-var config = require('./config.json');
-
 var VERSION = '3.4';
 var VERBOSE = true;
 var NEW_API = true;
@@ -133,6 +131,7 @@ function downloadNewAPI() {
       lineStates[i] = lines[i].lineStatuses[0].statusSeverityDescription;
     }
 
+    console.log(lineStates);
     sendToPebble(lineStates);
   });
   Log('Downloading from unified API...');

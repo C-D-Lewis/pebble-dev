@@ -2,7 +2,7 @@
 
 #include <pebble.h>
 
-#define VERBOSE false
+#define VERBOSE true
 #define VERSION "3.4"
 
 typedef enum {

@@ -71,6 +71,10 @@ static void timeout_handler(void *context) {
   settings_window_update_server_status(ServerStatusTimeout);
 }
 
+static void failed_callback() {
+  APP_LOG(APP_LOG_LEVEL_ERROR, "Packet send failed.");
+}
+
 void comm_get_server_status() {
   if(s_timeout_timer) {
     app_timer_cancel(s_timeout_timer);
@@ -79,7 +83,7 @@ void comm_get_server_status() {
 
   if(packet_begin()) {
     packet_put_integer(AppMessageKeyServerStatus, 0);
-    packet_send();
+    packet_send(failed_callback);
   }
 }
 
@@ -87,13 +91,13 @@ void comm_request_data() {
   // Tasty packets
   if(packet_begin()) {
     packet_put_integer(AppMessageKeyJSReady, 0);
-    packet_send();
+    packet_send(failed_callback);
   }
 }
 
 void comm_update_subscription_state() {
   if(packet_begin()) {
     packet_put_integer(AppMessageKeySubscriptionState, (int)settings_get_subscription_state());
-    packet_send();
+    packet_send(failed_callback);
   }
 }
