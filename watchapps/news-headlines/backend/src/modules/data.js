@@ -117,10 +117,7 @@ const insertUserPin = async (pin) => {
  * @param {number} index - Index of the story to push.
  */
 const pushPin = (stories, index) => {
-  // const pubDate = new Date(stories[index].date);
-  const pubDate = new Date();
-  pubDate.setHours(pubDate.getHours() + 12);
-
+  const pubDate = new Date(stories[index].date);
   const pin = {
     id: `news-headlines-story-${pubDate.getTime()}`,
     time: pubDate.toISOString(),
