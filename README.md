@@ -35,10 +35,7 @@ Projects here are mostly too old for the latest Pebble SDK.
 * ⚠️ `tube-status` (data sent, no reaction)
 * ✅ `block-world`
 * ✅ `news-headlines`
-* ❔ `data-toggle-android`
-* ❔ `data-toggle-pebble`
 * ❔ `modular-app-base`
-* ❔ `pebble-subcard`
 * ❔ `pge-examples`
 
 ## Other
