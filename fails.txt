@@ -70,17 +70,8 @@ Exit code for ./watchfaces/cmd-time/: 1
 An invalid value of '2' was found in the 'sdkVersion' field of the project's package.json. The latest supported value for this field is '3'.
 Exit code for ./watchfaces/divider-large-2/: 1
 
-Couldn't open project info.
-Exit code for ./watchfaces/divider-large/: 1
-
 An invalid value of '2' was found in the 'sdkVersion' field of the project's package.json. The latest supported value for this field is '3'.
 Exit code for ./watchfaces/divider-small-2/: 1
-
-Couldn't open project info.
-Exit code for ./watchfaces/divider-small/: 1
-
-An invalid value of '2' was found in the 'sdkVersion' field of the project's package.json. The latest supported value for this field is '3'.
-Exit code for ./watchfaces/eclipse/: 1
 
 Build failed
 Traceback (most recent call last):
@@ -109,9 +100,6 @@ Exit code for ./watchfaces/eventful/: 1
 
 An invalid value of '2' was found in the 'sdkVersion' field of the project's package.json. The latest supported value for this field is '3'.
 Exit code for ./watchfaces/events/: 1
-
-An invalid value of '2' was found in the 'sdkVersion' field of the project's package.json. The latest supported value for this field is '3'.
-Exit code for ./watchfaces/index/: 1
 
 Traceback (most recent call last):
   File "/home/pebble/.pebble-sdk/SDKs/current/sdk-core/pebble/.waf-1.7.11-951087d39789950ed009f0c86ce75e7b/waflib/Scripting.py", line 97, in waf_entry_point

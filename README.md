@@ -9,6 +9,8 @@ Projects here are mostly too old for the latest Pebble SDK.
 * ⚠️ `split-horizon-se` (crashes, InverterLayerCompat.c)
 * ✅ `brackets`
 * ✅ `dual-gauge`
+* ✅ `eclipse`
+* ✅ `index`
 * ✅ `split-horizon-pe`
 * ✅ `starfield-smooth`
 * ✅ `startfield-demo`
@@ -19,13 +21,9 @@ Projects here are mostly too old for the latest Pebble SDK.
 * ❌ `isotime-appstore` (pebble-pge-simple reference)
 * ❌ `split-horizon-me` (old inverter layer)
 * ❔ `divider-large-2`
-* ❔ `divider-large`
 * ❔ `divider-small-2`
-* ❔ `divider-small`
-* ❔ `eclipse`
 * ❔ `eventful`
 * ❔ `events`
-* ❔ `index`
 * ❔ `kitty-watchface`
 * ❔ `past-present-future-extended`
 * ❔ `past-present-future`
@@ -37,20 +35,17 @@ Projects here are mostly too old for the latest Pebble SDK.
 * ⚠️ `tube-status` (data sent, no reaction)
 * ✅ `block-world`
 * ✅ `news-headlines`
-* ❔ `bbc-news`
 * ❔ `data-toggle-android`
 * ❔ `data-toggle-pebble`
 * ❔ `modular-app-base`
-* ❔ `pebble-spark-base`
-* ❔ `pebble-spark-link-2`
-* ❔ `pebble-spark-link`
 * ❔ `pebble-subcard`
-* ❔ `pebble-tinker`
-* ❔ `pebble-trends`
-* ❔ `pebblejs-spark-base`
 * ❔ `pge-examples`
 
 ## Other
+
+Defunct, incomplete, or PoC things live here.
+
+## Other repositories
 
 Some projects live in their own repositories:
 
@@ -92,6 +87,17 @@ Caused by `version` that was missing patch component.
 
 Missing `wscript`. Running `pebble convert-project` helped.
 
+#### An invalid value of '2' was found in the 'sdkVersion' field of the project's package.json. The latest supported value for this field is '3'.
+
+(Even when it's not true) - manually update `appinfo.json` to the more recent `package.json` format from another working project, field by field.
+
+#### waf-looking errors or resource indice errors
+
+Copy `wscript` from a working project.
+
+#### Missing images
+
+As of SDK 3, some image resource types like `png` were deprecated.
 
 ## Todo
 

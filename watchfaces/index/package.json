@@ -1,0 +1,46 @@
+{
+  "name": "index",
+  "version": "1.0.0",
+  "author": "Chris Lewis",
+  "private": true,
+  "keywords": [
+    "pebble-app"
+  ],
+  "pebble": {
+    "sdkVersion": "3",
+    "resources": {
+      "media": [
+        {
+          "type": "font",
+          "name": "FONT_41",
+          "file": "fonts/gillsans.ttf"
+        },
+        {
+          "type": "font",
+          "name": "FONT_24",
+          "file": "fonts/gillsans.ttf"
+        }
+      ]
+    },
+    "projectType": "native",
+    "uuid": "b7de44cf-2aad-47a4-b6f7-4b7982cfe36c",
+    "messageKeys": {
+      "dummy": 0
+    },
+    "enableMultiJS": false,
+    "displayName": "Index",
+    "watchapp": {
+      "onlyShownOnCommunication": false,
+      "hiddenApp": false,
+      "watchface": true
+    },
+    "targetPlatforms": [
+      "aplite",
+      "basalt",
+      "chalk",
+      "diorite"
+    ],
+    "capabilities": []
+  },
+  "dependencies": {}
+}
