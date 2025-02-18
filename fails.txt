@@ -182,35 +182,11 @@ Build failed
 Build failed.
 Exit code for ./watchfaces/split-horizon-me/: 1
 
-An invalid value of '2' was found in the 'sdkVersion' field of the project's package.json. The latest supported value for this field is '3'.
-Exit code for ./watchapps/bbc-news/: 1
-
 Couldn't open project info.
 Exit code for ./watchapps/data-toggle-android/: 1
 
 This project is very outdated, and cannot be handled by this SDK.
 Exit code for ./watchapps/data-toggle-pebble/: 1
-
-An invalid value of '2' was found in the 'sdkVersion' field of the project's package.json. The latest supported value for this field is '3'.
-Exit code for ./watchapps/pebble-spark-base/: 1
-
-An invalid value of '2' was found in the 'sdkVersion' field of the project's package.json. The latest supported value for this field is '3'.
-Exit code for ./watchapps/pebble-spark-link-2/: 1
-
-An invalid value of '2' was found in the 'sdkVersion' field of the project's package.json. The latest supported value for this field is '3'.
-Exit code for ./watchapps/pebble-spark-link/: 1
-
-An invalid value of '2' was found in the 'sdkVersion' field of the project's package.json. The latest supported value for this field is '3'.
-Exit code for ./watchapps/pebble-subcard/: 1
-
-An invalid value of '2' was found in the 'sdkVersion' field of the project's package.json. The latest supported value for this field is '3'.
-Exit code for ./watchapps/pebble-tinker/: 1
-
-An invalid value of '2' was found in the 'sdkVersion' field of the project's package.json. The latest supported value for this field is '3'.
-Exit code for ./watchapps/pebble-trends/: 1
-
-This is not a project directory.
-Exit code for ./watchapps/pebblejs-spark-base/: 1
 
 This is not a project directory.
 Exit code for ./watchapps/pge-examples/: 1

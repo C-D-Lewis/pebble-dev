@@ -1,5 +1,13 @@
-const NODE_COMMON_DIR = `${__dirname}/../../../../node-common/`;
-[ 'boot', 'compare', 'config', 'db', 'eventBus', 'extract', 'fcm', 'gistSync', 
-  'ip', 'ledServerClient', 'leds', 'log', 'conduit', 'motePhat', 'server',
-  'testBed' 
-].forEach((item) => module.exports[item] = () => require(NODE_COMMON_DIR + item));
+const USER = process.env.USER || 'pi';
+const path = `/home/${USER}/code/node-microservices`;
+
+/**
+ * Import modules directly from the node-common project in this repo.
+ *
+ * @param {string[]} list - Array of modules names.
+ * @returns {Object[]} Array of loaded modules.
+ */
+module.exports = (list) => list.reduce((acc, item) => ({
+  ...acc,
+  [item]: require(`${path}/node-common/src/modules/${item}`),
+}), {});

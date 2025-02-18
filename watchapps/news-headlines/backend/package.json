@@ -3,13 +3,11 @@
   "version": "1.0.0",
   "description": "News Headlines backend server",
   "scripts": {
-    "start": "node src/main.js",
-    "deploy": "ssh pi@$SERVER_PI \"cd /home/pi/servers/news-headlines/backend && git pull origin master && sudo reboot\""
+    "start": "node src/index.js"
   },
   "dependencies": {
-    "express": "4.10.0",
-    "moment-timezone": "0.5.5",
-    "pebble-timeline-js-node": "^1.1.0",
-    "request": "2.74.0"
+    "dotenv": "^16.4.7",
+    "node-fetch": "^2.7.0",
+    "pebble-timeline-js-node": "^1.1.0"
   }
 }
