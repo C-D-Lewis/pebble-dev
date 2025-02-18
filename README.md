@@ -84,7 +84,7 @@ Caused by `version` that was missing patch component.
 
 Missing `wscript`. Running `pebble convert-project` helped.
 
-#### An invalid value of '2' was found in the 'sdkVersion' field of the project's package.json. The latest supported value for this field is '3'.
+#### `An invalid value of '2' was found in the 'sdkVersion' field of the project's package.json. The latest supported value for this field is '3'.`
 
 (Even when it's not true) - manually update `appinfo.json` to the more recent `package.json` format from another working project, field by field.
 
