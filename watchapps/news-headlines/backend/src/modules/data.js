@@ -2,11 +2,14 @@
 const fetch = require('node-fetch');
 // const timelinejs = require('pebble-timeline-js-node');
 
-const { API_KEY_PROD, API_KEY_SANDBOX } = process.env;
+const { API_KEY_PROD } = process.env;
 
+/** API URL for RWS timeline */
 const API_URL_ROOT = 'https://timeline-api.rebble.io/';
-const MAX_PUSHED = 1; // Max pins pushed each INTERVAL. Prevents infamous timeline blob db errors.
-const MAX_DUPLICATES = 50; // Max 'already pushed' stories
+/** Max pins pushed each INTERVAL. Prevents infamous timeline blob db errors. */
+const MAX_PUSHED = 1;
+/** Max 'already pushed' stories */
+const MAX_DUPLICATES = 50;
 
 // Check new stories against the last MAX_DUPLICATES to prevent hour-later duplucates
 const dupeBuffer = [];
@@ -94,7 +97,7 @@ const insertUserPin = async (pin) => {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
-      'X-User-Token': API_KEY_SANDBOX,
+      'X-User-Token': API_KEY_PROD,
     },
     body: JSON.stringify(pin),
   });
