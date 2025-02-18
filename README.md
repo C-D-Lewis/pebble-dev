@@ -34,9 +34,9 @@ Projects here are mostly too old for the latest Pebble SDK.
 
 * ⚠️ `tube-status` (data sent, no reaction)
 * ✅ `block-world`
+* ✅ `modular-app-base`
 * ✅ `news-headlines`
-* ❔ `modular-app-base`
-* ❔ `pge-examples`
+* ❌ `pge-examples` (needs ref to pge package)
 
 ## Other
 
