@@ -3,11 +3,20 @@
   "version": "1.0.0",
   "description": "News Headlines backend server",
   "scripts": {
-    "start": "node src/index.js"
+    "start": "node src/index.js",
+    "lint": "eslint src --fix",
+    "format": "prettier --write src/**/*.js"
   },
   "dependencies": {
     "dotenv": "^16.4.7",
     "node-fetch": "^2.7.0",
     "pebble-timeline-js-node": "^1.1.0"
+  },
+  "devDependencies": {
+    "@chris-lewis/eslint-config": "^1.0.3",
+    "prettier": "^3.5.1"
+  },
+  "eslintConfig": {
+    "extends": "@chris-lewis/eslint-config"
   }
 }
