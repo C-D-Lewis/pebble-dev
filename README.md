@@ -11,6 +11,7 @@ Projects here are mostly too old for the latest Pebble SDK.
 * ✅ `dual-gauge`
 * ✅ `eclipse`
 * ✅ `index`
+* ✅ `kitty-watchface`
 * ✅ `split-horizon-pe`
 * ✅ `starfield-smooth`
 * ✅ `startfield-demo`
@@ -24,7 +25,6 @@ Projects here are mostly too old for the latest Pebble SDK.
 * ❔ `divider-small-2`
 * ❔ `eventful`
 * ❔ `events`
-* ❔ `kitty-watchface`
 * ❔ `past-present-future-extended`
 * ❔ `past-present-future`
 * ❔ `seven-segments-date`

@@ -1,0 +1,46 @@
+{
+  "name": "kitty",
+  "version": "1.0.0",
+  "author": "Chris Lewis",
+  "private": true,
+  "keywords": [
+    "pebble-app"
+  ],
+  "pebble": {
+    "sdkVersion": "3",
+    "resources": {
+      "media": [
+        {
+          "type": "png",
+          "name": "KITTY",
+          "file": "images/kitty.png"
+        },
+        {
+          "type": "font",
+          "name": "FONT_SILOM_BOL_40",
+          "file": "fonts/SilomBol.ttf"
+        }
+      ]
+    },
+    "projectType": "native",
+    "uuid": "1406ab58-94f6-41de-8ea4-7d633b9a22d9",
+    "messageKeys": {
+      "dummy": 0
+    },
+    "enableMultiJS": false,
+    "displayName": "Kitty",
+    "watchapp": {
+      "onlyShownOnCommunication": false,
+      "hiddenApp": false,
+      "watchface": true
+    },
+    "targetPlatforms": [
+      "aplite",
+      "basalt",
+      "diorite"
+    ],
+    "capabilities": []
+  },
+  "dependencies": {}
+}
+
