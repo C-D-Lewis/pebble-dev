@@ -44,7 +44,7 @@ Defunct, incomplete, or PoC things live here.
 
 ## Other repositories
 
-Some projects still live in their own repositories:
+Some larger projects still live in their own repositories:
 
 * ✅ [thin](https://github.com/C-D-Lewis/thin)
 * ✅ [dashboard](https://github.com/C-D-Lewis/dashboard)
