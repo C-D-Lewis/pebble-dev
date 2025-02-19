@@ -44,12 +44,12 @@ Defunct, incomplete, or PoC things live here.
 
 ## Other repositories
 
-Some projects live in their own repositories:
+Some projects still live in their own repositories:
 
-* [thin](https://github.com/C-D-Lewis/thin)
-* [dashboard](https://github.com/C-D-Lewis/dashboard)
-* [beam-up](https://github.com/C-D-Lewis/beam-up)
-* [pge](https://github.com/C-D-Lewis/pge)
+* ✅ [thin](https://github.com/C-D-Lewis/thin)
+* ✅ [dashboard](https://github.com/C-D-Lewis/dashboard)
+* ✅ [beam-up](https://github.com/C-D-Lewis/beam-up)
+* ✅ [pge](https://github.com/C-D-Lewis/pge)
 
 ## Develop in Docker
 
