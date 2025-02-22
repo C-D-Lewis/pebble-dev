@@ -12,11 +12,6 @@
       "media": [
         {
           "type": "bitmap",
-          "name": "BACKGROUND",
-          "file": "images/background_transparent.png"
-        },
-        {
-          "type": "bitmap",
           "name": "BT_OFF",
           "file": "images/bt_off.png"
         },
@@ -47,6 +42,7 @@
     "targetPlatforms": [
       "aplite",
       "basalt",
+      "chalk",
       "diorite"
     ],
     "capabilities": []
