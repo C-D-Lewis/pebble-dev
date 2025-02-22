@@ -203,11 +203,7 @@ static void accel_tap_handler(AccelAxisType axis, int32_t direction) {
 
 static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
   static char buff[8];
-  if (clock_is_24h_style()) {
-    strftime(buff, 8 * sizeof(char), "%H:%M", tick_time);
-  } else {
-    strftime(buff, 8 * sizeof(char), "%I:%M", tick_time);
-  }
+  strftime(buff, 8 * sizeof(char), clock_is_24h_style() ? "%H:%M" : "%I:%M", tick_time);
   text_layer_set_text(s_time_layer, buff);
 
   static char date_buff[16];
