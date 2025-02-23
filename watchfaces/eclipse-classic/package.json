@@ -1,0 +1,55 @@
+{
+  "name": "eclipse",
+  "version": "1.1.0",
+  "author": "Chris Lewis",
+  "private": true,
+  "keywords": [
+    "pebble-app"
+  ],
+  "pebble": {
+    "sdkVersion": "3",
+    "resources": {
+      "media": [
+        {
+          "type": "bitmap",
+          "name": "BACKGROUND",
+          "file": "images/background_transparent.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "BT_OFF",
+          "file": "images/bt_off.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "BT_ON",
+          "file": "images/bt_on.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "POWER",
+          "file": "images/power.png"
+        }
+      ]
+    },
+    "projectType": "native",
+    "uuid": "e76b7110-f6ca-4aaf-8e41-2e69bcf8cc9e",
+    "messageKeys": {
+      "dummy": 0
+    },
+    "enableMultiJS": false,
+    "displayName": "Eclipse",
+    "watchapp": {
+      "onlyShownOnCommunication": false,
+      "hiddenApp": false,
+      "watchface": true
+    },
+    "targetPlatforms": [
+      "aplite",
+      "basalt",
+      "diorite"
+    ],
+    "capabilities": []
+  },
+  "dependencies": {}
+}
