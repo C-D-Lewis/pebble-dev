@@ -14,7 +14,7 @@ const MAX_DUPLICATES = 50;
 // Check new stories against the last MAX_DUPLICATES to prevent hour-later duplucates
 const dupeBuffer = [];
 // Don't post pins right away - stateful
-let cached = true;
+let cached = false;
 
 /**
  * Extract text from a larger block with locator strings.
@@ -91,6 +91,8 @@ const getStories = (xml) => {
  * @param {object} pin - Pin to insert.
  */
 const insertUserPin = async (pin) => {
+  if (!API_KEY_PROD) throw new Error('API_KEY_PROD is not set in .env');
+
   const url = `${API_URL_ROOT}v1/user/pins/${pin.id}`;
 
   const res = await fetch(url, {
