@@ -6,7 +6,7 @@
 #define GRECT_HOUR_LAYER GRect(0, Y_ROOT, WIDTH, 50)
 #define ARC_RADIUS 50
 #define ARC_WIDTH 10
-#define ARC_COLOR PBL_IF_COLOR_ELSE(GColorIcterine, GColorWhite)
+#define ARC_COLOR PBL_IF_COLOR_ELSE(GColorYellow, GColorWhite)
 #define ARC_BG_COLOR PBL_IF_COLOR_ELSE(GColorDarkGray, GColorBlack)
 
 static const int ARC_X = (WIDTH - (ARC_RADIUS * 2)) / 2;
