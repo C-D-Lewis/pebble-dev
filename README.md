@@ -2,7 +2,10 @@
 
 Repository with Pebble watchfaces, watchapps, and libraries - old and new.
 
-Projects here are mostly too old for the latest Pebble SDK.
+Projects here are mostly too old for the latest Pebble SDK, working status is
+shown in the lists below.
+
+Some PBWs can be found in `/pbw` for sideloading.
 
 ## Watchfaces
 

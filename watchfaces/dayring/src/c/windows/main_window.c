@@ -40,10 +40,14 @@ static void tick_handler(struct tm *tick_time, TimeUnits changed) {
 static void ring_layer_update_proc(Layer *layer, GContext *ctx) {
   GRect bounds = layer_get_bounds(layer);
 
-  graphics_context_set_stroke_width(ctx, ARC_WIDTH);
-
   // Ring background
-	graphics_context_set_stroke_color(ctx, ARC_BG_COLOR);
+#if defined(PBL_COLOR)
+  graphics_context_set_stroke_width(ctx, ARC_WIDTH);
+  graphics_context_set_stroke_color(ctx, ARC_BG_COLOR);
+#else
+  graphics_context_set_stroke_width(ctx, 1);
+  graphics_context_set_stroke_color(ctx, GColorWhite);
+#endif
   graphics_draw_arc(
     ctx,
     GRect(ARC_X, ARC_Y, ARC_RADIUS * 2, ARC_RADIUS * 2),
@@ -58,6 +62,7 @@ static void ring_layer_update_proc(Layer *layer, GContext *ctx) {
 
   bool is_night = s_hours < 6 || s_hours >= 18;
   GColor color = is_night ? ARC_COLOR_NIGHT : ARC_COLOR_DAY;
+  graphics_context_set_stroke_width(ctx, ARC_WIDTH);
 	graphics_context_set_stroke_color(ctx, color);
   graphics_draw_arc(
     ctx,
