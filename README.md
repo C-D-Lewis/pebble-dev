@@ -8,6 +8,7 @@ Projects here are mostly too old for the latest Pebble SDK.
 
 * ⚠️ `split-horizon-se` (crashes, InverterLayerCompat.c)
 * ✅ `brackets`
+* ✅ `dayring`
 * ✅ `dual-gauge`
 * ✅ `eclipse`
 * ✅ `index`
@@ -19,6 +20,7 @@ Projects here are mostly too old for the latest Pebble SDK.
 * ❌ `cards` (custom fonts)
 * ❌ `cmd-time-typed` (old inverter layer)
 * ❌ `cmd-time` (old inverter layer)
+* ❌ `eclipse-solar` (WIP)
 * ❌ `isotime-appstore` (pebble-pge-simple reference)
 * ❌ `split-horizon-me` (old inverter layer)
 * ❔ `divider-large-2`
