@@ -32,7 +32,9 @@
     },
     "targetPlatforms": [
       "aplite",
-      "chalk"
+      "basalt",
+      "chalk",
+      "diorite"
     ],
     "capabilities": []
   },
