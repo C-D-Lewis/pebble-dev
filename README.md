@@ -16,6 +16,7 @@ Some PBWs can be found in `/pbw` for sideloading.
 * ✅ `eclipse`
 * ✅ `index`
 * ✅ `kitty-watchface`
+* ✅ `pseudotime`
 * ✅ `split-horizon-pe`
 * ✅ `starfield-smooth`
 * ✅ `startfield-demo`
