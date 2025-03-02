@@ -9,40 +9,44 @@ Some PBWs can be found in `/pbw` for sideloading.
 
 ## Watchfaces
 
-* ⚠️ `split-horizon-se` (crashes, InverterLayerCompat.c)
-* ✅ `brackets`
-* ✅ `dayring`
-* ✅ `dual-gauge`
-* ✅ `eclipse`
-* ✅ `index`
-* ✅ `kitty-watchface`
-* ✅ `pseudotime`
-* ✅ `split-horizon-pe`
-* ✅ `starfield-smooth`
-* ✅ `startfield-demo`
-* ✅ `time-dots-appstore`
-* ❌ `cards` (custom fonts)
-* ❌ `cmd-time-typed` (old inverter layer)
-* ❌ `cmd-time` (old inverter layer)
-* ❌ `eclipse-solar` (WIP)
-* ❌ `isotime-appstore` (pebble-pge-simple reference)
-* ❌ `split-horizon-me` (old inverter layer)
-* ❔ `divider-large-2`
-* ❔ `divider-small-2`
-* ❔ `eventful`
-* ❔ `events`
-* ❔ `past-present-future-extended`
-* ❔ `past-present-future`
-* ❔ `seven-segments-date`
-* ❔ `seven-segments`
+| Name | Status | PBW |
+|------|--------|-----|
+| `split-horizon-se` | ⚠️ (crashes, InverterLayerCompat.c) | |
+| `brackets` | ✅ | [brackets.pbw](pbw/brackets.pbw) |
+| `dayring` | ✅ | [dayring.pbw](pbw/dayring.pbw) |
+| `dual-gauge` | ✅ | |
+| `eclipse` | ✅ | [eclipse.pbw](pbw/eclipse.pbw) |
+| `index` | ✅ | [index.pbw](pbw/index.pbw) |
+| `kitty-watchface` | ✅ | [kitty-watchface.pbw](pbw/kitty-watchface.pbw) |
+| `pseudotime` | ✅ | [pseudotime.pbw](pbw/pseudotime.pbw) |
+| `split-horizon-pe` | ✅ | [split-horizon-pe.pbw](pbw/split-horizon-pe.pbw) |
+| `starfield-smooth` | ✅ | [starfield-smooth.pbw](pbw/starfield-smooth.pbw) |
+| `startfield-demo` | ✅ | |
+| `time-dots-appstore` | ✅ | [time-dots-appstore.pbw](pbw/time-dots-appstore.pbw) |
+| `cards` | ❌ (custom fonts) | |
+| `cmd-time-typed` | ❌ (old inverter layer) | |
+| `cmd-time` | ❌ (old inverter layer) | |
+| `eclipse-solar` | ❌ (WIP) | |
+| `isotime-appstore` | ❌ (pebble-pge-simple reference) | |
+| `split-horizon-me` | ❌ (old inverter layer) | |
+| `divider-large-2` | ❔ | |
+| `divider-small-2` | ❔ | |
+| `eventful` | ❔ | |
+| `events` | ❔ | |
+| `past-present-future-extended` | ❔ | |
+| `past-present-future` | ❔ | |
+| `seven-segments-date` | ❔ | |
+| `seven-segments` | ❔ | |
 
 ## Watchapps
 
-* ⚠️ `tube-status` (data sent, no reaction)
-* ✅ `block-world`
-* ✅ `modular-app-base`
-* ✅ `news-headlines`
-* ❌ `pge-examples` (needs ref to pge package)
+| Name | Status | PBW |
+|------|--------|-----|
+| `tube-status`  | ⚠️ (data sent, no reaction) | |
+| `block-world` | ✅ | [block-world.pbw](pbw/block-world.pbw) |
+| `modular-app-base` | ✅ | [modular-app-base.pbw](pbw/modular-app-base.pbw) |
+| `news-headlines` | ✅ | [news-headlines.pbw](pbw/news-headlines.pbw) |
+| `pge-examples` | ❌ (needs ref to pge package) | |
 
 ## Other
 
