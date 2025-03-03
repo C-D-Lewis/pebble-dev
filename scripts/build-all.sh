@@ -32,7 +32,7 @@ function build_project {
     $COMMAND
     echo "Exit code for $1: $?"
 
-    # Copy the build
+    # Copy the build - note that generatedAt field means they will be new in git
     name=$(basename $1)
     cp "./build/$name.pbw" "../../pbw/$name.pbw"
     cd ../..
