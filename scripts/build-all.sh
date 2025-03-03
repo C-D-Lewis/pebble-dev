@@ -10,6 +10,7 @@ working_projects=$(cat <<EOF
 ./watchfaces/dayring/
 ./watchfaces/dual-gauge/
 ./watchfaces/eclipse/
+./watchfaces/hollywatch/
 ./watchfaces/index/
 ./watchfaces/kitty-watchface/
 ./watchfaces/pseudotime/
@@ -18,10 +19,10 @@ working_projects=$(cat <<EOF
 ./watchfaces/startfield-demo/
 ./watchfaces/timedots-appstore/
 
-./watchapps/tube-status/
 ./watchapps/block-world/
 ./watchapps/module-app-base/
 ./watchapps/news-headlines/
+./watchapps/tube-status/
 EOF
 )
 
