@@ -16,6 +16,7 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `dayring` | ✅ | [dayring.pbw](pbw/dayring.pbw) |
 | `dual-gauge` | ✅ | |
 | `eclipse` | ✅ | [eclipse.pbw](pbw/eclipse.pbw) |
+| `hollywatch` | ✅ | [hollywatch.pbw](pbw/hollywatch.pbw) |
 | `index` | ✅ | [index.pbw](pbw/index.pbw) |
 | `kitty-watchface` | ✅ | [kitty-watchface.pbw](pbw/kitty-watchface.pbw) |
 | `pseudotime` | ✅ | [pseudotime.pbw](pbw/pseudotime.pbw) |
@@ -108,5 +109,6 @@ As of SDK 3, some image resource types like `png` were deprecated.
 
 ## Todo
 
-* Finish importing all previous Pebble projects
-* Fixup old projects
+- [] Finish importing all previous Pebble projects
+- [] Fix build in GitHub Actions
+

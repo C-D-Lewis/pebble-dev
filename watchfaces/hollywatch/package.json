@@ -1,0 +1,41 @@
+{
+  "version": "1.0.0",
+  "author": "Chris Lewis",
+  "private": true,
+  "dependencies": {},
+  "keywords": [
+    "pebble-app"
+  ],
+  "pebble": {
+    "sdkVersion": "3",
+    "resources": {
+      "media": [
+        {
+          "type": "bitmap",
+          "name": "HOLLY",
+          "file": "images/holly.png"
+        }
+      ]
+    },
+    "projectType": "native",
+    "uuid": "9c7d1ad6-8637-4a2d-b064-114d4ad985bb",
+    "messageKeys": {
+      "dummy": 0
+    },
+    "enableMultiJS": true,
+    "displayName": "hollywatch",
+    "watchapp": {
+      "onlyShownOnCommunication": false,
+      "hiddenApp": false,
+      "watchface": true
+    },
+    "targetPlatforms": [
+      "aplite",
+      "basalt",
+      "chalk",
+      "diorite"
+    ],
+    "capabilities": []
+  },
+  "name": "hollywatch"
+}
