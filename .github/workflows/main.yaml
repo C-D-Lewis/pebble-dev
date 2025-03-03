@@ -12,8 +12,5 @@ jobs:
       - name: Build Pebble SDK image
         run: ./scripts/build-pebble-sdk-image.sh
 
-      - name: Ownership
-        run: whoami && id
-
       - name: Test build all projects
-        run: ./scripts/build-all.sh "docker run --rm -e HOME=/home/pebble/ -v .:/pebble/ --user $(id -u):$(id -g) pebble-sdk pebble build"
+        run: ./scripts/build-all.sh "docker run --rm -e HOME=/home/pebble/ -v .:/pebble/ pebble-sdk pebble build"
