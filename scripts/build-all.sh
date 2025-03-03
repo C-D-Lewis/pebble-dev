@@ -29,7 +29,6 @@ function build_project {
   if echo "$working_projects" | grep -q ".*$1.*"; then
     echo "Building $1"
     cd $1
-    pwd
     $COMMAND
     echo "Exit code for $1: $?"
 
