@@ -8,12 +8,29 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
-      - name: Build Pebble SDK image
-        run: ./scripts/build-pebble-sdk-image.sh
-
+      # - name: Build Pebble SDK image
+      #   run: ./scripts/build-pebble-sdk-image.sh
       - name: Ownership
         run: whoami && id
+      # - name: Test build all projects
+      #   run: ./scripts/build-all.sh "docker run --rm -v .:/pebble/ --user $(id -u):$(id -g) pebble-sdk pebble build"
 
-      - name: Test build all projects
-        run: ./scripts/build-all.sh "docker run --rm -v .:/pebble/ --user $(id -u):$(id -g) pebble-sdk pebble build"
+# Building ./watchfaces/brackets/
+# Traceback (most recent call last):
+#   File "/opt/pebble-sdk-4.5-linux64/pebble-tool/pebble.py", line 4, in <module>
+#     import pebble_tool
+#   File "/opt/pebble-sdk-4.5-linux64/pebble-tool/pebble_tool/__init__.py", line 11, in <module>
+#     from .sdk import sdk_version
+#   File "/opt/pebble-sdk-4.5-linux64/pebble-tool/pebble_tool/sdk/__init__.py", line 8, in <module>
+#     from .manager import SDKManager, pebble_platforms
+#   File "/opt/pebble-sdk-4.5-linux64/pebble-tool/pebble_tool/sdk/manager.py", line 20, in <module>
+#     from pebble_tool.util.config import config
+#   File "/opt/pebble-sdk-4.5-linux64/pebble-tool/pebble_tool/util/config.py", line 34, in <module>
+#     config = Config()
+#   File "/opt/pebble-sdk-4.5-linux64/pebble-tool/pebble_tool/util/config.py", line 13, in __init__
+#     self.path = os.path.join(get_persist_dir(), 'settings.json')
+#   File "/opt/pebble-sdk-4.5-linux64/pebble-tool/pebble_tool/util/__init__.py", line 13, in get_persist_dir
+#     os.makedirs(dir)
+#   File "/usr/local/lib/python2.7/os.py", line 157, in makedirs
+#     mkdir(name, mode)
+# OSError: [Errno 13] Permission denied: '/.pebble-sdk'
