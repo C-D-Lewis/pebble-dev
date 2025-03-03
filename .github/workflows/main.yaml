@@ -9,11 +9,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       
-      # - name: Build Pebble SDK image
-      #   run: ./scripts/build-pebble-sdk-image.sh
+      - name: Build Pebble SDK image
+        run: ./scripts/build-pebble-sdk-image.sh
 
       - name: Ownership
         run: whoami && id
 
-      # - name: Test build all projects
-      #   run: ./scripts/build-all.sh "docker run --rm -v .:/pebble/ pebble-sdk pebble build"
+      - name: Test build all projects
+        run: ./scripts/build-all.sh "docker run --rm -v .:/pebble/ --user $(id -u):$(id -g) pebble-sdk pebble build"
