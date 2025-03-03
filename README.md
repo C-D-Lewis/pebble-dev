@@ -74,10 +74,10 @@ Such an image can be built with
 docker build -t pebble-sdk .
 ```
 
-Then run it pointing to a Pebble project directory:
+Then run it pointing to a project directory:
 
 ```
-./scripts/docker-dev.sh watchfaces/starfield-smooth
+./scripts/docker-dev.sh
 ```
 
 ### Debugging

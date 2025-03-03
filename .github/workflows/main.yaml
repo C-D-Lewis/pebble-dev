@@ -1,0 +1,16 @@
+name: build
+on:
+  push:
+    branches:
+      - master
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Build Pebble SDK image
+        run: ./scripts/build-pebble-sdk-image.sh
+
+      - name: Test build all projects
+        run: ./scripts/build-all.sh "docker run --rm -it -v .:/pebble/ pebble-sdk pebble build"
