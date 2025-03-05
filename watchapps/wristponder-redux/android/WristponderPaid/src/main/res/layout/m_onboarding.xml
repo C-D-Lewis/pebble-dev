@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/main_color"
+    android:fitsSystemWindows="true" >
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:background="#FFFFFF"
+        android:padding="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:textSize="20sp"
+            android:text="Welcome!\n\nIn order for Wristponder to work properly, please grant the following permissions:"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:paddingTop="20dp"
+                    android:id="@+id/write_external_storage"
+                    android:text="Write to External Storage \n- Save your responses and favourite contacts."
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:paddingTop="10dp"
+                    android:id="@+id/read_sms"
+                    android:text="Read SMS \n- Keep track of the most common incoming contacts."
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:paddingTop="10dp"
+                    android:id="@+id/read_contacts"
+                    android:text="Read Contacts \n- Look up contact names to use for replies and set favourite contacts."
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:paddingTop="10dp"
+                    android:id="@+id/send_sms"
+                    android:text="Send SMS \n- Send your responses!"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:paddingTop="10dp"
+                    android:id="@+id/read_phone_state"
+                    android:text="Read Phone State \n- Keep track of the last caller."
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:paddingTop="10dp"
+                    android:id="@+id/receive_sms"
+                    android:text="Receive SMS \n- Launch the watchapp when an SMS is received."
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:paddingTop="10dp"
+                    android:id="@+id/write_sms"
+                    android:text="Write SMS \n- Add a response SMS to the provider database, so it shows up in your SMS conversation history."
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:paddingTop="10dp"
+                    android:id="@+id/internet"
+                    android:text="Internet \n- Download the 'Latest News' section of the Settings page."
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+
+        </ScrollView>
+
+    </LinearLayout>
+
+</LinearLayout>

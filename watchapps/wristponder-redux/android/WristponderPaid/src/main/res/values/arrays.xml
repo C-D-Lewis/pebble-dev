@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="array_sort_modes">
+        <item>atoz</item>
+        <item>ztoa</item>
+    </string-array>
+    <string-array name="human_sort_modes">
+        <item>Alphabetic A-Z</item>
+        <item>Alphabetic Z-A</item>
+    </string-array>
+
+</resources>

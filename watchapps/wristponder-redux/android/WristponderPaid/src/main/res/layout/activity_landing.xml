@@ -1,0 +1,70 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/main_color"
+    android:fitsSystemWindows="true" >
+
+    <LinearLayout
+        android:id="@+id/install_layout"
+        android:background="#FFFFFF"
+        android:layout_alignParentTop="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/install_button"
+            android:layout_margin="5dp"
+            android:textSize="17sp"
+            android:layout_alignParentTop="true"
+            android:text="Install/Update Watchapp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/sep3"
+        android:layout_width="fill_parent"
+        android:layout_height="2dp"
+        android:layout_below="@id/install_layout"
+        android:background="@color/main_color" />
+
+    <ListView
+        android:id="@+id/response_list"
+        android:background="#EEEEEE"
+        android:layout_below="@id/sep3"
+        android:layout_above="@+id/sep2"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" />
+
+    <TextView
+        android:id="@id/sep2"
+        android:layout_width="fill_parent"
+        android:layout_height="3dp"
+        android:layout_above="@+id/capacity_label"
+        android:background="@color/main_color" />
+
+    <TextView
+        android:id="@+id/capacity_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_margin="5dp"
+        android:text="0 slots used"
+        android:textColor="#FFFFFF"
+        android:textSize="15sp" />
+
+    <ProgressBar
+        android:id="@+id/capacity_progress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/capacity_label"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_toLeftOf="@id/capacity_label" />
+
+</RelativeLayout>

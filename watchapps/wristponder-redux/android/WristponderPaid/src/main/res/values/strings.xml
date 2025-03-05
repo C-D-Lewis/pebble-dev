@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Wristponder</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_section1">Section 1</string>
+    <string name="title_section2">Section 2</string>
+    <string name="title_section3">Section 3</string>
+    <string name="title_activity_landing">Landing</string>
+
+    <!-- ActionBar items -->
+    <string name="add_new">Add New</string>
+    <string name="settings">Settings</string>
+    <string name="importf">Import from file</string>
+    <string name="exportf">Export to file</string>
+    <string name="watchapp">Install watchapp</string>
+    <string name="action_save">Save</string>
+
+    <!-- Context Menu -->
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
+
+    <!-- Preferences -->
+    <string name="pref_title_comm">Communication</string>
+    <string name="pref_delay_title">AppMessage Delay</string>
+    <string name="pref_delay_body">Delay between AppMessages in milliseconds. Increase this if you are having problems.</string>
+    <string name="pref_title_general">General</string>
+    <string name="pref_title_data">Contact Data</string>
+
+    <!-- About -->
+    <string name="pref_header_about">About</string>
+    <string name="pref_about_title">Wristponder v3.1 by Chris Lewis</string>
+    <string name="pref_about_body">Tap for debug log</string>
+    <string name="pref_latest_title">Latest News</string>
+    <string name="pref_issues_title">Known Issues</string>
+
+    <!-- File -->
+    <string name="pref_sort_title">Sort Mode</string>
+    <string name="pref_title_file">Manage Responses</string>
+    <string name="pref_importf_title">Import</string>
+    <string name="pref_importf_body">Import a list of responses from a local text (.txt) file.</string>
+    <string name="pref_exportf_title">Export</string>
+    <string name="pref_exportf_body">Export a list of responses to a local text (.txt) file.</string>
+
+    <!-- Watchapp -->
+    <string name="pref_title_watchapp">Watchapp</string>
+    <string name="pref_watchapp_title">Install Watchapp</string>
+    <string name="pref_force_title">Force Sync</string>
+    <string name="pref_force_body">Force a sync of responses next time the watchapp is opened.</string>
+
+    <!-- Feedback -->
+    <string name="pref_header_feedback">Bugs/Feedback?</string>
+    <string name="pref_feedback_tweet">Tweet</string>
+    <string name="pref_feedback_email">E-mail Developer</string>
+    <string name="pref_feedback_blog">Developer Blog</string>
+    <string name="pref_feedback_rate">Leave a rating</string>
+
+    <!-- Autoclose -->
+    <string name="pref_autoclose_title">Auto-close</string>
+    <string name="pref_autoclose_body">Automatically close the watchapp after SMS is successfully sent.</string>
+
+    <!-- Autostart -->
+    <string name="pref_autostart_title">Auto-start (Experimental)</string>
+    <string name="pref_autostart_body">Automatically start the watchapp after an SMS or phone call is received.</string>
+
+    <!-- Notify -->
+    <string name="pref_notify_title">Notify Success</string>
+    <string name="pref_notify_body">Post a notification when the response is successfully sent.</string>
+
+    <!-- Reset data -->
+    <string name="pref_reset_title">Reset Most Frequent</string>
+    <string name="pref_reset_body">Reset the counting data for the most frequent received SMS contacts.</string>
+    <string name="pref_topfive_title">Most Frequent Senders</string>
+
+    <!-- Set favourites -->
+    <string name="pref_fav_title">Set Favourite Contacts</string>
+    <string name="pref_fav_body">Choose your favourite contacts</string>
+    <string name="select_favs">Select five favourite contacts:</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="favs">Favourites</string>
+    
+    <!-- Logs -->
+    <string name="pref_log_title">View Debug Log</string>
+    <string name="pref_log_body">Send a log file to help fix bugs</string>
+
+</resources>

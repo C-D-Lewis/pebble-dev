@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.wordpress.ninedof.wristponder"
+    android:versionCode="26"
+    android:versionName="3.0" >
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_SMS" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <uses-permission android:name="android.permission.WRITE_SMS" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/MaterialTheme" >
+        <activity
+            android:name="activity.Landing"
+            android:screenOrientation="portrait"
+            android:theme="@style/MaterialTheme"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="activity.Settings"
+            android:theme="@style/MaterialTheme"
+            android:screenOrientation="portrait"
+            android:label="@string/app_name"
+            android:parentActivityName="activity.Landing" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="activity.Favourites"
+            android:theme="@style/MaterialTheme"
+            android:screenOrientation="portrait"
+            android:label="@string/app_name"
+            android:parentActivityName="activity.Settings" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="activity.MOnboarding"
+            android:theme="@style/MaterialTheme"
+            android:screenOrientation="portrait"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="activity.LogViewer"
+            android:theme="@style/MaterialTheme"
+            android:screenOrientation="portrait"
+            android:label="@string/app_name"
+            android:parentActivityName="activity.Settings" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+        </activity>
+
+        <receiver
+            android:name="pebble.PebbleReceiver"
+            android:enabled="true"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="com.getpebble.action.app.RECEIVE" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name="pebble.PushService"
+            android:enabled="true" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+        </service>
+
+        <receiver android:name="phone.CallerBroadcastReceiver" >
+            <intent-filter>
+                <action android:name="android.intent.action.PHONE_STATE" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name="phone.SMSReceiver" >
+            <intent-filter>
+                <action android:name="android.provider.Telephony.SMS_RECEIVED" />
+            </intent-filter>
+        </receiver>
+    </application>
+
+</manifest>

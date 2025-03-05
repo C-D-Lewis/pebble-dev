@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="MaterialTheme" parent="android:Theme.Material.Light.DarkActionBar">
+        <item name="android:colorPrimary">@color/main_color</item>
+        <item name="android:statusBarColor">@color/main_color_dark</item>
+        <item name="android:colorAccent">@color/main_color_dark</item>
+        <item name="android:actionBarStyle">@style/MaterialTheme.ActionBar</item>
+    </style>
+
+    <style name="MaterialTheme.ActionBar" parent="@android:style/Widget.Holo.Light.ActionBar">
+        <item name="android:background">@color/main_color</item>
+        <item name="android:titleTextStyle">@style/MaterialTheme.ActionBar.Text</item>
+        <item name="android:logo">@android:color/transparent</item>
+    </style>
+
+    <style name="MaterialTheme.ActionBar.Text" parent="@android:style/TextAppearance">
+        <item name="android:textColor">@color/actionBarText</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    
+</resources>

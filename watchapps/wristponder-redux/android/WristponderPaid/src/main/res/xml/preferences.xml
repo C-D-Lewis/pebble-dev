@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <PreferenceCategory android:title="@string/pref_title_general" >
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="pref_key_autoclose"
+            android:summary="@string/pref_autoclose_body"
+            android:title="@string/pref_autoclose_title" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="pref_key_autostart"
+            android:summary="@string/pref_autostart_body"
+            android:title="@string/pref_autostart_title" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/pref_title_data" >
+        <Preference
+            android:key="pref_key_topfive"
+            android:title="@string/pref_topfive_title" />
+        <Preference
+            android:key="pref_key_reset"
+            android:summary="@string/pref_reset_body"
+            android:title="@string/pref_reset_title" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/pref_title_file" >
+        <ListPreference
+            android:key="pref_key_sort_string"
+            android:title="@string/pref_sort_title" >
+        </ListPreference>
+
+        <Preference
+            android:key="pref_key_importf"
+            android:summary="@string/pref_importf_body"
+            android:title="@string/pref_importf_title" >
+        </Preference>
+        <Preference
+            android:key="pref_key_exportf"
+            android:summary="@string/pref_exportf_body"
+            android:title="@string/pref_exportf_title" >
+        </Preference>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/pref_header_about" >
+        <Preference
+            android:key="pref_key_version"
+            android:title="@string/pref_about_title" >
+        </Preference>
+        <Preference
+            android:key="pref_key_latest"
+            android:title="@string/pref_latest_title" >
+        </Preference>
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Feedback" >
+        <Preference
+            android:icon="@drawable/tweet"
+            android:key="pref_key_tweet"
+            android:summary="\@Chris_DL"
+            android:title="Tweet Developer" >
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="http://twitter.com/Chris_DL" />
+        </Preference>
+        <Preference
+            android:icon="@drawable/mailsrc"
+            android:key="pref_key_email"
+            android:summary="Bonsitm@gmail.com"
+            android:title="Email Developer" >
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="mailto:bonsitm@gmail.com?subject=Wristponder Feedback" >
+            </intent>
+        </Preference>
+        <Preference
+            android:icon="@drawable/rate"
+            android:key="pref_key_rate"
+            android:summary="Google Play"
+            android:title="Rate This App" >
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="https://play.google.com/store/apps/details?id=com.wordpress.ninedof.wristponder" />
+        </Preference>
+        <Preference
+            android:icon="@drawable/wordpress"
+            android:key="pref_key_blog"
+            android:summary="ninedof.wordpress.com"
+            android:title="Read Developer Blog" >
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="http://ninedof.wordpress.com" />
+        </Preference>
+        <Preference
+            android:icon="@drawable/paypal"
+            android:summary="Found this app useful? Donations greatly appreciated!"
+            android:title="Donate to Developer" >
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="https://www.paypal.me/chrislewis1" />
+        </Preference>
+    </PreferenceCategory>
+</PreferenceScreen>
