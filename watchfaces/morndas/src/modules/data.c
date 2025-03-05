@@ -1,6 +1,6 @@
-#include "dict.h"
+#include "data.h"
 
-char* dict_get_weekday(int day) {
+char* data_get_weekday(int day) {
   switch(day) {
     case 0: return "Sundas";
     case 1: return "Morndas";
@@ -13,7 +13,7 @@ char* dict_get_weekday(int day) {
   }
 }
 
-char* dict_get_month(int month) {
+char* data_get_month(int month) {
   switch(month) {
     case 0: return "Morning Star";
     case 1: return "Sun's Dawn";
