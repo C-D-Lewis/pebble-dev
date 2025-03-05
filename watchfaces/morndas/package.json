@@ -1,0 +1,40 @@
+{
+  "version": "1.0.0",
+  "author": "Chris Lewis",
+  "private": true,
+  "dependencies": {},
+  "keywords": [
+    "pebble-app"
+  ],
+  "pebble": {
+    "sdkVersion": "3",
+    "resources": {
+      "media": [
+        {
+          "type": "bitmap",
+          "name": "BACKGROUND",
+          "file": "images/background.png"
+        }
+      ]
+    },
+    "projectType": "native",
+    "uuid": "2d5a99c4-fc56-497e-a2e8-9747a848b07b",
+    "messageKeys": {
+      "dummy": 0
+    },
+    "enableMultiJS": false,
+    "displayName": "morndas",
+    "watchapp": {
+      "onlyShownOnCommunication": false,
+      "hiddenApp": false,
+      "watchface": true
+    },
+    "targetPlatforms": [
+      "aplite",
+      "basalt",
+      "diorite"
+    ],
+    "capabilities": []
+  },
+  "name": "morndas"
+}

@@ -2,7 +2,7 @@
 
 set -eu
 
-COMMAND=${1:-pebble build}
+COMMAND=${1:-pebble}
 
 # Projects expected to build successfully
 working_projects=$(cat <<EOF
@@ -13,6 +13,7 @@ working_projects=$(cat <<EOF
 ./watchfaces/hollywatch/
 ./watchfaces/index/
 ./watchfaces/kitty-watchface/
+./watchfaces/morndas/
 ./watchfaces/pseudotime/
 ./watchfaces/split-horizon-pe/
 ./watchfaces/starfield-smooth/
@@ -30,7 +31,8 @@ function build_project {
   if echo "$working_projects" | grep -q ".*$1.*"; then
     echo "Building $1"
     cd $1
-    $COMMAND
+    $COMMAND clean
+    $COMMAND build
     echo "Exit code for $1: $?"
 
     # Copy the build - note that generatedAt field means they will be new in git

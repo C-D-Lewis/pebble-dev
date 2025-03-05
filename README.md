@@ -19,6 +19,7 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `hollywatch` | ✅ | [hollywatch.pbw](pbw/hollywatch.pbw) |
 | `index` | ✅ | [index.pbw](pbw/index.pbw) |
 | `kitty-watchface` | ✅ | [kitty-watchface.pbw](pbw/kitty-watchface.pbw) |
+| `morndas` | ✅ | [morndas.pbw](pbw/morndas.pbw) |
 | `pseudotime` | ✅ | [pseudotime.pbw](pbw/pseudotime.pbw) |
 | `split-horizon-pe` | ✅ | [split-horizon-pe.pbw](pbw/split-horizon-pe.pbw) |
 | `starfield-smooth` | ✅ | [starfield-smooth.pbw](pbw/starfield-smooth.pbw) |
