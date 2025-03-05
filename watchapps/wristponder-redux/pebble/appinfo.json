@@ -1,0 +1,82 @@
+{
+  "uuid": "9f37b7d8-e818-4d37-a8d2-420bd44dfc8b",
+  "shortName": "Wristponder",
+  "longName": "Wristponder",
+  "companyName": "Chris Lewis",
+  "versionCode": 27,
+  "versionLabel": "3.1",
+  "targetPlatforms": [
+    "aplite",
+    "basalt",
+    "chalk"
+  ],
+  "sdkVersion": "3",
+  "watchapp": {
+    "watchface": false
+  },
+  "appKeys": {},
+  "resources": {
+    "media": [
+      {
+        "file": "images/sms.png",
+        "type": "pbi",
+        "name": "SMS"
+      },
+      {
+        "file": "images/phone.png",
+        "type": "pbi",
+        "name": "PHONE"
+      },
+      {
+        "file": "images/arrow.png",
+        "type": "pbi",
+        "name": "ARROW"
+      },
+      {
+        "file": "images/heart.png",
+        "type": "pbi",
+        "name": "HEART"
+      },
+      {
+        "type": "bitmap",
+        "name": "APP_ICON_LARGE",
+        "file": "images/app_icon_large.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "ARROWS",
+        "file": "images/arrows.png"
+      },
+      {
+        "type": "raw",
+        "name": "SENT_SEQUENCE",
+        "file": "commands/sent_sequence.pdc"
+      },
+      {
+        "type": "bitmap",
+        "name": "SENT_IMAGE",
+        "file": "images/sent_image.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "MIC",
+        "file": "images/mic.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "FAILED",
+        "file": "images/failed.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "SUCCESS",
+        "file": "images/success.png"
+      },
+      {
+        "type": "bitmap",
+        "name": "TICK",
+        "file": "images/tick.png"
+      }
+    ]
+  }
+}
