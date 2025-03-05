@@ -49,6 +49,7 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `modular-app-base` | ✅ | [modular-app-base.pbw](pbw/modular-app-base.pbw) |
 | `news-headlines` | ✅ | [news-headlines.pbw](pbw/news-headlines.pbw) |
 | `pge-examples` | ❌ (needs ref to pge package) | |
+| `wristponder-redux` | ❌ (unfinished re-write) | |
 
 ## Other
 
