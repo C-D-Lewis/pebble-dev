@@ -14,7 +14,7 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `split-horizon-se` | ⚠️ (crashes, InverterLayerCompat.c) | |
 | `brackets` | ✅ | [brackets.pbw](pbw/brackets.pbw) |
 | `dayring` | ✅ | [dayring.pbw](pbw/dayring.pbw) |
-| `dual-gauge` | ✅ | |
+| `dual-gauge` | ✅ | [dual-gauge.pbw](pbw/dual-gauge.pbw) |
 | `eclipse` | ✅ | [eclipse.pbw](pbw/eclipse.pbw) |
 | `hollywatch` | ✅ | [hollywatch.pbw](pbw/hollywatch.pbw) |
 | `index` | ✅ | [index.pbw](pbw/index.pbw) |
@@ -23,7 +23,7 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `pseudotime` | ✅ | [pseudotime.pbw](pbw/pseudotime.pbw) |
 | `split-horizon-pe` | ✅ | [split-horizon-pe.pbw](pbw/split-horizon-pe.pbw) |
 | `starfield-smooth` | ✅ | [starfield-smooth.pbw](pbw/starfield-smooth.pbw) |
-| `startfield-demo` | ✅ | |
+| `startfield-demo` | ✅ | [starfield-demo.pbw](pbw/starfield-demo.pbw) |
 | `time-dots-appstore` | ✅ | [time-dots-appstore.pbw](pbw/time-dots-appstore.pbw) |
 | `cards` | ❌ (custom fonts) | |
 | `cmd-time-typed` | ❌ (old inverter layer) | |
