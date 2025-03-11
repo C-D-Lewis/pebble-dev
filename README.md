@@ -20,6 +20,7 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `index` | ✅ | [index.pbw](pbw/index.pbw) |
 | `kitty-watchface` | ✅ | [kitty-watchface.pbw](pbw/kitty-watchface.pbw) |
 | `morndas` | ✅ | [morndas.pbw](pbw/morndas.pbw) |
+| `past-present-future` | ✅ | [past-present-future.pbw](pbw/past-present-future.pbw) |
 | `pseudotime` | ✅ | [pseudotime.pbw](pbw/pseudotime.pbw) |
 | `split-horizon-pe` | ✅ | [split-horizon-pe.pbw](pbw/split-horizon-pe.pbw) |
 | `starfield-smooth` | ✅ | [starfield-smooth.pbw](pbw/starfield-smooth.pbw) |
@@ -36,7 +37,6 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `eventful` | ❔ | |
 | `events` | ❔ | |
 | `past-present-future-extended` | ❔ | |
-| `past-present-future` | ❔ | |
 | `seven-segments-date` | ❔ | |
 | `seven-segments` | ❔ | |
 

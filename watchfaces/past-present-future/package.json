@@ -1,0 +1,61 @@
+{
+  "version": "1.1.0",
+  "author": "Chris Lewis",
+  "private": true,
+  "dependencies": {},
+  "keywords": [
+    "pebble-app"
+  ],
+  "pebble": {
+    "sdkVersion": "3",
+    "resources": {
+      "media": [
+        {
+          "characterRegex": "[0-9 A-Z]",
+          "type": "font",
+          "name": "FONT_MEGAFONT_22",
+          "file": "fonts/megafont.ttf"
+        },
+        {
+          "type": "bitmap",
+          "name": "PAST",
+          "file": "images/past.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "PRESENT",
+          "file": "images/present.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "FUTURE",
+          "file": "images/future.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "MASK",
+          "file": "images/mask.png"
+        }
+      ]
+    },
+    "projectType": "native",
+    "uuid": "79a5fca6-e512-4db9-81f7-b87bbcf8da16",
+    "messageKeys": {
+      "dummy": 0
+    },
+    "enableMultiJS": false,
+    "displayName": "past-present-future",
+    "watchapp": {
+      "onlyShownOnCommunication": false,
+      "hiddenApp": false,
+      "watchface": true
+    },
+    "targetPlatforms": [
+      "aplite",
+      "basalt",
+      "diorite"
+    ],
+    "capabilities": []
+  },
+  "name": "past-present-future"
+}
