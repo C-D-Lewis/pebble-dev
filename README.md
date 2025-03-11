@@ -59,10 +59,12 @@ Defunct, incomplete, or PoC things live here.
 
 Some larger projects still live in their own repositories:
 
-* ✅ [thin](https://github.com/C-D-Lewis/thin)
-* ✅ [dashboard](https://github.com/C-D-Lewis/dashboard)
-* ✅ [beam-up](https://github.com/C-D-Lewis/beam-up)
-* ✅ [pge](https://github.com/C-D-Lewis/pge)
+| Name | Status | PBW |
+|------|--------|-----|
+| [thin](https://github.com/C-D-Lewis/thin) | ✅ | [thin.pbw](pbw/thin.pbw) |
+| [dashboard](https://github.com/C-D-Lewis/dashboard) | ✅ | [dashboard.pbw](pbw/dashboard.pbw) |
+| [beam-up](https://github.com/C-D-Lewis/beam-up) | ✅ | [beam-up.pbw](pbw/beam-up.pbw) |
+| [pge](https://github.com/C-D-Lewis/pge) | ✅ | [pge.pbw](pbw/pge.pbw) (test app) |
 
 ## Develop in Docker
 
