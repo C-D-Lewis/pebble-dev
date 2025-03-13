@@ -1,0 +1,58 @@
+{
+  "version": "1.0.0",
+  "author": "Chris Lewis",
+  "private": true,
+  "dependencies": {},
+  "keywords": [
+    "pebble-app"
+  ],
+  "pebble": {
+    "sdkVersion": "3",
+    "resources": {
+      "media": [
+        {
+          "type": "font",
+          "name": "OSTRICH_REGULAR_16",
+          "file": "fonts/ostrich-regular.ttf",
+          "characterRegex": "[A-Z]"
+        },
+        {
+          "type": "font",
+          "name": "OSTRICH_HEAVY_22",
+          "file": "fonts/ostrich-heavy.ttf",
+          "characterRegex": "[A-Z0-9 ]"
+        },
+        {
+          "type": "font",
+          "name": "OSTRICH_HEAVY_40",
+          "file": "fonts/ostrich-heavy.ttf",
+          "characterRegex": "[0-9 HXT]"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLASS_ICON_SCOUT",
+          "file": "images/scout.png"
+        }
+      ]
+    },
+    "projectType": "native",
+    "uuid": "f96eea53-0d04-4763-a051-3561eceb726c",
+    "messageKeys": {
+      "dummy": 0
+    },
+    "enableMultiJS": false,
+    "displayName": "deep-rock",
+    "watchapp": {
+      "onlyShownOnCommunication": false,
+      "hiddenApp": false,
+      "watchface": true
+    },
+    "targetPlatforms": [
+      "aplite",
+      "basalt",
+      "diorite"
+    ],
+    "capabilities": []
+  },
+  "name": "deep-rock"
+}

@@ -10,6 +10,5 @@ dist.zip
 node_modules/
 
 # Other
-releases
 *.DS_Store
 
