@@ -13,6 +13,7 @@ Some PBWs can be found in `/pbw` for sideloading.
 |------|--------|-----|
 | `split-horizon-se` | ⚠️ (crashes, InverterLayerCompat.c) | |
 | `brackets` | ✅ | [brackets.pbw](pbw/brackets.pbw) |
+| `cmd-time` | ✅ | [cmd-time.pbw](pbw/cmd-time.pbw) |
 | `dayring` | ✅ | [dayring.pbw](pbw/dayring.pbw) |
 | `dual-gauge` | ✅ | [dual-gauge.pbw](pbw/dual-gauge.pbw) |
 | `eclipse` | ✅ | [eclipse.pbw](pbw/eclipse.pbw) |
@@ -28,7 +29,6 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `time-dots-appstore` | ✅ | [time-dots-appstore.pbw](pbw/time-dots-appstore.pbw) |
 | `cards` | ❌ (custom fonts) | |
 | `cmd-time-typed` | ❌ (old inverter layer) | |
-| `cmd-time` | ❌ (old inverter layer) | |
 | `eclipse-solar` | ❌ (WIP) | |
 | `isotime-appstore` | ❌ (pebble-pge-simple reference) | |
 | `split-horizon-me` | ❌ (old inverter layer) | |

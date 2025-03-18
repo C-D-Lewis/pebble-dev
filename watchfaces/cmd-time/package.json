@@ -23,7 +23,7 @@
       "dummy": 0
     },
     "enableMultiJS": false,
-    "displayName": "CMD Time",
+    "displayName": "cmd-time",
     "watchapp": {
       "onlyShownOnCommunication": false,
       "hiddenApp": false,
@@ -38,5 +38,5 @@
     ],
     "capabilities": []
   },
-  "name": "CMD Time"
+  "name": "cmd-time"
 }
