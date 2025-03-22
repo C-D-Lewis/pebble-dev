@@ -9,6 +9,7 @@ working_projects=$(cat <<EOF
 ./watchfaces/brackets/
 ./watchfaces/cmd-time/
 ./watchfaces/dayring/
+./watchfaces/deep-rock/
 ./watchfaces/dual-gauge/
 ./watchfaces/eclipse/
 ./watchfaces/hollywatch/

@@ -20,18 +20,43 @@
           "type": "font",
           "name": "OSTRICH_HEAVY_22",
           "file": "fonts/ostrich-heavy.ttf",
-          "characterRegex": "[A-Z0-9 ]"
+          "characterRegex": "[A-Za-z0-9 ]"
         },
         {
           "type": "font",
           "name": "OSTRICH_HEAVY_40",
           "file": "fonts/ostrich-heavy.ttf",
-          "characterRegex": "[0-9 HXT]"
+          "characterRegex": "[0-9 :HXT]"
         },
         {
           "type": "bitmap",
-          "name": "CLASS_ICON_SCOUT",
+          "name": "CLASS_SCOUT",
           "file": "images/scout.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLASS_GUNNER",
+          "file": "images/gunner.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLASS_DRILLER",
+          "file": "images/driller.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLASS_ENGINEER",
+          "file": "images/engineer.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "ICON_SHIELD",
+          "file": "images/shield.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "ICON_HEALTH",
+          "file": "images/health.png"
         }
       ]
     },
@@ -52,7 +77,9 @@
       "basalt",
       "diorite"
     ],
-    "capabilities": []
+    "capabilities": [
+      "health"
+    ]
   },
   "name": "deep-rock"
 }

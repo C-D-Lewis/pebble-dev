@@ -15,6 +15,7 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `brackets` | ✅ | [brackets.pbw](pbw/brackets.pbw) |
 | `cmd-time` | ✅ | [cmd-time.pbw](pbw/cmd-time.pbw) |
 | `dayring` | ✅ | [dayring.pbw](pbw/dayring.pbw) |
+| `deep-rock` | ✅ | [deep-rock.pbw](pbw/deep-rock.pbw) |
 | `dual-gauge` | ✅ | [dual-gauge.pbw](pbw/dual-gauge.pbw) |
 | `eclipse` | ✅ | [eclipse.pbw](pbw/eclipse.pbw) |
 | `hollywatch` | ✅ | [hollywatch.pbw](pbw/hollywatch.pbw) |
