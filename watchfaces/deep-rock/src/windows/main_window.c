@@ -32,7 +32,7 @@
 static Window *s_window;
 static TextLayer *s_date_layer, *s_time_layer, *s_time_label_layer, *s_date_label_layer, *s_class_name_layer;
 static BitmapLayer *s_class_icon_layer, *s_shield_icon_layer, *s_health_icon_layer;
-static Layer *s_item_bg_layer;
+static Layer *s_shapes_layer;
 
 static GBitmap *s_class_icon_bitmap, *s_shield_icon_bitmap, *s_health_icon_bitmap;
 static GPath *s_time_label_bg_path;
@@ -59,6 +59,7 @@ static const GPathInfo DATE_LABEL_PATH_INFO = {
     {PBL_IF_COLOR_ELSE(X_ROOT, X_ROOT - 1), DATE_Y_ROOT}
   }
 };
+
 static char s_class_name[16];
 static int s_class_icon_id;
 static int s_battery_perc;
@@ -92,7 +93,7 @@ static void update_class_data() {
   }
 }
 
-static void item_bg_update_proc(Layer *layer, GContext *ctx) {
+static void shapes_update_proc(Layer *layer, GContext *ctx) {
   // Background areas
 #if defined(PBL_COLOR)
   graphics_context_set_fill_color(ctx, ITEM_BG_COLOR);
@@ -147,28 +148,32 @@ static void item_bg_update_proc(Layer *layer, GContext *ctx) {
 }
 
 #if defined(PBL_HEALTH)
-static void health_handler(HealthEventType event, void *context) {
-  if (event != HealthEventMovementUpdate) return;
-
+static void update_step_count() {
   HealthMetric metric = HealthMetricStepCount;
   time_t start = time_start_of_today();
   time_t end = time(NULL);
 
   HealthServiceAccessibilityMask mask = health_service_metric_accessible(metric, start, end);
-  if(mask & HealthServiceAccessibilityMaskAvailable) {
+  if (mask & HealthServiceAccessibilityMaskAvailable) {
     s_steps = (int)health_service_sum_today(metric);
   } else {
     s_steps = 0;
   }
 
-  layer_mark_dirty(s_item_bg_layer);
+  layer_mark_dirty(s_shapes_layer);
+}
+
+static void health_handler(HealthEventType event, void *context) {
+  if (event != HealthEventMovementUpdate) return;
+
+  update_step_count();
 }
 #endif
 
 static void battery_handler(BatteryChargeState state) {
   s_battery_perc = state.charge_percent;
 
-  layer_mark_dirty(s_item_bg_layer);
+  layer_mark_dirty(s_shapes_layer);
 }
 
 static void tick_handler(struct tm *tick_time, TimeUnits changed) {
@@ -204,6 +209,11 @@ static void tick_handler(struct tm *tick_time, TimeUnits changed) {
   if (s_class_icon_bitmap) gbitmap_destroy(s_class_icon_bitmap);
   s_class_icon_bitmap = gbitmap_create_with_resource(s_class_icon_id);
   bitmap_layer_set_bitmap(s_class_icon_layer, s_class_icon_bitmap);
+
+#if defined(PBL_HEALTH)
+  // Update step count even when no steps are taken (i.e: overnight)
+  update_step_count();
+#endif
 }
 
 static void window_load(Window *window) {
@@ -220,9 +230,9 @@ static void window_load(Window *window) {
   s_shield_icon_bitmap = gbitmap_create_with_resource(RESOURCE_ID_ICON_SHIELD);
   s_health_icon_bitmap = gbitmap_create_with_resource(RESOURCE_ID_ICON_HEALTH);
 
-  s_item_bg_layer = layer_create(bounds);
-  layer_set_update_proc(s_item_bg_layer, item_bg_update_proc);
-  layer_add_child(window_layer, s_item_bg_layer);
+  s_shapes_layer = layer_create(bounds);
+  layer_set_update_proc(s_shapes_layer, shapes_update_proc);
+  layer_add_child(window_layer, s_shapes_layer);
 
   s_time_layer = text_layer_create(GRect(X_ROOT + 4, TIME_Y_ROOT - 6, bounds.size.w, bounds.size.h));
   text_layer_set_text_color(s_time_layer, TEXT_COLOR);
@@ -281,7 +291,7 @@ static void window_unload(Window *window) {
   bitmap_layer_destroy(s_class_icon_layer);
   bitmap_layer_destroy(s_shield_icon_layer);
   bitmap_layer_destroy(s_health_icon_layer);
-  layer_destroy(s_item_bg_layer);
+  layer_destroy(s_shapes_layer);
 
   gbitmap_destroy(s_class_icon_bitmap);
   gpath_destroy(s_time_label_bg_path);
@@ -306,7 +316,7 @@ void main_window_push() {
   tick_timer_service_subscribe(MINUTE_UNIT, tick_handler);
   battery_state_service_subscribe(battery_handler);
 #if defined(PBL_HEALTH)
-  if(!health_service_events_subscribe(health_handler, NULL)) {
+  if (!health_service_events_subscribe(health_handler, NULL)) {
     APP_LOG(APP_LOG_LEVEL_ERROR, "Health not available!");
   }
 #endif
