@@ -25,16 +25,16 @@
 #define GRECT_TIME_BG GRect(X_ROOT, TIME_Y_ROOT, DATE_TIME_BG_WIDTH, 40)
 #define GRECT_DATE_BG GRect(X_ROOT, DATE_Y_ROOT, DATE_TIME_BG_WIDTH, 28)
 
-// #define TEST
 // TODO: Use Clay and AppMessage / pebble_packet to make this configurable
 #define STEP_GOAL 10000
+// #define TEST
 
 static Window *s_window;
 static TextLayer *s_date_layer, *s_time_layer, *s_time_label_layer, *s_date_label_layer, *s_class_name_layer;
-static BitmapLayer *s_class_icon_layer, *s_shield_icon_layer, *s_health_icon_layer;
+static BitmapLayer *s_class_icon_layer, *s_shield_icon_layer, *s_health_icon_layer, *s_bt_icon_layer;
 static Layer *s_shapes_layer;
 
-static GBitmap *s_class_icon_bitmap, *s_shield_icon_bitmap, *s_health_icon_bitmap;
+static GBitmap *s_class_icon_bitmap, *s_shield_icon_bitmap, *s_health_icon_bitmap, *s_bt_icon_bitmap;
 static GPath *s_time_label_bg_path;
 static GPath *s_date_label_bg_path;
 static const GPathInfo TIME_LABEL_PATH_INFO = {
@@ -216,6 +216,12 @@ static void tick_handler(struct tm *tick_time, TimeUnits changed) {
 #endif
 }
 
+ static void bt_handler(bool connected) {
+  if (!connected) vibes_double_pulse();
+
+  bitmap_layer_set_bitmap(s_bt_icon_layer, !connected ? s_bt_icon_bitmap : NULL);
+}
+
 static void window_load(Window *window) {
   Layer *window_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(window_layer);
@@ -229,6 +235,7 @@ static void window_load(Window *window) {
 
   s_shield_icon_bitmap = gbitmap_create_with_resource(RESOURCE_ID_ICON_SHIELD);
   s_health_icon_bitmap = gbitmap_create_with_resource(RESOURCE_ID_ICON_HEALTH);
+  s_bt_icon_bitmap = gbitmap_create_with_resource(RESOURCE_ID_ICON_BT);
 
   s_shapes_layer = layer_create(bounds);
   layer_set_update_proc(s_shapes_layer, shapes_update_proc);
@@ -280,6 +287,10 @@ static void window_load(Window *window) {
   bitmap_layer_set_bitmap(s_health_icon_layer, s_health_icon_bitmap);
   bitmap_layer_set_compositing_mode(s_health_icon_layer, GCompOpSet);
   layer_add_child(window_layer, bitmap_layer_get_layer(s_health_icon_layer));
+
+  s_bt_icon_layer = bitmap_layer_create(GRect(126, STATUS_Y_ROOT, STATUS_ICON_SIZE, STATUS_ICON_SIZE));
+  bitmap_layer_set_compositing_mode(s_bt_icon_layer, GCompOpSet);
+  layer_add_child(window_layer, bitmap_layer_get_layer(s_bt_icon_layer));
 }
 
 static void window_unload(Window *window) {
@@ -291,9 +302,14 @@ static void window_unload(Window *window) {
   bitmap_layer_destroy(s_class_icon_layer);
   bitmap_layer_destroy(s_shield_icon_layer);
   bitmap_layer_destroy(s_health_icon_layer);
+  bitmap_layer_destroy(s_bt_icon_layer);
   layer_destroy(s_shapes_layer);
 
   gbitmap_destroy(s_class_icon_bitmap);
+  gbitmap_destroy(s_shield_icon_bitmap);
+  gbitmap_destroy(s_health_icon_bitmap);
+  gbitmap_destroy(s_bt_icon_bitmap);
+
   gpath_destroy(s_time_label_bg_path);
   gpath_destroy(s_date_label_bg_path);
 
@@ -320,6 +336,9 @@ void main_window_push() {
     APP_LOG(APP_LOG_LEVEL_ERROR, "Health not available!");
   }
 #endif
+
+  bluetooth_connection_service_subscribe(bt_handler);
+  bitmap_layer_set_bitmap(s_bt_icon_layer, bluetooth_connection_service_peek() ? NULL : s_bt_icon_bitmap);
 
   time_t now = time(NULL);
   struct tm *time_now = localtime(&now);

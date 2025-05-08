@@ -1,5 +1,5 @@
 {
-  "version": "1.1.0",
+  "version": "1.2.0",
   "author": "Chris Lewis",
   "private": true,
   "dependencies": {},
@@ -57,6 +57,11 @@
           "type": "bitmap",
           "name": "ICON_HEALTH",
           "file": "images/health.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "ICON_BT",
+          "file": "images/bt.png"
         }
       ]
     },
