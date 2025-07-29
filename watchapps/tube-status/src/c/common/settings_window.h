@@ -11,12 +11,9 @@
 
 typedef enum {
   SettingsWindowRowSubscription = 0,
-  SettingsWindowRowServerStatus,
   SettingsWindowRowAbout,
 
   SettingsWindowRowMax
 } SettingsWindowRow;
 
 void settings_window_push();
-
-void settings_window_update_server_status(ServerStatus s);

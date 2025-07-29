@@ -1,11 +1,9 @@
 var VERSION = '3.4';
 var VERBOSE = true;
-var NEW_API = true;
 var TOPIC_PINS = 'delays';
 var TOPIC_NOTIFS = 'notifs';
 
-var AppMessageValueServerUp = 1,
-    AppMessageValueTimeout = 2;
+var AppMessageValueTimeout = 2;
 
 var SubscriptionStateUnsubscribed = 0,
     SubscriptionStateSubscribed = 1;
@@ -30,93 +28,6 @@ function request(url, callback) {
   xhr.send();
 };
 
-/*********************************** Server ***********************************/
-
-function getServerStatus() {
-  // Query boot for server IP
-  request(config.IP_URL, function(responseText) {
-    var ip_json = JSON.parse(responseText);
-    var ip = ip_json.ip;
-
-    request('http://' + ip + ':' + config.PORT + '/status', function(responseTextStatus) {
-      Log('getServerStatus(): Status response: ' + responseTextStatus);
-
-      var out = {};
-      if(responseTextStatus.indexOf('OK') > -1) {
-        Log('getServerStatus(): Server is up!');
-        out = { 'AppMessageKeyServerStatus': AppMessageValueServerUp };
-      } else {
-        Log('getServerStatus(): Server is down!');
-        out = { 'AppMessageKeyServerStatus': AppMessageValueTimeout };
-      }
-      Pebble.sendAppMessage(out, function() {
-        Log('getServerStatus(): Sent status to Pebble!');
-      }, function() {
-        Log('getServerStatus(): Failed sending status');
-      })
-    });
-  });
-}
-
-/**************************** Old Scraping 'API' ******************************/
-
-var getNodesOfName = function(text, name) {
-  var nodes = [];
-  var tag = '<' + name;
-  var endTag = '</' + name + '>';
-
-  var index = text.indexOf(tag);
-  if(index < 0) {
-    console.log('Unable to find XML node ' + name);
-    return null;
-  }
-
-  var i = 0;
-  var spool = text;
-  while(spool.indexOf(name) >= 0) {
-    spool = spool.substring(spool.indexOf(tag) + tag.length);
-    spool = spool.substring(spool.indexOf('>') + 1 /* > */);
-    
-    nodes[i] = spool.substring(0, spool.indexOf(endTag));
-
-    spool = spool.substring(spool.indexOf(endTag) + endTag.length);
-    i++;
-  }
-
-  Log('Found ' + nodes.length + ' nodes of name ' + name);
-  return nodes;
-};
-
-var getAttr = function(node, name) {
-  var index = node.indexOf(name);
-  if(index < 0) {
-    console.log('Unable to find XML attr ' + name);
-    return null;
-  }
-
-  var spool = node;
-  spool = spool.substring(spool.indexOf(name) + name.length + 2 /* =" */);
-  return spool.substring(0, spool.indexOf('"'));
-}
-
-function downloadOldAPI() {
-  var lineStates = [];
-
-  request('http://cloud.tfl.gov.uk/TrackerNet/LineStatus', function(responseText) {
-    console.log('Download complete!');
-
-    // Get lineStates - Boo XML
-    var lineStatusArray = getNodesOfName(responseText, 'LineStatus');
-    for(var i = 0; i < lineStatusArray.length; i++) {
-      lineStates[i] = getAttr(lineStatusArray[i], 'Description');
-    }
-    
-    // Get lineStates
-    sendToPebble(lineStates);
-  });
-  Log('Downloading...');
-}
-
 /******************************* New Unified API ******************************/
 
 function downloadNewAPI() {
@@ -131,7 +42,6 @@ function downloadNewAPI() {
       lineStates[i] = lines[i].lineStatuses[0].statusSeverityDescription;
     }
 
-    console.log(lineStates);
     sendToPebble(lineStates);
   });
   Log('Downloading from unified API...');
@@ -140,6 +50,7 @@ function downloadNewAPI() {
 /************************************* App ************************************/
 
 function sendToPebble(lineStates) {
+  // TODO Don't use order of values
   var dict = {
     'LineTypeBakerloo': lineStates[0], 
     'LineTypeCentral': lineStates[1],
@@ -203,11 +114,7 @@ function updateSubscriptions(state) {
   }
 
   // Get new data now that settings window has closed
-  if(NEW_API) {
-    downloadNewAPI();
-  } else {
-    downloadOldAPI();
-  }
+  downloadNewAPI();
 }
 
 Pebble.addEventListener('appmessage', function(dict) {
@@ -216,18 +123,8 @@ Pebble.addEventListener('appmessage', function(dict) {
   // Watch wants tube status
   if(hasKey(dict, 'AppMessageKeyJSReady')) {
     Log('Data request receieved.');
-    if(NEW_API) {
-      downloadNewAPI();
-    } else {
-      downloadOldAPI();
-    }
+    downloadNewAPI();
   } 
-
-  // Watch wants server status
-  if(hasKey(dict, 'AppMessageKeyServerStatus')) {
-    Log('appmessage: Getting server status...');
-    getServerStatus();
-  }
 
   // Watch weants to update subscription state
   if(hasKey(dict, 'AppMessageKeySubscriptionState')) {

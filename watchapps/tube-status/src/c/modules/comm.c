@@ -12,6 +12,9 @@ static void in_recv_handler(DictionaryIterator *iter, void *context) {
   Tuple *t = dict_read_first(iter);
   while(t) {
     int key = t->key;
+    if(VERBOSE) {
+      APP_LOG(APP_LOG_LEVEL_DEBUG, "Received key: %d, value: %s", key, t->value->cstring);
+    }
 
     // Line keys are linear from 0
     if(key >=0 && key < LineTypeMax) {
@@ -30,15 +33,6 @@ static void in_recv_handler(DictionaryIterator *iter, void *context) {
           // JS is ready, acknowledge
           app_timer_register(500, get_data_handler, NULL);
           return; // Only time we don't advance the Window
-        case AppMessageKeyServerStatus:
-          // The server is up! (A response, timeout is handled here)
-          settings_window_update_server_status(ServerStatusUp);
-
-          if(s_timeout_timer) {
-            app_timer_cancel(s_timeout_timer);
-            s_timeout_timer = NULL;
-          }
-          break;
         default:
           APP_LOG(APP_LOG_LEVEL_ERROR, "Unknown key: %d", key);
           break;
@@ -54,8 +48,13 @@ static void in_recv_handler(DictionaryIterator *iter, void *context) {
   }
 }
 
+static void inbox_dropped_handler(AppMessageResult reason, void *context) {
+  APP_LOG(APP_LOG_LEVEL_ERROR, "Inbox dropped! Reason: %d", reason);
+}
+
 void comm_init() {
   app_message_register_inbox_received(in_recv_handler);
+  app_message_register_inbox_dropped(inbox_dropped_handler);
   app_message_open(COMM_INBOX_SIZE, COMM_OUTBOX_SIZE);
 }
 
@@ -66,25 +65,8 @@ void comm_deinit() {
   }
 }
 
-static void timeout_handler(void *context) {
-  s_timeout_timer = NULL;
-  settings_window_update_server_status(ServerStatusTimeout);
-}
-
 static void failed_callback() {
   APP_LOG(APP_LOG_LEVEL_ERROR, "Packet send failed.");
-}
-
-void comm_get_server_status() {
-  if(s_timeout_timer) {
-    app_timer_cancel(s_timeout_timer);
-  }
-  s_timeout_timer = app_timer_register(10000, timeout_handler, NULL);
-
-  if(packet_begin()) {
-    packet_put_integer(AppMessageKeyServerStatus, 0);
-    packet_send(failed_callback);
-  }
 }
 
 void comm_request_data() {

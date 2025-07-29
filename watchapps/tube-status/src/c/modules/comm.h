@@ -7,8 +7,6 @@ typedef enum {
   AppMessageKeyJSReady = 14,
   // Watch: New subscription state
   AppMessageKeySubscriptionState,
-  // Watch: Get me that server status. Phone: Here's is the status
-  AppMessageKeyServerStatus,
   // Watch: N/A. Phone: Here's how far sending has progressed
   AppMessageKeyIndex
 } AppMessageKey;
@@ -28,8 +26,6 @@ typedef enum {
 
 void comm_init();
 void comm_deinit();
-
-void comm_get_server_status();
 
 void comm_request_data();
 

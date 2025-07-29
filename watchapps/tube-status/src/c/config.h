@@ -20,9 +20,3 @@ typedef enum {
 
   LineTypeMax
 } LineType;
-
-typedef enum {
-  ServerStatusWaiting = 0,
-  ServerStatusUp,
-  ServerStatusTimeout
-} ServerStatus;

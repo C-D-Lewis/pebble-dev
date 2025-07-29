@@ -3,8 +3,6 @@
 static Window *s_main_window;
 static MenuLayer *s_menu_layer;
 
-static ServerStatus s_server_status = ServerStatusWaiting;
-
 static uint16_t get_num_rows_callback(MenuLayer *menu_layer, uint16_t section_index, void *context) {
   return SettingsWindowRowMax;
 }
@@ -13,24 +11,6 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
   switch(cell_index->row) {
     case SettingsWindowRowSubscription:
       menu_cell_basic_draw(ctx, cell_layer, "Delay Pins", settings_get_subscription_string(), NULL);
-      break;
-    case SettingsWindowRowServerStatus:
-      if(!bluetooth_connection_service_peek()) {
-        menu_cell_basic_draw(ctx, cell_layer, "Pin Server", "N/A (disconnected)", NULL);
-        return;
-      }
-      
-      switch(s_server_status) {
-        case ServerStatusUp:
-          menu_cell_basic_draw(ctx, cell_layer, "Pin Server", "Server is up", NULL);
-          break;
-        case ServerStatusWaiting:
-          menu_cell_basic_draw(ctx, cell_layer, "Pin Server", "Querying status...", NULL);
-          break;
-        case ServerStatusTimeout:
-          menu_cell_basic_draw(ctx, cell_layer, "Pin Server", "Server may be down :(", NULL);
-          break;
-      }
       break;
     case SettingsWindowRowAbout: {
       static char s_version_buff[16];
@@ -107,26 +87,14 @@ static void main_window_unload(Window *window) {
   splash_window_push();
 }
 
-static void main_window_appear(Window *window) {
-  // Refresh that row
-  s_server_status = ServerStatusWaiting;
-  comm_get_server_status();
-}
-
 void settings_window_push() {
   if(!s_main_window) {
     s_main_window = window_create();
     window_set_background_color(s_main_window, PBL_IF_COLOR_ELSE(GColorBlack, GColorWhite));
     window_set_window_handlers(s_main_window, (WindowHandlers) {
-        .appear  = main_window_appear,
         .load = main_window_load,
         .unload = main_window_unload
     });
   }
   window_stack_push(s_main_window, true);
-}
-
-void settings_window_update_server_status(ServerStatus s) {
-  s_server_status = s;
-  menu_layer_reload_data(s_menu_layer);
 }
