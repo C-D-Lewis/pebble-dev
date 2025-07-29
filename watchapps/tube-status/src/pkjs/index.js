@@ -4,7 +4,7 @@ var VERBOSE = true;
 /********************************** Helpers ***********************************/
 
 function Log(content) {
-  if(VERBOSE) console.log(content);
+  if (VERBOSE) console.log(content);
 };
 
 var hasKey = function(dict, key) {
@@ -30,14 +30,13 @@ function downloadNewAPI() {
     // Get names
     var lineStates = [];
     var lines = JSON.parse(responseText);
-    for(var i = 0; i < lines.length; i++) {
+    for (var i = 0; i < lines.length; i++) {
       // Yay JSON!
       lineStates[i] = lines[i].lineStatuses[0].statusSeverityDescription;
     }
 
     sendToPebble(lineStates);
   });
-  Log('Downloading from unified API...');
 }
 
 /************************************* App ************************************/
@@ -72,7 +71,7 @@ Pebble.addEventListener('ready', function(e) {
   console.log('PebbleKit JS ready! Version ' + VERSION);
 
   // Inform that JS is ready
-  Pebble.sendAppMessage({ 'AppMessageKeyJSReady': 1 }, function(e) {
+  Pebble.sendAppMessage({ 'JSReady': 1 }, function(e) {
     Log('Send ready event successfully');
   }, function(e) {
     console.log('Failed to send ready event!');
@@ -83,7 +82,7 @@ Pebble.addEventListener('appmessage', function(dict) {
   Log('Got appmessage: ' + JSON.stringify(dict.payload));
 
   // Watch wants tube status
-  if(hasKey(dict, 'AppMessageKeyJSReady')) {
+  if (hasKey(dict, 'JSReady')) {
     Log('Data request receieved.');
     downloadNewAPI();
   } 

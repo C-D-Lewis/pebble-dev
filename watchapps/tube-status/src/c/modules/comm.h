@@ -4,9 +4,7 @@
 
 typedef enum {
   // Watch: Acknowledged, send data. Phone: JS is ready
-  AppMessageKeyJSReady = 14,
-  // Watch: N/A. Phone: Here's how far sending has progressed
-  AppMessageKeyIndex
+  AppMessageKeyJSReady = 11,
 } AppMessageKey;
 
 #include "../config.h"
