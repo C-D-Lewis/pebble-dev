@@ -6,8 +6,6 @@
 #include "../config.h"
 #include "../modules/data.h"
 
-#include "../common/settings_window.h"
-
 #define LINE_WINDOW_RADIUS 12
 #define LINE_WINDOW_MARGIN 10
 

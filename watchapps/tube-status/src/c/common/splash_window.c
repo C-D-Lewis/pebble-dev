@@ -45,24 +45,13 @@ static void window_unload(Window *window) {
   window_stack_pop_all(true);
 }
 
-static void window_appear(Window *window) {
-  if(s_first_view) {
-    // JS probably not ready
-    s_first_view = false;
-  } else {
-    // We are revisiting from settings
-    comm_update_subscription_state();
-  }
-}
-
 void splash_window_push() {
   if(!s_window) {
     s_window = window_create();
     window_set_background_color(s_window, GColorWhite);
     window_set_window_handlers(s_window, (WindowHandlers) {
       .load = window_load,
-      .unload = window_unload,
-      .appear = window_appear
+      .unload = window_unload
     });
   }
   window_stack_push(s_window, true);

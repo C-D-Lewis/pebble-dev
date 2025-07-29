@@ -29,9 +29,9 @@ static void draw_station(GContext *ctx, GPoint center, int size, int index) {
 /******************************** Click Config ********************************/
 
 static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
-  if(s_selected_line == LineTypeMax) {
-    settings_window_push();
-  }
+  // if(s_selected_line == LineTypeMax) {
+  //   settings_window_push();
+  // }
 }
 
 static void up_click_handler(ClickRecognizerRef recognizer, void *context) {

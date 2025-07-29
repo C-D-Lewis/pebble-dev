@@ -76,10 +76,3 @@ void comm_request_data() {
     packet_send(failed_callback);
   }
 }
-
-void comm_update_subscription_state() {
-  if(packet_begin()) {
-    packet_put_integer(AppMessageKeySubscriptionState, (int)settings_get_subscription_state());
-    packet_send(failed_callback);
-  }
-}

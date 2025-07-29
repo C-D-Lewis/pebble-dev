@@ -80,7 +80,7 @@ uint16_t get_num_rows_handler(MenuLayer *menu_layer, uint16_t section_index, voi
 /******************************** Click Config ********************************/
 
 static void select_click_handler(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) { 
-  settings_window_push();
+  // settings_window_push();
 }
 
 /*********************************** Window ***********************************/

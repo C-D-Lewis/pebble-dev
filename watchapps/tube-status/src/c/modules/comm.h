@@ -5,8 +5,6 @@
 typedef enum {
   // Watch: Acknowledged, send data. Phone: JS is ready
   AppMessageKeyJSReady = 14,
-  // Watch: New subscription state
-  AppMessageKeySubscriptionState,
   // Watch: N/A. Phone: Here's how far sending has progressed
   AppMessageKeyIndex
 } AppMessageKey;
@@ -17,16 +15,13 @@ typedef enum {
 #include "../rect/line_window.h"
 #include "../round/line_window.h"
 #include "../common/splash_window.h"
-#include "../common/settings_window.h"
 
 #include <pebble-packet/pebble-packet.h>
 
-#define COMM_INBOX_SIZE 2026
-#define COMM_OUTBOX_SIZE 656
+#define COMM_INBOX_SIZE 4096
+#define COMM_OUTBOX_SIZE 1024
 
 void comm_init();
 void comm_deinit();
 
 void comm_request_data();
-
-void comm_update_subscription_state();

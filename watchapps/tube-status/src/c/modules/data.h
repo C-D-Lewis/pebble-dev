@@ -2,12 +2,7 @@
 
 #include <pebble.h>
 
-typedef enum {
-  DataKeySubscription = 0,
-} DataKey;
-
 #include "../config.h"
-#include "settings.h"
 
 void data_init();
 void data_deinit();

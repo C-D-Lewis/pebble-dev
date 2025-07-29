@@ -10,19 +10,9 @@ void data_init() {
       persist_delete(i);
     }
   }
-
-  if(persist_exists(DataKeySubscription)) {
-    // Load data
-    settings_set_subscription_state(persist_read_int(DataKeySubscription));
-  } else {
-    // Store defaults
-    settings_set_subscription_state(SubscriptionStateSubscribed);
-    persist_write_int(DataKeySubscription, settings_get_subscription_state());
-  }
 }
 
 void data_deinit() {
-  persist_write_int(DataKeySubscription, settings_get_subscription_state());
 }
 
 char* data_get_line_name(int type) {
@@ -38,7 +28,6 @@ char* data_get_line_name(int type) {
     case LineTypePicadilly:          return "Picadilly";
     case LineTypeVictoria:           return "Victoria";
     case LineTypeWaterlooAndCity:    return "W'loo & City";
-    case LineTypeMax:                return "Settings";
     default:                         return "UNKNOWN LINE!";
   }
 }

@@ -31,8 +31,6 @@
     "messageKeys": {
       "AppMessageKeyIndex": 17,
       "AppMessageKeyJSReady": 14,
-      "AppMessageKeyServerStatus": 16,
-      "AppMessageKeySubscriptionState": 15,
       "LineTypeBakerloo": 0,
       "LineTypeCentral": 1,
       "LineTypeCircle": 2,
