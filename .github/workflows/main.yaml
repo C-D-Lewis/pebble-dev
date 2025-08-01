@@ -9,8 +9,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Build Pebble SDK image
-        run: ./scripts/build-pebble-sdk-image.sh
+      - name: Install pebble tool
+        run: ./scripts/install-pebble-tool.sh
 
       # - name: Test build all projects
       #   run: ./scripts/build-all.sh "docker run --rm -e HOME=/home/pebble/ -v .:/pebble/ --user $(id -u):$(id -g) pebble-sdk pebble build"
