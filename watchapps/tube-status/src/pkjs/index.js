@@ -44,7 +44,7 @@ function downloadNewAPI() {
 function sendToPebble(lineStates) {
   // TODO Don't use order of values
   var dict = {
-    'LineTypeBakerloo': lineStates[0], 
+    'LineTypeBakerloo': lineStates[0],
     'LineTypeCentral': lineStates[1],
     'LineTypeCircle': lineStates[2],
     'LineTypeDistrict': lineStates[3],
@@ -70,12 +70,14 @@ function sendToPebble(lineStates) {
 Pebble.addEventListener('ready', function(e) {
   console.log('PebbleKit JS ready! Version ' + VERSION);
 
-  // Inform that JS is ready
-  Pebble.sendAppMessage({ 'JSReady': 1 }, function(e) {
-    Log('Send ready event successfully');
-  }, function(e) {
-    console.log('Failed to send ready event!');
-  });
+  // Inform that JS is ready - for some reason this prevents future messages????
+  // Pebble.sendAppMessage({ 'JSReady': 1 }, function(e) {
+  //   Log('Send ready event successfully');
+  // }, function(e) {
+  //   console.log('Failed to send ready event!');
+  // });
+
+  downloadNewAPI();
 });
 
 Pebble.addEventListener('appmessage', function(dict) {

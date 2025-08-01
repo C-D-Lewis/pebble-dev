@@ -40,7 +40,6 @@
       "LineTypePicadilly",
       "LineTypeVictoria",
       "LineTypeWaterlooAndCity",
-      "LineTypeMax",
       "JSReady"
     ],
     "enableMultiJS": true,

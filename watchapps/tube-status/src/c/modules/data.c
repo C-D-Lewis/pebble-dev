@@ -3,13 +3,6 @@
 static char s_line_states[LineTypeMax][32];
 
 void data_init() {
-  const int nuke_v3_2 = 3458634897;  // Remove sub type option (now sub or unsub)
-  if(!persist_exists(nuke_v3_2)) {
-    persist_write_bool(nuke_v3_2, true);
-    for(int i = 0; i < 100; i++) {
-      persist_delete(i);
-    }
-  }
 }
 
 void data_deinit() {

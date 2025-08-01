@@ -6,21 +6,21 @@ static MenuLayer *s_menu_layer;
 static Layer *s_hint_layer;
 static StatusBarLayer *s_status_bar;
 
-static void hint_update_proc(Layer *layer, GContext *ctx) {
-  GRect bounds = layer_get_bounds(layer);
-  const int nudge = 3;
-  const int radius = 15;
-  GPoint center = GPoint(bounds.size.w + (radius / 2) - nudge, (bounds.size.h / 2) - nudge);
+// static void hint_update_proc(Layer *layer, GContext *ctx) {
+//   GRect bounds = layer_get_bounds(layer);
+//   const int nudge = 3;
+//   const int radius = 15;
+//   GPoint center = GPoint(bounds.size.w + (radius / 2) - nudge, (bounds.size.h / 2) - nudge);
 
-  graphics_context_set_fill_color(ctx, GColorBlack);
-  graphics_fill_circle(ctx, center, radius);
+//   graphics_context_set_fill_color(ctx, GColorBlack);
+//   graphics_fill_circle(ctx, center, radius);
 
-  // Hold
-  center.x -= (2 * radius) / 3;
-  center.x--;
-  graphics_context_set_fill_color(ctx, GColorWhite);
-  graphics_fill_circle(ctx, center, 2);
-}
+//   // Hold
+//   center.x -= (2 * radius) / 3;
+//   center.x--;
+//   graphics_context_set_fill_color(ctx, GColorWhite);
+//   graphics_fill_circle(ctx, center, 2);
+// }
 
 /********************************* MenuLayer **********************************/
 
@@ -47,7 +47,7 @@ void draw_row_handler(GContext *ctx, const Layer *cell_layer, MenuIndex *cell_in
   graphics_context_set_fill_color(ctx, GColorWhite);
   graphics_fill_circle(ctx, center, (5 * (LINE_WINDOW_RADIUS - 1)) / 7); 
 
-  // Closed?
+  // Issue?
   graphics_context_set_fill_color(ctx, data_get_line_state_color(type));
   graphics_fill_circle(ctx, center, (5 * (LINE_WINDOW_RADIUS - 1)) / 7); 
 
@@ -107,14 +107,14 @@ static void window_load(Window *window) {
   });
   layer_add_child(window_layer, menu_layer_get_layer(s_menu_layer));
 
-  s_hint_layer = layer_create(bounds);
-  layer_set_update_proc(s_hint_layer, hint_update_proc);
-  layer_add_child(window_layer, s_hint_layer);
+  // s_hint_layer = layer_create(bounds);
+  // layer_set_update_proc(s_hint_layer, hint_update_proc);
+  // layer_add_child(window_layer, s_hint_layer);
 }
 
 static void window_unload(Window *window) {
   menu_layer_destroy(s_menu_layer);
-  layer_destroy(s_hint_layer);
+  // layer_destroy(s_hint_layer);
   status_bar_layer_destroy(s_status_bar);
   
   window_destroy(s_window);
