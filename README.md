@@ -45,7 +45,7 @@ Some PBWs can be found in `/pbw` for sideloading.
 
 | Name | Status | PBW |
 |------|--------|-----|
-| `tube-status`  | ⚠️ (data sent, no reaction) | |
+| `tube-status`  | ✅ | [tube-status.pbw](pbw/tube-status.pbw) |
 | `block-world` | ✅ | [block-world.pbw](pbw/block-world.pbw) |
 | `modular-app-base` | ✅ | [modular-app-base.pbw](pbw/modular-app-base.pbw) |
 | `news-headlines` | ✅ | [news-headlines.pbw](pbw/news-headlines.pbw) |
