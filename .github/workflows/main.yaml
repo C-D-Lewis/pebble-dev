@@ -13,14 +13,4 @@ jobs:
         run: ./scripts/install-pebble-tool.sh
 
       - name: Test build all projects
-        run: ./scripts/build-all.sh "docker run --rm -e HOME=/home/pebble/ -v .:/pebble/ --user $(id -u):$(id -g) pebble-sdk pebble build"
-
-# Error in sys.exitfunc:
-# Traceback (most recent call last):
-#   File "/usr/local/lib/python2.7/atexit.py", line 24, in _run_exitfuncs
-#     func(*targs, **kargs)
-#   File "/opt/pebble-sdk-4.5-linux64/pebble-tool/pebble_tool/__init__.py", line 57, in wait_for_cleanup
-#     config.save()
-#   File "/opt/pebble-sdk-4.5-linux64/pebble-tool/pebble_tool/util/config.py", line 22, in save
-#     with open(self.path, 'w') as f:
-# IOError: [Errno 13] Permission denied: '/home/pebble/.pebble-sdk/settings.json'
+        run: ./scripts/build-all.sh
