@@ -10,9 +10,9 @@
 #define BARS_Y_OFFSET ((HEIGHT - BARS_TOTAL_HEIGHT) / 2)
 
 // TODO: Dithered grey for monochrome displays
-#define BAR_COLOR_HOUR PBL_IF_COLOR_ELSE(GColorRed, GColorWhite)
-#define BAR_COLOR_MINUTE PBL_IF_COLOR_ELSE(GColorYellow, GColorWhite)
-#define BAR_COLOR_SECOND PBL_IF_COLOR_ELSE(GColorBlueMoon, GColorWhite)
+#define BAR_COLOR_HOUR PBL_IF_COLOR_ELSE(GColorRed, GColorLightGray)
+#define BAR_COLOR_MINUTE PBL_IF_COLOR_ELSE(GColorYellow, GColorLightGray)
+#define BAR_COLOR_SECOND PBL_IF_COLOR_ELSE(GColorBlueMoon, GColorLightGray)
 #define BAR_COLOR_BACKGROUND PBL_IF_COLOR_ELSE(GColorDarkGray, GColorBlack)
 #define BAR_COLOR_LINE PBL_IF_COLOR_ELSE(GColorLightGray, GColorWhite)
 
