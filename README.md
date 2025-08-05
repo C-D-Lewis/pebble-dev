@@ -1,58 +1,58 @@
 # pebble-dev
 
-Repository with Pebble watchfaces, watchapps, and libraries - old and new.
+Repository with my Pebble watchfaces, watchapps, and libraries - old and new.
 
 Projects here are mostly too old for the latest Pebble SDK, working status is
 shown in the lists below.
 
 Some PBWs can be found in `/pbw` for sideloading.
 
-## Watchfaces
+## `watchfaces`
 
-| Name | Status | PBW |
-|------|--------|-----|
-| `split-horizon-se` | ⚠️ (crashes, InverterLayerCompat.c) | |
-| `brackets` | ✅ | [brackets.pbw](pbw/brackets.pbw) |
-| `cmd-time` | ✅ | [cmd-time.pbw](pbw/cmd-time.pbw) |
-| `dayring` | ✅ | [dayring.pbw](pbw/dayring.pbw) |
-| `deep-rock` | ✅ | [deep-rock.pbw](pbw/deep-rock.pbw) |
-| `dual-gauge` | ✅ | [dual-gauge.pbw](pbw/dual-gauge.pbw) |
-| `eclipse` | ✅ | [eclipse.pbw](pbw/eclipse.pbw) |
-| `hollywatch` | ✅ | [hollywatch.pbw](pbw/hollywatch.pbw) |
-| `index` | ✅ | [index.pbw](pbw/index.pbw) |
-| `kitty-watchface` | ✅ | [kitty-watchface.pbw](pbw/kitty-watchface.pbw) |
-| `morndas` | ✅ | [morndas.pbw](pbw/morndas.pbw) |
-| `past-present-future` | ✅ | [past-present-future.pbw](pbw/past-present-future.pbw) |
-| `pseudotime` | ✅ | [pseudotime.pbw](pbw/pseudotime.pbw) |
-| `split-horizon-pe` | ✅ | [split-horizon-pe.pbw](pbw/split-horizon-pe.pbw) |
-| `starfield-smooth` | ✅ | [starfield-smooth.pbw](pbw/starfield-smooth.pbw) |
-| `startfield-demo` | ✅ | [starfield-demo.pbw](pbw/starfield-demo.pbw) |
-| `time-dots-appstore` | ✅ | [time-dots-appstore.pbw](pbw/time-dots-appstore.pbw) |
-| `cards` | ❌ (custom fonts) | |
-| `cmd-time-typed` | ❌ (old inverter layer) | |
-| `eclipse-solar` | ❌ (WIP) | |
-| `isotime-appstore` | ❌ (pebble-pge-simple reference) | |
-| `split-horizon-me` | ❌ (old inverter layer) | |
-| `divider-large-2` | ❔ | |
-| `divider-small-2` | ❔ | |
-| `eventful` | ❔ | |
-| `events` | ❔ | |
-| `past-present-future-extended` | ❔ | |
-| `seven-segments-date` | ❔ | |
-| `seven-segments` | ❔ | |
+| Name                           | Status             | PBW                                |
+|--------------------------------|--------------------|------------------------------------|
+| `split-horizon-se`             | ⚠️ (old inv layer) |                                    |
+| `brackets`                     | ✅                  | [pbw](pbw/brackets.pbw)            |
+| `cmd-time`                     | ✅                  | [pbw](pbw/cmd-time.pbw)            |
+| `dayring`                      | ✅                  | [pbw](pbw/dayring.pbw)             |
+| `deep-rock`                    | ✅                  | [pbw](pbw/deep-rock.pbw)           |
+| `dual-gauge`                   | ✅                  | [pbw](pbw/dual-gauge.pbw)          |
+| `eclipse`                      | ✅                  | [pbw](pbw/eclipse.pbw)             |
+| `hollywatch`                   | ✅                  | [pbw](pbw/hollywatch.pbw)          |
+| `index`                        | ✅                  | [pbw](pbw/index.pbw)               |
+| `kitty-watchface`              | ✅                  | [pbw](pbw/kitty-watchface.pbw)     |
+| `morndas`                      | ✅                  | [pbw](pbw/morndas.pbw)             |
+| `past-present-future`          | ✅                  | [pbw](pbw/past-present-future.pbw) |
+| `pseudotime`                   | ✅                  | [pbw](pbw/pseudotime.pbw)          |
+| `split-horizon-pe`             | ✅                  | [pbw](pbw/split-horizon-pe.pbw)    |
+| `starfield-smooth`             | ✅                  | [pbw](pbw/starfield-smooth.pbw)    |
+| `startfield-demo`              | ✅                  | [pbw](pbw/starfield-demo.pbw)      |
+| `time-dots-appstore`           | ✅                  | [pbw](pbw/time-dots-appstore.pbw)  |
+| `cards`                        | ❌ (custom fonts)   |                                    |
+| `cmd-time-typed`               | ❌ (old inv layer)  |                                    |
+| `eclipse-solar`                | ❌ (WIP)            |                                    |
+| `isotime-appstore`             | ❌ (pge-simple)     |                                    |
+| `split-horizon-me`             | ❌ (old inv layer)  |                                    |
+| `divider-large-2`              | ❔                  |                                    |
+| `divider-small-2`              | ❔                  |                                    |
+| `eventful`                     | ❔                  |                                    |
+| `events`                       | ❔                  |                                    |
+| `past-present-future-extended` | ❔                  |                                    |
+| `seven-segments-date`          | ❔                  |                                    |
+| `seven-segments`               | ❔                  |                                    |
 
-## Watchapps
+## `watchapps`
 
-| Name | Status | PBW |
-|------|--------|-----|
-| `tube-status`  | ✅ | [tube-status.pbw](pbw/tube-status.pbw) |
-| `block-world` | ✅ | [block-world.pbw](pbw/block-world.pbw) |
-| `modular-app-base` | ✅ | [modular-app-base.pbw](pbw/modular-app-base.pbw) |
-| `news-headlines` | ✅ | [news-headlines.pbw](pbw/news-headlines.pbw) |
-| `pge-examples` | ❌ (needs ref to pge package) | |
-| `wristponder-redux` | ❌ (unfinished re-write) | |
+| Name                | Status                  | PBW                             |
+|---------------------|-------------------------|---------------------------------|
+| `tube-status`       | ✅                       | [pbw](pbw/tube-status.pbw)      |
+| `block-world`       | ✅                       | [pbw](pbw/block-world.pbw)      |
+| `modular-app-base`  | ✅                       | [pbw](pbw/modular-app-base.pbw) |
+| `news-headlines`    | ✅                       | [pbw](pbw/news-headlines.pbw)   |
+| `pge-examples`      | ❌ (needs pge package)   |                                 |
+| `wristponder-redux` | ❌ (unfinished re-write) |                                 |
 
-## Other
+## `other`
 
 Defunct, incomplete, or PoC things live here.
 
@@ -60,12 +60,12 @@ Defunct, incomplete, or PoC things live here.
 
 Some larger projects still live in their own repositories:
 
-| Name | Status | PBW |
-|------|--------|-----|
-| [thin](https://github.com/C-D-Lewis/thin) | ✅ | [thin.pbw](pbw/thin.pbw) |
-| [dashboard](https://github.com/C-D-Lewis/dashboard) | ✅ | [dashboard.pbw](pbw/dashboard.pbw) |
-| [beam-up](https://github.com/C-D-Lewis/beam-up) | ✅ | [beam-up.pbw](pbw/beam-up.pbw) |
-| [pge](https://github.com/C-D-Lewis/pge) | ✅ | [pge.pbw](pbw/pge.pbw) (test app) |
+| Name                                                | Status | PBW                           |
+|-----------------------------------------------------|--------|-------------------------------|
+| [thin](https://github.com/C-D-Lewis/thin)           | ✅      | [pbw](pbw/thin.pbw)           |
+| [dashboard](https://github.com/C-D-Lewis/dashboard) | ✅      | [pbw](pbw/dashboard.pbw)      |
+| [beam-up](https://github.com/C-D-Lewis/beam-up)     | ✅      | [pbw](pbw/beam-up.pbw)        |
+| [pge](https://github.com/C-D-Lewis/pge)             | ✅      | [pbw](pbw/pge.pbw) (test app) |
 
 ## Develop in Docker
 
