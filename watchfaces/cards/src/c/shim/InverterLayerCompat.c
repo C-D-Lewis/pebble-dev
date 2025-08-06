@@ -1,4 +1,3 @@
-#ifdef PBL_PLATFORM_BASALT
 #include "InverterLayerCompat.h"
 
 static GColor s_fg_color, s_bg_color;
@@ -61,5 +60,3 @@ void inverter_layer_compat_destroy(InverterLayerCompat *this) {
 Layer* inverter_layer_compat_get_layer(InverterLayerCompat *this) {
   return this->layer;
 }
-
-#endif

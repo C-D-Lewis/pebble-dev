@@ -20,11 +20,7 @@ typedef struct {
   	*battery_bg_layer,
   	*bt_layer,
     *weather_layer; //Assign and free when weather changes
-#ifdef PBL_PLATFORM_APLITE
-  InverterLayer *battery_bar_layer;
-#elif PBL_PLATFORM_BASALT
   InverterLayerCompat *battery_bar_layer;
-#endif
 
   //Text
   TextLayer 

@@ -7,7 +7,6 @@
  * - Due to shared framebuffer, there can only be one color set
  */
 
-#ifdef PBL_PLATFORM_BASALT
 #pragma once
 
 #include <pebble.h>
@@ -20,5 +19,3 @@ InverterLayerCompat *inverter_layer_compat_create(GRect bounds);
 void inverter_layer_compat_set_colors(GColor fg, GColor bg);
 void inverter_layer_compat_destroy(InverterLayerCompat *this);
 Layer* inverter_layer_compat_get_layer(InverterLayerCompat *this);
-
-#endif

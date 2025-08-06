@@ -89,7 +89,7 @@
       "KEY_LOCATION": 0,
       "KEY_TEMPERATURE": 2
     },
-    "enableMultiJS": false,
+    "enableMultiJS": true,
     "displayName": "Cards",
     "watchapp": {
       "onlyShownOnCommunication": false,
@@ -98,9 +98,10 @@
     },
     "targetPlatforms": [
       "aplite",
-      "basalt"
+      "basalt",
+      "diorite"
     ],
     "capabilities": []
   },
-  "name": "Cards"
+  "name": "cards"
 }
