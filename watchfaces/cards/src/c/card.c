@@ -4,6 +4,33 @@ static bool match(char *subject, char *p1, char *p2) {
   return strstr(subject, p1) != NULL || strstr(subject, p2) != NULL;
 }
 
+static void battery_bar_update_proc(Layer *layer, GContext *ctx) {
+  GRect bounds = layer_get_bounds(layer);
+
+  // BatteryChargeState state = battery_state_service_peek();
+  // int offset = 2; // Offset for the battery contact
+  // int icon_height = BAT_ICN_H - offset;
+  // int height = state.charge_percent * icon_height / 100;
+  // APP_LOG(APP_LOG_LEVEL_DEBUG, "Battery height: %d for percent %d", height, state.charge_percent);
+  // APP_LOG(APP_LOG_LEVEL_DEBUG, "bounds: %d, %d, %d, %d", bounds.origin.x, bounds.origin.y, bounds.size.w, bounds.size.h);
+
+  // graphics_context_set_fill_color(ctx, GColorWhite);
+  // graphics_fill_rect(
+  //   ctx,
+  //   GRect(
+  //     bounds.origin.x,
+  //     bounds.origin.y + offset + (icon_height - height),
+  //     BAT_ICN_W,
+  //     height
+  //   ),
+  //   0,
+  //   GCornerNone
+  // );
+
+  graphics_context_set_fill_color(ctx, GColorWhite);
+  graphics_fill_rect(ctx, grect_inset(bounds, GEdgeInsets(1)), 0, GCornerNone);
+}
+
 /**
  * Create a Card object and all subelements
  */
@@ -18,8 +45,9 @@ Card* card_add(Window *window, char *location_buff_ptr, char* conditions_buff_pt
   this->time_layer = cl_text_layer_create(GRect(bounds.origin.x + 10, bounds.origin.y, bounds.size.w - 10, 50), GColorBlack, GColorClear, false, NULL, FONT_KEY_BITHAM_42_LIGHT, GTextAlignmentLeft);
   this->date_layer = cl_text_layer_create(GRect(bounds.origin.x + 10, bounds.origin.y + 40, 144, 30), GColorBlack, GColorClear, false, NULL, FONT_KEY_GOTHIC_18, GTextAlignmentLeft);
   this->battery_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BATTERY);
-  this->battery_bg_layer = bitmap_layer_create(GRect(bounds.origin.x + 125, bounds.origin.y + 13, 9, 22));
-  this->battery_bar_layer = layer_create(GRect(bounds.origin.x + 125 + 2, bounds.origin.y + 15 + 2, 16, 5));
+  this->battery_bg_layer = bitmap_layer_create(GRect(bounds.origin.x + 125, bounds.origin.y + 15, BAT_ICN_W, 22));
+  this->battery_bar_layer = layer_create(GRect(bounds.origin.x + 125, bounds.origin.y + 15, BAT_ICN_W, BAT_ICN_H));
+  layer_set_update_proc(this->battery_bar_layer, battery_bar_update_proc);
   this->bt_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BT);
   this->bt_layer = bitmap_layer_create(GRect(bounds.origin.x + 125, bounds.origin.y + 40, 9, 16));
   this->weather_layer = bitmap_layer_create(GRect(bounds.origin.x + 10, bounds.origin.y + 63, 22, 22));
@@ -188,19 +216,19 @@ static void card_animate(Card *this, GRect start, GRect finish, int duration, in
     duration, delay, curve
   );
 
-  // Battery - calculate width of bar
+  // Battery - calculate height of bar
   BatteryChargeState state = battery_state_service_peek();
-  int height = (int)(float)(((float)state.charge_percent / 100.0F) * (float)16);
+  int height = state.charge_percent * BAT_ICN_H / 100;
   animate_layer(
     bitmap_layer_get_layer(this->battery_bg_layer),
-    GRect(start.origin.x + 125, start.origin.y + 13, 9, 22),
-    GRect(finish.origin.x + 125, finish.origin.y + 13, 9, 22),
+    GRect(start.origin.x + 125, start.origin.y + 13, BAT_ICN_W, BAT_ICN_H),
+    GRect(finish.origin.x + 125, finish.origin.y + 15, BAT_ICN_W, BAT_ICN_H),
     duration, delay, curve
   );
   animate_layer(
     this->battery_bar_layer,
-    GRect(start.origin.x + 125 + 2, start.origin.y + 15 + 2 + (16 - height), 5, height),
-    GRect(finish.origin.x + 125 + 2, finish.origin.y + 15 + 2 + (16 - height), 5, height),
+    GRect(start.origin.x + 125, start.origin.y + 15 + (BAT_ICN_H - height), BAT_ICN_W, height),
+    GRect(finish.origin.x + 125, finish.origin.y + 15 + (BAT_ICN_H - height), BAT_ICN_W, height),
     duration, delay, curve
   );
 

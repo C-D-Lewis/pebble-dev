@@ -6,32 +6,34 @@
 #define CARD_SPAWN_LOCATION GRect(0, 168, 144, 109)
 #define CARD_RESTING_LOCATION GRect(0, 29, 144, 109)
 #define CARD_DESPAWN_LOCATION GRect(0, -100, 144, 109)
+#define BAT_ICN_W 9
+#define BAT_ICN_H 20
 
 typedef struct {
-	// Layout
+  // Layout
   GBitmap 
-  	*background_bitmap,
-  	*battery_bitmap,
-  	*bt_bitmap,
+    *background_bitmap,
+    *battery_bitmap,
+    *bt_bitmap,
     *weather_bitmap;
   BitmapLayer 
-  	*background_layer,
-  	*battery_bg_layer,
-  	*bt_layer,
+    *background_layer,
+    *battery_bg_layer,
+    *bt_layer,
     *weather_layer; //Assign and free when weather changes
   Layer *battery_bar_layer;
 
   // Text
   TextLayer 
-  	*time_layer,
-  	*date_layer,
+    *time_layer,
+    *date_layer,
     *conditions_layer,
     *location_layer;
 
   // Storage
   char 
-  	*time_buff,
-  	*date_buff;
+    *time_buff,
+    *date_buff;
 
 } Card;
 

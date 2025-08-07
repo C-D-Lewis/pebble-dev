@@ -119,6 +119,7 @@ static void init() {
 
   tick_timer_service_subscribe(MINUTE_UNIT, (TickHandler)tick_handler);
   bluetooth_connection_service_subscribe((BluetoothConnectionHandler)bt_handler);
+  battery_state_service_subscribe((BatteryStateHandler)next_card);
 
   cl_app_message_open(1024, 128, in_recv_handler);
 
