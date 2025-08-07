@@ -7,26 +7,6 @@ static bool match(char *subject, char *p1, char *p2) {
 static void battery_bar_update_proc(Layer *layer, GContext *ctx) {
   GRect bounds = layer_get_bounds(layer);
 
-  // BatteryChargeState state = battery_state_service_peek();
-  // int offset = 2; // Offset for the battery contact
-  // int icon_height = BAT_ICN_H - offset;
-  // int height = state.charge_percent * icon_height / 100;
-  // APP_LOG(APP_LOG_LEVEL_DEBUG, "Battery height: %d for percent %d", height, state.charge_percent);
-  // APP_LOG(APP_LOG_LEVEL_DEBUG, "bounds: %d, %d, %d, %d", bounds.origin.x, bounds.origin.y, bounds.size.w, bounds.size.h);
-
-  // graphics_context_set_fill_color(ctx, GColorWhite);
-  // graphics_fill_rect(
-  //   ctx,
-  //   GRect(
-  //     bounds.origin.x,
-  //     bounds.origin.y + offset + (icon_height - height),
-  //     BAT_ICN_W,
-  //     height
-  //   ),
-  //   0,
-  //   GCornerNone
-  // );
-
   graphics_context_set_fill_color(ctx, GColorWhite);
   graphics_fill_rect(ctx, grect_inset(bounds, GEdgeInsets(1)), 0, GCornerNone);
 }
