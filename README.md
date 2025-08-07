@@ -13,6 +13,7 @@ Some PBWs can be found in `/pbw` for sideloading.
 |--------------------------------|--------------------|------------------------------------|
 | `split-horizon-se`             | ⚠️ (old inv layer) |                                    |
 | `brackets`                     | ✅                  | [pbw](pbw/brackets.pbw)            |
+| `cards`                        | ✅                  | [pbw](pbw/cards.pbw)               |
 | `cmd-time`                     | ✅                  | [pbw](pbw/cmd-time.pbw)            |
 | `dayring`                      | ✅                  | [pbw](pbw/dayring.pbw)             |
 | `deep-rock`                    | ✅                  | [pbw](pbw/deep-rock.pbw)           |
@@ -28,7 +29,6 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `starfield-smooth`             | ✅                  | [pbw](pbw/starfield-smooth.pbw)    |
 | `startfield-demo`              | ✅                  | [pbw](pbw/starfield-demo.pbw)      |
 | `time-dots-appstore`           | ✅                  | [pbw](pbw/time-dots-appstore.pbw)  |
-| `cards`                        | ❌ (custom fonts)   |                                    |
 | `cmd-time-typed`               | ❌ (old inv layer)  |                                    |
 | `eclipse-solar`                | ❌ (WIP)            |                                    |
 | `isotime-appstore`             | ❌ (pge-simple)     |                                    |
