@@ -54,5 +54,14 @@ function build_all_in_dir {
   done
 }
 
+function setup {
+  echo "Setting up build environment..."
+  
+  if [[ -n "${CI:-}" ]]; then
+    echo "module.exports = { token: 'foo' };" > ./watchfaces/cards/src/pkjs/secrets.js
+  fi
+}
+
+setup
 build_all_in_dir ./watchfaces
 build_all_in_dir ./watchapps
