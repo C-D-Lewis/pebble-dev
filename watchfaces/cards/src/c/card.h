@@ -2,14 +2,13 @@
 
 #include <pebble.h>
 #include "include/cl_util.h"
-#include "shim/InverterLayerCompat.h"
 
 #define CARD_SPAWN_LOCATION GRect(0, 168, 144, 109)
 #define CARD_RESTING_LOCATION GRect(0, 29, 144, 109)
 #define CARD_DESPAWN_LOCATION GRect(0, -100, 144, 109)
 
 typedef struct {
-	//Layout
+	// Layout
   GBitmap 
   	*background_bitmap,
   	*battery_bitmap,
@@ -20,16 +19,16 @@ typedef struct {
   	*battery_bg_layer,
   	*bt_layer,
     *weather_layer; //Assign and free when weather changes
-  InverterLayerCompat *battery_bar_layer;
+  Layer *battery_bar_layer;
 
-  //Text
+  // Text
   TextLayer 
   	*time_layer,
   	*date_layer,
     *conditions_layer,
     *location_layer;
 
-  //Storage
+  // Storage
   char 
   	*time_buff,
   	*date_buff;
