@@ -71,7 +71,7 @@ Card* card_add(Window *window, char *location_buff_ptr, char* conditions_buff_pt
         this->weather_bitmap = gbitmap_create_with_resource(RESOURCE_ID_SUN);
       } else if (match(conditions_buff_ptr, "Rain", "rain")) {
         this->weather_bitmap = gbitmap_create_with_resource(RESOURCE_ID_RAIN);
-      } else if (match(conditions_buff_ptr, "Cloud", "cloud")) {
+      } else if (match(conditions_buff_ptr, "Cloud", "cloud") || match(conditions_buff_ptr, "Overcast", "overcast")) {
         this->weather_bitmap = gbitmap_create_with_resource(RESOURCE_ID_CLOUD);
       } else if (match(conditions_buff_ptr, "Wind", "wind")) {
         this->weather_bitmap = gbitmap_create_with_resource(RESOURCE_ID_WIND);
@@ -89,7 +89,7 @@ Card* card_add(Window *window, char *location_buff_ptr, char* conditions_buff_pt
         this->weather_bitmap = gbitmap_create_with_resource(RESOURCE_ID_MOON);
       } else if (match(conditions_buff_ptr, "Rain", "rain")) {
         this->weather_bitmap = gbitmap_create_with_resource(RESOURCE_ID_RAIN);
-      } else if (match(conditions_buff_ptr, "Cloud", "cloud")) {
+      } else if (match(conditions_buff_ptr, "Cloud", "cloud") || match(conditions_buff_ptr, "Overcast", "overcast")) {
         this->weather_bitmap = gbitmap_create_with_resource(RESOURCE_ID_CLOUD_NIGHT);
       } else if (match(conditions_buff_ptr, "Wind", "wind")) {
         this->weather_bitmap = gbitmap_create_with_resource(RESOURCE_ID_WIND_NIGHT);
