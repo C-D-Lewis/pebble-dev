@@ -9,48 +9,50 @@ Some PBWs can be found in `/pbw` for sideloading.
 
 ## `watchfaces`
 
-| Name                           | Status             | PBW                                |
-|--------------------------------|--------------------|------------------------------------|
-| `split-horizon-se`             | ⚠️ (old inv layer) |                                    |
-| `brackets`                     | ✅                  | [pbw](pbw/brackets.pbw)            |
-| `cards`                        | ✅                  | [pbw](pbw/cards.pbw)               |
-| `cmd-time`                     | ✅                  | [pbw](pbw/cmd-time.pbw)            |
-| `dayring`                      | ✅                  | [pbw](pbw/dayring.pbw)             |
-| `deep-rock`                    | ✅                  | [pbw](pbw/deep-rock.pbw)           |
-| `dual-gauge`                   | ✅                  | [pbw](pbw/dual-gauge.pbw)          |
-| `eclipse`                      | ✅                  | [pbw](pbw/eclipse.pbw)             |
-| `hollywatch`                   | ✅                  | [pbw](pbw/hollywatch.pbw)          |
-| `index`                        | ✅                  | [pbw](pbw/index.pbw)               |
-| `kitty-watchface`              | ✅                  | [pbw](pbw/kitty-watchface.pbw)     |
-| `morndas`                      | ✅                  | [pbw](pbw/morndas.pbw)             |
-| `past-present-future`          | ✅                  | [pbw](pbw/past-present-future.pbw) |
-| `pseudotime`                   | ✅                  | [pbw](pbw/pseudotime.pbw)          |
-| `split-horizon-pe`             | ✅                  | [pbw](pbw/split-horizon-pe.pbw)    |
-| `starfield-smooth`             | ✅                  | [pbw](pbw/starfield-smooth.pbw)    |
-| `startfield-demo`              | ✅                  | [pbw](pbw/starfield-demo.pbw)      |
-| `time-dots-appstore`           | ✅                  | [pbw](pbw/time-dots-appstore.pbw)  |
-| `cmd-time-typed`               | ❌ (old inv layer)  |                                    |
-| `eclipse-solar`                | ❌ (WIP)            |                                    |
-| `isotime-appstore`             | ❌ (pge-simple)     |                                    |
-| `split-horizon-me`             | ❌ (old inv layer)  |                                    |
-| `divider-large-2`              | ❔                  |                                    |
-| `divider-small-2`              | ❔                  |                                    |
-| `eventful`                     | ❔                  |                                    |
-| `events`                       | ❔                  |                                    |
-| `past-present-future-extended` | ❔                  |                                    |
-| `seven-segments-date`          | ❔                  |                                    |
-| `seven-segments`               | ❔                  |                                    |
+> `A` = Aplite, `B` = Basalt, `C` = Chalk, `D` = Diorite, `E` = Emery platforms.
+
+| Name                           | Builds              | Icon | PBW                                |
+|--------------------------------|---------------------|------|------------------------------------|
+| `split-horizon-se`             | ⚠️ (old inv layer)  | ✅    |                                    |
+| `brackets`                     | `A` `B` `C` `D`     |      | [pbw](pbw/brackets.pbw)            |
+| `cards`                        | `A` `B` `D`         |      | [pbw](pbw/cards.pbw)               |
+| `cmd-time`                     | `A` `B` `C` `D` `E` |      | [pbw](pbw/cmd-time.pbw)            |
+| `dayring`                      | `A` `B` `C` `D`     |      | [pbw](pbw/dayring.pbw)             |
+| `deep-rock`                    | `A` `B` `D`         |      | [pbw](pbw/deep-rock.pbw)           |
+| `dual-gauge`                   | `A` `B` `C` `D`     |      | [pbw](pbw/dual-gauge.pbw)          |
+| `eclipse`                      | `A` `B` `D`         |      | [pbw](pbw/eclipse.pbw)             |
+| `hollywatch`                   | `A` `B` `C` `D`     |      | [pbw](pbw/hollywatch.pbw)          |
+| `index`                        | `A` `B` `C` `D`     |      | [pbw](pbw/index.pbw)               |
+| `kitty-watchface`              | `A` `B` `D`         |      | [pbw](pbw/kitty-watchface.pbw)     |
+| `morndas`                      | `A` `B` `D`         |      | [pbw](pbw/morndas.pbw)             |
+| `past-present-future`          | `A` `B` `D`         |      | [pbw](pbw/past-present-future.pbw) |
+| `pseudotime`                   | `A` `B` `C` `D`     |      | [pbw](pbw/pseudotime.pbw)          |
+| `split-horizon-pe`             | `A` `B` `D`         | ✅    | [pbw](pbw/split-horizon-pe.pbw)    |
+| `starfield-smooth`             | `A` `B` `C`         | ✅    | [pbw](pbw/starfield-smooth.pbw)    |
+| `startfield-demo`              | `A` `B` `C` `D`     |      | [pbw](pbw/starfield-demo.pbw)      |
+| `time-dots-appstore`           | `A` `B` `C` `D`     |      | [pbw](pbw/time-dots-appstore.pbw)  |
+| `cmd-time-typed`               | ❌ (old inv layer)   |      |                                    |
+| `eclipse-solar`                | ❌ (WIP)             |      |                                    |
+| `isotime-appstore`             | ❌ (pge-simple)      |      |                                    |
+| `split-horizon-me`             | ❌ (old inv layer)   | ✅    |                                    |
+| `divider-large-2`              | ❔                   | ✅    |                                    |
+| `divider-small-2`              | ❔                   | ✅    |                                    |
+| `eventful`                     | ❔                   |      |                                    |
+| `events`                       | ❔                   |      |                                    |
+| `past-present-future-extended` | ❔                   |      |                                    |
+| `seven-segments-date`          | ❔                   | ✅    |                                    |
+| `seven-segments`               | ❔                   | ✅    |                                    |
 
 ## `watchapps`
 
-| Name                | Status                  | PBW                             |
-|---------------------|-------------------------|---------------------------------|
-| `tube-status`       | ✅                       | [pbw](pbw/tube-status.pbw)      |
-| `block-world`       | ✅                       | [pbw](pbw/block-world.pbw)      |
-| `modular-app-base`  | ✅                       | [pbw](pbw/modular-app-base.pbw) |
-| `news-headlines`    | ✅                       | [pbw](pbw/news-headlines.pbw)   |
-| `pge-examples`      | ❌ (needs pge package)   |                                 |
-| `wristponder-redux` | ❌ (unfinished re-write) |                                 |
+| Name                | Status                  | Icon | PBW                             |
+|---------------------|-------------------------|------|---------------------------------|
+| `tube-status`       | `A` `B` `C` `D`         | ✅    | [pbw](pbw/tube-status.pbw)      |
+| `block-world`       | `B` `C`                 |      | [pbw](pbw/block-world.pbw)      |
+| `modular-app-base`  | `A` `B` `C` `D`         |      | [pbw](pbw/modular-app-base.pbw) |
+| `news-headlines`    | `A` `B` `C` `D`         | ✅    | [pbw](pbw/news-headlines.pbw)   |
+| `pge-examples`      | ❌ (needs pge package)   |      |                                 |
+| `wristponder-redux` | ❌ (unfinished re-write) |      |                                 |
 
 ## `other`
 

@@ -1,7 +1,7 @@
 {
   "name": "Brackets",
   "author": "Chris Lewis",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "private": true,
   "keywords": [
     "pebble-app"
@@ -12,11 +12,12 @@
     "targetPlatforms": [
       "aplite",
       "basalt",
-      "chalk"
+      "chalk",
+      "diorite"
     ],
     "enableMultiJS": false,
     "capabilities": [
-      "configurable"
+      "_configurable"
     ],
     "projectType": "native",
     "displayName": "Brackets",
