@@ -1,0 +1,64 @@
+{
+  "name": "Brackets",
+  "author": "Chris Lewis",
+  "version": "1.2.0",
+  "private": true,
+  "keywords": [
+    "pebble-app"
+  ],
+  "dependencies": {},
+  "pebble": {
+    "sdkVersion": "3",
+    "targetPlatforms": [
+      "aplite",
+      "basalt",
+      "chalk"
+    ],
+    "enableMultiJS": false,
+    "capabilities": [
+      "configurable"
+    ],
+    "projectType": "native",
+    "displayName": "Brackets",
+    "uuid": "1bd648e8-786a-479c-8609-e2f87f5b706e",
+    "watchapp": {
+      "watchface": true,
+      "hiddenApp": false,
+      "onlyShownOnCommunication": false
+    },
+    "resources": {
+      "media": [
+        {
+          "type": "font",
+          "name": "SHARE_20",
+          "file": "fonts/Share-TechMono.ttf",
+          "characterRegex": "[0-9%]"
+        },
+        {
+          "type": "font",
+          "name": "SHARE_24",
+          "file": "fonts/Share-TechMono.ttf",
+          "characterRegex": "[0-9A-GJ-PR-VY :]"
+        },
+        {
+          "type": "font",
+          "name": "SHARE_47",
+          "file": "fonts/Share-TechMono.ttf",
+          "characterRegex": "[ \\[\\]]"
+        }
+      ]
+    },
+    "messageKeys": {
+      "AppKeyBatteryMeter": 0,
+      "AppKeyBluetoothAlert": 1,
+      "AppKeyDashedLine": 2,
+      "AppKeySecondTick": 3,
+      "AppKeyBackgroundColor": 4,
+      "AppKeyDateColor": 5,
+      "AppKeyTimeColor": 6,
+      "AppKeyBracketColor": 7,
+      "AppKeyLineColor": 8,
+      "AppKeyComplicationColor": 9
+    }
+  }
+}
