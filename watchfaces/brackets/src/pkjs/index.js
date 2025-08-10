@@ -1,5 +1,3 @@
-var VERSION = '1.2';
-
 // https://github.com/smallstoneapps/gcolor.js/blob/master/lib/gcolor.js
 function GColorFromHex(hex) {
   var hexNum = parseInt(hex, 16);
@@ -11,9 +9,10 @@ function GColorFromHex(hex) {
 }
 
 Pebble.addEventListener('ready', function() {
-  console.log('PebbleKit JS ready! Version ' + VERSION);
+  console.log('PebbleKit JS ready!');
 });
 
+// TODO: Use clay
 Pebble.addEventListener('showConfiguration', function() {
   Pebble.openURL('https://dl.dropboxusercontent.com/u/10824180/pebble%20config%20pages/brackets-config.html?version=' + VERSION);
 });

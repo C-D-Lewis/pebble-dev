@@ -67,11 +67,17 @@ static char* get_caps_month(int month) {
   }
 }
 
+static char* zero_pad(int value) {
+  static char buffer[8];
+  snprintf(buffer, sizeof(buffer), "%02d", value);
+  return buffer;
+}
+
 static void tick_handler(struct tm *tick_time, TimeUnits changed) {
   // Date
   static char date_buffer[16];
-  snprintf(date_buffer, sizeof(date_buffer), "%s%d %d", 
-    get_caps_month(tick_time->tm_mon), tick_time->tm_mday, tick_time->tm_year - 100);
+  snprintf(date_buffer, sizeof(date_buffer), "%s%s %d", 
+    get_caps_month(tick_time->tm_mon), zero_pad(tick_time->tm_mday), tick_time->tm_year - 100);
   text_layer_set_text(s_date_layer, date_buffer);
 
   // Time
