@@ -1,29 +1,29 @@
 #include "comm.h"
 
 static void inbox_received_handler(DictionaryIterator *iter, void *context) {
-  for(int i = 0; i < DATA_NUM_BOOLEANS + DATA_NUM_COLORS; i++) {
-    Tuple *t = dict_find(iter, i);
-    if(t) {
-      int key = t->key;
-      switch(key) {
-        case AppKeyBatteryMeter:
-        case AppKeyBluetoothAlert:
-        case AppKeyDashedLine:
-        case AppKeySecondTick:
-          data_set_boolean(key, strcmp(t->value->cstring, "true") == 0);
-          break;
-
-        case AppKeyBackgroundColor:
-        case AppKeyDateColor:
-        case AppKeyTimeColor:
-        case AppKeyBracketColor:
-        case AppKeyLineColor:
-        case AppKeyComplicationColor:
-          data_set_color(key, (GColor){ .argb = t->value->int32 });
-          printf("%d got %d", key, (int)t->value->int32);
-          break;
-      }
+  Tuple *t = dict_read_first(iter);
+  while (t) {
+    uint32_t key = t->key;
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "Received key: %d", (int)key);
+    if (key == MESSAGE_KEY_BatteryMeter ||
+        key == MESSAGE_KEY_BluetoothAlert ||
+        key == MESSAGE_KEY_DashedLine ||
+        key == MESSAGE_KEY_SecondTick) {
+      APP_LOG(APP_LOG_LEVEL_DEBUG, "Received boolean: %d", (int)t->value->int32);
+      data_set_boolean(key, t->value->int32 == 1);
     }
+
+    if (key == MESSAGE_KEY_BackgroundColor ||
+        key == MESSAGE_KEY_DateColor ||
+        key == MESSAGE_KEY_TimeColor ||
+        key == MESSAGE_KEY_BracketColor ||
+        key == MESSAGE_KEY_LineColor ||
+        key == MESSAGE_KEY_ComplicationColor) {
+      APP_LOG(APP_LOG_LEVEL_DEBUG, "Received color: %d", (int)t->value->int32);
+      data_set_color(key, GColorFromHEX(t->value->int32));
+    }
+
+    t = dict_read_next(iter);
   }
 
   // Exit to reload
@@ -32,8 +32,5 @@ static void inbox_received_handler(DictionaryIterator *iter, void *context) {
 
 void comm_init() {
   app_message_register_inbox_received(inbox_received_handler);
-
-  const int inbox_size = 512;
-  const int outbox_size = 64;
-  app_message_open(inbox_size, outbox_size);
+  app_message_open(1024, 256);
 }

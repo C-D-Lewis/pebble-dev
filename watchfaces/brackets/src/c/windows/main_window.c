@@ -12,7 +12,7 @@ static TextLayer *s_brackets_layer, *s_date_layer, *s_time_layer, *s_battery_lay
 static Layer *s_dashes_layer, *s_bt_layer;
 
 static void bt_update_proc(Layer *layer, GContext *ctx) {
-  graphics_context_set_fill_color(ctx, data_get_color(AppKeyBackgroundColor));
+  graphics_context_set_fill_color(ctx, data_get_color(MESSAGE_KEY_BackgroundColor));
   graphics_fill_rect(ctx, layer_get_bounds(layer), 0 , GCornerNone);
 }
 
@@ -21,14 +21,14 @@ static void dashes_update_proc(Layer *layer, GContext *ctx) {
   const int line_height = 2;
 
   // Draw line
-  graphics_context_set_fill_color(ctx, data_get_color(AppKeyLineColor));
+  graphics_context_set_fill_color(ctx, data_get_color(MESSAGE_KEY_LineColor));
   graphics_fill_rect(ctx, GRect(0, 0, bounds.size.w, line_height), 0 , GCornerNone);
 
   // Cut dashes
   const int num_dashes = 9;
   const int dash_width = 18;
   const int dash_gap = 2;
-  graphics_context_set_fill_color(ctx, data_get_color(AppKeyBackgroundColor));
+  graphics_context_set_fill_color(ctx, data_get_color(MESSAGE_KEY_BackgroundColor));
   for(int i = 0; i < num_dashes; i++) {
     GRect rect = GRect((5 * dash_gap) + (i * dash_width), 0, dash_gap, line_height);
     graphics_fill_rect(ctx, rect, 0, GCornerNone);
@@ -82,7 +82,7 @@ static void tick_handler(struct tm *tick_time, TimeUnits changed) {
 
   // Time
   static char time_buffer[16];
-  if(data_get_boolean(AppKeySecondTick)) {
+  if(data_get_boolean(MESSAGE_KEY_SecondTick)) {
     strftime(time_buffer, sizeof(time_buffer), clock_is_24h_style() ? "%H:%M:%S" : "%I:%M:%S", tick_time);
   } else {
     strftime(time_buffer, sizeof(time_buffer), clock_is_24h_style() ? "%H:%M   " : "%I:%M   ", tick_time);
@@ -151,7 +151,9 @@ static void window_load(Window *window) {
 
   const int gap = 5;
   const int y_margin = (bounds.size.h - gap) / 2;
-  s_bt_layer = layer_create(grect_inset(bounds, GEdgeInsets(y_margin, 0)));
+  GRect bt_bounds = grect_inset(bounds, GEdgeInsets(y_margin, 0));
+  bt_bounds.origin.y -= gap;  // Not quite centered
+  s_bt_layer = layer_create(bt_bounds);
   layer_set_update_proc(s_bt_layer, bt_update_proc);
   layer_add_child(root_layer, s_bt_layer);
 }
@@ -193,25 +195,25 @@ void main_window_push() {
 }
 
 void main_window_reload() {
-  layer_set_hidden(text_layer_get_layer(s_battery_layer), !data_get_boolean(AppKeyBatteryMeter));
+  layer_set_hidden(text_layer_get_layer(s_battery_layer), !data_get_boolean(MESSAGE_KEY_BatteryMeter));
 
-  layer_set_hidden(s_bt_layer, !data_get_boolean(AppKeyBluetoothAlert));
+  layer_set_hidden(s_bt_layer, !data_get_boolean(MESSAGE_KEY_BluetoothAlert));
   connection_service_unsubscribe();
-  if(data_get_boolean(AppKeyBluetoothAlert)) {
+  if(data_get_boolean(MESSAGE_KEY_BluetoothAlert)) {
     connection_service_subscribe((ConnectionHandlers) {
       .pebble_app_connection_handler = bt_handler
     });
     bt_handler(connection_service_peek_pebble_app_connection());
   }
 
-  layer_set_hidden(s_dashes_layer, !data_get_boolean(AppKeyDashedLine));
+  layer_set_hidden(s_dashes_layer, !data_get_boolean(MESSAGE_KEY_DashedLine));
 
   tick_timer_service_unsubscribe();
-  tick_timer_service_subscribe(data_get_boolean(AppKeySecondTick) ? SECOND_UNIT : MINUTE_UNIT, tick_handler);
+  tick_timer_service_subscribe(data_get_boolean(MESSAGE_KEY_SecondTick) ? SECOND_UNIT : MINUTE_UNIT, tick_handler);
 
-  window_set_background_color(s_window, data_get_color(AppKeyBackgroundColor));
-  text_layer_set_text_color(s_brackets_layer, data_get_color(AppKeyBracketColor));
-  text_layer_set_text_color(s_date_layer, data_get_color(AppKeyDateColor));
-  text_layer_set_text_color(s_time_layer, data_get_color(AppKeyTimeColor));
-  text_layer_set_text_color(s_battery_layer, data_get_color(AppKeyComplicationColor));
+  window_set_background_color(s_window, data_get_color(MESSAGE_KEY_BackgroundColor));
+  text_layer_set_text_color(s_brackets_layer, data_get_color(MESSAGE_KEY_BracketColor));
+  text_layer_set_text_color(s_date_layer, data_get_color(MESSAGE_KEY_DateColor));
+  text_layer_set_text_color(s_time_layer, data_get_color(MESSAGE_KEY_TimeColor));
+  text_layer_set_text_color(s_battery_layer, data_get_color(MESSAGE_KEY_ComplicationColor));
 }
