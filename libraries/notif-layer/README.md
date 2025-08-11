@@ -13,7 +13,7 @@ Simple top-down notification Layer subclass for Pebble.
 
 2. Add the `NotifLayer` to the `Window` it will display within:
 
-        notif_layer_add_to_window(some_parent_window);
+        notif_layer_add_to_window(notif_layer, some_parent_window);
 
 3. Show a notification. Long text will automatically scroll:
 

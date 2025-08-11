@@ -26,17 +26,9 @@ void notif_layer_add_to_window(NotifLayer *this, Window *parent) {
 static void destroy_animations(NotifLayer *this) {
   if(this->content_prop_anim) {
     animation_unschedule((Animation*)this->content_prop_anim);
-#ifdef PBL_SDK_2
-    property_animation_destroy(this->content_prop_anim);
-    this->content_prop_anim = NULL;
-#endif
   }
   if(this->bg_prop_anim) {
     animation_unschedule((Animation*)this->bg_prop_anim);
-#ifdef PBL_SDK_2
-    property_animation_destroy(this->bg_prop_anim);
-    this->bg_prop_anim = NULL;
-#endif
   }
 }
 

@@ -9,7 +9,7 @@ Some PBWs can be found in `/pbw` for sideloading.
 
 ## `watchfaces`
 
-> `A` = Aplite, `B` = Basalt, `C` = Chalk, `D` = Diorite, `E` = Emery platforms.
+> Platforms: `A` = Aplite, `B` = Basalt, `C` = Chalk, `D` = Diorite, `E` = Emery
 
 | Name                           | Builds              | Icon | PBW                                |
 |--------------------------------|---------------------|------|------------------------------------|
@@ -45,14 +45,29 @@ Some PBWs can be found in `/pbw` for sideloading.
 
 ## `watchapps`
 
-| Name                | Status                  | Icon | PBW                             |
-|---------------------|-------------------------|------|---------------------------------|
-| `tube-status`       | `A` `B` `C` `D`         | ✅    | [pbw](pbw/tube-status.pbw)      |
-| `block-world`       | `B` `C`                 |      | [pbw](pbw/block-world.pbw)      |
-| `modular-app-base`  | `A` `B` `C` `D`         |      | [pbw](pbw/modular-app-base.pbw) |
-| `news-headlines`    | `A` `B` `C` `D`         | ✅    | [pbw](pbw/news-headlines.pbw)   |
-| `pge-examples`      | ❌ (needs pge package)   |      |                                 |
-| `wristponder-redux` | ❌ (unfinished re-write) |      |                                 |
+| Name             | Status                | Icon | PBW                           |
+|------------------|-----------------------|------|-------------------------------|
+| `tube-status`    | `A` `B` `C` `D`       | ✅    | [pbw](pbw/tube-status.pbw)    |
+| `block-world`    | `B` `C`               |      | [pbw](pbw/block-world.pbw)    |
+| `news-headlines` | `A` `B` `C` `D`       | ✅    | [pbw](pbw/news-headlines.pbw) |
+| `pge-examples`   | ❌ (needs pge package) |      |                               |
+
+## `libraries`
+
+| Name                       | Status | Test App |
+|----------------------------|--------|----------|
+| `notif-layer`              | ✅      | ✅        |
+| `pebble-alert-lib`         |        |          |
+| `pebble-isometric`         |        |          |
+| `pebble-packet`            |        |          |
+| `pebble-pge-simple`        |        |          |
+| `pebble-progressbar-layer` |        |          |
+| `pebble-simple-request`    |        |          |
+| `pebble-timeline-js`       |        |          |
+| `pebble-timeline-js-node`  |        |          |
+| `pebble-universal-fb`      |        |          |
+| `ToastLayer`               |        |          |
+
 
 ## `other`
 
@@ -62,12 +77,12 @@ Defunct, incomplete, or PoC things live here.
 
 Some larger projects still live in their own repositories:
 
-| Name                                                | Status | Icon | PBW                           |
-|-----------------------------------------------------|--------|------|-------------------------------|
-| [thin](https://github.com/C-D-Lewis/thin)           | ✅      |      | [pbw](pbw/thin.pbw)           |
-| [dashboard](https://github.com/C-D-Lewis/dashboard) | ✅      | ✅    | [pbw](pbw/dashboard.pbw)      |
-| [beam-up](https://github.com/C-D-Lewis/beam-up)     | ✅      | ✅    | [pbw](pbw/beam-up.pbw)        |
-| [pge](https://github.com/C-D-Lewis/pge)             | ✅      |      | [pbw](pbw/pge.pbw) (test app) |
+| Name                                                | Status       | Icon | PBW                      |
+|-----------------------------------------------------|--------------|------|--------------------------|
+| [thin](https://github.com/C-D-Lewis/thin)           | ✅            |      | [pbw](pbw/thin.pbw)      |
+| [dashboard](https://github.com/C-D-Lewis/dashboard) | ✅            | ✅    | [pbw](pbw/dashboard.pbw) |
+| [beam-up](https://github.com/C-D-Lewis/beam-up)     | ✅            | ✅    | [pbw](pbw/beam-up.pbw)   |
+| [pge](https://github.com/C-D-Lewis/pge)             | ✅ (test app) |      | -                        |
 
 ## Develop in Docker
 
