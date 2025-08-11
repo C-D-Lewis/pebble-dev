@@ -59,7 +59,7 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `notif-layer`              | ✅      | ✅        |
 | `pebble-alert-lib`         |        |          |
 | `pebble-isometric`         |        |          |
-| `pebble-packet`            |        |          |
+| `pebble-packet`            | ✅      | ✅        |
 | `pebble-pge-simple`        |        |          |
 | `pebble-progressbar-layer` |        |          |
 | `pebble-simple-request`    |        |          |

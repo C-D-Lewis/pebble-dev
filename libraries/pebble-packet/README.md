@@ -7,43 +7,46 @@ Available on [NPM](https://www.npmjs.com/package/pebble-packet).
 
 ## How to use
 
-1. Install the Pebble package:
+1. Install the Pebble packages:
 
   ```
   $ pebble package install pebble-packet
+  $ pebble package install pebble-events
   ```
 
-2. Add the pebble-package include at the top of your source.
+2. Add the includes at the top of your source.
 
   ```c
   #include <pebble-packet/pebble-packet.h>
+  #include <pebble-events/pebble-events.h>
   ```
 
-3. Ensure `AppMessage` is open:
+3. Ensure `AppMessage` is open via `pebble-events`:
 
   ```c
-  const int inbox = 128;
-  const int outbox = 128;
-  events_app_message_request_inbox_size(inbox);
-  events_app_message_request_outbox_size(outbox);
+  events_app_message_request_inbox_size(512);
+  events_app_message_request_outbox_size(512);
   events_app_message_open();
   ```
 
 4. Begin, build, and send a packet:
 
   ```c
-  if(packet_begin()) {
+  if (packet_begin()) {
     packet_put_integer(AppKeyInteger, 42);
     packet_put_string(AppKeyString, "Don't talk to me about life.");
-    packet_send();
+    packet_send(failed_handler);
   }
   ```
 
 5. Get data from a received dictionary:
 
   ```c
-  // in your setup after the app_message_open call
-  app_message_register_inbox_received(in_recv_handler);
+  // in your setup AFTER the app message open call
+  events_app_message_register_inbox_received(inbox_received_handler, NULL);
+  ```
+
+  ```c
   
   static void in_recv_handler(DictionaryIterator *iter, void *context) {
     if(packet_contains_key(iter, MESSAGE_KEY_Integer)) {
