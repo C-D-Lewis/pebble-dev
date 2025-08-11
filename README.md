@@ -14,7 +14,7 @@ Some PBWs can be found in `/pbw` for sideloading.
 | Name                           | Builds              | Icon | PBW                                |
 |--------------------------------|---------------------|------|------------------------------------|
 | `split-horizon-se`             | ⚠️ (old inv layer)  | ✅    |                                    |
-| `brackets`                     | `A` `B` `C` `D`     | ✏️   | [pbw](pbw/brackets.pbw)            |
+| `brackets`                     | `A` `B` `C` `D`     | ✅    | [pbw](pbw/brackets.pbw)            |
 | `cards`                        | `A` `B` `D`         |      | [pbw](pbw/cards.pbw)               |
 | `cmd-time`                     | `A` `B` `C` `D` `E` |      | [pbw](pbw/cmd-time.pbw)            |
 | `dayring`                      | `A` `B` `C` `D`     |      | [pbw](pbw/dayring.pbw)             |
@@ -62,12 +62,12 @@ Defunct, incomplete, or PoC things live here.
 
 Some larger projects still live in their own repositories:
 
-| Name                                                | Status | PBW                           |
-|-----------------------------------------------------|--------|-------------------------------|
-| [thin](https://github.com/C-D-Lewis/thin)           | ✅      | [pbw](pbw/thin.pbw)           |
-| [dashboard](https://github.com/C-D-Lewis/dashboard) | ✅      | [pbw](pbw/dashboard.pbw)      |
-| [beam-up](https://github.com/C-D-Lewis/beam-up)     | ✅      | [pbw](pbw/beam-up.pbw)        |
-| [pge](https://github.com/C-D-Lewis/pge)             | ✅      | [pbw](pbw/pge.pbw) (test app) |
+| Name                                                | Status | Icon | PBW                           |
+|-----------------------------------------------------|--------|------|-------------------------------|
+| [thin](https://github.com/C-D-Lewis/thin)           | ✅      |      | [pbw](pbw/thin.pbw)           |
+| [dashboard](https://github.com/C-D-Lewis/dashboard) | ✅      | ✅    | [pbw](pbw/dashboard.pbw)      |
+| [beam-up](https://github.com/C-D-Lewis/beam-up)     | ✅      | ✅    | [pbw](pbw/beam-up.pbw)        |
+| [pge](https://github.com/C-D-Lewis/pge)             | ✅      |      | [pbw](pbw/pge.pbw) (test app) |
 
 ## Develop in Docker
 
@@ -104,7 +104,8 @@ Missing `wscript`. Running `pebble convert-project` helped.
 
 #### `An invalid value of '2' was found in the 'sdkVersion' field of the project's package.json. The latest supported value for this field is '3'.`
 
-(Even when it's not true) - manually update `appinfo.json` to the more recent `package.json` format from another working project, field by field.
+(Even when it's not true) - manually update `appinfo.json` to the more recent
+`package.json` format from another working project, field by field.
 
 #### waf-looking errors or resource indice errors
 
@@ -112,10 +113,13 @@ Copy `wscript` from a working project.
 
 #### Missing images
 
-As of SDK 3, some image resource types like `png` were deprecated.
+As of SDK 3, some image resource types like `png` were deprecated. `bitmap`
+should be used instead
 
 ## Todo
 
-- [] Finish importing all previous Pebble projects
-- [] Fix build in GitHub Actions
-
+- [x] Fix build in GitHub Actions
+- [ ] Finish importing all previous Pebble projects
+- [ ] Merge Split Horizon editions into config.
+- [ ] Menu icons for all current watchfaces and watchapps
+- [ ] Migrate all custom config to Clay.

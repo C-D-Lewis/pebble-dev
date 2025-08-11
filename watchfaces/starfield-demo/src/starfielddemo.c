@@ -20,11 +20,6 @@ struct Star {
 
 struct Star *stars[MAX_STARS];
 
-static void applog(const char* message)
-{
-	app_log(APP_LOG_LEVEL_INFO, "renderer.c", 0, message);
-}
-
 /********************************** Star Lifecycle *****************************/
 
 static struct Star* create_star()
