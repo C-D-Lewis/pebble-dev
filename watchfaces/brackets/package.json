@@ -46,6 +46,12 @@
           "name": "SHARE_47",
           "file": "fonts/Share-TechMono.ttf",
           "characterRegex": "[ \\[\\]]"
+        },
+        {
+          "type": "bitmap",
+          "name": "MENU_ICON",
+          "file": "images/menu_icon.png",
+          "menuIcon": true
         }
       ]
     },
