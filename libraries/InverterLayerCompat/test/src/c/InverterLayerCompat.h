@@ -1,10 +1,6 @@
 /**
- * InverterLayer substitute for Basalt
+ * InverterLayer substitute
  * Author: Chris Lewis
- *
- * Caveats: 
- * - Must specify colors with inverter_layer_set_colors().
- * - Due to shared framebuffer, there can only be one color set
  */
 
 #pragma once

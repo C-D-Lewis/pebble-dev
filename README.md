@@ -17,6 +17,7 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `brackets`                     | `A` `B` `C` `D`     | ✅    | [pbw](pbw/brackets.pbw)            |
 | `cards`                        | `A` `B` `D`         |      | [pbw](pbw/cards.pbw)               |
 | `cmd-time`                     | `A` `B` `C` `D` `E` | ✅    | [pbw](pbw/cmd-time.pbw)            |
+| `cmd-time-typed`               | `A` `B` `C` `D` `E` | ✅    | [pbw](pbw/cmd-time-typed.pbw)      |
 | `dayring`                      | `A` `B` `C` `D`     |      | [pbw](pbw/dayring.pbw)             |
 | `deep-rock`                    | `A` `B` `D`         |      | [pbw](pbw/deep-rock.pbw)           |
 | `dual-gauge`                   | `A` `B` `C` `D`     |      | [pbw](pbw/dual-gauge.pbw)          |
@@ -31,7 +32,6 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `starfield-smooth`             | `A` `B` `C`         | ✅    | [pbw](pbw/starfield-smooth.pbw)    |
 | `startfield-demo`              | `A` `B` `C` `D`     |      | [pbw](pbw/starfield-demo.pbw)      |
 | `time-dots-appstore`           | `A` `B` `C` `D`     |      | [pbw](pbw/time-dots-appstore.pbw)  |
-| `cmd-time-typed`               | ❌ (old inv layer)   |      |                                    |
 | `eclipse-solar`                | ❌ (WIP)             |      |                                    |
 | `isotime-appstore`             | ❌ (pge-simple)      |      |                                    |
 | `split-horizon-me`             | ❌ (old inv layer)   | ✅    |                                    |
@@ -47,15 +47,16 @@ Some PBWs can be found in `/pbw` for sideloading.
 
 | Name             | Status                | Icon | PBW                           |
 |------------------|-----------------------|------|-------------------------------|
-| `tube-status`    | `A` `B` `C` `D`       | ✅    | [pbw](pbw/tube-status.pbw)    |
 | `block-world`    | `B` `C`               |      | [pbw](pbw/block-world.pbw)    |
 | `news-headlines` | `A` `B` `C` `D`       | ✅    | [pbw](pbw/news-headlines.pbw) |
 | `pge-examples`   | ❌ (needs pge package) |      |                               |
+| `tube-status`    | `A` `B` `C` `D`       | ✅    | [pbw](pbw/tube-status.pbw)    |
 
 ## `libraries`
 
 | Name                       | Status | Test App |
 |----------------------------|--------|----------|
+| `InverterLayerCompat`      | ✅      | ✅        |
 | `notif-layer`              | ✅      | ✅        |
 | `pebble-alert-lib`         |        |          |
 | `pebble-isometric`         |        |          |
@@ -63,8 +64,8 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `pebble-pge-simple`        |        |          |
 | `pebble-progressbar-layer` |        |          |
 | `pebble-simple-request`    |        |          |
-| `pebble-timeline-js`       |        |          |
 | `pebble-timeline-js-node`  |        |          |
+| `pebble-timeline-js`       |        |          |
 | `pebble-universal-fb`      |        |          |
 | `ToastLayer`               |        |          |
 

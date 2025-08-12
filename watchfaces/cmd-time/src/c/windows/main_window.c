@@ -1,5 +1,5 @@
 #include <pebble.h>
-#include "../lib/InverterLayerCompat.h"
+#include "main_window.h"
 
 static Window *window;
 static TextLayer *s_time_label, *s_time_layer, *s_date_label, *s_date_layer, *s_prompt_label;
