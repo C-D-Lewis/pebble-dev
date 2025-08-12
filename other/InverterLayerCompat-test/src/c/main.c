@@ -14,8 +14,8 @@ static void window_load(Window *window) {
   text_layer_set_text_alignment(s_text_layer, GTextAlignmentCenter);
   layer_add_child(window_layer, text_layer_get_layer(s_text_layer));
 
-  s_inverter_layer = inverter_layer_compat_create(grect_inset(bounds, GEdgeInsets(20)));
-  inverter_layer_compat_set_colors(GColorBlack, GColorWhite);
+  GColor replacement = PBL_IF_COLOR_ELSE(GColorBlue, GColorWhite);
+  s_inverter_layer = inverter_layer_compat_create(grect_inset(bounds, GEdgeInsets(20)), GColorBlack, replacement);
   layer_add_child(window_layer, inverter_layer_compat_get_layer(s_inverter_layer));
 }
 

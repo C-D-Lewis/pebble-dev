@@ -1,7 +1,5 @@
 #include "InverterLayerCompat.h"
 
-static GColor s_fg_color, s_bg_color;
-
 static bool byte_get_bit(uint8_t *byte, uint8_t bit) {
   return ((*byte) >> bit) & 1;
 }
@@ -10,45 +8,29 @@ static void byte_set_bit(uint8_t *byte, uint8_t bit, uint8_t value) {
   *byte ^= (-value ^ *byte) & (1 << bit);
 }
 
-static GColor get_pixel_color(uint8_t *fb_data, GSize fb_size, GPoint layer_origin, GPoint pixel) {
-  int offset = (pixel.y * fb_size.w) + pixel.x;
-
-  // Need to consider the layer origin
-  pixel.x += layer_origin.x;
-  pixel.y += layer_origin.y;
-
-  if (pixel.x >= 0 && pixel.x < fb_size.w && pixel.y >= 0 && pixel.y < fb_size.h) {
+static GColor get_pixel_color(GBitmapDataRowInfo info, GPoint point) {
 #if defined(PBL_COLOR)
-    // Read whole byte
-    return (GColor) { .argb = fb_data[offset] };
-#else
-    // Read the bit
-    int byte_index = offset / 8;
-    uint8_t bit_index = offset % 8;
-    if (pixel.x == 100 && pixel.y == 100) {
-      APP_LOG(APP_LOG_LEVEL_DEBUG, "x,y: %d,%d, offset: %d, byte_index: %d, bit_index: %d", pixel.x, pixel.y, offset, byte_index, bit_index);
-    }
-    return byte_get_bit(&fb_data[byte_index], bit_index) ? GColorWhite : GColorBlack;
+  // Read the single byte color pixel
+  return (GColor){ .argb = info.data[point.x] };
+#elif defined(PBL_BW)
+  // Read the single bit of the correct byte
+  uint8_t byte = point.x / 8;
+  uint8_t bit = point.x % 8; 
+  return byte_get_bit(&info.data[byte], bit) ? GColorWhite : GColorBlack;
 #endif
-  } else {
-    return PBL_IF_COLOR_ELSE(GColorRed, GColorBlack); // Default color if out of bounds
-  }
 }
 
-static void set_pixel_color(uint8_t *fb_data, GSize fb_size, GPoint pixel, GColor color) {
-  int offset = (pixel.y * fb_size.w) + pixel.x;
-
-  if (pixel.x >= 0 && pixel.x < fb_size.w && pixel.y >= 0 && pixel.y < fb_size.h) {
+static void set_pixel_color(GBitmapDataRowInfo info, GPoint point, 
+                                                                GColor color) {
 #if defined(PBL_COLOR)
-    // Write whole byte
-    memset(&fb_data[offset], (uint8_t)color.argb, 1);
-#else
-    // Write the bit
-    int byte_index = offset / 8;
-    uint8_t bit_index = offset % 8;
-    byte_set_bit(&fb_data[byte_index], bit_index, gcolor_equal(color, GColorWhite) ? 1 : 0);
+  // Write the pixel's byte color
+  memset(&info.data[point.x], color.argb, 1);
+#elif defined(PBL_BW)
+  // Find the correct byte, then set the appropriate bit
+  uint8_t byte = point.x / 8;
+  uint8_t bit = point.x % 8; 
+  byte_set_bit(&info.data[byte], bit, gcolor_equal(color, GColorWhite) ? 1 : 0);
 #endif
-  }
 }
 
 static void layer_update_proc(Layer *layer, GContext *ctx) {
@@ -56,18 +38,23 @@ static void layer_update_proc(Layer *layer, GContext *ctx) {
   GBitmap *fb = graphics_capture_frame_buffer(ctx);
   GSize size = gbitmap_get_bounds(fb).size;
   GRect frame = layer_get_frame(layer);
+  InverterLayerCompatInfo ilc_info = *(InverterLayerCompatInfo*)layer_get_data(layer);
   
   uint8_t *fb_data = gbitmap_get_data(fb);
 
+  // Iterate over the whole frame but only within the layer's bounds
   for (int y = frame.origin.y; y < frame.origin.y + frame.size.h; y++) {
+    GBitmapDataRowInfo info = gbitmap_get_data_row_info(fb, y);
+
     for (int x = frame.origin.x; x < frame.origin.x + frame.size.w; x++) {
-      GColor pixel_color = get_pixel_color(fb_data, size, frame.origin, GPoint(x, y));
-      if (gcolor_equal(pixel_color, s_fg_color)) {
+      GColor pixel_color = get_pixel_color(info, GPoint(x, y));
+      
+      if (gcolor_equal(pixel_color, ilc_info.fg_color)) {
         // Invert foreground to background
-        set_pixel_color(fb_data, size, GPoint(x, y), s_bg_color);
-      } else if (gcolor_equal(pixel_color, s_bg_color)) {
+        set_pixel_color(info, GPoint(x, y), ilc_info.bg_color);
+      } else if (gcolor_equal(pixel_color, ilc_info.bg_color)) {
         // Invert background to foreground
-        set_pixel_color(fb_data, size, GPoint(x, y), s_fg_color);
+        set_pixel_color(info, GPoint(x, y), ilc_info.fg_color);
       }
     }
   }
@@ -76,17 +63,15 @@ static void layer_update_proc(Layer *layer, GContext *ctx) {
   graphics_release_frame_buffer(ctx, fb);
 }
 
-InverterLayerCompat *inverter_layer_compat_create(GRect bounds) {
+InverterLayerCompat *inverter_layer_compat_create(GRect bounds, GColor fg, GColor bg) {
   InverterLayerCompat *this = (InverterLayerCompat*)malloc(sizeof(InverterLayerCompat));
-  this->layer = layer_create(bounds);
+  this->layer = layer_create_with_data(bounds, sizeof(InverterLayerCompatInfo));
+  InverterLayerCompatInfo *ilc_info = (InverterLayerCompatInfo*)layer_get_data(this->layer);
+  ilc_info->fg_color = fg;
+  ilc_info->bg_color = bg;
   layer_set_update_proc(this->layer, layer_update_proc);
 
   return this;
-}
-
-void inverter_layer_compat_set_colors(GColor fg, GColor bg) {
-  s_fg_color = fg;
-  s_bg_color = bg;
 }
 
 void inverter_layer_compat_destroy(InverterLayerCompat *this) {
