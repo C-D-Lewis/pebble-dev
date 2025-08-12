@@ -16,7 +16,7 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `split-horizon-se`             | ⚠️ (old inv layer)  | ✅    |                                    |
 | `brackets`                     | `A` `B` `C` `D`     | ✅    | [pbw](pbw/brackets.pbw)            |
 | `cards`                        | `A` `B` `D`         |      | [pbw](pbw/cards.pbw)               |
-| `cmd-time`                     | `A` `B` `C` `D` `E` |      | [pbw](pbw/cmd-time.pbw)            |
+| `cmd-time`                     | `A` `B` `C` `D` `E` | ✅    | [pbw](pbw/cmd-time.pbw)            |
 | `dayring`                      | `A` `B` `C` `D`     |      | [pbw](pbw/dayring.pbw)             |
 | `deep-rock`                    | `A` `B` `D`         |      | [pbw](pbw/deep-rock.pbw)           |
 | `dual-gauge`                   | `A` `B` `C` `D`     |      | [pbw](pbw/dual-gauge.pbw)          |
