@@ -1,5 +1,5 @@
 #include <pebble.h>
-#include "modules/InverterLayerCompat.h"
+#include "../lib/InverterLayerCompat.h"
 
 static Window *window;
 static TextLayer *s_time_label, *s_time_layer, *s_date_label, *s_date_layer, *s_prompt_label;
@@ -76,8 +76,7 @@ static void window_load(Window *window) {
   text_layer_set_text(s_prompt_label, "C:\\>");
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_prompt_label));
 
-  s_prompt_layer = inverter_layer_compat_create(GRect(45, 115, 12, 2));
-  inverter_layer_compat_set_colors(GColorWhite, GColorBlack);
+  s_prompt_layer = inverter_layer_compat_create(GRect(45, 115, 12, 2), GColorWhite, GColorBlack);
 
   // Initial time display
   time_t temp = time(NULL);    
