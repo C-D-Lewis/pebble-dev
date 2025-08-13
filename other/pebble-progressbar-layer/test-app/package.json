@@ -1,0 +1,30 @@
+{
+  "name": "pebble-progressbar-layer-test",
+  "author": "Chris Lewis",
+  "version": "1.0.0",
+  "keywords": ["pebble-app"],
+  "private": true,
+  "dependencies": {},
+  "pebble": {
+    "displayName": "pebble-progressbar-layer-test",
+    "uuid": "fff11e77-6b88-42cc-90f4-b209d3266064",
+    "sdkVersion": "3",
+    "enableMultiJS": true,
+    "targetPlatforms": [
+      "aplite",
+      "basalt",
+      "chalk",
+      "diorite",
+      "emery"
+    ],
+    "watchapp": {
+      "watchface": false
+    },
+    "messageKeys": [
+      "dummy"
+    ],
+    "resources": {
+      "media": []
+    }
+  }
+}
