@@ -83,7 +83,7 @@ Some larger projects still live in their own repositories:
 | [thin](https://github.com/C-D-Lewis/thin)           | `A` `B` `C` `D` `E` | ✅    | [pbw](pbw/thin.pbw)      |
 | [dashboard](https://github.com/C-D-Lewis/dashboard) | `A` `B` `C` `D`     | ✅    | [pbw](pbw/dashboard.pbw) |
 | [beam-up](https://github.com/C-D-Lewis/beam-up)     | `A` `B` `C` `D`     | ✅    | [pbw](pbw/beam-up.pbw)   |
-| [pge](https://github.com/C-D-Lewis/pge)             | ✅ (test app)        |      | -                        |
+| [pge](https://github.com/C-D-Lewis/pge)             | -                   | -    | -                        |
 
 ## Develop in Docker
 
