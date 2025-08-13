@@ -29,6 +29,6 @@
     }
   },
   "dependencies": {
-    "pebble-universal-fb": "file:.."
+    "pebble-universal-fb": "^1.7.2"
   }
 }

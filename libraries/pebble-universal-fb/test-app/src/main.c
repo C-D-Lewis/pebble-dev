@@ -21,14 +21,14 @@ static void test_universal_fb(GBitmap *fb, GColor c1, GColor c2) {
        "universal_fb_set/get_pixel_color");
 
   // Test swap
-  universal_fb_swap_colors(fb, bounds, c1, c2);
+  universal_fb_swap_colors(fb, grect_inset(bounds, GEdgeInsets(20)), c1, c2);
   test(gcolor_equal(universal_fb_get_pixel_color(info, bounds, test_point), c2), 
        "universal_fb_swap_colors");
 }
 
 static void update_proc(Layer *layer, GContext *ctx) {
-  GColor c1 = PBL_IF_COLOR_ELSE(GColorRed, GColorBlack);
-  GColor c2 = PBL_IF_COLOR_ELSE(GColorGreen, GColorWhite);
+  GColor c1 = GColorBlack;
+  GColor c2 = GColorWhite;
 
   GBitmap *fb = graphics_capture_frame_buffer(ctx);
   test_universal_fb(fb, c1, c2);

@@ -59,14 +59,14 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `InverterLayerCompat`      | ✅      | ✅        |
 | `notif-layer`              | ✅      | ✅        |
 | `pebble-alert-lib`         |        |          |
-| `pebble-isometric`         |        |          |
+| `pebble-isometric`         | ✅      | ✅        |
 | `pebble-packet`            | ✅      | ✅        |
 | `pebble-pge-simple`        |        |          |
 | `pebble-progressbar-layer` |        |          |
 | `pebble-simple-request`    |        |          |
 | `pebble-timeline-js-node`  |        |          |
 | `pebble-timeline-js`       |        |          |
-| `pebble-universal-fb`      |        |          |
+| `pebble-universal-fb`      | ✅       | ✅         |
 | `ToastLayer`               |        |          |
 
 
