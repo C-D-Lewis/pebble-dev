@@ -45,7 +45,7 @@ Some PBWs can be found in `/pbw` for sideloading.
 
 ## `watchapps`
 
-| Name             | Status                | Icon | PBW                           |
+| Name             | Builds                | Icon | PBW                           |
 |------------------|-----------------------|------|-------------------------------|
 | `block-world`    | `B` `C`               |      | [pbw](pbw/block-world.pbw)    |
 | `news-headlines` | `A` `B` `C` `D`       | ✅    | [pbw](pbw/news-headlines.pbw) |
@@ -78,12 +78,12 @@ Defunct, incomplete, or PoC things live here.
 
 Some larger projects still live in their own repositories:
 
-| Name                                                | Status       | Icon | PBW                      |
-|-----------------------------------------------------|--------------|------|--------------------------|
-| [thin](https://github.com/C-D-Lewis/thin)           | ✅            |      | [pbw](pbw/thin.pbw)      |
-| [dashboard](https://github.com/C-D-Lewis/dashboard) | ✅            | ✅    | [pbw](pbw/dashboard.pbw) |
-| [beam-up](https://github.com/C-D-Lewis/beam-up)     | ✅            | ✅    | [pbw](pbw/beam-up.pbw)   |
-| [pge](https://github.com/C-D-Lewis/pge)             | ✅ (test app) |      | -                        |
+| Name                                                | Builds              | Icon | PBW                      |
+|-----------------------------------------------------|---------------------|------|--------------------------|
+| [thin](https://github.com/C-D-Lewis/thin)           | `A` `B` `C` `D` `E` | ✅    | [pbw](pbw/thin.pbw)      |
+| [dashboard](https://github.com/C-D-Lewis/dashboard) | `A` `B` `C` `D`     | ✅    | [pbw](pbw/dashboard.pbw) |
+| [beam-up](https://github.com/C-D-Lewis/beam-up)     | `A` `B` `C` `D`     | ✅    | [pbw](pbw/beam-up.pbw)   |
+| [pge](https://github.com/C-D-Lewis/pge)             | ✅ (test app)        |      | -                        |
 
 ## Develop in Docker
 
@@ -136,6 +136,7 @@ should be used instead
 
 - [x] Fix build in GitHub Actions
 - [ ] Finish importing all previous Pebble projects
-- [ ] Merge Split Horizon editions into config.
+- [ ] Merge all Split Horizon editions into config.
 - [ ] Menu icons for all current watchfaces and watchapps
 - [ ] Migrate all custom config to Clay.
+- [ ] Verify correct tick unit used.
