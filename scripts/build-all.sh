@@ -60,9 +60,9 @@ function build_all_in_dir {
 function setup {
   echo "Setting up build environment..."
   
-  if [[ -n "${CI:-}" ]]; then
-    echo "module.exports = { token: 'foo' };" > ./watchfaces/cards/src/pkjs/secrets.js
-  fi
+  # Save this if running this script locally
+  mv ./watchfaces/cards/src/pkjs/secrets.js ./watchfaces/cards/src/pkjs/secrets.js.bak || true
+  echo "module.exports = { token: 'foo' };" > ./watchfaces/cards/src/pkjs/secrets.js
 }
 
 setup
