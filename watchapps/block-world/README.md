@@ -2,7 +2,7 @@
 
 Simple 'block-builder' game for Pebble SDK 3.0
 
-![screenshot](screenshots/screenshot.png)
+![screenshot](screenshots/basalt.png)
 
 Uses modified [PGE](https://github.com/C-D-Lewis/pge) and isometric libraries to
 show a grid of 16 x 16 x 14 blocks that can be placed by the user.

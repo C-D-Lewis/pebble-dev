@@ -69,6 +69,7 @@ function getWeather() {
   window.navigator.geolocation.getCurrentPosition(
     locationSuccess,
     function (err) {
+      console.log(err);
       Pebble.sendAppMessage({'KEY_REQUEST_TEMPERATURE': 'ERR'});
     },
     {'timeout': 15000, 'maximumAge': 60000}
