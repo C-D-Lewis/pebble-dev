@@ -14,6 +14,7 @@ working_projects=$(cat <<EOF
 ./watchfaces/deep-rock/
 ./watchfaces/dual-gauge/
 ./watchfaces/eclipse/
+./watchfaces/events/
 ./watchfaces/hollywatch/
 ./watchfaces/index/
 ./watchfaces/kitty-watchface/

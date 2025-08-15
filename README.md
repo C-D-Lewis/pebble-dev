@@ -1,11 +1,17 @@
 # pebble-dev
 
 Repository with my Pebble watchfaces, watchapps, and libraries - old and new.
-
-Projects here are mostly too old for the latest Pebble SDK, working status is
-shown in the lists below.
+Working status is shown in the lists below.
 
 Some PBWs can be found in `/pbw` for sideloading.
+
+- [watchfaces](#watchfaces)
+- [watchapps](#watchapps)
+- [libraries](#libraries)
+- [other](#other)
+- [Other repositories](#other-repositories)
+- [Debugging](#debugging)
+
 
 ## `watchfaces`
 
@@ -22,6 +28,7 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `deep-rock`                    | `A` `B` `D`         |      | [pbw](pbw/deep-rock.pbw)           |
 | `dual-gauge`                   | `A` `B` `C` `D`     |      | [pbw](pbw/dual-gauge.pbw)          |
 | `eclipse`                      | `A` `B` `D`         |      | [pbw](pbw/eclipse.pbw)             |
+| `events`                       | `A` `B` `D` `E`     | ✅    | [pbw](pbw/events.pbw)              |
 | `hollywatch`                   | `A` `B` `C` `D`     |      | [pbw](pbw/hollywatch.pbw)          |
 | `index`                        | `A` `B` `C` `D`     |      | [pbw](pbw/index.pbw)               |
 | `kitty-watchface`              | `A` `B` `D`         |      | [pbw](pbw/kitty-watchface.pbw)     |
@@ -38,7 +45,6 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `divider-large-2`              | ❔                   | ✅    |                                    |
 | `divider-small-2`              | ❔                   | ✅    |                                    |
 | `eventful`                     | ❔                   |      |                                    |
-| `events`                       | ❔                   |      |                                    |
 | `past-present-future-extended` | ❔                   |      |                                    |
 | `seven-segments-date`          | ❔                   | ✅    |                                    |
 | `seven-segments`               | ❔                   | ✅    |                                    |
@@ -54,17 +60,17 @@ Some PBWs can be found in `/pbw` for sideloading.
 
 ## `libraries`
 
-| Name                       | Status | Test App |
-|----------------------------|--------|----------|
-| `InverterLayerCompat`      | ✅      | ✅        |
-| `notif-layer`              | ✅      | ✅        |
-| `pebble-isometric`         | ✅      | ✅        |
-| `pebble-packet`            | ✅      | ✅        |
-| `pebble-pge-simple`        |        |          |
-| `pebble-simple-request`    |        |          |
-| `pebble-timeline-js-node`  |        |          |
-| `pebble-timeline-js`       |        |          |
-| `pebble-universal-fb`      | ✅      | ✅        |
+| Name                      | Status | Test App |
+|---------------------------|--------|----------|
+| `InverterLayerCompat`     | ✅      | ✅        |
+| `notif-layer`             | ✅      | ✅        |
+| `pebble-isometric`        | ✅      | ✅        |
+| `pebble-packet`           | ✅      | ✅        |
+| `pebble-pge-simple`       |        |          |
+| `pebble-simple-request`   |        |          |
+| `pebble-timeline-js-node` |        |          |
+| `pebble-timeline-js`      |        |          |
+| `pebble-universal-fb`     | ✅      | ✅        |
 
 
 ## `other`
@@ -82,26 +88,8 @@ Some larger projects still live in their own repositories:
 | [beam-up](https://github.com/C-D-Lewis/beam-up)     | `A` `B` `C` `D`     | ✅    | [pbw](pbw/beam-up.pbw)   |
 | [pge](https://github.com/C-D-Lewis/pge)             | -                   | -    | -                        |
 
-## Develop in Docker
 
-If you have a Docker image locally called `pebble-sdk`, the script
-`docker-dev.sh` can be used to run it and allow building and running at least on
-an emulator.
-
-Such an image can be built with
-[bboehmke/docker-pebble-dev](https://github.com/bboehmke/docker-pebble-dev)
-
-```
-docker build -t pebble-sdk .
-```
-
-Then run it pointing to a project directory:
-
-```
-./scripts/docker-dev.sh
-```
-
-### Debugging
+## Debugging
 
 Here are some errors encountered in old projects and the fixes I found:
 
