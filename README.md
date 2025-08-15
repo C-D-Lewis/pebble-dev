@@ -19,11 +19,10 @@ Some PBWs can be found in `/pbw` for sideloading.
 
 | Name                           | Builds              | Icon | PBW                                |
 |--------------------------------|---------------------|------|------------------------------------|
-| `split-horizon-se`             | ⚠️ (old inv layer)  | ✅    |                                    |
 | `brackets`                     | `A` `B` `C` `D`     | ✅    | [pbw](pbw/brackets.pbw)            |
 | `cards`                        | `A` `B` `D`         |      | [pbw](pbw/cards.pbw)               |
-| `cmd-time`                     | `A` `B` `C` `D` `E` | ✅    | [pbw](pbw/cmd-time.pbw)            |
 | `cmd-time-typed`               | `A` `B` `C` `D` `E` | ✅    | [pbw](pbw/cmd-time-typed.pbw)      |
+| `cmd-time`                     | `A` `B` `C` `D` `E` | ✅    | [pbw](pbw/cmd-time.pbw)            |
 | `dayring`                      | `A` `B` `C` `D`     |      | [pbw](pbw/dayring.pbw)             |
 | `deep-rock`                    | `A` `B` `D`         |      | [pbw](pbw/deep-rock.pbw)           |
 | `dual-gauge`                   | `A` `B` `C` `D`     |      | [pbw](pbw/dual-gauge.pbw)          |
@@ -31,6 +30,7 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `events`                       | `A` `B` `D` `E`     | ✅    | [pbw](pbw/events.pbw)              |
 | `hollywatch`                   | `A` `B` `C` `D`     |      | [pbw](pbw/hollywatch.pbw)          |
 | `index`                        | `A` `B` `C` `D`     |      | [pbw](pbw/index.pbw)               |
+| `isotime-appstore`             | `A` `B` `C` `D` `E` | ✅    | [pbw](pbw/isotime.pbw)             |
 | `kitty-watchface`              | `A` `B` `D`         |      | [pbw](pbw/kitty-watchface.pbw)     |
 | `morndas`                      | `A` `B` `D`         |      | [pbw](pbw/morndas.pbw)             |
 | `past-present-future`          | `A` `B` `D`         |      | [pbw](pbw/past-present-future.pbw) |
@@ -39,8 +39,8 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `starfield-smooth`             | `A` `B` `C`         | ✅    | [pbw](pbw/starfield-smooth.pbw)    |
 | `startfield-demo`              | `A` `B` `C` `D`     |      | [pbw](pbw/starfield-demo.pbw)      |
 | `time-dots-appstore`           | `A` `B` `C` `D`     |      | [pbw](pbw/time-dots-appstore.pbw)  |
+| `split-horizon-se`             | ⚠️ (old inv layer)  | ✅    |                                    |
 | `eclipse-solar`                | ❌ (WIP)             |      |                                    |
-| `isotime-appstore`             | ❌ (pge-simple)      |      |                                    |
 | `split-horizon-me`             | ❌ (old inv layer)   | ✅    |                                    |
 | `divider-large-2`              | ❔                   | ✅    |                                    |
 | `divider-small-2`              | ❔                   | ✅    |                                    |

@@ -1,0 +1,64 @@
+module.exports = [
+  { 
+    type: 'heading', 
+    defaultValue: 'Isotime Configuration' ,
+    size: 3
+  }, 
+  {
+    type: 'section',
+    items: [
+      {
+        type: 'heading',
+        defaultValue: 'Colors'
+      },
+      {
+        type: 'text',
+        defaultValue: 'Only available on compatible platforms.'
+      },
+      {
+        type: 'color',
+        label: 'Background',
+        messageKey: 'AppKeyColorBackground',
+        defaultValue: '000000'
+      },
+      {
+        type: 'color',
+        label: 'Block sides',
+        messageKey: 'AppKeyColorSides',
+        defaultValue: 'FF5500'
+      },
+      {
+        type: 'color',
+        label: 'Faces',
+        messageKey: 'AppKeyColorFace',
+        defaultValue: 'FFFF00'
+      }
+    ]
+  },
+  {
+    type: 'section',
+    items: [
+      {
+        type: 'heading',
+        defaultValue: 'Features'
+      },
+      {
+        type: 'toggle',
+        label: 'Animations',
+        messageKey: 'AppKeyAnimations',
+        defaultValue: true,
+        capabilities: [ 'RECT' ]
+      },
+      {
+        type: 'toggle',
+        label: 'Bluetooth alerts',
+        messageKey: 'AppKeyBluetooth',
+        defaultValue: true
+      }
+    ]
+  },
+  {
+    type: 'submit',
+    defaultValue: 'Save'
+  }
+]

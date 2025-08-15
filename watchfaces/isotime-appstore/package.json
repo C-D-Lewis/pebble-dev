@@ -1,9 +1,9 @@
 {
-  "version": "1.12.0",
+  "version": "1.13.0",
   "author": "Chris Lewis",
-  "name": "Isotime",
+  "name": "isotime",
   "dependencies": {
-    "pebble-clay": "^1.0.3",
+    "pebble-clay": "^1.0.4",
     "pebble-isometric": "^1.1.0",
     "pebble-packet": "^1.3.2",
     "pebble-pge-simple": "^1.0.1",
@@ -17,7 +17,14 @@
     "displayName": "Isotime",
     "sdkVersion": "3",
     "resources": {
-      "media": []
+      "media": [
+        {
+          "type": "bitmap",
+          "name": "MENU_ICON",
+          "file": "images/menu_icon.png",
+          "menuIcon": true
+        }
+      ]
     },
     "projectType": "native",
     "uuid": "4997bd2e-d87c-4377-ba52-a7b8a795b18d",
