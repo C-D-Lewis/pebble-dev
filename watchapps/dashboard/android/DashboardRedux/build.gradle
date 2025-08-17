@@ -1,6 +1,8 @@
 apply plugin: 'com.android.application'
 
 android {
+    namespace 'com.wordpress.ninedof.dashboard'
+
     compileSdkVersion 29
 
     defaultConfig {
@@ -23,5 +25,5 @@ dependencies {
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'com.google.android.gms:play-services-location:17.1.0'
     implementation 'com.getpebble:pebblekit:3.0.0'
-    compile files('libs/RootTools-3.4.jar')
+    implementation files('libs/RootTools-3.4.jar')
 }

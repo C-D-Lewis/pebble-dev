@@ -146,11 +146,12 @@ public class LogViewer extends Activity {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		switch(item.getItemId()) {
-		case R.id.action_refresh:
+		final int id = item.getItemId();
+		if (id == R.id.action_refresh) {
 			refreshLog();
-			break;
-		case R.id.action_report:
+		}
+
+		if (id == R.id.action_report) {
 			UserInterface.showDialog(this, 
 				"Log Reporting", 
 				"You are about to send a copy of this log to the developer to help fix a problem.\n\nPlease include a description of the problem you are experiencing.\n\nThanks for your co-operation!",
@@ -171,7 +172,6 @@ public class LogViewer extends Activity {
 					}
 				}
 			);
-			break;
 		}
 		
 		//Finally

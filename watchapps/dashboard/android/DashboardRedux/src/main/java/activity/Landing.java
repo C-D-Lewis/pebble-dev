@@ -64,7 +64,7 @@ import cl_toolkit.Web;
 import config.Build;
 import config.Keys;
 import config.Runtime;
-import no_commit.NoCommit;
+//import no_commit.NoCommit;
 
 public class Landing extends FragmentActivity {
 
@@ -408,7 +408,7 @@ public class Landing extends FragmentActivity {
             @Override
             public void run() {
                 showCard(newsCard);
-                downloadNews();
+//                downloadNews();
             }
 
         }, 800);
@@ -588,10 +588,9 @@ public class Landing extends FragmentActivity {
 
     @Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-			case R.id.action_settings:
-                startActivity(new Intent(this, AboutActivity.class));
-				break;
+        final int id = item.getItemId();
+		if (id == R.id.action_settings) {
+            startActivity(new Intent(this, AboutActivity.class));
 		}
 
 		return super.onOptionsItemSelected(item);
@@ -653,51 +652,51 @@ public class Landing extends FragmentActivity {
 	private void downloadNews() {
 		newsProgressBar.setVisibility(View.VISIBLE);
 		newsBody.setText("");
-		new Thread(new Runnable() {
-	
-			@Override
-			public void run() {
-                final Context context = getApplicationContext();
-				try {
-					final JSONObject appsJson = Web.downloadJSON(NoCommit.APP_VERSIONS_JSON_URL);
-                    JSONObject dashboardObj = appsJson.getJSONObject("dashboard");
-                    final String newsString = dashboardObj.getString("news");
-	
-					handler.postDelayed(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            try {
-                                // Hide progressbar
-                                newsProgressBar.setVisibility(View.GONE);
-
-                                // Show news
-                                newsBody.setText(newsString);
-                            } catch (Exception e) {
-                                newsBody.setText("There was a problem downloading the news text.");
-                                e.printStackTrace();
-                                Runtime.log(context, TAG, "Exception fetching news.", Logger.ERROR);
-                                Runtime.logStackTrace(context, e);
-                            }
-                        }
-
-                    }, 1000);
-				} catch (Exception e) {
-					e.printStackTrace();
-                    Runtime.log(context, TAG, "Exception fetching news.", Logger.ERROR);
-                    Runtime.logStackTrace(context, e);
-					handler.post(new Runnable() {
-	
-						@Override
-						public void run() {
-							newsBody.setText("There was a problem downloading the news text.");
-						}
-	
-					});
-				}
-			}
-	
-		}).start();
+//		new Thread(new Runnable() {
+//
+//			@Override
+//			public void run() {
+//                final Context context = getApplicationContext();
+//				try {
+//					final JSONObject appsJson = Web.downloadJSON(NoCommit.APP_VERSIONS_JSON_URL);
+//                    JSONObject dashboardObj = appsJson.getJSONObject("dashboard");
+//                    final String newsString = dashboardObj.getString("news");
+//
+//					handler.postDelayed(new Runnable() {
+//
+//                        @Override
+//                        public void run() {
+//                            try {
+//                                // Hide progressbar
+//                                newsProgressBar.setVisibility(View.GONE);
+//
+//                                // Show news
+//                                newsBody.setText(newsString);
+//                            } catch (Exception e) {
+//                                newsBody.setText("There was a problem downloading the news text.");
+//                                e.printStackTrace();
+//                                Runtime.log(context, TAG, "Exception fetching news.", Logger.ERROR);
+//                                Runtime.logStackTrace(context, e);
+//                            }
+//                        }
+//
+//                    }, 1000);
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//                    Runtime.log(context, TAG, "Exception fetching news.", Logger.ERROR);
+//                    Runtime.logStackTrace(context, e);
+//					handler.post(new Runnable() {
+//
+//						@Override
+//						public void run() {
+//							newsBody.setText("There was a problem downloading the news text.");
+//						}
+//
+//					});
+//				}
+//			}
+//
+//		}).start();
 	}
 
 	private void showCard(final CardView card) {

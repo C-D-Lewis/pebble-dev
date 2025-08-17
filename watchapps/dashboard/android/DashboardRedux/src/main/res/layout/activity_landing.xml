@@ -489,6 +489,7 @@
 
                 <RelativeLayout
                     android:layout_width="fill_parent"
+                    android:visibility="gone"
                     android:layout_height="wrap_content">
 
                     <TextView
