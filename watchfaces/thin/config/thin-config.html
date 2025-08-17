@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Thin Configuration</title>
+  </head>
+  <body>
+    <h2>Thin Configuration</h2>
+    <p>
+      Choose settings, click 'Save' and reload app to apply. 
+    </p>
+ 
+    <table>
+      <tr><td>Show weekday/month</td><td><input id='check_date' type='checkbox'/></tr>
+      <tr><td>Show day of month</td><td><input id='check_day' type='checkbox'/></tr>
+      <tr><td>Show disconnected indicator</td><td><input id='check_bluetooth' type='checkbox'/></td></tr>
+      <tr><td>Show battery level </td><td><input id='check_battery' type='checkbox'/></tr>
+      <tr><td>Show second hand</td><td><input id='check_second_hand' type='checkbox'/></tr>
+      <!-- <tr><td>Longer hands, no markers</td><td><input id='check_no_markers' type='checkbox'/></tr> -->
+    </table>
+
+    <p>
+    <button id='save_button'>Save</button>
+    </p>
+
+    <hr />
+    <h2>Version</h2>
+    <p id='current_version'>Current version:</p>
+    <p id='p_version'>Getting latest version...</p>
+
+    <hr />
+    <p>
+    <h2>Latest News</h2>
+    <p id='news'>Loading...</p>
+    </p>
+
+    <script>
+      function persistWrite(key, value) {
+        localStorage.setItem(key, value);
+      }
+
+      var persistRead = function(key, defaultValue) {
+        if(localStorage.getItem(key) === null) {
+          return defaultValue;
+        } else {
+          return localStorage.getItem(key);
+        }
+      };
+
+      function firstTimeSetup() {
+        if(!persistRead('first-time', false)) {
+          persistWrite('first-time', true);
+          console.log('This is the first launch!');
+
+          // Align with watchapp defaults
+          persistWrite('date', 'true');
+          persistWrite('day', 'true');
+          persistWrite('bluetooth', 'true');
+          persistWrite('battery', 'true');
+          persistWrite('second_hand', 'true');
+          // persistWrite('no_markers', 'false');
+        }
+      }
+
+      function loadConfig() {
+        document.getElementById('check_date').checked = persistRead('date', 'false') === 'true';
+        document.getElementById('check_day').checked = persistRead('day', 'false') === 'true';
+        document.getElementById('check_bluetooth').checked = persistRead('bluetooth', 'false') === 'true';
+        document.getElementById('check_battery').checked = persistRead('battery', 'false') === 'true';
+        document.getElementById('check_second_hand').checked = persistRead('second_hand', 'false') === 'true';
+        // document.getElementById('check_no_markers').checked = persistRead('no_markers', 'false') === 'true';
+      }
+
+      function ajax(url, type, callback) {
+        var xhr = new XMLHttpRequest();
+        xhr.onload = function () {
+          callback(this.responseText);
+        };
+        xhr.open(type, url);
+        xhr.send();
+      };
+
+      function getAppVersionAndNews() {
+        //Get latest
+        ajax(
+          'https://dl.dropboxusercontent.com/u/10824180/pebble%20config%20pages/app_versions.json', 
+          'GET',
+          function(responseText) {
+            var json = JSON.parse(responseText);
+            document.getElementById('p_version').innerHTML = 'Latest version: ' + json.thin;
+            document.getElementById('news').innerHTML = '' + json.thinnews;
+          }
+        );
+
+        //Get local
+        var version = '' + document.location;
+        var index = version.indexOf('version=');
+        if(index > 0) {
+          version = version.substring(index + 'version='.length);
+          document.getElementById('current_version').innerHTML = 'Current version: ' + version;
+        } else {
+          document.getElementById('current_version').innerHTML = 'Error determining local version. Running in the emulator?';
+        }
+      }
+
+      function getQueryParam(query, defaultValue) {
+        var query = location.search.substring(1);
+        var vars = query.split('&');
+        for (var i = 0; i < vars.length; i++) {
+          var pair = vars[i].split('=');
+          // If the query query parameter is found, decode it to use and return it for use
+          if (pair[0] === query) {
+            return decodeURIComponent(pair[1]);
+          }
+        }
+        return defaultValue || false;
+      }
+
+      var submitButton = document.getElementById('save_button');
+      submitButton.addEventListener('click', 
+        function() {
+          var options = {
+            'date': document.getElementById('check_date').checked ? 'true' : 'false',
+            'day': document.getElementById('check_day').checked ? 'true' : 'false',
+            'bluetooth': document.getElementById('check_bluetooth').checked ? 'true' : 'false',
+            'battery': document.getElementById('check_battery').checked ? 'true' : 'false',
+            'second_hand': document.getElementById('check_second_hand').checked ? 'true' : 'false'
+            // 'no_markers': document.getElementById('check_no_markers').checked ? 'true' : 'false'
+          };  
+
+          persistWrite('date', options.date);
+          persistWrite('day', options.day);
+          persistWrite('bluetooth', options.bluetooth);
+          persistWrite('battery', options.battery);
+          persistWrite('second_hand', options.second_hand);
+          // persistWrite('no_markers', options.no_markers);
+
+          // Set the return URL depending on the runtime environment
+          var return_to = getQueryParam('return_to', 'pebblejs://close#');
+          document.location = return_to + encodeURIComponent(JSON.stringify(options));
+        }, 
+      false);
+
+      getAppVersionAndNews();
+      firstTimeSetup();
+      loadConfig();
+    </script>
+  </body>
+</html>
