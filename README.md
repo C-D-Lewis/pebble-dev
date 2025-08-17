@@ -110,7 +110,7 @@ should be used instead
 ## Todo
 
 - [x] Fix build in GitHub Actions
-- [ ] Finish importing all previous Pebble projects
+- [x] Finish importing all previous Pebble projects
 - [ ] Merge all Split Horizon editions into config.
 - [ ] Menu icons for all current watchfaces and watchapps
 - [ ] Migrate all custom config to Clay.
