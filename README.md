@@ -19,7 +19,7 @@ Some PBWs can be found in `/pbw` for sideloading.
 
 | Name                           | Screenshot                                                                    | Builds              | Icon | PBW                                |
 |--------------------------------|-------------------------------------------------------------------------------|---------------------|------|------------------------------------|
-| `beam-up`                     | ![](watchfaces/beam-up/screenshots/aplite.png)                               | `A` `B` `C` `D`     | ✅    | [pbw](pbw/beam-up.pbw)            |
+| `beam-up`                      | ![](watchfaces/beam-up/screenshots/aplite.png)                                | `A` `B` `C` `D`     | ✅    | [pbw](pbw/beam-up.pbw)             |
 | `brackets`                     | ![](watchfaces/brackets/screenshots/aplite.png)                               | `A` `B` `C` `D`     | ✅    | [pbw](pbw/brackets.pbw)            |
 | `cards`                        | ![](watchfaces/cards/screenshots/diorite.png)                                 | `A` `B` `D`         |      | [pbw](pbw/cards.pbw)               |
 | `cmd-time-typed`               | ![](watchfaces/cmd-time-typed/screenshots/diorite.png)                        | `A` `B` `C` `D` `E` | ✅    | [pbw](pbw/cmd-time-typed.pbw)      |
@@ -39,6 +39,7 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `split-horizon-pe`             | ![](watchfaces/split-horizon-pe/screenshots/diorite.png)                      | `A` `B` `D`         | ✅    | [pbw](pbw/split-horizon-pe.pbw)    |
 | `starfield-demo`               | ![](watchfaces/starfield-demo/screenshots/aplite.png)                         | `A` `B` `C` `D`     |      | [pbw](pbw/starfield-demo.pbw)      |
 | `starfield-smooth`             | ![](watchfaces/starfield-smooth/screenshots/aplite.png)                       | `A` `B` `C`         | ✅    | [pbw](pbw/starfield-smooth.pbw)    |
+| `thin`                         | ![](watchfaces/thin/screenshots/basalt.png)                                   | `A` `B` `C` `D` `E` | ✅    | [pbw](pbw/thin.pbw)                |
 | `time-dots-appstore`           | ![](watchfaces/time-dots-appstore/screenshots/basalt1.png)                    | `A` `B` `C` `D`     |      | [pbw](pbw/time-dots-appstore.pbw)  |
 | `split-horizon-se`             |                                                                               | ⚠️ (old inv layer)  | ✅    |                                    |
 | `eclipse-solar`                |                                                                               | ❌ (WIP)             |      |                                    |
@@ -82,11 +83,10 @@ Defunct, incomplete, or PoC things live here.
 
 Some larger projects still live in their own repositories:
 
-| Name                                                | Builds              | Icon | PBW                      |
-|-----------------------------------------------------|---------------------|------|--------------------------|
-| [thin](https://github.com/C-D-Lewis/thin)           | `A` `B` `C` `D` `E` | ✅    | [pbw](pbw/thin.pbw)      |
-| [dashboard](https://github.com/C-D-Lewis/dashboard) | `A` `B` `C` `D`     | ✅    | [pbw](pbw/dashboard.pbw) |
-| [pge](https://github.com/C-D-Lewis/pge)             | -                   | -    | -                        |
+| Name                                                | Builds          | Icon | PBW                      |
+|-----------------------------------------------------|-----------------|------|--------------------------|
+| [dashboard](https://github.com/C-D-Lewis/dashboard) | `A` `B` `C` `D` | ✅    | [pbw](pbw/dashboard.pbw) |
+| [pge](https://github.com/C-D-Lewis/pge)             | -               | -    | -                        |
 
 
 ## Debugging

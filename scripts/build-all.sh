@@ -26,7 +26,8 @@ working_projects=$(cat <<EOF
 ./watchfaces/split-horizon-pe/
 ./watchfaces/starfield-smooth/
 ./watchfaces/startfield-demo/
-./watchfaces/timedots-appstore/
+./watchfaces/thin/
+./watchfaces/time-dots-appstore/
 
 ./watchapps/block-world/
 ./watchapps/module-app-base/
