@@ -18,55 +18,58 @@ working_projects=$(cat <<EOF
 ./watchfaces/events/
 ./watchfaces/hollywatch/
 ./watchfaces/index/
-./watchfaces/isotime/
+./watchfaces/isotime-appstore/
 ./watchfaces/kitty-watchface/
 ./watchfaces/morndas/
 ./watchfaces/past-present-future/
 ./watchfaces/pseudotime/
 ./watchfaces/split-horizon-pe/
 ./watchfaces/starfield-smooth/
-./watchfaces/startfield-demo/
+./watchfaces/starfield-demo/
 ./watchfaces/thin/
 ./watchfaces/time-dots-appstore/
 
 ./watchapps/block-world/
-./watchapps/module-app-base/
 ./watchapps/news-headlines/
 ./watchapps/tube-status/
+
+./libraries/notif-layer/test-app/
+./libraries/InverterLayerCompat/test-app/
+./libraries/pge/test-app/
+./libraries/pebble-packet/test-app/
+./libraries/pebble-isometric/test-app/
+./libraries/pebble-universal-fb/test-app/
 EOF
 )
 
 function build_project {
-  if echo "$working_projects" | grep -q ".*$1.*"; then
-    echo "Building $1"
+    echo ">>> Building $1"
     cd $1
     $COMMAND clean
     $COMMAND build
-    echo "Exit code for $1: $?"
+    echo ">>> Exit code for $1: $?"
 
-    # Copy the build - note that generatedAt field means they will be new in git
-    name=$(basename $1)
-    cp "./build/$name.pbw" "../../pbw/$name.pbw"
-    cd ../..
-  else
-    echo "Skipping $1"
-  fi
-}
-
-function build_all_in_dir {
-  for dir in $1/*/; do
-    build_project "$dir"
-  done
+    # Copy the build - note that generatedAt field means they will be new in git - disabled for now
+    # name=$(basename $1)
+    # cp "./build/$name.pbw" "../../pbw/$name.pbw"
+    cd -
 }
 
 function setup {
-  echo "Setting up build environment..."
+  echo ">>> Setting up build environment..."
   
   # Save this if running this script locally
   mv ./watchfaces/cards/src/pkjs/secrets.js ./watchfaces/cards/src/pkjs/secrets.js.bak || true
   echo "module.exports = { token: 'foo' };" > ./watchfaces/cards/src/pkjs/secrets.js
 }
 
+function build_all_projects {
+  for dir in $working_projects; do
+    build_project "$dir"
+  done
+
+  echo ">>> Completed build_all_projects"
+}
+
 setup
-build_all_in_dir ./watchfaces
-build_all_in_dir ./watchapps
+build_all_projects

@@ -73,7 +73,7 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `pebble-timeline-js-node` |        |          |
 | `pebble-timeline-js`      |        |          |
 | `pebble-universal-fb`     | ✅      | ✅        |
-
+| `pge`                     | ✅      | ✅        |
 
 ## `other`
 
@@ -86,7 +86,6 @@ Some larger projects still live in their own repositories:
 | Name                                                | Builds          | Icon | PBW                      |
 |-----------------------------------------------------|-----------------|------|--------------------------|
 | [dashboard](https://github.com/C-D-Lewis/dashboard) | `A` `B` `C` `D` | ✅    | [pbw](pbw/dashboard.pbw) |
-| [pge](https://github.com/C-D-Lewis/pge)             | -               | -    | -                        |
 
 
 ## Debugging
