@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+<!-- STATES WHEN BUTTON IS NOT PRESSED -->
+
+    <!-- Non focused states -->
+    <item android:state_focused="false" android:state_selected="false"
+          android:state_pressed="false"
+          android:drawable="@color/pebblereddark" />
+    <item android:state_focused="false" android:state_selected="true"
+          android:state_pressed="false"
+          android:drawable="@color/main_colour" />
+
+<!-- STATES WHEN BUTTON IS PRESSED -->
+
+    <!-- Non focused states -->
+    <item android:state_focused="false" android:state_selected="false"
+          android:state_pressed="true"
+          android:drawable="@color/main_colour" />
+    <item android:state_focused="false" android:state_selected="true"
+        android:state_pressed="true"
+        android:drawable="@color/main_colour" />
+
+</selector>

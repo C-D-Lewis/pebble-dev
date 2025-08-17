@@ -1,0 +1,127 @@
+{
+  "name": "dashboard",
+  "version": "4.8.0",
+  "author": "Chris Lewis",
+  "private": true,
+  "dependencies": {},
+  "keywords": [
+    "pebble-app"
+  ],
+  "pebble": {
+    "sdkVersion": "3",
+    "resources": {
+      "media": [
+        {
+          "type": "bitmap",
+          "name": "LOGO",
+          "file": "images/logo.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "TICK",
+          "file": "images/tick.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "UP",
+          "file": "images/up.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "SELECT",
+          "file": "images/select.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "DOWN",
+          "file": "images/down.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "WIFI",
+          "file": "icons/wifi.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "DATA",
+          "file": "icons/data.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "BLUETOOTH",
+          "file": "icons/bt.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "RINGER_LOUD",
+          "file": "icons/loud.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "RINGER_VIBRATE",
+          "file": "icons/vibrate.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "RINGER_SILENT",
+          "file": "icons/silent.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "RINGER_PRIORITY",
+          "file": "icons/priority.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "SYNC",
+          "file": "icons/sync.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "WIFI_AP",
+          "file": "icons/ap.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "FIND_PHONE",
+          "file": "icons/phone.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOCK_PHONE",
+          "file": "icons/lock.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "BRIGHTNESS",
+          "file": "icons/brightness.png"
+        },
+        {
+          "menuIcon": true,
+          "type": "bitmap",
+          "name": "APP_ICON",
+          "file": "images/app_icon.png"
+        }
+      ]
+    },
+    "projectType": "native",
+    "uuid": "d522bc8e-65f3-4edf-9651-05e1e4567021",
+    "messageKeys": {
+      "dummy": 0
+    },
+    "enableMultiJS": true,
+    "displayName": "Dashboard",
+    "watchapp": {
+      "onlyShownOnCommunication": false,
+      "hiddenApp": false,
+      "watchface": false
+    },
+    "targetPlatforms": [
+      "aplite",
+      "basalt",
+      "chalk",
+      "diorite"
+    ],
+    "capabilities": []
+  }
+}

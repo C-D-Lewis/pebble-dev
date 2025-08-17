@@ -9,7 +9,6 @@ Some PBWs can be found in `/pbw` for sideloading.
 - [watchapps](#watchapps)
 - [libraries](#libraries)
 - [other](#other)
-- [Other repositories](#other-repositories)
 - [Debugging](#debugging)
 
 
@@ -53,12 +52,13 @@ Some PBWs can be found in `/pbw` for sideloading.
 
 ## `watchapps`
 
-| Name             | Screenshot                                           | Builds                | Icon | PBW                           |
-|------------------|------------------------------------------------------|-----------------------|------|-------------------------------|
-| `block-world`    | ![](watchapps/block-world/screenshots/basalt.png)    | `B` `C`               |      | [pbw](pbw/block-world.pbw)    |
-| `news-headlines` | ![](watchapps/news-headlines/screenshots/basalt.png) | `A` `B` `C` `D`       | ✅    | [pbw](pbw/news-headlines.pbw) |
-| `pge-examples`   |                                                      | ❌ (needs pge package) |      |                               |
-| `tube-status`    | ![](watchapps/tube-status/screenshots/basalt.png)    | `A` `B` `C` `D`       | ✅    | [pbw](pbw/tube-status.pbw)    |
+| Name             | Screenshot                                              | Builds                | Icon | PBW                           |
+|------------------|---------------------------------------------------------|-----------------------|------|-------------------------------|
+| `block-world`    | ![](watchapps/block-world/screenshots/basalt.png)       | `B` `C`               |      | [pbw](pbw/block-world.pbw)    |
+| `dashboard`      | ![](watchapps/dashboard/assets/screenshots/basalt1.png) | `A` `B` `C` `D`       | ✅    | [pbw](pbw/dashboard.pbw)      |
+| `news-headlines` | ![](watchapps/news-headlines/screenshots/basalt.png)    | `A` `B` `C` `D`       | ✅    | [pbw](pbw/news-headlines.pbw) |
+| `pge-examples`   |                                                         | ❌ (needs pge package) |      |                               |
+| `tube-status`    | ![](watchapps/tube-status/screenshots/basalt.png)       | `A` `B` `C` `D`       | ✅    | [pbw](pbw/tube-status.pbw)    |
 
 ## `libraries`
 
@@ -78,15 +78,6 @@ Some PBWs can be found in `/pbw` for sideloading.
 ## `other`
 
 Defunct, incomplete, or PoC things live here.
-
-## Other repositories
-
-Some larger projects still live in their own repositories:
-
-| Name                                                | Builds          | Icon | PBW                      |
-|-----------------------------------------------------|-----------------|------|--------------------------|
-| [dashboard](https://github.com/C-D-Lewis/dashboard) | `A` `B` `C` `D` | ✅    | [pbw](pbw/dashboard.pbw) |
-
 
 ## Debugging
 

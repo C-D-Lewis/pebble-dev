@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+                  android:key="pref_screen">
+
+    <PreferenceCategory android:title="About" >
+        <Preference
+            android:key="pref_key_version" >
+        </Preference>
+        <Preference
+            android:title="Open Source"
+            android:summary="https://github.com/C-D-Lewis/dashboard">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="https://github.com/C-D-Lewis/dashboard" />
+        </Preference>
+<!--        <Preference-->
+<!--            android:summary="https://github.com/Stericson/RootTools"-->
+<!--            android:title="Uses RootTools" >-->
+
+<!--            <intent-->
+<!--                android:action="android.intent.action.VIEW"-->
+<!--                android:data="https://github.com/Stericson/RootTools" />-->
+<!--        </Preference>-->
+    </PreferenceCategory>
+    <PreferenceCategory android:title="Feedback" >
+        <Preference
+            android:icon="@drawable/tweet"
+            android:key="pref_key_tweet"
+            android:summary="\@Chris_DL"
+            android:title="Tweet Developer" >
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="http://twitter.com/Chris_DL" />
+        </Preference>
+        <Preference
+            android:icon="@drawable/mailsrc"
+            android:key="pref_key_email"
+            android:summary="Bonsitm@gmail.com"
+            android:title="Email Developer" >
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="mailto:bonsitm@gmail.com?subject=Dashboard Feedback" >
+            </intent>
+        </Preference>
+        <Preference
+            android:icon="@drawable/rate"
+            android:key="pref_key_rate"
+            android:summary="Google Play"
+            android:title="Rate This App" >
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="https://play.google.com/store/apps/details?id=com.wordpress.ninedof.dashboard" />
+        </Preference>
+        <Preference
+            android:icon="@drawable/wordpress"
+            android:key="pref_key_blog"
+            android:summary="ninedof.wordpress.com"
+            android:title="Read Developer Blog" >
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="http://ninedof.wordpress.com" />
+        </Preference>
+    </PreferenceCategory>
+
+    <!-- Additional root related items -->
+<!--    <PreferenceCategory-->
+<!--        android:key="pref_category_advanced"-->
+<!--        android:title="Advanced Settings" >-->
+<!--        <CheckBoxPreference-->
+<!--            android:title="Enable Data toggle (requires root)"-->
+<!--            android:summary="As of Android 5.0 (Lollipop), the Data toggle requires root in order to function, and may not work on all devices. This is an Android platform limitation. Sorry!\n\nUse the test below to see if Dashboard can use root on this device."-->
+<!--            android:key="pref_key_data_enabled"-->
+<!--            android:defaultValue="false">-->
+<!--        </CheckBoxPreference>-->
+<!--        <Preference-->
+<!--            android:title="Test Root Access"-->
+<!--            android:summary="Tap this to test root access for Dashboard. If prompted, please grant access!"-->
+<!--            android:key="pref_key_root_access">-->
+<!--        </Preference>-->
+<!--    </PreferenceCategory>-->
+
+</PreferenceScreen>

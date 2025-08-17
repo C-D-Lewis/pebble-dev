@@ -30,6 +30,7 @@ working_projects=$(cat <<EOF
 ./watchfaces/time-dots-appstore/
 
 ./watchapps/block-world/
+./watchapps/dashboard-pebble/
 ./watchapps/news-headlines/
 ./watchapps/tube-status/
 

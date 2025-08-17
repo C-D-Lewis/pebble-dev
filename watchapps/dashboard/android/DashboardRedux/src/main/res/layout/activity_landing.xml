@@ -1,0 +1,531 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <TextView
+        android:id="@+id/debug_label"
+        android:text="DEBUG BUILD"
+        android:gravity="center"
+        android:textColor="#FFFFFF"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        android:background="@color/main_colour_dark"
+        android:layout_alignParentTop="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <ScrollView
+        android:layout_below="@id/debug_label"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+
+        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp">
+
+            <androidx.cardview.widget.CardView
+                xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/install_card"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="10dp"
+                card_view:cardBackgroundColor="#FFFFFF"
+                card_view:cardCornerRadius="5dp"
+                android:padding="10dp"
+                android:visibility="invisible" >
+
+                <RelativeLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/install_title"
+                        android:layout_alignParentTop="true"
+                        android:layout_width="fill_parent"
+                        android:textSize="20sp"
+                        android:paddingLeft="10dp"
+                        android:paddingBottom="5dp"
+                        android:text="Watchapp"
+                        android:background="@color/main_colour"
+                        android:textColor="#FFFFFF"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:id="@+id/install_body"
+                        android:layout_width="fill_parent"
+                        android:textSize="16sp"
+                        android:layout_below="@id/install_title"
+                        android:paddingLeft="10dp"
+                        android:paddingRight="10dp"
+                        android:paddingBottom="5dp"
+                        android:text="Install the watchapp from either the appstore or direct from GitHub"
+                        android:textColor="#000000"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:id="@+id/install_body2"
+                        android:layout_width="fill_parent"
+                        android:textSize="16sp"
+                        android:layout_below="@id/install_body"
+                        android:paddingLeft="10dp"
+                        android:paddingBottom="5dp"
+                        android:textStyle="bold"
+                        android:text="Compatible with watch FW 4.0+/3.12+ only."
+                        android:textColor="#000000"
+                        android:layout_height="wrap_content" />
+
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/install_body2" >
+
+                        <Button
+                            android:id="@+id/button_install_appstore"
+                            android:layout_width="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:text="Appstore"
+                            android:layout_margin="5dp"
+                            />
+
+                        <Button
+                            android:id="@+id/button_install_github"
+                            android:layout_weight="1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="GitHub"
+                            android:layout_margin="5dp"
+                            />
+
+                    </LinearLayout>
+
+                </RelativeLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/options_card"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_below="@id/install_card"
+                card_view:cardBackgroundColor="#FFFFFF"
+                card_view:cardCornerRadius="5dp"
+                android:padding="10dp"
+                android:visibility="invisible" >
+
+                <RelativeLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/admin_title"
+                        android:layout_alignParentTop="true"
+                        android:layout_width="fill_parent"
+                        android:textSize="20sp"
+                        android:paddingLeft="10dp"
+                        android:paddingBottom="5dp"
+                        android:text="Permissions"
+                        android:background="@color/main_colour"
+                        android:textColor="#FFFFFF"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:id="@+id/admin_label"
+                        android:layout_alignParentLeft="true"
+                        android:layout_width="fill_parent"
+                        android:textSize="16sp"
+                        android:paddingLeft="10dp"
+                        android:layout_below="@id/admin_title"
+                        android:layout_toLeftOf="@+id/admin_switch"
+                        android:textStyle="bold"
+                        android:text="Device Admin"
+                        android:textColor="#000000"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:id="@+id/admin_body"
+                        android:layout_alignParentLeft="true"
+                        android:layout_width="fill_parent"
+                        android:textSize="16sp"
+                        android:paddingLeft="10dp"
+                        android:layout_below="@id/admin_label"
+                        android:layout_toLeftOf="@+id/admin_switch"
+                        android:text="Required for Lock Phone toggle. Before you uninstall this app, disable this first!"
+                        android:textColor="#000000"
+                        android:layout_height="wrap_content" />
+
+                    <Switch
+                        android:layout_alignParentRight="true"
+                        android:layout_below="@id/admin_title"
+                        android:id="@id/admin_switch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                </RelativeLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/layout_card"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                card_view:cardBackgroundColor="#FFFFFF"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="10dp"
+                card_view:cardCornerRadius="5dp"
+                android:padding="10dp"
+                android:layout_below="@id/options_card"
+                android:visibility="invisible" >
+
+                <RelativeLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    >
+
+                    <TextView
+                        android:id="@+id/layout_title"
+                        android:layout_alignParentTop="true"
+                        android:layout_width="fill_parent"
+                        android:textSize="20sp"
+                        android:paddingLeft="10dp"
+                        android:paddingBottom="5dp"
+                        android:background="@color/main_colour"
+                        android:text="Options"
+                        android:textColor="#FFFFFF"
+                        android:layout_height="wrap_content" />
+
+                    <RelativeLayout
+                        android:id="@+id/layout_parent_layout"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/layout_title"
+                        >
+
+                        <TextView
+                            android:id="@+id/order_label"
+                            android:layout_alignParentTop="true"
+                            android:layout_alignParentLeft="true"
+                            android:layout_width="fill_parent"
+                            android:textSize="16sp"
+                            android:paddingLeft="10dp"
+                            android:textStyle="bold"
+                            android:text="Toggle Order"
+                            android:textColor="#000000"
+                            android:layout_height="wrap_content" />
+
+                        <RelativeLayout
+                            android:id="@+id/layout_layout"
+                            android:layout_below="@id/order_label"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            >
+
+                            <LinearLayout
+                                android:id="@+id/r1"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentTop="true"
+                                android:paddingTop="5dp"
+                                android:background="#00000000"
+                                android:clipChildren="false"
+                                android:orientation="horizontal" >
+
+                                <Spinner
+                                    android:id="@+id/s11"
+                                    android:layout_width="fill_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="33" />
+
+                                <Spinner
+                                    android:id="@+id/s12"
+                                    android:layout_width="fill_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="33" />
+
+                                <Spinner
+                                    android:id="@+id/s13"
+                                    android:layout_width="fill_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="33" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:id="@+id/r2"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@id/r1"
+                                android:background="#00000000"
+                                android:clipChildren="false"
+                                android:orientation="horizontal" >
+
+                                <Spinner
+                                    android:id="@+id/s21"
+                                    android:layout_width="fill_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="33" />
+
+                                <Spinner
+                                    android:id="@+id/s22"
+                                    android:layout_width="fill_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="33" />
+
+                                <Spinner
+                                    android:id="@+id/s23"
+                                    android:layout_width="fill_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="33" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:id="@+id/r3"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@id/r2"
+                                android:paddingBottom="10dp"
+                                android:background="#00000000"
+                                android:clipChildren="false"
+                                android:orientation="horizontal" >
+
+                                <Spinner
+                                    android:id="@+id/s31"
+                                    android:layout_width="fill_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="33" />
+
+                                <Spinner
+                                    android:id="@+id/s32"
+                                    android:layout_width="fill_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="33" />
+
+                                <Spinner
+                                    android:id="@+id/s33"
+                                    android:layout_width="fill_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="33" />
+                            </LinearLayout>
+                        </RelativeLayout>
+
+                        <TextView
+                            android:id="@+id/quick_launch_label"
+                            android:layout_alignParentLeft="true"
+                            android:layout_width="fill_parent"
+                            android:textSize="16sp"
+                            android:paddingLeft="10dp"
+                            android:layout_below="@id/layout_layout"
+                            android:textStyle="bold"
+                            android:text="Quick Start"
+                            android:textColor="#000000"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:id="@+id/quick_launch_body"
+                            android:layout_alignParentLeft="true"
+                            android:layout_width="fill_parent"
+                            android:textSize="16sp"
+                            android:paddingLeft="10dp"
+                            android:layout_below="@id/quick_launch_label"
+                            android:layout_toLeftOf="@+id/quick_launch_switch"
+                            android:text="When the watchapp is launched, jump straight to the toggle set below."
+                            android:textColor="#000000"
+                            android:layout_height="wrap_content" />
+
+                        <Switch
+                            android:id="@id/quick_launch_switch"
+                            android:layout_alignParentRight="true"
+                            android:layout_below="@id/quick_launch_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:id="@+id/quick_launch_spinner_label"
+                            android:layout_alignParentLeft="true"
+                            android:layout_width="fill_parent"
+                            android:textSize="16sp"
+                            android:paddingLeft="10dp"
+                            android:layout_below="@id/quick_launch_body"
+                            android:layout_toLeftOf="@+id/quick_launch_spinner"
+                            android:text="Chosen toggle:"
+                            android:textColor="#000000"
+                            android:layout_height="wrap_content" />
+
+                        <Spinner
+                            android:id="@id/quick_launch_spinner"
+                            android:layout_below="@id/quick_launch_body"
+                            android:layout_alignParentRight="true"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:id="@+id/charge_notif_label"
+                            android:layout_alignParentLeft="true"
+                            android:layout_width="fill_parent"
+                            android:textSize="16sp"
+                            android:paddingLeft="10dp"
+                            android:layout_below="@id/quick_launch_spinner"
+                            android:textStyle="bold"
+                            android:text="Fully Charged Notification"
+                            android:textColor="#000000"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:id="@+id/charge_notif_body"
+                            android:layout_alignParentLeft="true"
+                            android:layout_width="fill_parent"
+                            android:textSize="16sp"
+                            android:paddingLeft="10dp"
+                            android:layout_below="@id/charge_notif_label"
+                            android:layout_toLeftOf="@+id/charge_notif_switch"
+                            android:text="Notify when the phone battery reaches full charge."
+                            android:textColor="#000000"
+                            android:layout_height="wrap_content" />
+
+                        <Switch
+                            android:id="@id/charge_notif_switch"
+                            android:layout_alignParentRight="true"
+                            android:layout_below="@id/charge_notif_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                        <RelativeLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingTop="15dp"
+                            android:layout_below="@id/charge_notif_body">
+
+                            <TextView
+                                android:id="@+id/find_phone_label"
+                                android:layout_alignParentLeft="true"
+                                android:layout_width="fill_parent"
+                                android:textSize="16sp"
+                                android:paddingLeft="10dp"
+                                android:textStyle="bold"
+                                android:text="Find Phone Sound"
+                                android:textColor="#000000"
+                                android:layout_height="wrap_content" />
+
+                            <TextView
+                                android:id="@+id/find_phone_body"
+                                android:layout_alignParentLeft="true"
+                                android:layout_width="fill_parent"
+                                android:textSize="16sp"
+                                android:paddingLeft="10dp"
+                                android:layout_below="@id/find_phone_label"
+                                android:text="Sound used for the Find Phone toggle."
+                                android:textColor="#000000"
+                                android:layout_height="wrap_content" />
+
+                            <TextView
+                                android:id="@+id/find_phone_body_current_file"
+                                android:layout_alignParentLeft="true"
+                                android:layout_width="fill_parent"
+                                android:textSize="16sp"
+                                android:paddingLeft="10dp"
+                                android:layout_below="@id/find_phone_body"
+                                android:text="Current:"
+                                android:textColor="#000000"
+                                android:layout_height="wrap_content" />
+
+                            <LinearLayout
+                                android:orientation="horizontal"
+                                android:layout_below="@id/find_phone_body_current_file"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content">
+
+                                <Button
+                                    android:id="@+id/find_phone_sound_set"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="0.3"
+                                    android:text="Choose Sound"/>
+
+                                <Button
+                                    android:id="@+id/find_phone_sound_test"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="0.3"
+                                    android:text="Test"/>
+
+                                <Button
+                                    android:id="@+id/find_phone_sound_default"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="0.3"
+                                    android:text="Default"/>
+
+                            </LinearLayout>
+                        </RelativeLayout>
+                    </RelativeLayout>
+                </RelativeLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/news_card"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                card_view:cardCornerRadius="5dp"
+                card_view:cardBackgroundColor="#FFFFFF"
+                android:padding="10dp"
+                android:layout_below="@id/layout_card"
+                android:visibility="invisible" >
+
+                <RelativeLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/news_title"
+                        android:layout_alignParentTop="true"
+                        android:layout_width="fill_parent"
+                        android:textSize="20sp"
+                        android:paddingLeft="10dp"
+                        android:paddingBottom="5dp"
+                        android:background="@color/main_colour"
+                        android:text="Developer News"
+                        android:textColor="#FFFFFF"
+                        android:layout_height="wrap_content" />
+
+                    <ProgressBar
+                        android:id="@+id/news_progress_bar"
+                        android:layout_below="@id/news_title"
+                        android:layout_width="50dp"
+                        android:layout_centerHorizontal="true"
+                        android:layout_height="50dp" />
+
+                    <TextView
+                        android:id="@+id/news_body"
+                        android:layout_below="@id/news_title"
+                        android:layout_width="fill_parent"
+                        android:textSize="15sp"
+                        android:textColor="#000000"
+                        android:paddingLeft="10dp"
+                        android:paddingBottom="5dp"
+                        android:layout_height="wrap_content" />
+
+                </RelativeLayout>
+
+            </androidx.cardview.widget.CardView>
+
+        </RelativeLayout>
+
+    </ScrollView>
+
+</RelativeLayout>
