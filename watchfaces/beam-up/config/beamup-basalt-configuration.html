@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Beam Up Configuration</title>
+  </head>
+  <body>
+    <h2>Beam Up Configuration</h2>
+
+    <hr/>
+
+    <h3>Colors (Pebble Time/Steel/Round only)</h3>
+
+    <a href="http://www.w3schools.com/tags/ref_colorpicker.asp">Hex color picker</a> (get code then return here).
+    <br/><br/>
+
+    <table>
+      <tr>
+        <td>Foreground color (Hex)</td><td><input type="text" size="8" id="text_foreground_color"></td>
+      </tr>
+      <tr>
+        <td>Background color (Hex)</td><td><input type="text" size="8" id="text_background_color"></td>
+      </tr>
+    </table>
+    <hr/>
+
+    <h3>Features</h3>
+
+    </p>
+    <table>
+      <tr>
+        <td>Show short date</td><td><input id='check_date' type='checkbox'/></td>
+      </tr>
+      <tr>
+        <td>Animations</td><td><input id='check_animations' type='checkbox'/></td>
+      </tr>
+      <tr>
+        <td>Show disconnected indicator</td><td><input id='check_bluetooth' type='checkbox'/></td>
+      </tr>
+      <tr>
+        <td>Vibrate on the hour</td><td><input id='check_hourly' type='checkbox'/></td>
+      </tr>
+      <tr>
+        <td>Sleep (don't animate) at night (00:00 - 6:00)</td><td><input id='check_sleep' type='checkbox'/></td>
+      </tr>
+    </table>
+
+    <p>
+      <button style="display: block; width: 100%;" id='save_button'>Save</button>
+    </p>
+
+    <hr/>
+    <h3>Version</h3>
+    <p id='current_version'>Current version:</p>
+    <p id='p_version'>Getting latest version...</p>
+
+    <hr/>
+
+    <p>
+    <h3>Latest News</h3>
+    <p id='news'>Loading...</p>
+    </p>
+
+    <script>
+      function persistWrite(key, value) {
+        localStorage.setItem(key, value);
+      }
+
+      var persistRead = function(key, defaultValue) {
+        if(localStorage.getItem(key) === null) {
+          return defaultValue;
+        } else {
+          return localStorage.getItem(key);
+        }
+      };
+
+      function firstTimeSetup() {
+        if(!persistRead('first-time', false)) {
+          persistWrite('first-time', true);
+          console.log('This is the first launch!');
+
+          // Align with watchapp defaults
+          persistWrite('date', 'false');
+          persistWrite('animations', 'true');
+          persistWrite('bluetooth', 'true');
+          persistWrite('hourly', 'false');
+          persistWrite('sleep', 'true');
+          persistWrite('foreground', 'FFFFFF');
+          persistWrite('background', '000000');
+        }
+      }
+
+      function loadConfig() {
+        document.getElementById('check_date').checked = persistRead('date', 'false') === 'true';
+        document.getElementById('check_animations').checked = persistRead('animations', 'true') === 'true';
+        document.getElementById('check_bluetooth').checked = persistRead('bluetooth', 'true') === 'true';
+        document.getElementById('check_hourly').checked = persistRead('hourly', 'false') === 'true';
+        document.getElementById('check_sleep').checked = persistRead('sleep', 'true') === 'true';
+        document.getElementById('text_foreground_color').value = '' + persistRead('foreground', 'FFFFFF');
+        document.getElementById('text_background_color').value = '' + persistRead('background', '000000');
+      }
+
+      function ajax(url, type, callback) {
+        var xhr = new XMLHttpRequest();
+        xhr.onload = function () {
+          callback(this.responseText);
+        };
+        xhr.open(type, url);
+        xhr.send();
+      };
+
+      function getAppVersionAndNews() {
+        //Get latest
+        var url = 'https://dl.dropboxusercontent.com/u/10824180/pebble%20config%20pages/app_versions.json';
+        ajax(url, 'GET', function(responseText) {
+          var json = JSON.parse(responseText);
+          document.getElementById('p_version').innerHTML = 'Latest version: ' + json.beamupbasalt;
+          document.getElementById('news').innerHTML = '' + json.beamupbasaltnews;
+        });
+
+        //Get local
+        var version = '' + document.location;
+        version = version.substring(version.indexOf('version=') + 'version='.length);
+        document.getElementById('current_version').innerHTML = 'Current version: ' + version;
+      }
+
+      var submitButton = document.getElementById('save_button');
+      submitButton.addEventListener('click', function() {
+        var options = {
+          'date': document.getElementById('check_date').checked ? 'true' : 'false',
+          'animations': document.getElementById('check_animations').checked ? 'true' : 'false',
+          'bluetooth': document.getElementById('check_bluetooth').checked ? 'true' : 'false',
+          'hourly': document.getElementById('check_hourly').checked ? 'true' : 'false',
+          'sleep': document.getElementById('check_sleep').checked ? 'true' : 'false',
+          'foreground': '' + document.getElementById('text_foreground_color').value,
+          'background': '' + document.getElementById('text_background_color').value
+        };
+
+        // Save
+        persistWrite('date', options['date']);
+        persistWrite('animations', options['animations']);
+        persistWrite('bluetooth', options['bluetooth']);
+        persistWrite('hourly', options['hourly']);
+        persistWrite('sleep', options['sleep']);
+        persistWrite('foreground', options['foreground']);
+        persistWrite('background', options['background']);
+
+        // Return
+        document.location = 'pebblejs://close#' + encodeURIComponent(JSON.stringify(options));
+      }, false);
+
+      firstTimeSetup();
+      getAppVersionAndNews();
+      loadConfig();
+    </script>
+  </body>
+</html>

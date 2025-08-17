@@ -6,6 +6,7 @@ COMMAND=${1:-pebble}
 
 # Projects expected to build successfully
 working_projects=$(cat <<EOF
+./watchfaces/beam-up/
 ./watchfaces/brackets/
 ./watchfaces/cards/
 ./watchfaces/cmd-time/

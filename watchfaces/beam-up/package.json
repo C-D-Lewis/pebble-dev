@@ -1,0 +1,75 @@
+{
+  "version": "3.7.0",
+  "author": "Chris Lewis",
+  "private": true,
+  "dependencies": {
+    "pebble-clay": "^1.0.4"
+  },
+  "keywords": [
+    "pebble-app"
+  ],
+  "pebble": {
+    "sdkVersion": "3",
+    "resources": {
+      "media": [
+        {
+          "type": "font",
+          "name": "FONT_IMAGINE_48",
+          "file": "fonts/imagine.ttf",
+          "compatibility": "2.7"
+        },
+        {
+          "type": "font",
+          "name": "FONT_IMAGINE_24",
+          "file": "fonts/imagine.ttf",
+          "compatibility": "2.7"
+        },
+        {
+          "menuIcon": true,
+          "type": "png",
+          "name": "IMAGE_MENU_ICON",
+          "file": "images/menu_icon.png"
+        },
+        {
+          "type": "png",
+          "name": "BT_WHITE",
+          "file": "images/bt-bar-white.png"
+        },
+        {
+          "type": "png",
+          "name": "BT_BLACK",
+          "file": "images/bt-bar-black.png"
+        }
+      ]
+    },
+    "projectType": "native",
+    "uuid": "67ca694e-9543-41ce-8db3-3d4896e2fbd3",
+    "messageKeys": {
+      "DataKeySleep": 4,
+      "DataKeyHourlyVibration": 3,
+      "DataKeyAnimations": 1,
+      "DataKeyBTIndicator": 2,
+      "DataKeyNumBoolKeys": 5,
+      "DataKeyBackgroundColor": 51,
+      "DataKeyDate": 0,
+      "DataKeyForegroundColor": 50
+    },
+    "enableMultiJS": true,
+    "displayName": "Beam Up",
+    "watchapp": {
+      "onlyShownOnCommunication": false,
+      "hiddenApp": false,
+      "watchface": true
+    },
+    "targetPlatforms": [
+      "aplite",
+      "basalt",
+      "chalk",
+      "diorite"
+    ],
+    "capabilities": [
+      "configurable"
+    ]
+  },
+  "name": "beam-up"
+}

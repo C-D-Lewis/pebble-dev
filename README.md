@@ -19,6 +19,7 @@ Some PBWs can be found in `/pbw` for sideloading.
 
 | Name                           | Screenshot                                                                    | Builds              | Icon | PBW                                |
 |--------------------------------|-------------------------------------------------------------------------------|---------------------|------|------------------------------------|
+| `beam-up`                     | ![](watchfaces/beam-up/screenshots/aplite.png)                               | `A` `B` `C` `D`     | ✅    | [pbw](pbw/beam-up.pbw)            |
 | `brackets`                     | ![](watchfaces/brackets/screenshots/aplite.png)                               | `A` `B` `C` `D`     | ✅    | [pbw](pbw/brackets.pbw)            |
 | `cards`                        | ![](watchfaces/cards/screenshots/diorite.png)                                 | `A` `B` `D`         |      | [pbw](pbw/cards.pbw)               |
 | `cmd-time-typed`               | ![](watchfaces/cmd-time-typed/screenshots/diorite.png)                        | `A` `B` `C` `D` `E` | ✅    | [pbw](pbw/cmd-time-typed.pbw)      |
@@ -85,7 +86,6 @@ Some larger projects still live in their own repositories:
 |-----------------------------------------------------|---------------------|------|--------------------------|
 | [thin](https://github.com/C-D-Lewis/thin)           | `A` `B` `C` `D` `E` | ✅    | [pbw](pbw/thin.pbw)      |
 | [dashboard](https://github.com/C-D-Lewis/dashboard) | `A` `B` `C` `D`     | ✅    | [pbw](pbw/dashboard.pbw) |
-| [beam-up](https://github.com/C-D-Lewis/beam-up)     | `A` `B` `C` `D`     | ✅    | [pbw](pbw/beam-up.pbw)   |
 | [pge](https://github.com/C-D-Lewis/pge)             | -                   | -    | -                        |
 
 

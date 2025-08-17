@@ -1,0 +1,74 @@
+[
+  { 
+    "type": "heading", 
+    "defaultValue": "Beam Up Configuration"
+  }, 
+  {
+    "type": "section",
+    "items": [
+      {
+        "type": "heading",
+        "defaultValue": "Colors"
+      },
+      {
+        "type": "text",
+        "defaultValue": "Only available on compatible platforms."
+      },
+      {
+        "type": "color",
+        "label": "Background",
+        "messageKey": "DataKeyBackgroundColor",
+        "defaultValue": "000000"
+      },
+      {
+        "type": "color",
+        "label": "Foreground",
+        "messageKey": "DataKeyForegroundColor",
+        "defaultValue": "FFFFFF"
+      }
+    ]
+  },
+  {
+    "type": "section",
+    "items": [
+      {
+        "type": "heading",
+        "defaultValue": "Features"
+      },
+      {
+        "type": "toggle",
+        "label": "Show short date",
+        "messageKey": "DataKeyDate",
+        "defaultValue": false
+      },
+      {
+        "type": "toggle",
+        "label": "Play animations",
+        "messageKey": "DataKeyAnimations",
+        "defaultValue": true
+      },
+      {
+        "type": "toggle",
+        "label": "Vibrate on disconnect",
+        "messageKey": "DataKeyBTIndicator",
+        "defaultValue": true
+      },
+      {
+        "type": "toggle",
+        "label": "Vibrate on the hour",
+        "messageKey": "DataKeyHourlyVibration",
+        "defaultValue": false
+      },
+      {
+        "type": "toggle",
+        "label": "Don't animate between 00:00 and 06:00",
+        "messageKey": "DataKeySleep",
+        "defaultValue": true
+      }
+    ]
+  },
+  {
+    "type": "submit",
+    "defaultValue": "Save"
+  }
+]
