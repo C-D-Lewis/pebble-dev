@@ -1,0 +1,29 @@
+{
+  "name": "pebble-pge",
+  "author": "Chris Lewis <bonsitm@gmail.com>",
+  "version": "1.6.2",
+  "description": "Simple looping game engine for Pebble",
+  "repository": "C-D-Lewis/pge",
+  "files": [
+    "dist.zip"
+  ],
+  "keywords": [
+    "pebble-package",
+    "pge",
+    "game"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "universal-fb": "1.6.0"
+  },
+  "pebble": {
+    "projectType": "package",
+    "sdkVersion": "3",
+    "targetPlatforms": [
+      "aplite",
+      "basalt",
+      "chalk",
+      "diorite"
+    ]
+  }
+}

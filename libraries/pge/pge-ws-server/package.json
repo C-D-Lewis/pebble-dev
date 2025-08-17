@@ -1,0 +1,19 @@
+{
+  "name": "pge-ws-server",
+  "version": "1.0.0",
+  "description": "A Node.js app using Express 4",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "ws": "0.7.2"
+  },
+  "engines": {
+    "node": "0.10.x"
+  },
+  "keywords": [
+    "node"
+  ],
+  "license": "MIT"
+}
