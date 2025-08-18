@@ -42,11 +42,11 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `time-dots-appstore`           | ![](watchfaces/time-dots-appstore/screenshots/basalt1.png)                    | `A` `B` `C` `D`     |      | [pbw](pbw/time-dots-appstore.pbw)  |
 | `divider-large-2`              |                                                                               | ❔                   | ✅    |                                    |
 | `divider-small-2`              |                                                                               | ❔                   | ✅    |                                    |
+| `past-present-future-extended` |                                                                               | ❔                   |      |                                    |
 | `seven-segments-date`          |                                                                               | ❔                   | ✅    |                                    |
 | `seven-segments`               |                                                                               | ❔                   | ✅    |                                    |
-| `past-present-future-extended` |                                                                               | ❔                   |      |                                    |
-| `eventful`                     |                                                                               | ❌ (req. Dash API)   |      |                                    |
 | `eclipse-solar`                |                                                                               | ❌ (WIP)             |      |                                    |
+| `eventful`                     |                                                                               | ❌ (req. Dash API)   |      |                                    |
 
 
 ## `watchapps`
