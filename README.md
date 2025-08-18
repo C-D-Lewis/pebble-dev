@@ -110,7 +110,7 @@ should be used instead
 
 - [x] Fix build in GitHub Actions
 - [x] Finish importing all previous Pebble projects
-- [ ] Merge all Split Horizon editions into config.
+- [x] Merge all Split Horizon editions into config.
 - [ ] Menu icons for all current watchfaces and watchapps
 - [ ] Migrate all custom config to Clay.
-- [ ] Verify correct tick unit used.
+- [ ] Verify correct tick unit used to save power.
