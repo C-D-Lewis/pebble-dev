@@ -35,7 +35,7 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `morndas`                      | ![](watchfaces/morndas/screenshots/basalt.png)                                | `A` `B` `D`         |      | [pbw](pbw/morndas.pbw)             |
 | `past-present-future`          | ![](watchfaces/past-present-future/screenshots/aplite.png)                    | `A` `B` `D`         |      | [pbw](pbw/past-present-future.pbw) |
 | `pseudotime`                   | ![](watchfaces/pseudotime/screenshots/basalt.png)                             | `A` `B` `C` `D`     |      | [pbw](pbw/pseudotime.pbw)          |
-| `split-horizon-pe`             | ![](watchfaces/split-horizon-pe/screenshots/diorite.png)                      | `A` `B` `D`         | ✅    | [pbw](pbw/split-horizon-pe.pbw)    |
+| `split-horizon`                | ![](watchfaces/split-horizon/screenshots/diorite.png)                         | `A` `B` `D`         | ✅    | [pbw](pbw/split-horizon.pbw)       |
 | `starfield-demo`               | ![](watchfaces/starfield-demo/screenshots/aplite.png)                         | `A` `B` `C` `D`     |      | [pbw](pbw/starfield-demo.pbw)      |
 | `starfield-smooth`             | ![](watchfaces/starfield-smooth/screenshots/aplite.png)                       | `A` `B` `C`         | ✅    | [pbw](pbw/starfield-smooth.pbw)    |
 | `thin`                         | ![](watchfaces/thin/screenshots/basalt.png)                                   | `A` `B` `C` `D` `E` | ✅    | [pbw](pbw/thin.pbw)                |
@@ -45,10 +45,8 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `seven-segments-date`          |                                                                               | ❔                   | ✅    |                                    |
 | `seven-segments`               |                                                                               | ❔                   | ✅    |                                    |
 | `past-present-future-extended` |                                                                               | ❔                   |      |                                    |
-| `split-horizon-se`             |                                                                               | ⚠️ (old inv layer)  | ✅    |                                    |
 | `eventful`                     |                                                                               | ❌ (req. Dash API)   |      |                                    |
 | `eclipse-solar`                |                                                                               | ❌ (WIP)             |      |                                    |
-| `split-horizon-me`             |                                                                               | ❌ (old inv layer)   | ✅    |                                    |
 
 
 ## `watchapps`

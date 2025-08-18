@@ -8,9 +8,7 @@ static Window *s_main_window;
 static TextLayer *lower_layer, *time_layer, *am_pm_layer, *day_layer, *date_layer, *month_layer;
 static InverterLayerCompat *top_shade, *bottom_shade, *q1_shade, *q2_shade, *q3_shade, *q4_shade;
 
-// State
-static bool s_q_states[4];
-
+static bool s_anim_states[4];
 static GColor fg_color, bg_color;
 
 /******************************** Time functions **********************************/
@@ -26,7 +24,7 @@ static void set_time(struct tm *t) {
   text_layer_set_text(time_layer, s_hour_text);
   
   // AM/PM
-  if(!clock_is_24h_style()) {
+  if (!clock_is_24h_style()) {
     // Show AM/PM marker
     layer_set_frame(text_layer_get_layer(am_pm_layer), GRect(113, 35, 40, 40));
     text_layer_set_text(am_pm_layer, (hours < 12) ? "AM" : "PM");
@@ -43,7 +41,7 @@ static void set_time(struct tm *t) {
   // Date string
   static char s_date_text[] = "xxxx";
   strftime(s_date_text, sizeof(s_date_text), "%eth", t);
-  if(day == 1 || day == 21 || day == 31) {  
+  if (day == 1 || day == 21 || day == 31) {  
     // 1st, 21st, 31st
     s_date_text[2] = 's';
     s_date_text[3] = 't';
@@ -51,7 +49,7 @@ static void set_time(struct tm *t) {
     // 2nd, 22nd
     s_date_text[2] = 'n';
     s_date_text[3] = 'd';
-  } else if(day == 3 || day == 23) {  
+  } else if (day == 3 || day == 23) {  
     // 3rd, 23rd
     s_date_text[2] = 'r';
     s_date_text[3] = 'd';
@@ -59,29 +57,28 @@ static void set_time(struct tm *t) {
   text_layer_set_text(date_layer, s_date_text);
 
   // Month string
-  static char s_month_text[] = "September";
+  static char s_month_text[16];
   strftime(s_month_text, sizeof(s_month_text), "%B", t);
   text_layer_set_text(month_layer, s_month_text);
   
-  // Synchronise q markers
-  if(!s_q_states[0] && seconds >= 15) {
+  // Synchronise quarterly markers if opened part way through the minute
+  if (!s_anim_states[0] && seconds >= 15) {
     util_animate_layer(inverter_layer_compat_get_layer(q1_shade), GRect(0,0,35,0), GRect(0,0,35,10), 1000, 0);
-    s_q_states[0] = true;
+    s_anim_states[0] = true;
   }
 
-  if(!s_q_states[1] && seconds >= 30) {
+  if (!s_anim_states[1] && seconds >= 30) {
     util_animate_layer(inverter_layer_compat_get_layer(q2_shade), GRect(36,0,35,0), GRect(36,0,35,10), 1000, 0);
-    s_q_states[1] = true;
+    s_anim_states[1] = true;
   }
 
-  if(!s_q_states[2] && seconds >= 45) {
+  if (!s_anim_states[2] && seconds >= 45) {
     util_animate_layer(inverter_layer_compat_get_layer(q3_shade), GRect(72,0,35,0), GRect(72,0,35,10), 1000, 0);
-    s_q_states[2] = true;
+    s_anim_states[2] = true;
   }
 }
 
 static void tick_handler(struct tm *t, TimeUnits units_changed) {
-  // Get seconds
   int seconds = t->tm_sec;
 
   // Animate markers and shades
@@ -95,31 +92,31 @@ static void tick_handler(struct tm *t, TimeUnits units_changed) {
       util_animate_layer(inverter_layer_compat_get_layer(top_shade), GRect(0,0,144,84), GRect(0,0,144,0), 400, 0);
       util_animate_layer(inverter_layer_compat_get_layer(bottom_shade), GRect(0,84,144,84), GRect(0,168,144,0), 400, 0);
       
-      // Retract q markers
+      // Retract quarterly markers
       util_animate_layer(inverter_layer_compat_get_layer(q1_shade), GRect(0,0,35,10), GRect(0,0,35,0), 300, 0);
       util_animate_layer(inverter_layer_compat_get_layer(q2_shade), GRect(36,0,35,10), GRect(36,0,35,0), 300, 0);
       util_animate_layer(inverter_layer_compat_get_layer(q3_shade), GRect(72,0,35,10), GRect(72,0,35,0), 300, 0);
       util_animate_layer(inverter_layer_compat_get_layer(q4_shade), GRect(108,0,35,10), GRect(108,0,35,0), 300, 0);
-      s_q_states[0] = false; 
-      s_q_states[1] = false; 
-      s_q_states[2] = false; 
-      s_q_states[3] = false;
+      s_anim_states[0] = false; 
+      s_anim_states[1] = false; 
+      s_anim_states[2] = false; 
+      s_anim_states[3] = false;
       break;
     case 15: 
       util_animate_layer(inverter_layer_compat_get_layer(q1_shade), GRect(0,0,35,0), GRect(0,0,35,10), 1000, 0);
-      s_q_states[0] = true;
+      s_anim_states[0] = true;
       break;
     case 30:
       util_animate_layer(inverter_layer_compat_get_layer(q2_shade), GRect(36,0,35,0), GRect(36,0,35,10), 1000, 0);
-      s_q_states[1] = true;
+      s_anim_states[1] = true;
       break;
     case 45:
       util_animate_layer(inverter_layer_compat_get_layer(q3_shade), GRect(72,0,35,0), GRect(72,0,35,10), 1000, 0);
-      s_q_states[2] = true;
+      s_anim_states[2] = true;
       break;
     case 59: 
       util_animate_layer(inverter_layer_compat_get_layer(q4_shade), GRect(108,0,35,0), GRect(108,0,35,10), 1000, 0);
-      s_q_states[3] = true;  
+      s_anim_states[3] = true;  
       
       // Animate shades in
       util_animate_layer(inverter_layer_compat_get_layer(top_shade), GRect(0,0,144,0), GRect(0,0,144,84), 400, 0);
@@ -131,6 +128,8 @@ static void tick_handler(struct tm *t, TimeUnits units_changed) {
 /******************************** Window functions *******************************/
 
 static void main_window_load(Window *window) {
+  Layer *root_layer = window_get_root_layer(window);
+
   // Get resources
   ResHandle font_20 = resource_get_handle(RESOURCE_ID_FONT_IMAGINE_20);
   ResHandle font_25 = resource_get_handle(RESOURCE_ID_FONT_IMAGINE_25);
@@ -139,47 +138,47 @@ static void main_window_load(Window *window) {
   // Bottom frame
   lower_layer = text_layer_create(GRect(0, 84, 144, 84));
   text_layer_set_background_color(lower_layer, fg_color);
-  layer_add_child(window_get_root_layer(window), text_layer_get_layer(lower_layer));
+  layer_add_child(root_layer, text_layer_get_layer(lower_layer));
 
   // TextLayers
   time_layer = util_init_text_layer(GRect(1, 41, 150, 50), fg_color, GColorClear, font_43, GTextAlignmentLeft);
-  layer_add_child(window_get_root_layer(window), text_layer_get_layer(time_layer));
+  layer_add_child(root_layer, text_layer_get_layer(time_layer));
 
   am_pm_layer = util_init_text_layer(GRect(0, 0, 0, 0), fg_color, GColorClear, font_20, GTextAlignmentLeft);
-  layer_add_child(window_get_root_layer(window), text_layer_get_layer(am_pm_layer));
+  layer_add_child(root_layer, text_layer_get_layer(am_pm_layer));
 
   day_layer = util_init_text_layer(GRect(1, 75, 150, 50), bg_color, GColorClear, font_25, GTextAlignmentLeft);
   text_layer_set_text(day_layer, "MON");
-  layer_add_child(window_get_root_layer(window), text_layer_get_layer(day_layer));
+  layer_add_child(root_layer, text_layer_get_layer(day_layer));
 
   date_layer = util_init_text_layer(GRect(70, 75, 150, 50), bg_color, GColorClear, font_25, GTextAlignmentLeft);
   text_layer_set_text(date_layer, "25");
-  layer_add_child(window_get_root_layer(window), text_layer_get_layer(date_layer));
+  layer_add_child(root_layer, text_layer_get_layer(date_layer));
 
   month_layer = util_init_text_layer(GRect(1, 95, 150, 50), bg_color, GColorClear, font_20, GTextAlignmentLeft);
   text_layer_set_text(month_layer, "JANUARY");
-  layer_add_child(window_get_root_layer(window), text_layer_get_layer(month_layer));
+  layer_add_child(root_layer, text_layer_get_layer(month_layer));
 
   // InverterLayers
   top_shade = inverter_layer_compat_create(GRect(0, 0, 144, 0), GColorBlack, GColorWhite);
-  layer_add_child(window_get_root_layer(window), inverter_layer_compat_get_layer(top_shade));
+  layer_add_child(root_layer, inverter_layer_compat_get_layer(top_shade));
 
   bottom_shade = inverter_layer_compat_create(GRect(0, 0, 144, 0), GColorBlack, GColorWhite);
-  layer_add_child(window_get_root_layer(window), inverter_layer_compat_get_layer(bottom_shade));
+  layer_add_child(root_layer, inverter_layer_compat_get_layer(bottom_shade));
 
   q1_shade = inverter_layer_compat_create(GRect(0, 0, 35, 0), GColorBlack, GColorWhite);
-  layer_add_child(window_get_root_layer(window), inverter_layer_compat_get_layer(q1_shade));
+  layer_add_child(root_layer, inverter_layer_compat_get_layer(q1_shade));
 
   q2_shade = inverter_layer_compat_create(GRect(36, 0, 35, 0), GColorBlack, GColorWhite);
-  layer_add_child(window_get_root_layer(window), inverter_layer_compat_get_layer(q2_shade));
+  layer_add_child(root_layer, inverter_layer_compat_get_layer(q2_shade));
 
   q3_shade = inverter_layer_compat_create(GRect(72, 0, 35, 0), GColorBlack, GColorWhite);
-  layer_add_child(window_get_root_layer(window), inverter_layer_compat_get_layer(q3_shade));
+  layer_add_child(root_layer, inverter_layer_compat_get_layer(q3_shade));
 
   q4_shade = inverter_layer_compat_create(GRect(108, 0, 35, 0), GColorBlack, GColorWhite);
-  layer_add_child(window_get_root_layer(window), inverter_layer_compat_get_layer(q4_shade));
+  layer_add_child(root_layer, inverter_layer_compat_get_layer(q4_shade));
 
-  // Init display not blank
+  // Show time now
   time_t temp = time(NULL);  
   struct tm *t = localtime(&temp);
   set_time(t);
@@ -204,24 +203,24 @@ static void main_window_unload(Window *window) {
 }
 
 static void init() {
-  s_main_window = window_create();
-  WindowHandlers handlers = {
-    .load = main_window_load,
-    .unload = main_window_unload
-  };
-  window_set_window_handlers(s_main_window, handlers);
-
   fg_color = PBL_IF_COLOR_ELSE(GColorRed, GColorBlack);
   bg_color = GColorWhite;
 
-  tick_timer_service_subscribe(SECOND_UNIT, tick_handler);
-
+  s_main_window = window_create();
+  window_set_window_handlers(s_main_window, (WindowHandlers) {
+    .load = main_window_load,
+    .unload = main_window_unload
+  });
   window_stack_push(s_main_window, true);
+
+  tick_timer_service_subscribe(SECOND_UNIT, tick_handler);
+}
+
+static void deinit() {
 }
 
 int main() {
   init();
   app_event_loop();
-
-  return 0;
+  deinit();
 }

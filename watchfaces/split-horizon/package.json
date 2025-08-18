@@ -38,7 +38,7 @@
     "messageKeys": {
       "dummy": 0
     },
-    "enableMultiJS": false,
+    "enableMultiJS": true,
     "displayName": "Split Horizon",
     "watchapp": {
       "onlyShownOnCommunication": false,
