@@ -40,15 +40,16 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `starfield-smooth`             | ![](watchfaces/starfield-smooth/screenshots/aplite.png)                       | `A` `B` `C`         | ✅    | [pbw](pbw/starfield-smooth.pbw)    |
 | `thin`                         | ![](watchfaces/thin/screenshots/basalt.png)                                   | `A` `B` `C` `D` `E` | ✅    | [pbw](pbw/thin.pbw)                |
 | `time-dots-appstore`           | ![](watchfaces/time-dots-appstore/screenshots/basalt1.png)                    | `A` `B` `C` `D`     |      | [pbw](pbw/time-dots-appstore.pbw)  |
-| `split-horizon-se`             |                                                                               | ⚠️ (old inv layer)  | ✅    |                                    |
-| `eclipse-solar`                |                                                                               | ❌ (WIP)             |      |                                    |
-| `split-horizon-me`             |                                                                               | ❌ (old inv layer)   | ✅    |                                    |
 | `divider-large-2`              |                                                                               | ❔                   | ✅    |                                    |
 | `divider-small-2`              |                                                                               | ❔                   | ✅    |                                    |
-| `eventful`                     |                                                                               | ❔                   |      |                                    |
-| `past-present-future-extended` |                                                                               | ❔                   |      |                                    |
 | `seven-segments-date`          |                                                                               | ❔                   | ✅    |                                    |
 | `seven-segments`               |                                                                               | ❔                   | ✅    |                                    |
+| `past-present-future-extended` |                                                                               | ❔                   |      |                                    |
+| `split-horizon-se`             |                                                                               | ⚠️ (old inv layer)  | ✅    |                                    |
+| `eventful`                     |                                                                               | ❌ (req. Dash API)   |      |                                    |
+| `eclipse-solar`                |                                                                               | ❌ (WIP)             |      |                                    |
+| `split-horizon-me`             |                                                                               | ❌ (old inv layer)   | ✅    |                                    |
+
 
 ## `watchapps`
 

@@ -13,7 +13,7 @@ static void window_load(Window *window) {
   Layer *window_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(window_layer);
 
-  s_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_DS_DIGIB_60));
+  s_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_DS_DIGIB_48));
 
   int top = PBL_IF_ROUND_ELSE(5, -6);
   int left = PBL_IF_ROUND_ELSE(44, 32);
