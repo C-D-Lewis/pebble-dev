@@ -28,6 +28,7 @@ working_projects=$(cat <<EOF
 ./watchfaces/starfield-demo/
 ./watchfaces/thin/
 ./watchfaces/time-dots-appstore/
+./watchfaces/void-statues/
 
 ./watchapps/block-world/
 ./watchapps/dashboard/pebble/
