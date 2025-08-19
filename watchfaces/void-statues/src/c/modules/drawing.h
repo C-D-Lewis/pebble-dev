@@ -6,4 +6,6 @@
 #include "drawing.h"
 #include "../config.h"
 
-void draw_number(int number, GPoint pos);
+void drawing_draw_number(int number, GPoint pos);
+
+void drawing_set_colors(GColor box_color, GColor shadow_color);

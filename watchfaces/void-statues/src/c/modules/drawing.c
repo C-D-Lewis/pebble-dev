@@ -1,12 +1,14 @@
 #include "drawing.h"
 
+static GColor s_box_color, s_shadow_color;
+
 static void draw_box(Vec3 pos) {
-  isometric_fill_box(Vec3(pos.x, pos.y, pos.z), BOX_SIZE, H, GColorBlack);
+  isometric_fill_box(Vec3(pos.x, pos.y, pos.z), BOX_SIZE, H, s_box_color);
   // isometric_draw_box(Vec3(pos.x, pos.y, pos.z), BOX_SIZE, H, GColorWhite);
 }
 
 static void draw_shadow(Vec3 pos) {
-  isometric_fill_rect(Vec3(pos.x, pos.y, pos.z), BOX_SIZE, GColorLightGray);
+  isometric_fill_rect(Vec3(pos.x, pos.y, pos.z), BOX_SIZE, s_shadow_color);
 }
 
 static void draw_digit_blocks(GPoint pos, int cells[15]) {
@@ -46,7 +48,7 @@ static void draw_digit_shadow(GPoint pos, int cells[15]) {
   if (cells[14] == 1) draw_shadow(Vec3(pos.x + W, pos.y, 0));
 }
 
-void draw_number(int number, GPoint pos) {
+void drawing_draw_number(int number, GPoint pos) {
   switch (number) {
     case 0: {
       int cells[15] = {
@@ -171,4 +173,9 @@ void draw_number(int number, GPoint pos) {
     default:
       break;
   }
+}
+
+void drawing_set_colors(GColor box_color, GColor shadow_color) {
+  s_box_color = box_color;
+  s_shadow_color = shadow_color;
 }
