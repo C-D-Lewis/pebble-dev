@@ -27,10 +27,10 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
   s_minute_units = tick_time->tm_min % 10;
 
 #ifdef TEST
-  s_hour_tens = 4;
-  s_hour_units = 6;
-  s_minute_tens = 8;
-  s_minute_units = 9;
+  s_hour_tens = 1;
+  s_hour_units = 2;
+  s_minute_tens = 3;
+  s_minute_units = 5;
 #endif
 
   layer_mark_dirty(s_draw_layer);
