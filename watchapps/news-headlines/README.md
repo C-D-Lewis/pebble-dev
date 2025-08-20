@@ -22,4 +22,5 @@ Open source since December 2016.
 
 ## TODO
 
-* More detailed documentation
+- [ ] Use messageKeys and pebble-packet
+- [ ] Remove image stuff

@@ -3,7 +3,6 @@
 static void write_defaults() {
   // Set default settings
   settings_set_category(CategoryHeadlines);
-  settings_set_subscribed_type(PinSubscriptionTypeNotSubscribed);
   settings_set_number_of_stories(10);
   settings_set_font_size(FontSizeLarge);
   settings_set_region(RegionUK);
@@ -69,18 +68,6 @@ char* settings_get_category_string() {
   }
 }
 
-char* settings_get_subscribed_string() {
-  switch(settings_get_subscribed_type()) {
-    case PinSubscriptionTypeNotSubscribed: return "Not subscribed";
-    case PinSubscriptionTypeSubscribed:    return "Subscribed";
-    default:
-      // Could have been with notif
-      settings_set_subscribed_type(PinSubscriptionTypeNotSubscribed);
-      return settings_get_subscribed_string();
-      break;
-  }
-}
-
 char* settings_get_num_stories_string() {
   switch(settings_get_number_of_stories()) {
     case 10: return "10 stories";
@@ -99,14 +86,6 @@ char* settings_get_font_size_string() {
       settings_set_font_size(FontSizeLarge);
       return "Large (24) (default)";
   }
-}
-
-void settings_set_subscribed_type(PinSubscriptionType status) {
-  persist_write_int(SettingsTypePins, (int)status);
-}
-
-PinSubscriptionType settings_get_subscribed_type() {
-  return (PinSubscriptionType)persist_read_int(SettingsTypePins);
 }
 
 void settings_set_region(Region region) {

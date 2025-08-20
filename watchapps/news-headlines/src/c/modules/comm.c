@@ -41,17 +41,6 @@ static void in_recv_handler(DictionaryIterator *iter, void *context) {
     splash_window_set_progress(index);
   }
 
-  // Server status result
-  t = dict_find(iter, AppKeyStatus);
-  if(t) {
-    settings_window_update_pin_server_status((ServerStatus)(int)t->value->int32);
-
-    // Cancel timeout
-    if(s_timeout_timer) {
-      app_timer_cancel(s_timeout_timer);
-    }
-  }
-
   // Image data?
   t = dict_find(iter, AppKeyOffset);
   if(t) {
@@ -134,31 +123,12 @@ void comm_send_settings() {
 
   int value = settings_get_category();
   dict_write_int(out, AppKeySettingsCategory, &value, sizeof(int), true);
-  value = (int)settings_get_subscribed_type();
-  dict_write_int(out, AppKeySettingsSubscription, &value, sizeof(int), true);
   value = settings_get_number_of_stories();
   dict_write_int(out, AppKeySettingsNumStories, &value, sizeof(int), true);
   value = settings_get_region();
   dict_write_int(out, AppKeySettingsRegion, &value, sizeof(int), true);
 
   app_message_outbox_send();
-}
-
-static void timeout(void *context) {
-  settings_window_update_pin_server_status(ServerStatusTimeout);
-
-  s_timeout_timer = NULL;
-}
-
-void comm_get_pin_server_status() {
-  DictionaryIterator *out;
-  app_message_outbox_begin(&out);
-
-  int dummy = 0;
-  dict_write_int(out, AppKeyStatus, &dummy, sizeof(int), true);
-  
-  app_message_outbox_send();
-  s_timeout_timer = app_timer_register(COMM_TIMEOUT_MS, timeout, NULL);
 }
 
 void comm_set_fast(bool fast) {

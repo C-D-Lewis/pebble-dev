@@ -6,12 +6,9 @@ typedef enum {
   SettingsTypeFirstLaunch = -1,
   SettingsTypeRegion = 0,
   SettingsTypeCategory,
-  SettingsTypePins,
   SettingsTypeNumStories,
   SettingsTypeFontSize,
-  SettingsTypeStatus,
   SettingsTypeAbout,
-  SettingsTypeDonate,
 } SettingsType;
 
 typedef enum {
@@ -34,24 +31,11 @@ typedef enum {
 } FontSize;
 
 typedef enum {
-  ServerStatusWaiting,
-  ServerStatusUp,
-  ServerStatusDown,
-  ServerStatusTimeout
-} ServerStatus;
-
-typedef enum {
-  PinSubscriptionTypeNotSubscribed = 0,
-  PinSubscriptionTypeSubscribed
-} PinSubscriptionType;
-
-typedef enum {
   AppKeyTitle = 0,               // Story title
   AppKeyDescription,             // Story description
   AppKeyQuantity,                // Total number of stories
   AppKeyIndex,                   // Which story this is
-  AppKeyFailed = 5,              // The pin story was not found
-  AppKeyStatus = 9,              // Query pin server status
+  AppKeyFailed,              // The pin story was not found
   AppKeyReady,                   // JS is ready
   AppKeyImageFailed,             // Failed to download image
   AppKeyImage,                   // Fetch an image
@@ -63,8 +47,7 @@ typedef enum {
 } AppKey;
 
 typedef enum {
-  AppKeySettingsCategory = 6,
-  AppKeySettingsSubscription,
+  AppKeySettingsCategory = 20,
   AppKeySettingsNumStories,
   AppKeySettingsRegion
 } AppKeySettings;

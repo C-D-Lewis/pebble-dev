@@ -12,10 +12,6 @@ void settings_init();
 void settings_set_category(Category category);
 Category settings_get_category();
 
-// Set/get pin setting
-void settings_set_subscribed_type(PinSubscriptionType status);
-PinSubscriptionType settings_get_subscribed_type();
-
 // Set/get num stories
 void settings_set_number_of_stories(int number);
 int settings_get_number_of_stories();
@@ -26,7 +22,6 @@ FontSize settings_get_font_size();
 
 // UI
 char* settings_get_category_string();
-char* settings_get_subscribed_string();
 char* settings_get_num_stories_string();
 char* settings_get_font_size_string();
 

@@ -1,5 +1,5 @@
 var DEBUG = false;  // Turn off for release
-var VERSION = '4.6';  // Match package.json
+var VERSION = '4.7';  // Match package.json
 var MAX_ITEMS = 20;   // Max feed items the app will display
 var DATA_SIZE = 1950; // Max AppMessage image chunk size (pre-dates 8k buffers)
 var THUMBNAIL_WIDTH = 144;
@@ -10,40 +10,26 @@ var TOPIC_HEADLINES_NOTIFS = 'headlines-notifs';
 
 /*********************************** Enums ************************************/
 
-var ServerStatus = {
-  Waiting: 0,
-  Up: 1,
-  Down: 2,
-  Timeout: 3
-};
-
 var AppKey = {
   Title: 0,                    // Story title
   Description: 1,              // Story description
   Quantity: 2,                 // Total number of stories
   Index: 3,                    // Which story this is
-  Failed: 5,                   // The pin story was not found
-  Status: 9,                   // Query pin server status
-  Ready: 10,                   // JS is ready
-  ImageFailed: 11,             // Failed to download image
-  Img: 12,                     // Fetch an image
-  Offset: 13,                  // Offset in an image
-  Data: 14,                    // Actual image data
-  ImageDone: 15,               // Image should be complete
-  ChunkSize: 16,               // Size of incoming image chunk
-  ImageAvailabilityString: 17  // String of '0' and '1' representing which stories have images
+  Failed: 4,                   // The pin story was not found
+  Ready: 5,                   // JS is ready
+  ImageFailed: 6,             // Failed to download image
+  Img: 7,                     // Fetch an image
+  Offset: 8,                  // Offset in an image
+  Data: 9,                    // Actual image data
+  ImageDone: 10,               // Image should be complete
+  ChunkSize: 11,               // Size of incoming image chunk
+  ImageAvailabilityString: 12  // String of '0' and '1' representing which stories have images
 };
 
 var AppKeySettings = {
-  Category: 6,
-  Subscription: 7,
-  NumStories: 8,
-  Region: 9
-};
-
-var PinSubscriptionType = {
-  NotSubscribed: 0,
-  Subscribed: 1
+  Category: 20,
+  NumStories: 21,
+  Region: 22
 };
 
 var Region = {
@@ -121,8 +107,6 @@ var decode = function(str) {
 
 var parseFeed = function(responseText) {
   var items = [];
-  var longestTitle = 0;
-  var longestDesc = 0;
 
   var outerSpool = responseText;
 
@@ -471,33 +455,6 @@ var checksum = function(input) {
   return result;
 };
 
-function getStatus() {
-  // Query boot for IP
-  request(config.BOOT_URL, 'GET', function(responseText) {
-    var json = JSON.parse(responseText);
-    var ip = json.ip;
-
-    // Get status
-    request('http://' + ip + ':5000/status', 'GET', function(responseTextStatus) {
-      debug('getStatus(): Status response: ' + responseTextStatus);
-
-      var out = {};
-      if(responseTextStatus.indexOf('OK') > -1) {
-        debug('getStatus(): Server is up!');
-        out[AppKey.Status] = ServerStatus.Up;
-      } else {
-        debug('getStatus(): Server is down!');
-        out[AppKey.Status] = ServerStatus.Down;
-      }
-      Pebble.sendAppMessage(out, function() {
-        debug('getStatus(): Sent status to Pebble!');
-      }, function() {
-        debug('getStatus(): Failed sending status');
-      });
-    });
-  });
-}
-
 /********************************** PebbleKit JS ******************************/
 
 Pebble.addEventListener('ready', function(e) {
@@ -515,18 +472,6 @@ Pebble.addEventListener('ready', function(e) {
 
 Pebble.addEventListener('appmessage', function(dict) {
   debug('appmessage: ' + JSON.stringify(dict.payload));
-
-  // Pin?
-  // if(hasKey(dict, 'KEY_ACTION')) {
-  //   gLaunchCode = getValue(dict, 'KEY_ACTION');
-  //   debug('appmessage: TIMELINE PIN LAUNCH CODE: ' + gLaunchCode + '\n\n\n');
-
-  //   // Find from all
-  //   gQuantity = MAX_ITEMS;
-
-  //   // Download stories, and match the titles to the pin
-  //   download(gCategory, findPinWithHash);
-  // }
 
   // Image?
   if(hasKey(dict, AppKey.Img)) {
@@ -550,50 +495,7 @@ Pebble.addEventListener('appmessage', function(dict) {
     gQuantity = getInt(dict, AppKeySettings.NumStories);
     gRegion = getInt(dict, AppKeySettings.Region);
 
-    var subscribedType = getInt(dict, AppKeySettings.Subscription);
-    editPinSubscriptions(subscribedType);
-
-    debug('appmessage: Watch sent settings: ' + gCategory + '/' + subscribedType + '/' + gQuantity + '/' + gRegion);
+    debug('appmessage: Watch sent settings: ' + gCategory + '/' + gQuantity + '/' + gRegion);
     download(gCategory, sendToWatch);
   }
-
-  // Server query
-  else if(hasKey(dict, AppKey.Status)) {
-    getStatus();
-    debug('appmessage: Getting server status...');
-  }
 });
-
-function editPinSubscriptions(enumValue) {
-  if(Pebble.timelineSubscribe) {
-    switch(enumValue) {
-      case PinSubscriptionType.NotSubscribed:
-        Pebble.timelineUnsubscribe(TOPIC_HEADLINES,
-          function(success) { debug('editPinSubscriptions(): Unsub from headlines OK'); },
-          function(error)   { verbose('editPinSubscriptions(): Unsub error: ' + error); });
-        // Pebble.timelineUnsubscribe(TOPIC_HEADLINES_NOTIFS,
-        //   function(success) { debug('editPinSubscriptions(): Unsub from headlines-notifs OK'); },
-        //   function(error)   { verbose('editPinSubscriptions(): Unsub error: ' + error); });
-        break;
-      case PinSubscriptionType.Subscribed:
-        Pebble.timelineSubscribe(TOPIC_HEADLINES,
-          function(success) { debug('editPinSubscriptions(): Sub to headlines OK'); },
-          function(error)   { verbose('editPinSubscriptions(): Sub error: ' + error); });
-        // Pebble.timelineUnsubscribe(TOPIC_HEADLINES_NOTIFS,
-        //   function(success) { debug('editPinSubscriptions(): Unsub from headlines-notifs OK'); },
-        //   function(error)   { verbose('editPinSubscriptions(): Unsub error: ' + error); });
-        break;
-      // case PinSubscriptionType.SubscribedWithNotifs:
-      //   Pebble.timelineSubscribe(TOPIC_HEADLINES_NOTIFS,
-      //     function(success) { debug('editPinSubscriptions(): Sub to headlines-notifs OK'); },
-      //     function(error)   { verbose('editPinSubscriptions(): Sub error: ' + error); });
-      //   Pebble.timelineUnsubscribe(TOPIC_HEADLINES,
-      //     function(success) { debug('editPinSubscriptions(): Unsub from headlines OK'); },
-      //     function(error)   { verbose('editPinSubscriptions(): Unsub error: ' + error); });
-      //   break;
-      default:
-        verbose('editPinSubscriptions(): Unknown enumValue: ' + enumValue);
-        break;
-    }
-  }
-}

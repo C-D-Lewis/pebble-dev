@@ -1,6 +1,6 @@
 {
-  "name": "News Headlines",
-  "version": "4.6.0",
+  "name": "news-headlines",
+  "version": "4.7.0",
   "author": "Chris Lewis",
   "private": true,
   "dependencies": {},

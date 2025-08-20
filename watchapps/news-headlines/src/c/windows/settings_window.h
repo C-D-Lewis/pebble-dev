@@ -8,10 +8,7 @@
 #include "splash_window.h"
 #include "../modules/settings.h"
 
-#define SETTINGS_WINDOW_NUM_SETTINGS 8
+#define SETTINGS_WINDOW_NUM_SETTINGS 5
 
 // Push the settings Window
 void settings_window_push();
-
-// Update the server status menu row
-void settings_window_update_pin_server_status(ServerStatus s);

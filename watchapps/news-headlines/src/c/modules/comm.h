@@ -22,9 +22,6 @@ void comm_request_quantity();
 // Send web settings to JS
 void comm_send_settings();
 
-// Query the pin server
-void comm_get_pin_server_status();
-
 // Faster AppMessage
 void comm_set_fast(bool fast);
 

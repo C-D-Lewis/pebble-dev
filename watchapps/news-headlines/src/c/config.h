@@ -7,4 +7,4 @@
 #define THUMBNAIL_WIDTH  144
 #define THUMBNAIL_HEIGHT 81
 
-#define VERSION "4.6"
+#define VERSION "4.7"
