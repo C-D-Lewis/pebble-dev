@@ -92,6 +92,13 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
   layer_mark_dirty(s_canvas_layer);
 }
 
+static void bt_handler(bool connected) {
+  if (!connected) vibes_double_pulse();
+
+  drawing_set_is_connected(connected);
+  layer_mark_dirty(s_canvas_layer);
+}
+
 /************************************ Window **********************************/
 
 static void window_load(Window *window) {
@@ -119,11 +126,15 @@ void main_window_push() {
   s_current_time.minute_tens = tm_now->tm_min / 10;
   s_current_time.minute_units = tm_now->tm_min % 10;
 
-  GColor initial_bg_color = tm_now->tm_hour >= 6 && tm_now->tm_hour < 18 ? GColorWhite : GColorBlack;
+  bool is_day = tm_now->tm_hour >= 6 && tm_now->tm_hour < 18;
+  drawing_set_colors(
+    is_day ? GColorBlack : GColorWhite,
+    is_day ? GColorLightGray : GColorDarkGray
+  );
 
   if (!s_window) {
     s_window = window_create();
-    window_set_background_color(s_window, initial_bg_color);
+    window_set_background_color(s_window, is_day ? GColorWhite : GColorBlack);
     window_set_window_handlers(s_window, (WindowHandlers) {
       .load = window_load,
       .unload = window_unload,
@@ -132,6 +143,9 @@ void main_window_push() {
   window_stack_push(s_window, true);
 
   tick_timer_service_subscribe(MINUTE_UNIT, tick_handler);
+
+  bluetooth_connection_service_subscribe((BluetoothConnectionHandler)bt_handler);
+  drawing_set_is_connected(bluetooth_connection_service_peek());
 
   // Begin smooth animation
   static AnimationImplementation anim_implementation = { .update = anim_update };

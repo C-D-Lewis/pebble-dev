@@ -9,3 +9,5 @@
 void drawing_draw_number(int number, GPoint pos);
 
 void drawing_set_colors(GColor box_color, GColor shadow_color);
+
+void drawing_set_is_connected(bool is_connected);

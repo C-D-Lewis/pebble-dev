@@ -1,9 +1,16 @@
 #include "drawing.h"
 
 static GColor s_box_color, s_shadow_color;
+static bool s_is_connected = false;
 
 static void draw_box(Vec3 pos) {
-  isometric_fill_box(Vec3(pos.x, pos.y, pos.z), BOX_SIZE, H, s_box_color);
+  if (s_is_connected) {
+    isometric_fill_box(Vec3(pos.x, pos.y, pos.z), BOX_SIZE, H, s_box_color);
+  } else {
+    isometric_draw_box(Vec3(pos.x, pos.y, pos.z), BOX_SIZE, H, s_box_color);
+  }
+
+  // Outline?
   // isometric_draw_box(Vec3(pos.x, pos.y, pos.z), BOX_SIZE, H, GColorWhite);
 }
 
@@ -178,4 +185,8 @@ void drawing_draw_number(int number, GPoint pos) {
 void drawing_set_colors(GColor box_color, GColor shadow_color) {
   s_box_color = box_color;
   s_shadow_color = shadow_color;
+}
+
+void drawing_set_is_connected(bool is_connected) {
+  s_is_connected = is_connected;
 }
