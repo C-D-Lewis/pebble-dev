@@ -9,7 +9,7 @@ static void write_defaults() {
 }
 
 void settings_init() {
-  if(!persist_exists(SettingsTypeFirstLaunch)) {
+  if (!persist_exists(SettingsTypeFirstLaunch)) {
     persist_write_bool(SettingsTypeFirstLaunch, false);
 
     write_defaults();
@@ -17,14 +17,15 @@ void settings_init() {
 
   // Nuke versions
   const int nuked_v_3_6 = 453786;
-  if(!persist_exists(nuked_v_3_6)) {
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "Nuking persist for new version...");
-    const int persist_max = 220; // desc base key (200) + 20 max stories
+  const int nuked_v_3_7 = 453787;
+  if (!persist_exists(nuked_v_3_6) || !persist_exists(nuked_v_3_7)) {
+    const int persist_max = 32;
     for(int i = 0; i < persist_max; i++) {
       persist_delete(i);
     }
     APP_LOG(APP_LOG_LEVEL_DEBUG, "Nuke complete");
     persist_write_bool(nuked_v_3_6, true);
+    persist_write_bool(nuked_v_3_7, true);
     write_defaults();
   }
 }

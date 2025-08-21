@@ -13,7 +13,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
       menu_cell_basic_draw(ctx, cell_layer, "News Region", settings_get_region_string(), NULL);
       break;
     case SettingsTypeCategory:
-      if(settings_get_region() == RegionUK) {
+      if (settings_get_region() == RegionUK) {
         menu_cell_basic_draw(ctx, cell_layer, "News Category", settings_get_category_string(), NULL);
       } else {
         menu_cell_basic_draw(ctx, cell_layer, "News Category", "(UK Region Only)", NULL);
@@ -48,7 +48,7 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
       settings_set_region(num);
     } break;
     case SettingsTypeCategory: {
-      if(settings_get_region() == RegionUK) {
+      if (settings_get_region() == RegionUK) {
         int num = settings_get_category();
         num += (num < CategoryCount - 1) ? 1 : -(CategoryCount - 1);
         settings_set_category(num);
@@ -124,7 +124,7 @@ static void main_window_unload(Window *window) {
 }
 
 void settings_window_push() {
-  if(!s_main_window) {
+  if (!s_main_window) {
     s_main_window = window_create();
     window_set_background_color(s_main_window, PBL_IF_COLOR_ELSE(GColorBlack, GColorWhite));
     window_set_window_handlers(s_main_window, (WindowHandlers) {

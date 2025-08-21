@@ -31,26 +31,15 @@ typedef enum {
 } FontSize;
 
 typedef enum {
-  AppKeyTitle = 0,               // Story title
-  AppKeyDescription,             // Story description
-  AppKeyQuantity,                // Total number of stories
-  AppKeyIndex,                   // Which story this is
-  AppKeyFailed,              // The pin story was not found
-  AppKeyReady,                   // JS is ready
-  AppKeyImageFailed,             // Failed to download image
-  AppKeyImage,                   // Fetch an image
-  AppKeyOffset,                  // Offset in an image
-  AppKeyData,                    // Actual image data
-  AppKeyImageDone,               // Image should be complete
-  AppKeyChunkSize,               // Size of incoming image chunk
-  AppKeyImageAvailabilityString  // String of '0' and '1' representing which stories have images
+  AppKeyTitle = 0,          // Story title
+  AppKeyDescription,        // Story description
+  AppKeyQuantity,           // Total number of stories
+  AppKeyIndex,              // Which story this is
+  AppKeyReady,              // JS is ready
+  AppKeySettingsCategory,   // Selected category
+  AppKeySettingsNumStories, // Number of stories to show
+  AppKeySettingsRegion      // Selected region
 } AppKey;
-
-typedef enum {
-  AppKeySettingsCategory = 20,
-  AppKeySettingsNumStories,
-  AppKeySettingsRegion
-} AppKeySettings;
 
 typedef enum {
   RegionUK = 0,

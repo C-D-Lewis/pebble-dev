@@ -16,7 +16,7 @@ static void anim_stopped_handler(Animation *animation, bool finished, void *cont
 }
 
 static void animate_in(int offset) {
-  if(!s_is_animating) {
+  if (!s_is_animating) {
     s_is_animating = true;
 
     GRect finish = layer_get_frame(s_title_layer);
@@ -51,25 +51,6 @@ static void title_update_proc(Layer *layer, GContext *ctx) {
   graphics_context_set_fill_color(ctx, GColorDarkGray);
   graphics_fill_rect(ctx, GRect(bounds.origin.x + 3, bounds.origin.y + 3, bounds.size.w - 6, 2), 0, GCornerNone);
 
-  // Logo
-  // const int h_width = 100;
-  // const GEdgeInsets logo_insets = {
-  //   .top = 6,
-  //   .left = (bounds.size.w - h_width) / 2,
-  //   .bottom = bounds.size.h - 8,
-  //   .right = (bounds.size.w - h_width) / 2
-  // };
-  // GRect logo_bounds = grect_inset(bounds, logo_insets);
-
-  // Thumbnail icon hint - not since image sizes changed in June 2016 :(
-// #if defined(PBL_COLOR)
-//   if(story->has_image) {
-//     const int hint_size = 15; // bitmap size
-//     GRect thumb_icon_rect = GRect(logo_bounds.origin.x + 100, logo_bounds.origin.y - 1, hint_size, hint_size);
-//     graphics_draw_bitmap_in_rect(ctx, s_thumb_icon_bitmap, thumb_icon_rect);
-//   }
-// #endif
-
   // Bottom sep
   graphics_fill_rect(ctx, GRect(bounds.origin.x + 3, bounds.origin.y + 7, bounds.size.w - 6, 3), 0, GCornerNone);
 
@@ -96,49 +77,43 @@ static void title_update_proc(Layer *layer, GContext *ctx) {
     bounds.origin.x + 5, y,
     bounds.size.w - s_fake_para_widths[1], (s_fake_para_widths[1] / 2)), 0, GCornerNone);
   y += (s_fake_para_widths[1] / 2) + 3;
-  int last_height = (s_fake_para_widths[2] / 2);
   graphics_fill_rect(ctx, GRect(
     bounds.origin.x + 5, y,
     bounds.size.w - s_fake_para_widths[2], 168), 0, GCornerNone); // Fill the rest
 }
 
 static void update_data() {
-  if(s_title_layer) {
-    // Show updated data for current story
-    Story *story = data_get_story(s_index);
+  static char s_status_buffer[32];
+  snprintf(s_status_buffer, sizeof(s_status_buffer), "%d/%d", s_index + 1, data_get_quantity());
+  text_layer_set_text(s_status_layer, s_status_buffer);
 
-    static char s_status_buffer[32];
-    snprintf(s_status_buffer, sizeof(s_status_buffer), "%d/%d", s_index + 1, data_get_quantity());
-    text_layer_set_text(s_status_layer, s_status_buffer);
+  content_indicator_set_content_available(s_indicator, ContentIndicatorDirectionUp, (s_index > 0));
+  content_indicator_set_content_available(s_indicator, ContentIndicatorDirectionDown, (s_index < data_get_quantity() - 1));
 
-    content_indicator_set_content_available(s_indicator, ContentIndicatorDirectionUp, (s_index > 0));
-    content_indicator_set_content_available(s_indicator, ContentIndicatorDirectionDown, (s_index < data_get_quantity() - 1));
-
-    layer_mark_dirty(s_title_layer);
-  }
+  layer_mark_dirty(s_title_layer);
 }
 
 /*********************************** Clicks ***********************************/
 
 static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
-  if(!s_is_animating) {
+  if (!s_is_animating) {
     detail_window_push(s_index);
   }
 }
 
 static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
-  if(!s_is_animating) {
-    if(s_index > 0) {
+  if (!s_is_animating) {
+    if (s_index > 0) {
       s_index--;
       update_data();
       animate_in(STORIES_WINDOW_ANIM_OFFSET);
       regenerate_fake_paragraph_widths();
     } else {
-      if(click_recognizer_is_repeating(recognizer)) {
+      if (click_recognizer_is_repeating(recognizer)) {
         return;
       }
       
-      if(connection_service_peek_pebble_app_connection()) {
+      if (connection_service_peek_pebble_app_connection()) {
         // Show settings
         settings_window_push();
       } else {
@@ -151,13 +126,13 @@ static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
 }
 
 static void down_click_handler(ClickRecognizerRef recognizer, void *context) {
-  if(!s_is_animating) {
-    if(s_index < data_get_quantity() - 1) {
+  if (!s_is_animating) {
+    if (s_index < data_get_quantity() - 1) {
       s_index++;
       update_data();
       animate_in(STORIES_WINDOW_ANIM_OFFSET);
       regenerate_fake_paragraph_widths();
-    } else if(!click_recognizer_is_repeating(recognizer)) {
+    } else if (!click_recognizer_is_repeating(recognizer)) {
       // End reached
       animate_in(STORIES_WINDOW_ANIM_OFFSET / 2);
       vibes_double_pulse();
@@ -178,7 +153,7 @@ static void up_update_proc(Layer *layer, GContext *ctx) {
   GRect bounds = layer_get_bounds(layer);
 
   // If not in cache mode
-  if(connection_service_peek_pebble_app_connection()) {
+  if (connection_service_peek_pebble_app_connection()) {
     // Show wrench when not a ContentIndicator
     graphics_context_set_compositing_mode(ctx, GCompOpSet);
 
@@ -271,7 +246,7 @@ static void window_unload(Window *this) {
 /************************************ API *************************************/
 
 void stories_window_push() {
-  if(!s_window) {
+  if (!s_window) {
     s_window = window_create();
     window_set_background_color(s_window, PBL_IF_COLOR_ELSE(GColorDarkCandyAppleRed, GColorBlack));
     window_set_click_config_provider(s_window, click_config_provider);

@@ -27,7 +27,7 @@ void splash_window_begin() {
 
 static void load_cache_handler(void *context) {
   splash_window_cancel_timeout();
-  if(data_load_cached_data()) {
+  if (data_load_cached_data()) {
     comm_set_fast(false);
     stories_window_push();
   } else {
@@ -85,16 +85,16 @@ static void window_unload(Window *window) {
 }
 
 static void window_appear(Window *window) {
-  if(bluetooth_connection_service_peek()) {
+  if (bluetooth_connection_service_peek()) {
     // Cater for returning when applying
-    if(s_first_view) {
+    if (s_first_view) {
       s_first_view = false;
     } else {
       // 'ready' won't come mid-app, go anyway
       splash_window_begin();
     }
   } else {
-    if(persist_exists(DATA_PERSIST_KEY_CACHED)) {
+    if (persist_exists(DATA_PERSIST_KEY_CACHED)) {
       app_timer_register(1500, load_cache_handler, NULL);
     } else {
       // Can't load from cache, no data available
@@ -104,7 +104,7 @@ static void window_appear(Window *window) {
 }
 
 void splash_window_push() {
-  if(!s_window) {
+  if (!s_window) {
     s_window = window_create();
     window_set_background_color(s_window, GColorBlack);
     window_set_window_handlers(s_window, (WindowHandlers) {
@@ -131,7 +131,7 @@ void splash_window_set_progress(int progress) {
   // Update progress bar
   layer_mark_dirty(s_bar_layer);
 
-  if(progress == s_quantity - 1) {
+  if (progress == s_quantity - 1) {
     // All here
     app_timer_register(500, next_window_handler, NULL);
     data_cache_data();
@@ -140,7 +140,7 @@ void splash_window_set_progress(int progress) {
 }
 
 void splash_window_cancel_timeout() {
-  if(s_timeout_timer) {
+  if (s_timeout_timer) {
     app_timer_cancel(s_timeout_timer);
     s_timeout_timer = NULL;
   }

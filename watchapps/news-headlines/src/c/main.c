@@ -8,7 +8,7 @@
 
 #if PBL_API_EXISTS(app_glance_reload)
 static void app_glance_callback(AppGlanceReloadSession *session, size_t limit, void *context) {
-  if(limit < 1) {
+  if (limit < 1) {
     return;
   }
 
@@ -20,7 +20,7 @@ static void app_glance_callback(AppGlanceReloadSession *session, size_t limit, v
   };
 
   const AppGlanceResult result = app_glance_add_slice(session, entry);
-  if(result != APP_GLANCE_RESULT_SUCCESS) {
+  if (result != APP_GLANCE_RESULT_SUCCESS) {
     APP_LOG(APP_LOG_LEVEL_ERROR, "AppGlance error: %d", result);
   }
 }
