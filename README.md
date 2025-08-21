@@ -27,6 +27,7 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `deep-rock`                    | ![](watchfaces/deep-rock/screenshots/basalt.png)                              | `A` `B` `D`         |      | [pbw](pbw/deep-rock.pbw)           |
 | `dual-gauge`                   | ![](watchfaces/dual-gauge/screenshots/basalt.png)                             | `A` `B` `C` `D`     |      | [pbw](pbw/dual-gauge.pbw)          |
 | `eclipse`                      | ![](watchfaces/eclipse/screenshots/pebble-screenshot_2014-03-25_12-39-28.png) | `A` `B` `D`         |      | [pbw](pbw/eclipse.pbw)             |
+| `eventful`                     | ![](watchfaces/eventful/screenshots/aplite.png)                               | `A` `B` `C` `D`     |      | [pbw](pbw/eventful.pbw)            |
 | `events`                       | ![](watchfaces/events/screenshots/aplite.png)                                 | `A` `B` `D` `E`     | ✅    | [pbw](pbw/events.pbw)              |
 | `hollywatch`                   | ![](watchfaces/hollywatch/screenshots/basalt.png)                             | `A` `B` `C` `D`     |      | [pbw](pbw/hollywatch.pbw)          |
 | `index`                        | ![](watchfaces/index/screenshots/aplite.png)                                  | `A` `B` `C` `D`     |      | [pbw](pbw/index.pbw)               |
@@ -47,7 +48,6 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `seven-segments-date`          |                                                                               | ❔                   | ✅    |                                    |
 | `seven-segments`               |                                                                               | ❔                   | ✅    |                                    |
 | `eclipse-solar`                |                                                                               | ❌ (WIP)             |      |                                    |
-| `eventful`                     |                                                                               | ❌ (req. Dash API)   |      |                                    |
 
 
 ## `watchapps`
@@ -57,8 +57,8 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `block-world`    | ![](watchapps/block-world/screenshots/basalt.png)       | `B` `C`               |      | [pbw](pbw/block-world.pbw)    |
 | `dashboard`      | ![](watchapps/dashboard/assets/screenshots/basalt1.png) | `A` `B` `C` `D`       | ✅    | [pbw](pbw/dashboard.pbw)      |
 | `news-headlines` | ![](watchapps/news-headlines/screenshots/basalt.png)    | `A` `B` `C` `D`       | ✅    | [pbw](pbw/news-headlines.pbw) |
-| `pge-examples`   |                                                         | ❌ (needs pge package) |      |                               |
 | `tube-status`    | ![](watchapps/tube-status/screenshots/basalt.png)       | `A` `B` `C` `D`       | ✅    | [pbw](pbw/tube-status.pbw)    |
+| `pge-examples`   |                                                         | ❌ (needs pge package) |      |                               |
 
 ## `libraries`
 
@@ -68,12 +68,12 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `notif-layer`             | ✅      | ✅        |
 | `pebble-isometric`        | ✅      | ✅        |
 | `pebble-packet`           | ✅      | ✅        |
+| `pebble-universal-fb`     | ✅      | ✅        |
+| `pge`                     | ✅      | ✅        |
 | `pebble-pge-simple`       |        |          |
 | `pebble-simple-request`   |        |          |
 | `pebble-timeline-js-node` |        |          |
 | `pebble-timeline-js`      |        |          |
-| `pebble-universal-fb`     | ✅      | ✅        |
-| `pge`                     | ✅      | ✅        |
 
 ## `other`
 
