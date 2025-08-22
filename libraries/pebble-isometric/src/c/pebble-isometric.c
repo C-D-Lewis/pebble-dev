@@ -14,7 +14,7 @@ static void set_pixel(GPoint pixel, GColor color) {
   GColor actual_color = color;
 #if defined(PBL_BW)
   // Dither black and white if gray requested
-  if(gcolor_equal(color, GColorDarkGray) || gcolor_equal(color, GColorLightGray)) {
+  if (gcolor_equal(color, GColorDarkGray) || gcolor_equal(color, GColorLightGray)) {
     actual_color = (pixel.x % 2 == 0) ? GColorWhite : GColorBlack;
   }
 #endif
@@ -33,17 +33,16 @@ static void bresenham_line(GPoint start, GPoint finish, GColor color) {
   int e2;
 
   s_info = gbitmap_get_data_row_info(s_fb, start.y);
-  while(true) {
+  while (true) {
     set_pixel(GPoint(start.x, start.y), color);
-    if(start.x == finish.x && start.y == finish.y) {
-      break;
-    }
+    if (start.x == finish.x && start.y == finish.y) break;
+
     e2 = err;
-    if(e2 > -dx) {
+    if (e2 > -dx) {
       err -= dy;
       start.x += sx;
     }
-    if(e2 < dy) {
+    if (e2 < dy) {
       err += dx;
       start.y += sy;
       s_info = gbitmap_get_data_row_info(s_fb, start.y);
@@ -59,7 +58,7 @@ GBitmap* isometric_begin(GContext *ctx) {
 }
 
 void isometric_finish(GContext *ctx) {
-  if(s_fb) {
+  if (s_fb) {
     graphics_release_frame_buffer(ctx, s_fb);
     s_fb = NULL;
     s_fb_data = NULL;
@@ -76,7 +75,7 @@ void isometric_set_projection_offset(GPoint offset) {
 
 GPoint isometric_project(Vec3 input) {
   GPoint result;
-  if(s_enabled) {
+  if (s_enabled) {
     result.x = s_projection_offset.x + (input.x - input.y);
     result.y = s_projection_offset.y + ((input.x / 2) + (input.y / 2)) - input.z;
   } else {
@@ -112,7 +111,7 @@ void isometric_fill_rect(Vec3 origin, GSize size, GColor color) {
   int iterations = 2;
 #if defined(PBL_BW)
   // Prevent vertical stipes when dithered gray
-  if(gcolor_equal(color, GColorDarkGray) || gcolor_equal(color, GColorLightGray)) {
+  if (gcolor_equal(color, GColorDarkGray) || gcolor_equal(color, GColorLightGray)) {
     iterations = 1;
   }
 #endif
@@ -199,6 +198,80 @@ void isometric_fill_textured_rect(Vec3 origin, GBitmap *texture) {
         uint8_t value = tex_data[(y * bytes_per_row) + x];
         set_pixel(isometric_project(Vec3(origin.x + x, origin.y + y, z)), (GColor)value);
       }
+    }
+  }
+}
+
+void isometric_draw_box_faces(Vec3 origin, GSize size, int z_height, GColor color, bool top, bool right, bool left) {
+  if (top) {
+    isometric_draw_rect(Vec3(origin.x, origin.y, origin.z + z_height), size, color);
+  }
+
+  if (right) {
+    // Bottom
+    GPoint start = isometric_project(Vec3(origin.x + size.w, origin.y, origin.z));
+    GPoint finish = isometric_project(Vec3(origin.x + size.w, origin.y + size.h, origin.z));
+    bresenham_line(start, finish, color);
+
+    // Left vertical
+    start = isometric_project(Vec3(origin.x + size.w, origin.y + size.h, origin.z));
+    finish = isometric_project(Vec3(origin.x + size.w, origin.y + size.h, origin.z + z_height));
+    bresenham_line(start, finish, color);
+
+    // Right vertical
+    start = isometric_project(Vec3(origin.x + size.w, origin.y, origin.z));
+    finish = isometric_project(Vec3(origin.x + size.w, origin.y, origin.z + z_height));
+    bresenham_line(start, finish, color);
+
+    // Top
+    start = isometric_project(Vec3(origin.x + size.w, origin.y, origin.z + z_height));
+    finish = isometric_project(Vec3(origin.x + size.w, origin.y + size.h, origin.z + z_height));
+    bresenham_line(start, finish, color);
+  }
+
+  if (left) {
+    // Bottom
+    GPoint start = isometric_project(Vec3(origin.x, origin.y + size.h, origin.z));
+    GPoint finish = isometric_project(Vec3(origin.x + size.w, origin.y + size.h, origin.z));
+    bresenham_line(start, finish, color);
+
+    // Left vertical
+    start = isometric_project(Vec3(origin.x, origin.y + size.h, origin.z));
+    finish = isometric_project(Vec3(origin.x, origin.y + size.h, origin.z + z_height));
+    bresenham_line(start, finish, color);
+
+    // Right vertical
+    start = isometric_project(Vec3(origin.x + size.w, origin.y + size.h, origin.z));
+    finish = isometric_project(Vec3(origin.x + size.w, origin.y + size.h, origin.z + z_height));
+    bresenham_line(start, finish, color);
+
+    // Top
+    start = isometric_project(Vec3(origin.x, origin.y + size.h, origin.z + z_height));
+    finish = isometric_project(Vec3(origin.x + size.w, origin.y + size.h, origin.z + z_height));
+    bresenham_line(start, finish, color);
+  }
+}
+
+void isometric_fill_box_faces(Vec3 origin, GSize size, int z_height, GColor color, bool top, bool right, bool left) {
+  if (top) {
+    isometric_fill_rect(Vec3(origin.x, origin.y, origin.z + z_height), size, color);
+  }
+
+  if (right) {
+    for(int z = origin.z; z < origin.z + z_height; z++) {
+      // Right
+      GPoint start = isometric_project(Vec3(origin.x + size.w, origin.y, z));
+      GPoint finish = isometric_project(Vec3(origin.x + size.w, origin.y + size.h, z));
+      bresenham_line(start, finish, color);
+    }
+  }
+
+  if (left) {
+    for(int z = origin.z; z < origin.z + z_height; z++) {
+      // Bottom
+      GPoint start = isometric_project(Vec3(origin.x, origin.y + size.h, z));
+      GPoint finish = isometric_project(Vec3(origin.x + size.w, origin.y + size.h, z));
+      bresenham_line(start, finish, color);
     }
   }
 }

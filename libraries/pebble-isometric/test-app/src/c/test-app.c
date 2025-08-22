@@ -1,6 +1,6 @@
 #include <pebble.h>
 
-#include <pebble-isometric/pebble-isometric.h>
+#include "pebble-isometric.h"
 
 static Window *s_window;
 static Layer *s_canvas_layer;
@@ -20,9 +20,16 @@ static void update_proc(Layer *layer, GContext *ctx) {
   isometric_fill_box(Vec3(0, 0, 60), GSize(25, 25), 25, GColorBlue);
   isometric_draw_box(Vec3(0, 0, 60), GSize(25, 25), 25, GColorBlack);
 
+  // Fill a face
+  isometric_fill_box_faces(Vec3(0, 0, 60), GSize(25, 25), 25, GColorGreen, false, true, false);
+
   // Draw small box
   isometric_fill_box(Vec3(0, 0, 85), GSize(10, 10), 10, GColorRed);
   isometric_draw_box(Vec3(0, 0, 85), GSize(10, 10), 10, GColorBlack);
+
+  // Draw a face
+  isometric_draw_box_faces(Vec3(0, 0, 85), GSize(10, 10), 10, GColorWhite, false, false, true);
+
 
   // Release framebuffer
   isometric_finish(ctx);

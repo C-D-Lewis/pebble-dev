@@ -71,3 +71,13 @@ void isometric_draw_pixel(Vec3 point, GColor color);
  * Draw an isometric rectangle filled with a texture
  */
 void isometric_fill_textured_rect(Vec3 origin, GBitmap *texture);
+
+/**
+ * Draw individual faces of an isometric box
+ */
+void isometric_draw_box_faces(Vec3 origin, GSize size, int z_height, GColor color, bool top, bool right, bool left);
+
+/**
+ * Fill individual faces of an isometric box
+ */
+void isometric_fill_box_faces(Vec3 origin, GSize size, int z_height, GColor color, bool top, bool right, bool left);
