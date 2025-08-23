@@ -21,9 +21,14 @@ void draw_row_handler(GContext *ctx, const Layer *cell_layer, MenuIndex *cell_in
   graphics_fill_rect(ctx, bounds, GCornerNone, 0);
 
   // Line color
+  int line_color_x = center.x - (LINE_WINDOW_MARGIN / 2);
   graphics_context_set_fill_color(ctx, data_get_line_color(type));
-  graphics_fill_rect(ctx, GRect(center.x - (LINE_WINDOW_MARGIN / 2), bounds.origin.y, 
+  graphics_fill_rect(ctx, GRect(line_color_x, bounds.origin.y, 
     LINE_WINDOW_MARGIN, bounds.size.h), GCornerNone, 0);
+  if (data_get_line_color_is_striped(type)) {
+    graphics_context_set_fill_color(ctx, GColorWhite);
+    graphics_fill_rect(ctx, GRect(line_color_x + 4, bounds.origin.y, 2, bounds.size.h), GCornerNone, 0);
+  }
 
   // Draw circle
   graphics_context_set_fill_color(ctx, GColorBlack);

@@ -79,3 +79,19 @@ GColor data_get_line_state_color(int type) {
 
   return GColorClear;
 }
+
+bool data_get_line_color_is_striped(int type) {
+  switch(type) {
+    case LineTypeDLR:
+    case LineTypeElizabeth:
+    case LineTypeLiberty:
+    case LineTypeLioness:
+    case LineTypeMildmay:
+    case LineTypeSuffragette:
+    case LineTypeWeaver:
+    case LineTypeWindrush:
+      return true;
+    default:
+      return false;
+  }
+}

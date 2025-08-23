@@ -15,3 +15,5 @@ char* data_get_line_state(int type);
 GColor data_get_line_color(int type);
 
 GColor data_get_line_state_color(int type);
+
+bool data_get_line_color_is_striped(int type);

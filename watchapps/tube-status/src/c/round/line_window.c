@@ -45,16 +45,6 @@ static void click_config_provider(void *context) {
 
 /*********************************** Window ***********************************/
 
-static void hint_update_proc(Layer *layer, GContext *ctx) {
-  GRect bounds = layer_get_bounds(layer);
-
-  graphics_context_set_fill_color(ctx, GColorBlack);
-
-  const int radius = 15;
-  graphics_fill_circle(ctx, 
-    GPoint(bounds.size.w + (radius / 3), ((bounds.size.h - (2 * radius)) / 2) + radius), radius);
-}
-
 static void ring_update_proc(Layer *layer, GContext *ctx) {
   const GRect bounds = layer_get_bounds(layer);
   const int name_y_margin = 50;
@@ -68,6 +58,11 @@ static void ring_update_proc(Layer *layer, GContext *ctx) {
   GRect ring_rect = grect_inset(bounds, GEdgeInsets(RING_MARGIN));
   graphics_fill_radial(ctx, ring_rect, GOvalScaleModeFitCircle, 
     LINE_WINDOW_MARGIN, DEG_TO_TRIGANGLE(0), DEG_TO_TRIGANGLE(360));
+  if (data_get_line_color_is_striped(s_selected_line)) {
+    graphics_context_set_fill_color(ctx, GColorWhite);
+    graphics_fill_radial(ctx, grect_inset(ring_rect, GEdgeInsets((3))), 
+      GOvalScaleModeFitCircle, 4, DEG_TO_TRIGANGLE(0), DEG_TO_TRIGANGLE(360));
+  }
 
   // Stations
   int angle = 0;
