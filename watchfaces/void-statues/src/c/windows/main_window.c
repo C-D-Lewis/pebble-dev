@@ -161,7 +161,7 @@ void main_window_push() {
   bluetooth_connection_service_subscribe((BluetoothConnectionHandler)bt_handler);
   drawing_set_is_connected(bluetooth_connection_service_peek());
 #ifdef TEST
-  drawing_set_is_connected(false);
+  drawing_set_is_connected(true);
 #endif
 
   // Begin smooth animation
