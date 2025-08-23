@@ -57,7 +57,7 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `block-world`    | ![](watchapps/block-world/screenshots/basalt.png)       | `B` `C`               |      | [pbw](pbw/block-world.pbw)    |
 | `dashboard`      | ![](watchapps/dashboard/assets/screenshots/basalt1.png) | `A` `B` `C` `D`       | ✅    | [pbw](pbw/dashboard.pbw)      |
 | `news-headlines` | ![](watchapps/news-headlines/screenshots/basalt.png)    | `A` `B` `C` `D`       | ✅    | [pbw](pbw/news-headlines.pbw) |
-| `tube-status`    | ![](watchapps/tube-status/screenshots/basalt.png)       | `A` `B` `C` `D`       | ✅    | [pbw](pbw/tube-status.pbw)    |
+| `tube-status`    | ![](watchapps/tube-status/screenshots/basalt.png)       | `A` `B` `C` `D` `E`   | ✅    | [pbw](pbw/tube-status.pbw)    |
 | `pge-examples`   |                                                         | ❌ (needs pge package) |      |                               |
 
 ## `libraries`

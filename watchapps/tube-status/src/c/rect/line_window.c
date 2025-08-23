@@ -42,7 +42,12 @@ void draw_row_handler(GContext *ctx, const Layer *cell_layer, MenuIndex *cell_in
   }
 
   // Info
-  GRect text_bounds = GRect(bounds.origin.x + (3 * LINE_WINDOW_MARGIN), 
+#ifdef PBL_PLATFORM_EMERY
+  int inset_mult = 4;
+#else
+  int inset_mult = 3;
+#endif
+  GRect text_bounds = GRect(bounds.origin.x + (inset_mult * LINE_WINDOW_MARGIN), 
     bounds.origin.y - 5, bounds.size.w - (4 * LINE_WINDOW_MARGIN), 30);
   graphics_context_set_text_color(ctx, GColorBlack);
   graphics_draw_text(ctx, data_get_line_name(type), fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD),
@@ -59,6 +64,10 @@ void draw_row_handler(GContext *ctx, const Layer *cell_layer, MenuIndex *cell_in
 
 uint16_t get_num_rows_handler(MenuLayer *menu_layer, uint16_t section_index, void *context) {
   return LineTypeMax;
+}
+
+int16_t get_cell_height_handler(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) {
+  return 45;
 }
 
 /*********************************** Window ***********************************/
@@ -80,7 +89,8 @@ static void window_load(Window *window) {
   menu_layer_pad_bottom_enable(s_menu_layer, false);
   menu_layer_set_callbacks(s_menu_layer, NULL, (MenuLayerCallbacks) {
     .draw_row = draw_row_handler,
-    .get_num_rows = get_num_rows_handler
+    .get_num_rows = get_num_rows_handler,
+    .get_cell_height = get_cell_height_handler,
   });
   layer_add_child(window_layer, menu_layer_get_layer(s_menu_layer));
 }
