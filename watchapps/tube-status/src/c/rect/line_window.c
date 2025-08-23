@@ -3,28 +3,12 @@
 
 static Window *s_window;
 static MenuLayer *s_menu_layer;
-static Layer *s_hint_layer;
 static StatusBarLayer *s_status_bar;
-
-// static void hint_update_proc(Layer *layer, GContext *ctx) {
-//   GRect bounds = layer_get_bounds(layer);
-//   const int nudge = 3;
-//   const int radius = 15;
-//   GPoint center = GPoint(bounds.size.w + (radius / 2) - nudge, (bounds.size.h / 2) - nudge);
-
-//   graphics_context_set_fill_color(ctx, GColorBlack);
-//   graphics_fill_circle(ctx, center, radius);
-
-//   // Hold
-//   center.x -= (2 * radius) / 3;
-//   center.x--;
-//   graphics_context_set_fill_color(ctx, GColorWhite);
-//   graphics_fill_circle(ctx, center, 2);
-// }
 
 /********************************* MenuLayer **********************************/
 
 void draw_row_handler(GContext *ctx, const Layer *cell_layer, MenuIndex *cell_index, void *context) { 
+  // Important that all lines are in the same order as LineType and zero-indexed
   int type = cell_index->row;
 
   GRect bounds = layer_get_bounds(cell_layer);
@@ -77,12 +61,6 @@ uint16_t get_num_rows_handler(MenuLayer *menu_layer, uint16_t section_index, voi
   return LineTypeMax;
 }
 
-/******************************** Click Config ********************************/
-
-static void select_click_handler(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) { 
-  // settings_window_push();
-}
-
 /*********************************** Window ***********************************/
 
 static void window_load(Window *window) {
@@ -102,19 +80,13 @@ static void window_load(Window *window) {
   menu_layer_pad_bottom_enable(s_menu_layer, false);
   menu_layer_set_callbacks(s_menu_layer, NULL, (MenuLayerCallbacks) {
     .draw_row = draw_row_handler,
-    .get_num_rows = get_num_rows_handler,
-    .select_long_click = select_click_handler
+    .get_num_rows = get_num_rows_handler
   });
   layer_add_child(window_layer, menu_layer_get_layer(s_menu_layer));
-
-  // s_hint_layer = layer_create(bounds);
-  // layer_set_update_proc(s_hint_layer, hint_update_proc);
-  // layer_add_child(window_layer, s_hint_layer);
 }
 
 static void window_unload(Window *window) {
   menu_layer_destroy(s_menu_layer);
-  // layer_destroy(s_hint_layer);
   status_bar_layer_destroy(s_status_bar);
   
   window_destroy(s_window);

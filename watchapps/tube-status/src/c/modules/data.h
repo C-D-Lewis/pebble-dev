@@ -5,6 +5,7 @@
 #include "../config.h"
 
 void data_init();
+
 void data_deinit();
 
 char* data_get_line_name(int type);

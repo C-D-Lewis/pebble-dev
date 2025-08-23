@@ -1,91 +1,83 @@
-var VERSION = '3.4';
-var VERBOSE = true;
-
 /********************************** Helpers ***********************************/
 
-function Log(content) {
-  if (VERBOSE) console.log(content);
-};
-
-var hasKey = function(dict, key) {
-  return typeof dict.payload[key] !== 'undefined';
-};
-
-// Request-like shim
-function request(url, callback) {
+function requestJson(url, callback) {
   var xhr = new XMLHttpRequest();
   xhr.onload = function() {
-    callback(this.responseText);
+    callback(JSON.parse(this.responseText));
   };
   xhr.open('GET', url);
   xhr.send();
 };
 
-/******************************* New Unified API ******************************/
+/************************************* App ************************************/
 
-function downloadNewAPI() {
-  request('https://api.tfl.gov.uk/line/mode/tube/status', function(responseText) {
-    console.log('Download from unified API complete!');
+/**
+ * Send all lines statuses to Pebble.
+ *
+ * @param {Object} lineStates Object mapping line IDs to status strings.
+ */
+function sendToPebble(lineStates) {
+  // TODO: Stream messages with larger lineStatuses[n].reason string for detail window
+  var dict = {
+    'LineTypeBakerloo': lineStates['bakerloo'] || '?',
+    'LineTypeCentral': lineStates['central'] || '?',
+    'LineTypeCircle': lineStates['circle'] || '?',
+    'LineTypeDistrict': lineStates['district'] || '?',
+    'LineTypeDLR': lineStates['dlr'] || '?',
+    'LineTypeElizabeth': lineStates['elizabeth'] || '?',
+    'LineTypeHammersmithAndCity': lineStates['hammersmith-city'] || '?',
+    'LineTypeJubilee': lineStates['jubilee'] || '?',
+    'LineTypeLiberty': lineStates['liberty'] || '?',
+    'LineTypeLioness': lineStates['lioness'] || '?',
+    'LineTypeMetropolitan': lineStates['metropolitan'] || '?',
+    'LineTypeMildmay': lineStates['mildmay'] || '?',
+    'LineTypeNorthern': lineStates['northern'] || '?',
+    'LineTypePicadilly': lineStates['piccadilly'] || '?',
+    'LineTypeSuffragette': lineStates['suffragette'] || '?',
+    'LineTypeVictoria': lineStates['victoria'] || '?',
+    'LineTypeWaterlooAndCity': lineStates['waterloo-city'] || '?',
+    'LineTypeWeaver': lineStates['weaver'] || '?',
+    'LineTypeWindrush': lineStates['windrush'] || '?'
+  };
 
-    // Get names
-    var lineStates = [];
-    var lines = JSON.parse(responseText);
-    for (var i = 0; i < lines.length; i++) {
-      // Yay JSON!
-      lineStates[i] = lines[i].lineStatuses[0].statusSeverityDescription;
-    }
-
-    sendToPebble(lineStates);
+  Pebble.sendAppMessage(dict, function(e) {
+    console.log('Sent!');
+  }, function(e) {
+    console.log('Send failed!');
   });
 }
 
-/************************************* App ************************************/
+/**
+ * Download all lines statuses.
+ *
+ * @param {string[]} lineIds Array of line IDs, e.g. ['tube', 'dlr'] etc
+ */
+function downloadStatus(lineIds) {
+  requestJson('https://api.tfl.gov.uk/line/mode/' + lineIds.join(',') + '/status', function(json) {
+    var result = json.reduce(function(acc, obj) {
+      acc[obj.id] = '?';
+    
+      if (obj.lineStatuses && obj.lineStatuses.length > 0) {
+        acc[obj.id] = obj.lineStatuses[0].statusSeverityDescription;
+      }
+      return acc;
+    }, {});
+    console.log(JSON.stringify(result));
 
-function sendToPebble(lineStates) {
-  // TODO Don't use order of values
-  var dict = {
-    'LineTypeBakerloo': lineStates[0],
-    'LineTypeCentral': lineStates[1],
-    'LineTypeCircle': lineStates[2],
-    'LineTypeDistrict': lineStates[3],
-    'LineTypeHammersmithAndCity': lineStates[4],
-    'LineTypeJubilee': lineStates[5],
-    'LineTypeMetropolitan': lineStates[6],
-    'LineTypeNorthern': lineStates[7],
-    'LineTypePicadilly': lineStates[8],
-    'LineTypeVictoria': lineStates[9],
-    'LineTypeWaterlooAndCity': lineStates[10]
-  };
-  console.log(JSON.stringify(dict));
-
-  Pebble.sendAppMessage(dict, function(e) {
-    console.log('Sent to Pebble!');
-  }, function(e) {
-    console.log('Send failed!');
+    sendToPebble(result);
   });
 }
 
 /******************************** PebbleKit JS ********************************/
 
 Pebble.addEventListener('ready', function(e) {
-  console.log('PebbleKit JS ready! Version ' + VERSION);
+  console.log('PebbleKit JS ready');
 
-  // Inform that JS is ready - for some reason this prevents future messages????
-  // Pebble.sendAppMessage({ 'JSReady': 1 }, function(e) {
-  //   Log('Send ready event successfully');
-  // }, function(e) {
-  //   console.log('Failed to send ready event!');
-  // });
-
-  downloadNewAPI();
-});
-
-Pebble.addEventListener('appmessage', function(dict) {
-  Log('Got appmessage: ' + JSON.stringify(dict.payload));
-
-  // Watch wants tube status
-  if (hasKey(dict, 'JSReady')) {
-    Log('Data request receieved.');
-    downloadNewAPI();
-  } 
+  // Available modes: https://api.tfl.gov.uk/StopPoint/Meta/modes
+  downloadStatus([
+    'tube',
+    'dlr',
+    'elizabeth-line',
+    'overground',
+  ]);
 });

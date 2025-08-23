@@ -10,13 +10,21 @@ typedef enum {
   LineTypeCentral,
   LineTypeCircle,
   LineTypeDistrict,
+  LineTypeDLR,
+  LineTypeElizabeth,
   LineTypeHammersmithAndCity,
   LineTypeJubilee,
+  LineTypeLiberty,
+  LineTypeLioness,
   LineTypeMetropolitan,
+  LineTypeMildmay,
   LineTypeNorthern,
   LineTypePicadilly,
+  LineTypeSuffragette,
   LineTypeVictoria,
   LineTypeWaterlooAndCity,
+  LineTypeWeaver,
+  LineTypeWindrush,
 
   LineTypeMax
 } LineType;
