@@ -49,27 +49,39 @@ static void draw_digit_blocks(GPoint pos, int cells[15], int number) {
   if (cells[12] == 1) draw_box(get_block_position(12, pos));
   if (cells[11] == 1) draw_box(get_block_position(11, pos));
   if (cells[10] == 1) draw_box(get_block_position(10, pos));
+  if (number == 0 || number == 6 || number == 8) {
+    isometric_fill_box_faces(get_block_position(10, pos), BOX_SIZE, H, s_clarity_color, false, true, false);
+    isometric_draw_box(get_block_position(10, pos), BOX_SIZE, H, s_box_color, true);
+  }
   if (cells[9] == 1) draw_box(get_block_position(9, pos));
   if (cells[8] == 1) draw_box(get_block_position(8, pos));
   if (cells[7] == 1) draw_box(get_block_position(7, pos));
+  if (number == 0) {
+    isometric_fill_box_faces(get_block_position(7, pos), BOX_SIZE, H, s_clarity_color, false, true, false);
+    isometric_draw_box(get_block_position(7, pos), BOX_SIZE, H, s_box_color, true);
+  }
   if (cells[6] == 1) draw_box(get_block_position(6, pos));
   if (cells[5] == 1) draw_box(get_block_position(5, pos));
   if (cells[4] == 1) draw_box(get_block_position(4, pos));
+  if (number == 0 || number == 8 || number == 9) {
+    isometric_fill_box_faces(get_block_position(4, pos), BOX_SIZE, H, s_clarity_color, false, true, false);
+    isometric_draw_box(get_block_position(4, pos), BOX_SIZE, H, s_box_color, true);
+  }
   if (cells[3] == 1) draw_box(get_block_position(3, pos));
   if (cells[2] == 1) draw_box(get_block_position(2, pos));
   if (cells[1] == 1) draw_box(get_block_position(1, pos));
   if (cells[0] == 1) draw_box(get_block_position(0, pos));
 
   // Some extra box lines for better readability
-  if (number == 6 || number == 8) {
-    isometric_draw_box_faces(get_block_position(10, pos), BOX_SIZE, H, s_clarity_color, false, true, false);
-  }
-  if (number == 8 || number == 9) {
-    isometric_draw_box_faces(get_block_position(4, pos), BOX_SIZE, H, s_clarity_color, false, true, false);
-  }
-  if (number == 0) {
-    isometric_draw_box_faces(get_block_position(10, pos), BOX_SIZE, 3 * H, s_clarity_color, false, true, false);
-  }
+  // if (number == 6 || number == 8) {
+  //   isometric_draw_box_faces(get_block_position(10, pos), BOX_SIZE, H, s_clarity_color, false, true, false);
+  // }
+  // if (number == 8 || number == 9) {
+  //   isometric_draw_box_faces(get_block_position(4, pos), BOX_SIZE, H, s_clarity_color, false, true, false);
+  // }
+  // if (number == 0) {
+  //   isometric_draw_box_faces(get_block_position(10, pos), BOX_SIZE, 3 * H, s_clarity_color, false, true, false);
+  // }
 }
 
 static void draw_digit_shadow(GPoint pos, int cells[15]) {
