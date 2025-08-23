@@ -23,6 +23,14 @@ static void canvas_layer_update_proc(Layer *layer, GContext *ctx) {
 
   SimpleTime mode_time = s_animating ? s_anim_time : s_current_time;
 
+#ifdef TEST
+  // Example time such as 18:24
+  mode_time.hour_tens = 1;
+  mode_time.hour_units = 8;
+  mode_time.minute_tens = 2;
+  mode_time.minute_units = 4;
+#endif
+
   // Offsets for B&W shadow rendering
   drawing_draw_number(mode_time.hour_tens, GPoint(0, 0));
   drawing_draw_number(mode_time.hour_units, GPoint(1, -40));
@@ -81,11 +89,16 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
   s_current_time.minute_units = tick_time->tm_min % 10;
 
   // Colors update for day and night
-  if (hours >= 6 && hours < 18) {
-    drawing_set_colors(GColorBlack, GColorLightGray);
+#ifdef TEST
+  bool is_day = true;
+#else
+  bool is_day = tick_time->tm_hour >= 6 && tick_time->tm_hour < 18;
+#endif
+  if (is_day) {
+    drawing_set_colors(GColorBlack, GColorLightGray, PBL_IF_COLOR_ELSE(GColorDarkGray, GColorWhite));
     window_set_background_color(s_window, GColorWhite);
   } else {
-    drawing_set_colors(GColorWhite, GColorDarkGray);
+    drawing_set_colors(GColorWhite, GColorDarkGray, PBL_IF_COLOR_ELSE(GColorLightGray, GColorBlack));
     window_set_background_color(s_window, GColorBlack);
   }
 
@@ -129,7 +142,8 @@ void main_window_push() {
   bool is_day = tm_now->tm_hour >= 6 && tm_now->tm_hour < 18;
   drawing_set_colors(
     is_day ? GColorBlack : GColorWhite,
-    is_day ? GColorLightGray : GColorDarkGray
+    is_day ? GColorLightGray : GColorDarkGray,
+    is_day ? PBL_IF_COLOR_ELSE(GColorDarkGray, GColorWhite) : PBL_IF_COLOR_ELSE(GColorLightGray, GColorBlack)
   );
 
   if (!s_window) {
@@ -146,6 +160,9 @@ void main_window_push() {
 
   bluetooth_connection_service_subscribe((BluetoothConnectionHandler)bt_handler);
   drawing_set_is_connected(bluetooth_connection_service_peek());
+#ifdef TEST
+  drawing_set_is_connected(false);
+#endif
 
   // Begin smooth animation
   static AnimationImplementation anim_implementation = { .update = anim_update };

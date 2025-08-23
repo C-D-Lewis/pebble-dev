@@ -66,8 +66,8 @@ function setup {
   echo "module.exports = { token: 'foo' };" > ./watchfaces/cards/src/pkjs/secrets.js
 
   # Populate build files for library test apps
-  cp ./libraries/pebble-isometric/include/pebble-isometric.h ./libraries/pebble-isometric/src/c/pebble-isometric.h
-  cp ./libraries/pebble-isometric/src/c/pebble-isometric.c ./libraries/pebble-isometric/src/c/pebble-isometric.c
+  cp ./libraries/pebble-isometric/include/pebble-isometric.h ./libraries/pebble-isometric/test-app/src/c/pebble-isometric.h
+  cp ./libraries/pebble-isometric/src/c/pebble-isometric.c ./libraries/pebble-isometric/test-app/src/c/pebble-isometric.c
 }
 
 function build_all_projects {
