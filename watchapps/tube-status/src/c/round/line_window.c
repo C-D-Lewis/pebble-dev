@@ -4,7 +4,7 @@
 #define RING_MARGIN 17
 
 static Window *s_window;
-static Layer *s_ring_layer, *s_hint_layer;
+static Layer *s_ring_layer;
 
 static GTextAttributes *s_attributes;
 static GBitmap *s_spanner_bitmap;
@@ -16,7 +16,7 @@ static void draw_station(GContext *ctx, GPoint center, int size, int index) {
   graphics_context_set_fill_color(ctx, GColorWhite);
   graphics_fill_circle(ctx, center, (6 * (size - 1)) / 7); 
 
-  if(index != LineTypeMax) {
+  if (index != LineTypeMax) {
     graphics_context_set_fill_color(ctx, data_get_line_state_color(index));
     graphics_fill_circle(ctx, center, (6 * (size - 1)) / 7); 
   }
@@ -28,28 +28,17 @@ static void draw_station(GContext *ctx, GPoint center, int size, int index) {
 
 /******************************** Click Config ********************************/
 
-static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
-  // if(s_selected_line == LineTypeMax) {
-  //   settings_window_push();
-  // }
-}
-
 static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
-  s_selected_line -= (s_selected_line > 0) ? 1 : -LineTypeMax;
+  s_selected_line -= (s_selected_line > 0) ? 1 : -(LineTypeMax - 1);
   layer_mark_dirty(s_ring_layer);
-
-  layer_set_hidden(s_hint_layer, !(s_selected_line == LineTypeMax));
 }
 
 static void down_click_handler(ClickRecognizerRef recognizer, void *context) {
-  s_selected_line += (s_selected_line < LineTypeMax) ? 1 : -LineTypeMax;
+  s_selected_line += (s_selected_line < (LineTypeMax - 1)) ? 1 : -(LineTypeMax - 1);
   layer_mark_dirty(s_ring_layer);
-
-  layer_set_hidden(s_hint_layer, !(s_selected_line == LineTypeMax));
 }
 
 static void click_config_provider(void *context) {
-  window_single_click_subscribe(BUTTON_ID_SELECT, select_click_handler);
   window_single_click_subscribe(BUTTON_ID_UP, up_click_handler);
   window_single_click_subscribe(BUTTON_ID_DOWN, down_click_handler);
 }
@@ -73,6 +62,7 @@ static void ring_update_proc(Layer *layer, GContext *ctx) {
     data_get_line_name(s_selected_line), fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD),
     grect_inset(bounds, GEdgeInsets(name_y_margin, 0, 0, 0)), GTextOverflowModeWordWrap,
     GTextAlignmentCenter, s_attributes);
+
   // Draw ring
   graphics_context_set_fill_color(ctx, data_get_line_color(s_selected_line));
   GRect ring_rect = grect_inset(bounds, GEdgeInsets(RING_MARGIN));
@@ -80,45 +70,23 @@ static void ring_update_proc(Layer *layer, GContext *ctx) {
     LINE_WINDOW_MARGIN, DEG_TO_TRIGANGLE(0), DEG_TO_TRIGANGLE(360));
 
   // Stations
+  int angle = 0;
   for(int i = 0; i < LineTypeMax; i++) {
-    int angle = (i * 290) / LineTypeMax;
+    angle = (i * 290) / LineTypeMax;
     GPoint center = gpoint_from_polar(
       grect_inset(ring_rect, GEdgeInsets((LINE_WINDOW_MARGIN / 2) - 1)), 
                   GOvalScaleModeFitCircle, DEG_TO_TRIGANGLE(angle));
     draw_station(ctx, center, LINE_WINDOW_RADIUS, i);
   }
 
-  // Special station
-  int angle = ((LineTypeMax + 1) * 290) / LineTypeMax;
-  GPoint center = gpoint_from_polar(
-    grect_inset(ring_rect, GEdgeInsets((LINE_WINDOW_MARGIN / 2) - 1)), 
-                GOvalScaleModeFitCircle, DEG_TO_TRIGANGLE(angle));
-  draw_station(ctx, center, LINE_WINDOW_RADIUS, LineTypeMax);
-
   graphics_context_set_fill_color(ctx, GColorBlack);
-  if(s_selected_line != LineTypeMax) {
+  if (s_selected_line != LineTypeMax) {
     // Selection
     angle = (s_selected_line * 290) / LineTypeMax;
     GPoint center = gpoint_from_polar(
       grect_inset(ring_rect, GEdgeInsets((LINE_WINDOW_MARGIN / 2) - 1)), 
                   GOvalScaleModeFitCircle, DEG_TO_TRIGANGLE(angle));
     graphics_fill_circle(ctx, center, LINE_WINDOW_MARGIN / 2);
-  } else {
-    // Special selection
-    angle = ((LineTypeMax + 1) * 290) / LineTypeMax;
-    GPoint center = gpoint_from_polar(
-      grect_inset(ring_rect, GEdgeInsets((LINE_WINDOW_MARGIN / 2) - 1)), 
-                  GOvalScaleModeFitCircle, DEG_TO_TRIGANGLE(angle));
-    graphics_fill_circle(ctx, center, LINE_WINDOW_MARGIN / 2);
-
-    // Spanner
-    graphics_context_set_compositing_mode(ctx, GCompOpSet);
-    GRect bitmap_bounds = gbitmap_get_bounds(s_spanner_bitmap);
-    const int top = name_y_margin + name_size.h + LINE_WINDOW_MARGIN;
-    const int x_margin = (bounds.size.w - bitmap_bounds.size.w) / 2;
-    GRect rect = grect_inset(bounds, GEdgeInsets(top, x_margin,
-      bounds.size.h - top - bitmap_bounds.size.h, x_margin));
-    graphics_draw_bitmap_in_rect(ctx, s_spanner_bitmap, rect);
   }
 
   // Line name
@@ -144,16 +112,10 @@ static void window_load(Window *window) {
 
   s_attributes = graphics_text_attributes_create();
   graphics_text_attributes_enable_screen_text_flow(s_attributes, RING_MARGIN + LINE_WINDOW_MARGIN);
-
-  s_hint_layer = layer_create(bounds);
-  layer_set_update_proc(s_hint_layer, hint_update_proc);
-  layer_add_child(window_layer, s_hint_layer);
-  layer_set_hidden(s_hint_layer, true);
 }
 
 static void window_unload(Window *window) {
   layer_destroy(s_ring_layer);
-  layer_destroy(s_hint_layer);
   graphics_text_attributes_destroy(s_attributes);
   gbitmap_destroy(s_spanner_bitmap);
 
@@ -163,7 +125,7 @@ static void window_unload(Window *window) {
 }
 
 void line_window_push() {
-  if(!s_window) {
+  if (!s_window) {
     s_window = window_create();
     window_set_click_config_provider(s_window, click_config_provider);
     window_set_window_handlers(s_window, (WindowHandlers) {
@@ -174,7 +136,6 @@ void line_window_push() {
   window_stack_push(s_window, true);
 
   s_selected_line = LineTypeBakerloo;
-  layer_mark_dirty(s_hint_layer);
   layer_mark_dirty(s_ring_layer);
 }
 #endif
