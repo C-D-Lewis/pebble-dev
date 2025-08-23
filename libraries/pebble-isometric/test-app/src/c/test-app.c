@@ -13,7 +13,7 @@ static void update_proc(Layer *layer, GContext *ctx) {
   isometric_fill_box(Vec3(0, 0, 0), GSize(50, 50), 50, GColorYellow);
   isometric_draw_box(Vec3(0, 0, 0), GSize(50, 50), 50, GColorBlack);
 
-  // Dithered fill test
+  // Dithered fill test (B/W screens only)
   isometric_fill_box(Vec3(0, 0, 55), GSize(40, 40), 10, GColorDarkGray);
 
   // Draw medium box
@@ -21,14 +21,14 @@ static void update_proc(Layer *layer, GContext *ctx) {
   isometric_draw_box(Vec3(0, 0, 60), GSize(25, 25), 25, GColorBlack);
 
   // Fill a face
-  isometric_fill_box_faces(Vec3(0, 0, 60), GSize(25, 25), 25, GColorGreen, false, true, false);
+  isometric_fill_box_faces(Vec3(0, 0, 60), GSize(25, 25), 25, GColorGreen, false, false, true);
 
   // Draw small box
   isometric_fill_box(Vec3(0, 0, 85), GSize(10, 10), 10, GColorRed);
   isometric_draw_box(Vec3(0, 0, 85), GSize(10, 10), 10, GColorBlack);
 
   // Draw a face
-  isometric_draw_box_faces(Vec3(0, 0, 85), GSize(10, 10), 10, GColorWhite, false, false, true);
+  isometric_draw_box_faces(Vec3(0, 0, 85), GSize(10, 10), 10, GColorWhite, false, true, false);
 
 
   // Release framebuffer
