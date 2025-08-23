@@ -61,9 +61,13 @@ function build_project {
 function setup {
   echo ">>> Setting up build environment..."
   
-  # Save this if running this script locally
+  # Backup cards secrets.js and replace with dummy version
   mv ./watchfaces/cards/src/pkjs/secrets.js ./watchfaces/cards/src/pkjs/secrets.js.bak || true
   echo "module.exports = { token: 'foo' };" > ./watchfaces/cards/src/pkjs/secrets.js
+
+  # Populate build files for library test apps
+  cp ./libraries/pebble-isometric/include/pebble-isometric.h ./libraries/pebble-isometric/src/c/pebble-isometric.h
+  cp ./libraries/pebble-isometric/src/c/pebble-isometric.c ./libraries/pebble-isometric/src/c/pebble-isometric.c
 }
 
 function build_all_projects {
