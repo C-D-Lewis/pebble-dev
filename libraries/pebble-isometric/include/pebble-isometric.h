@@ -60,7 +60,7 @@ void isometric_fill_box(Vec3 origin, GSize size, int z_height, GColor color);
 /**
  * Draw an isometric box with z height
  */
-void isometric_draw_box(Vec3 origin, GSize size, int z_height, GColor color);
+void isometric_draw_box(Vec3 origin, GSize size, int z_height, GColor color, bool all_edges);
 
 /**
  * Draw a single projected isometric pixel

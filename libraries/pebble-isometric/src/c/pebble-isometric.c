@@ -150,7 +150,7 @@ void isometric_fill_box(Vec3 origin, GSize size, int z_height, GColor color) {
   isometric_fill_rect(Vec3(origin.x, origin.y, (z_height > 0) ? z - 1 : z), size, color);
 }
 
-void isometric_draw_box(Vec3 origin, GSize size, int z_height, GColor color) {
+void isometric_draw_box(Vec3 origin, GSize size, int z_height, GColor color, bool all_edges) {
   // Bottom
   GPoint start = isometric_project(Vec3(origin.x + size.w, origin.y, origin.z));
   GPoint finish = isometric_project(Vec3(origin.x + size.w, origin.y + size.h, origin.z));
@@ -178,6 +178,28 @@ void isometric_draw_box(Vec3 origin, GSize size, int z_height, GColor color) {
     isometric_project(Vec3(origin.x + size.w, origin.y, origin.z + z_height)),
     color
   );
+
+  if (all_edges) {
+    // Vertical line at top
+    bresenham_line(
+      isometric_project(Vec3(origin.x, origin.y, origin.z)), 
+      isometric_project(Vec3(origin.x, origin.y, origin.z + z_height)),
+      color
+    );
+    
+    // Left bottom edge
+    bresenham_line(
+      isometric_project(Vec3(origin.x, origin.y, origin.z)), 
+      isometric_project(Vec3(origin.x, origin.y + size.h, origin.z)),
+      color
+    );
+    // Right bottom edge
+    bresenham_line(
+      isometric_project(Vec3(origin.x, origin.y, origin.z)), 
+      isometric_project(Vec3(origin.x + size.w, origin.y, origin.z)),
+      color
+    );
+  }
 }
 
 void isometric_draw_pixel(Vec3 point, GColor color) {
