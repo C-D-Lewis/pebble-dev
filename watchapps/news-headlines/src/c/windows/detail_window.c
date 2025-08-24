@@ -16,26 +16,24 @@ static int s_index;
 /*********************************** Window ***********************************/
 
 static void update_data() {
-  if (s_desc_layer) {
-    Story *story = data_get_story(s_index);
+  Story *story = data_get_story(s_index);
 
-    text_layer_set_text(s_desc_layer, story->description);
+  text_layer_set_text(s_desc_layer, story->description);
 
-    // Content available?
-    ContentIndicator *indicator = scroll_layer_get_content_indicator(s_scroll_layer);
-    content_indicator_set_content_available(indicator, ContentIndicatorDirectionUp,
-      (s_scroll_state == ScrollStatePageTwo));
-    content_indicator_set_content_available(indicator, ContentIndicatorDirectionDown,
-      (s_scroll_state == ScrollStatePageOne));
+  // Content available?
+  ContentIndicator *indicator = scroll_layer_get_content_indicator(s_scroll_layer);
+  content_indicator_set_content_available(indicator, ContentIndicatorDirectionUp,
+    (s_scroll_state == ScrollStatePageTwo));
+  content_indicator_set_content_available(indicator, ContentIndicatorDirectionDown,
+    (s_scroll_state == ScrollStatePageOne));
 
-    // Dumb ScrollLayer
-    GRect bounds = layer_get_frame(text_layer_get_layer(s_desc_layer));
-    GSize text_size = text_layer_get_content_size(s_desc_layer);
-    GRect frame = GRect(bounds.origin.x, bounds.origin.y, bounds.size.w, text_size.h + STATUS_BAR_LAYER_HEIGHT);
-    layer_set_frame(text_layer_get_layer(s_desc_layer), frame);
-    layer_set_bounds(text_layer_get_layer(s_desc_layer), frame);
-    scroll_layer_set_content_size(s_scroll_layer, GSize(text_size.w, text_size.h));
-  }
+  // Dumb ScrollLayer
+  GRect bounds = layer_get_frame(text_layer_get_layer(s_desc_layer));
+  GSize text_size = text_layer_get_content_size(s_desc_layer);
+  GRect frame = GRect(bounds.origin.x, bounds.origin.y, bounds.size.w, text_size.h + STATUS_BAR_LAYER_HEIGHT);
+  layer_set_frame(text_layer_get_layer(s_desc_layer), frame);
+  layer_set_bounds(text_layer_get_layer(s_desc_layer), frame);
+  scroll_layer_set_content_size(s_scroll_layer, GSize(text_size.w, text_size.h));
 }
 
 static void window_load(Window *window) {
@@ -45,7 +43,6 @@ static void window_load(Window *window) {
   const int x_margin = 0;
   const int y_margin = 0;
   s_desc_layer = text_layer_create(GRect(x_margin, y_margin, bounds.size.w - (2 * x_margin), 2000));
-  text_layer_set_text_color(s_desc_layer, GColorWhite);
   text_layer_set_background_color(s_desc_layer, GColorClear);
   text_layer_set_text_alignment(s_desc_layer, PBL_IF_ROUND_ELSE(GTextAlignmentCenter, GTextAlignmentLeft));
   text_layer_set_overflow_mode(s_desc_layer, GTextOverflowModeWordWrap);
@@ -97,6 +94,8 @@ static void window_load(Window *window) {
       .background = GColorDarkCandyAppleRed
     }
   });
+
+  update_data();
 }
 
 static void window_unload(Window *window) {
@@ -112,17 +111,15 @@ static void window_unload(Window *window) {
 /************************************ API *************************************/
 
 void detail_window_push(int index) {
+  s_scroll_state = ScrollStatePageOne;
+  s_index = index;
+
   if (!s_window) {
     s_window = window_create();
-    window_set_background_color(s_window, GColorDarkCandyAppleRed);
     window_set_window_handlers(s_window, (WindowHandlers) {
       .load = window_load,
       .unload = window_unload,
     });
   }
   window_stack_push(s_window, true);
-
-  s_scroll_state = ScrollStatePageOne;
-  s_index = index;
-  update_data();
 }

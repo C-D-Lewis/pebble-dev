@@ -25,11 +25,9 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
     case SettingsTypeFontSize:
       menu_cell_basic_draw(ctx, cell_layer, "Font Size", settings_get_font_size_string(), NULL);
       break;
-    case SettingsTypeAbout: {
-      static char s_version_buff[16];
-      snprintf(s_version_buff, sizeof(s_version_buff), "Version %s", VERSION);
-      menu_cell_basic_draw(ctx, cell_layer, s_version_buff, "Powered by BBC News", NULL);
-    } break;
+    case SettingsTypeAbout:
+      menu_cell_basic_draw(ctx, cell_layer, "News Headlines", "Powered by BBC News", NULL);
+      break;
   }
 }
 

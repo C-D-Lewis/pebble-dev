@@ -47,11 +47,9 @@ static void title_update_proc(Layer *layer, GContext *ctx) {
   graphics_context_set_fill_color(ctx, GColorWhite);
   graphics_fill_rect(ctx, bounds, 0, GCornerNone);
 
-  // Top sep
+  // Top decorations
   graphics_context_set_fill_color(ctx, GColorDarkGray);
   graphics_fill_rect(ctx, GRect(bounds.origin.x + 3, bounds.origin.y + 3, bounds.size.w - 6, 2), 0, GCornerNone);
-
-  // Bottom sep
   graphics_fill_rect(ctx, GRect(bounds.origin.x + 3, bounds.origin.y + 7, bounds.size.w - 6, 3), 0, GCornerNone);
 
   // Title
@@ -109,9 +107,7 @@ static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
       animate_in(STORIES_WINDOW_ANIM_OFFSET);
       regenerate_fake_paragraph_widths();
     } else {
-      if (click_recognizer_is_repeating(recognizer)) {
-        return;
-      }
+      if (click_recognizer_is_repeating(recognizer)) return;
       
       if (connection_service_peek_pebble_app_connection()) {
         // Show settings
@@ -209,7 +205,7 @@ static void window_load(Window *this) {
     }
   });
 
-  #if defined(PBL_ROUND)
+#if defined(PBL_ROUND)
   GRect status_bounds = GRect(0, indicator_margin - 8, bounds.size.w, 36);
 #elif defined(PBL_RECT)
   GRect status_bounds = GRect(0, -3, bounds.size.w - 5, 36);
@@ -228,14 +224,13 @@ static void window_load(Window *this) {
 
 static void window_unload(Window *this) {
   layer_destroy(s_title_layer);
-  gbitmap_destroy(s_wrench_bitmap);
-  gbitmap_destroy(s_thumb_icon_bitmap);
   text_layer_destroy(s_status_layer);
   content_indicator_destroy(s_indicator);
   layer_destroy(s_up_indicator_layer);
   layer_destroy(s_down_indicator_layer);
+  gbitmap_destroy(s_wrench_bitmap);
+  gbitmap_destroy(s_thumb_icon_bitmap);
 
-  // Self destroy
   window_destroy(s_window);
   s_window = NULL;
 

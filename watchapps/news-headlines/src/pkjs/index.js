@@ -1,5 +1,3 @@
-var DEBUG = false;     // Turn off for release
-var VERSION = '4.8';   // Match package.json
 var MAX_ITEMS = 20;    // Max feed items the app will display
 
 /*********************************** Enums ************************************/
@@ -29,16 +27,6 @@ var Region = {
   Wales: 10
 };
 
-/********************************** Helpers ***********************************/
-
-function verbose(message) {
-  console.log(message);
-}
-
-function debug(message) {
-  if (DEBUG) verbose(message);
-}
-
 /******************************* Requests *************************************/
 
 function request(url, type, callback) {
@@ -48,6 +36,7 @@ function request(url, type, callback) {
   };
   xhr.open(type, url);
   xhr.send();
+  console.log('request(): ' + url);
 }
 
 /******************************** Pebble helpers ******************************/
@@ -60,7 +49,7 @@ var getValue = function(dict, key) {
   if (hasKey(dict, key)) {
     return '' + dict.payload[key];
   } else {
-    verbose('getValue(): Key ' + key + ' does not exist in received dictionary!');
+    console.log('getValue(): Key ' + key + ' does not exist in received dictionary!');
     return undefined;
   }
 };
@@ -76,7 +65,6 @@ var gLastIndex = 0;
 var gQuantity = 0;
 var gCategory = 0;
 var gRegion = 0;
-
 var gLastOffset = 0;
 
 var decode = function(str) {
@@ -88,12 +76,11 @@ var decode = function(str) {
 
 var parseFeed = function(responseText) {
   var items = [];
-
   var outerSpool = responseText;
 
   // Strip heading data
   outerSpool = outerSpool.substring(outerSpool.indexOf('<item>'));
-  debug('parseFeed(): gQuantity=' + gQuantity);
+  
   while(outerSpool.indexOf('<title>') > 0 && items.length < gQuantity) {
     var s = {};
 
@@ -114,20 +101,18 @@ var parseFeed = function(responseText) {
     s.description = decode(desc);
 
     // Add
-    debug('parseFeed(): Sizes: ' + title.length + ', ' + desc.length);
-    debug(JSON.stringify(s));
+    // console.log(JSON.stringify(s));
     items.push(s);
 
     // Next
     outerSpool = outerSpool.substring(outerSpool.indexOf('</item>') + '</item>'.length);
   }
 
-  debug('parseFeed(): Extracted ' + items.length + ' items.');
+  console.log('parseFeed(): Extracted ' + items.length + ' items.');
   return items;
 };
 
 var getUKRegionCategoryURL = function(category) {
-  // Parse category int
   switch(category) {
     case 0: category = 'headlines'; break;
     case 1: category = 'world'; break;
@@ -139,7 +124,7 @@ var getUKRegionCategoryURL = function(category) {
     case 7: category = 'technology'; break;
     case 8: category = 'entertainment_and_arts'; break;
     default: 
-      debug('Defaulting to headlines for category: ' + category);
+      console.log('Defaulting to headlines for category: ' + category);
       category = 'headlines'; 
       break;
   }
@@ -151,43 +136,32 @@ var getUKRegionCategoryURL = function(category) {
   } else {
     url = 'http://feeds.bbci.co.uk/news/' + category + '/rss.xml';
   }
-  debug('download(): Category: ' + category);
   return url;
 };
 
 function getURL() {
-  var url;
   switch(gRegion) {
-    case Region.Africa: url = 'http://feeds.bbci.co.uk/news/world/africa/rss.xml'; break;
-    case Region.Asia: url = 'http://feeds.bbci.co.uk/news/world/asia/rss.xml'; break;
-    case Region.Europe: url = 'http://feeds.bbci.co.uk/news/world/europe/rss.xml'; break;
-    case Region.LatinAmerica: url = 'http://feeds.bbci.co.uk/news/world/latin_america/rss.xml'; break;
-    case Region.MiddleEast: url = 'http://feeds.bbci.co.uk/news/world/middle_east/rss.xml'; break;
-    case Region.USAndCanada: url = 'http://feeds.bbci.co.uk/news/world/us_and_canada/rss.xml'; break;
-    case Region.England: url = 'http://feeds.bbci.co.uk/news/england/rss.xml'; break;
-    case Region.NorthernIreland: url = 'http://feeds.bbci.co.uk/news/northern_ireland/rss.xml'; break;
-    case Region.Scotland: url = 'http://feeds.bbci.co.uk/news/scotland/rss.xml'; break;
-    case Region.Wales: url = 'http://feeds.bbci.co.uk/news/wales/rss.xml'; break;
+    case Region.Africa:          return 'http://feeds.bbci.co.uk/news/world/africa/rss.xml';
+    case Region.Asia:            return 'http://feeds.bbci.co.uk/news/world/asia/rss.xml';
+    case Region.Europe:          return 'http://feeds.bbci.co.uk/news/world/europe/rss.xml';
+    case Region.LatinAmerica:    return 'http://feeds.bbci.co.uk/news/world/latin_america/rss.xml';
+    case Region.MiddleEast:      return 'http://feeds.bbci.co.uk/news/world/middle_east/rss.xml';
+    case Region.USAndCanada:     return 'http://feeds.bbci.co.uk/news/world/us_and_canada/rss.xml';
+    case Region.England:         return 'http://feeds.bbci.co.uk/news/england/rss.xml';
+    case Region.NorthernIreland: return 'http://feeds.bbci.co.uk/news/northern_ireland/rss.xml';
+    case Region.Scotland:        return 'http://feeds.bbci.co.uk/news/scotland/rss.xml';
+    case Region.Wales:           return 'http://feeds.bbci.co.uk/news/wales/rss.xml';
     default:
-      debug('Region is invalid or Region.UK (' + gRegion + '), defaulting to category ' + gCategory); 
-      url = getUKRegionCategoryURL(gCategory);
-      break;
+      console.log('getURL(): Region is invalid or is UK: ' + gRegion + ', defaulting to selected category ' + gCategory); 
+      return getUKRegionCategoryURL(gCategory);
   }
-  return url;
-}
-
-// DO NOT modify signature - also used for images etc
-function download(category, callback) {
-  var url = getURL();
-  request(url, 'GET', callback);
-  debug('request(): request sent to ' + url);
 }
 
 /********************************** App Transfer ******************************/
 
 function sendToWatch(responseText) {
   // User pref else dict length if less than max
-  debug('sendToWatch(): quantity read as ' + gQuantity);
+  console.log('sendToWatch(): initial quantity: ' + gQuantity);
 
   // Strip metadata
   responseText = responseText.substring(responseText.indexOf('<item>') + '<item>'.length);
@@ -195,73 +169,73 @@ function sendToWatch(responseText) {
 
   // There are more than MAX
   if (gQuantity > MAX_ITEMS) {
-    debug('sendToWatch(): quantity > MAX_ITEMS, now ' + MAX_ITEMS);
+    console.log('sendToWatch(): quantity > MAX_ITEMS, now ' + MAX_ITEMS);
     gQuantity = MAX_ITEMS;
   }
 
   // There are not enough
   if (gQuantity > gStories.length) {
-    debug('sendToWatch(): gQuantity > gStories.length, now ' + gStories.length);
+    console.log('sendToWatch(): gQuantity > gStories.length, now ' + gStories.length);
     gQuantity = gStories.length;
   }
 
-  // Start download
+  // Start upload
   var dict = {};
   dict[AppKey.Quantity] = gQuantity;
   Pebble.sendAppMessage(dict, function(e) {
-    debug('sendToWatch(): Quantity ' + gQuantity + ' sent, beginning download.');
+    console.log('sendToWatch(): Quantity ' + gQuantity + ' sent, beginning upload.');
     gLastIndex = 0;
-    sendNext();
+    sendNextStory();
   }, function(e) {
-    debug('sendToWatch(): Sending of gQuantity failed!');
+    console.log('sendToWatch(): Sending of gQuantity failed!');
   });
 }
 
 // Upload one story at a time
-function sendNext() {
-  if (gLastIndex < gQuantity) {
-    var dict = {};
-    dict[AppKey.Index] = gLastIndex;
-    dict[AppKey.Title] = gStories[gLastIndex].title;
-    dict[AppKey.Description] = gStories[gLastIndex].description;
-    Pebble.sendAppMessage(dict, function() {
-      debug('sendNext(): Sent story ' + gLastIndex);
-      sendNext();
-    }, function(err) {
-      verbose('sendNext(): Error sending story ' + gLastIndex + ': ' + err);
-    });
-
-    gLastIndex += 1;
-  } else {
-    verbose('sendNext(): Sent all stories to Pebble!');
+function sendNextStory() {
+  if (gLastIndex === gQuantity) {
+    console.log('sendNextStory(): Sent all stories to Pebble!');
+    return;
   }
+
+  var dict = {};
+  dict[AppKey.Index] = gLastIndex;
+  dict[AppKey.Title] = gStories[gLastIndex].title;
+  dict[AppKey.Description] = gStories[gLastIndex].description;
+
+  Pebble.sendAppMessage(dict, function() {
+    gLastIndex += 1;
+    sendNextStory();
+  }, function(err) {
+    console.log('sendNextStory(): Error sending story ' + gLastIndex + ': ' + err);
+  });
+
 }
 
 /********************************** PebbleKit JS ******************************/
 
 Pebble.addEventListener('ready', function(e) {
-  verbose('ready: PebbleKit JS ready! Version ' + VERSION);
+  console.log('ready: PebbleKit JS ready!');
 
   var dict = {};
   dict[AppKey.Ready] = 1;
-  debug('dict: ' + JSON.stringify(dict));
   Pebble.sendAppMessage(dict, function() {
-    debug('ready: Sent ready to watchapp.');
+    console.log('ready: Sent ready to watchapp.');
   }, function(error) {
-    verbose('ready: Failed to send ready to watchapp: ' + error.message);
+    console.log('ready: Failed to send ready to watchapp: ' + error.message);
   });
 });
 
 Pebble.addEventListener('appmessage', function(dict) {
-  debug('appmessage: ' + JSON.stringify(dict.payload));
+  console.log('appmessage: ' + JSON.stringify(dict.payload));
 
   // Settings - if category exists, the others will too
   if (hasKey(dict, AppKey.SettingsCategory)) {
     gCategory = getInt(dict, AppKey.SettingsCategory);
     gQuantity = getInt(dict, AppKey.SettingsNumStories);
     gRegion = getInt(dict, AppKey.SettingsRegion);
+    console.log('appmessage: Watch sent settings: ' + gCategory + '/' + gQuantity + '/' + gRegion);
 
-    debug('appmessage: Watch sent settings: ' + gCategory + '/' + gQuantity + '/' + gRegion);
-    download(gCategory, sendToWatch);
+    request(getURL(), 'GET', sendToWatch);
   }
 });
