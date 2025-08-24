@@ -24,6 +24,8 @@ def configure(ctx):
 
 
 def build(ctx):
+    ctx.exec_command('npm run build')
+
     ctx.load('pebble_sdk')
 
     build_worker = os.path.exists('worker_src')
