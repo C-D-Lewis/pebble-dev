@@ -43,7 +43,6 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `thin`                         | ![](watchfaces/thin/screenshots/basalt.png)                                   | `A` `B` `C` `D` `E` | ✅    | [pbw](pbw/thin.pbw)                |
 | `time-dots-appstore`           | ![](watchfaces/time-dots-appstore/screenshots/basalt1.png)                    | `A` `B` `C` `D`     |      | [pbw](pbw/time-dots-appstore.pbw)  |
 | `void-statues`                 | ![](watchfaces/void-statues/screenshots/basalt.png)                           | `A` `B` `C` `D`     |      | [pbw](pbw/void-statues.pbw)        |
-| `past-present-future-extended` |                                                                               | ❔                   |      |                                    |
 | `eclipse-solar`                |                                                                               | ❌ (WIP)             |      |                                    |
 
 
@@ -109,6 +108,6 @@ should be used instead
 - [x] Fix build in GitHub Actions
 - [x] Finish importing all previous Pebble projects
 - [x] Merge all Split Horizon editions into config.
+- [x] Migrate all custom config to Clay.
 - [ ] Menu icons for all current watchfaces and watchapps
-- [ ] Migrate all custom config to Clay.
 - [ ] Verify correct tick unit used to save power.
