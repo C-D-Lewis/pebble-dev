@@ -1,0 +1,46 @@
+{
+  "version": "1.0.0",
+  "author": "Chris Lewis",
+  "private": true,
+  "dependencies": {},
+  "keywords": [
+    "pebble-app"
+  ],
+  "pebble": {
+    "sdkVersion": "3",
+    "resources": {
+      "media": [
+        {
+        "type": "bitmap",
+        "name": "BACKGROUND",
+        "file": "images/background.png"
+        },
+        {
+          "menuIcon": true,
+          "type": "bitmap",
+          "name": "APP_ICON",
+          "file": "images/menu_icon.png"
+        }
+      ]
+    },
+    "projectType": "native",
+    "uuid": "15792050-e502-4d96-99e4-b6c099c43119",
+    "messageKeys": {
+      "dummy": 0
+    },
+    "enableMultiJS": true,
+    "displayName": "potential-divider",
+    "watchapp": {
+      "onlyShownOnCommunication": false,
+      "hiddenApp": false,
+      "watchface": true
+    },
+    "targetPlatforms": [
+      "aplite",
+      "basalt",
+      "diorite"
+    ],
+    "capabilities": []
+  },
+  "name": "potential-divider"
+}

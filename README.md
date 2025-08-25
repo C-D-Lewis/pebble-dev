@@ -35,6 +35,7 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `kitty-watchface`              | ![](watchfaces/kitty-watchface/screenshots/aplite.png)                        | `A` `B` `D`         |      | [pbw](pbw/kitty-watchface.pbw)     |
 | `morndas`                      | ![](watchfaces/morndas/screenshots/basalt.png)                                | `A` `B` `D`         |      | [pbw](pbw/morndas.pbw)             |
 | `past-present-future`          | ![](watchfaces/past-present-future/screenshots/aplite.png)                    | `A` `B` `D`         |      | [pbw](pbw/past-present-future.pbw) |
+| `potential-divider`            | ![](watchfaces/potential-divider/screenshots/aplite.png)                      | `A` `B` `D`         | ✅    | [pbw](pbw/potential-divider.pbw)   |
 | `pseudotime`                   | ![](watchfaces/pseudotime/screenshots/basalt.png)                             | `A` `B` `C` `D`     |      | [pbw](pbw/pseudotime.pbw)          |
 | `split-horizon`                | ![](watchfaces/split-horizon/screenshots/diorite.png)                         | `A` `B` `D`         | ✅    | [pbw](pbw/split-horizon.pbw)       |
 | `starfield-demo`               | ![](watchfaces/starfield-demo/screenshots/aplite.png)                         | `A` `B` `C` `D`     |      | [pbw](pbw/starfield-demo.pbw)      |
@@ -42,7 +43,6 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `thin`                         | ![](watchfaces/thin/screenshots/basalt.png)                                   | `A` `B` `C` `D` `E` | ✅    | [pbw](pbw/thin.pbw)                |
 | `time-dots-appstore`           | ![](watchfaces/time-dots-appstore/screenshots/basalt1.png)                    | `A` `B` `C` `D`     |      | [pbw](pbw/time-dots-appstore.pbw)  |
 | `void-statues`                 | ![](watchfaces/void-statues/screenshots/basalt.png)                           | `A` `B` `C` `D`     |      | [pbw](pbw/void-statues.pbw)        |
-| `potential-divider`              |                                                                               | ❔                   | ✅    |                                    |
 | `past-present-future-extended` |                                                                               | ❔                   |      |                                    |
 | `seven-segments-date`          |                                                                               | ❔                   | ✅    |                                    |
 | `seven-segments`               |                                                                               | ❔                   | ✅    |                                    |
