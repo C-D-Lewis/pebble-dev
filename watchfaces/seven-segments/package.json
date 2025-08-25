@@ -1,0 +1,44 @@
+{
+  "version": "1.0.0",
+  "author": "Chris Lewis",
+  "private": true,
+  "dependencies": {},
+  "keywords": [
+    "pebble-app"
+  ],
+  "pebble": {
+    "sdkVersion": "3",
+    "resources": {
+      "media": [
+        {
+          "menuIcon": true,
+          "type": "bitmap",
+          "name": "APP_ICON",
+          "file": "images/app_icon.png"
+        }
+      ]
+    },
+    "projectType": "native",
+    "uuid": "2ba3eaf4-5369-4f11-87b0-7c74429e117e",
+    "messageKeys": {
+      "INVERTED": 0
+    },
+    "enableMultiJS": true,
+    "displayName": "seven-segments",
+    "watchapp": {
+      "onlyShownOnCommunication": false,
+      "hiddenApp": false,
+      "watchface": true
+    },
+    "targetPlatforms": [
+      "aplite",
+      "basalt",
+      "chalk",
+      "diorite"
+    ],
+    "capabilities": [
+      "configurable"
+    ]
+  },
+  "name": "seven-segments"
+}

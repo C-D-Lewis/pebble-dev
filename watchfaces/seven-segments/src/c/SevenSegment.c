@@ -1,4 +1,5 @@
 #include "SevenSegment.h"
+#include "lib/InverterLayerCompat.h"
 
 SevenSegment* seven_segment_create(GPoint origin, GSize segment_dimensions, int anim_duration, int seg_delay, Window *parent)
 {
@@ -10,9 +11,9 @@ SevenSegment* seven_segment_create(GPoint origin, GSize segment_dimensions, int 
 
   for(int i = 0; i < 7; i++)
   {
-    this->layer_array[i] = inverter_layer_create(GRect(0, 0, 0, 0));
+    this->layer_array[i] = inverter_layer_compat_create(GRect(0, 0, 0, 0));
 
-    layer_add_child(window_get_root_layer(parent), inverter_layer_get_layer(this->layer_array[i]));
+    layer_add_child(window_get_root_layer(parent), inverter_layer_compat_get_layer(this->layer_array[i]));
   }
 
   //Init to 0
@@ -32,7 +33,7 @@ void seven_segment_destroy(SevenSegment *this)
 {
   for(int i = 0; i < 7; i++)
   {
-    inverter_layer_destroy(this->layer_array[i]);
+    inverter_layer_compat_destroy(this->layer_array[i]);
   }
 
   free(this);
