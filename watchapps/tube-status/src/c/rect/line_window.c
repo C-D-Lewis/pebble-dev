@@ -52,8 +52,13 @@ void draw_row_handler(GContext *ctx, const Layer *cell_layer, MenuIndex *cell_in
 #else
   int inset_mult = 3;
 #endif
-  GRect text_bounds = GRect(bounds.origin.x + (inset_mult * LINE_WINDOW_MARGIN), 
-    bounds.origin.y - 5, bounds.size.w - (4 * LINE_WINDOW_MARGIN), 30);
+  GRect text_bounds = GRect(
+    bounds.origin.x + (inset_mult * LINE_WINDOW_MARGIN), 
+    bounds.origin.y - 5,
+    bounds.size.w - (3 * LINE_WINDOW_MARGIN)
+    ,
+    30
+  );
   graphics_context_set_text_color(ctx, GColorBlack);
   graphics_draw_text(ctx, data_get_line_name(type), fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD),
     text_bounds, GTextOverflowModeTrailingEllipsis, GTextAlignmentLeft, NULL);
