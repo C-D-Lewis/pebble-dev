@@ -65,5 +65,11 @@
       "emery"
     ],
     "capabilities": []
+  },
+  "devDependencies": {
+    "pkts": "^0.2.1"
+  },
+  "scripts": {
+    "build": "pkts build"
   }
 }
