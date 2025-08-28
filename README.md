@@ -16,34 +16,34 @@ Some PBWs can be found in `/pbw` for sideloading.
 
 > Platforms: `A` = Aplite, `B` = Basalt, `C` = Chalk, `D` = Diorite, `E` = Emery
 
-| Name                           | Screenshot                                                                    | Builds              | Icon | PBW                                |
-|--------------------------------|-------------------------------------------------------------------------------|---------------------|------|------------------------------------|
-| `beam-up`                      | ![](watchfaces/beam-up/screenshots/aplite.png)                                | `A` `B` `C` `D`     | ✅    | [pbw](pbw/beam-up.pbw)             |
-| `brackets`                     | ![](watchfaces/brackets/screenshots/aplite.png)                               | `A` `B` `C` `D`     | ✅    | [pbw](pbw/brackets.pbw)            |
-| `cards`                        | ![](watchfaces/cards/screenshots/diorite.png)                                 | `A` `B` `D`         |      | [pbw](pbw/cards.pbw)               |
-| `cmd-time-typed`               | ![](watchfaces/cmd-time-typed/screenshots/diorite.png)                        | `A` `B` `C` `D` `E` | ✅    | [pbw](pbw/cmd-time-typed.pbw)      |
-| `cmd-time`                     | ![](watchfaces/cmd-time/screenshots/diorite.png)                              | `A` `B` `C` `D` `E` | ✅    | [pbw](pbw/cmd-time.pbw)            |
-| `dayring`                      | ![](watchfaces/dayring/screenshots/basalt.png)                                | `A` `B` `C` `D`     |      | [pbw](pbw/dayring.pbw)             |
-| `deep-rock`                    | ![](watchfaces/deep-rock/screenshots/basalt.png)                              | `A` `B` `D`         |      | [pbw](pbw/deep-rock.pbw)           |
-| `dual-gauge`                   | ![](watchfaces/dual-gauge/screenshots/basalt.png)                             | `A` `B` `C` `D`     |      | [pbw](pbw/dual-gauge.pbw)          |
-| `eclipse`                      | ![](watchfaces/eclipse/screenshots/pebble-screenshot_2014-03-25_12-39-28.png) | `A` `B` `D`         |      | [pbw](pbw/eclipse.pbw)             |
-| `eventful`                     | ![](watchfaces/eventful/screenshots/aplite.png)                               | `A` `B` `C` `D`     |      | [pbw](pbw/eventful.pbw)            |
-| `events`                       | ![](watchfaces/events/screenshots/aplite.png)                                 | `A` `B` `D` `E`     | ✅    | [pbw](pbw/events.pbw)              |
-| `hollywatch`                   | ![](watchfaces/hollywatch/screenshots/basalt.png)                             | `A` `B` `C` `D`     |      | [pbw](pbw/hollywatch.pbw)          |
-| `index`                        | ![](watchfaces/index/screenshots/aplite.png)                                  | `A` `B` `C` `D`     |      | [pbw](pbw/index.pbw)               |
-| `isotime-appstore`             | ![](watchfaces/isotime-appstore/screenshots/yellow.png)                       | `A` `B` `C` `D` `E` | ✅    | [pbw](pbw/isotime.pbw)             |
-| `kitty-watchface`              | ![](watchfaces/kitty-watchface/screenshots/aplite.png)                        | `A` `B` `D`         |      | [pbw](pbw/kitty-watchface.pbw)     |
-| `morndas`                      | ![](watchfaces/morndas/screenshots/basalt.png)                                | `A` `B` `D`         |      | [pbw](pbw/morndas.pbw)             |
-| `past-present-future`          | ![](watchfaces/past-present-future/screenshots/aplite.png)                    | `A` `B` `D`         |      | [pbw](pbw/past-present-future.pbw) |
-| `potential-divider`            | ![](watchfaces/potential-divider/screenshots/aplite.png)                      | `A` `B` `D`         | ✅    | [pbw](pbw/potential-divider.pbw)   |
-| `pseudotime`                   | ![](watchfaces/pseudotime/screenshots/basalt.png)                             | `A` `B` `C` `D`     |      | [pbw](pbw/pseudotime.pbw)          |
-| `split-horizon`                | ![](watchfaces/split-horizon/screenshots/diorite.png)                         | `A` `B` `D`         | ✅    | [pbw](pbw/split-horizon.pbw)       |
-| `starfield-demo`               | ![](watchfaces/starfield-demo/screenshots/aplite.png)                         | `A` `B` `C` `D`     |      | [pbw](pbw/starfield-demo.pbw)      |
-| `starfield-smooth`             | ![](watchfaces/starfield-smooth/screenshots/aplite.png)                       | `A` `B` `C`         | ✅    | [pbw](pbw/starfield-smooth.pbw)    |
-| `thin`                         | ![](watchfaces/thin/screenshots/basalt.png)                                   | `A` `B` `C` `D` `E` | ✅    | [pbw](pbw/thin.pbw)                |
-| `time-dots-appstore`           | ![](watchfaces/time-dots-appstore/screenshots/basalt1.png)                    | `A` `B` `C` `D`     |      | [pbw](pbw/time-dots-appstore.pbw)  |
-| `void-statues`                 | ![](watchfaces/void-statues/screenshots/basalt.png)                           | `A` `B` `C` `D`     |      | [pbw](pbw/void-statues.pbw)        |
-| `eclipse-solar`                |                                                                               | ❌ (WIP)             |      |                                    |
+| Name                  | Screenshot                                                 | Builds              | Icon | PBW                                |
+|-----------------------|------------------------------------------------------------|---------------------|------|------------------------------------|
+| `beam-up`             | ![](watchfaces/beam-up/screenshots/aplite.png)             | `A` `B` `C` `D`     | ✅    | [pbw](pbw/beam-up.pbw)             |
+| `brackets`            | ![](watchfaces/brackets/screenshots/aplite.png)            | `A` `B` `C` `D`     | ✅    | [pbw](pbw/brackets.pbw)            |
+| `cards`               | ![](watchfaces/cards/screenshots/diorite.png)              | `A` `B` `D`         |      | [pbw](pbw/cards.pbw)               |
+| `cmd-time-typed`      | ![](watchfaces/cmd-time-typed/screenshots/diorite.png)     | `A` `B` `C` `D` `E` | ✅    | [pbw](pbw/cmd-time-typed.pbw)      |
+| `cmd-time`            | ![](watchfaces/cmd-time/screenshots/diorite.png)           | `A` `B` `C` `D` `E` | ✅    | [pbw](pbw/cmd-time.pbw)            |
+| `dayring`             | ![](watchfaces/dayring/screenshots/basalt.png)             | `A` `B` `C` `D`     |      | [pbw](pbw/dayring.pbw)             |
+| `deep-rock`           | ![](watchfaces/deep-rock/screenshots/basalt.png)           | `A` `B` `D`         |      | [pbw](pbw/deep-rock.pbw)           |
+| `dual-gauge`          | ![](watchfaces/dual-gauge/screenshots/basalt.png)          | `A` `B` `C` `D`     |      | [pbw](pbw/dual-gauge.pbw)          |
+| `eclipse`             | ![](watchfaces/eclipse/screenshots/aplite.png)             | `A` `B` `D`         |      | [pbw](pbw/eclipse.pbw)             |
+| `eventful`            | ![](watchfaces/eventful/screenshots/aplite.png)            | `A` `B` `C` `D`     |      | [pbw](pbw/eventful.pbw)            |
+| `events`              | ![](watchfaces/events/screenshots/aplite.png)              | `A` `B` `D` `E`     | ✅    | [pbw](pbw/events.pbw)              |
+| `hollywatch`          | ![](watchfaces/hollywatch/screenshots/basalt.png)          | `A` `B` `C` `D`     |      | [pbw](pbw/hollywatch.pbw)          |
+| `index`               | ![](watchfaces/index/screenshots/aplite.png)               | `A` `B` `C` `D`     |      | [pbw](pbw/index.pbw)               |
+| `isotime-appstore`    | ![](watchfaces/isotime-appstore/screenshots/yellow.png)    | `A` `B` `C` `D` `E` | ✅    | [pbw](pbw/isotime.pbw)             |
+| `kitty-watchface`     | ![](watchfaces/kitty-watchface/screenshots/aplite.png)     | `A` `B` `D`         |      | [pbw](pbw/kitty-watchface.pbw)     |
+| `morndas`             | ![](watchfaces/morndas/screenshots/basalt.png)             | `A` `B` `D`         |      | [pbw](pbw/morndas.pbw)             |
+| `past-present-future` | ![](watchfaces/past-present-future/screenshots/aplite.png) | `A` `B` `D`         |      | [pbw](pbw/past-present-future.pbw) |
+| `potential-divider`   | ![](watchfaces/potential-divider/screenshots/aplite.png)   | `A` `B` `D`         | ✅    | [pbw](pbw/potential-divider.pbw)   |
+| `pseudotime`          | ![](watchfaces/pseudotime/screenshots/basalt.png)          | `A` `B` `C` `D`     |      | [pbw](pbw/pseudotime.pbw)          |
+| `split-horizon`       | ![](watchfaces/split-horizon/screenshots/diorite.png)      | `A` `B` `D`         | ✅    | [pbw](pbw/split-horizon.pbw)       |
+| `starfield-demo`      | ![](watchfaces/starfield-demo/screenshots/aplite.png)      | `A` `B` `C` `D`     |      | [pbw](pbw/starfield-demo.pbw)      |
+| `starfield-smooth`    | ![](watchfaces/starfield-smooth/screenshots/aplite.png)    | `A` `B` `C`         | ✅    | [pbw](pbw/starfield-smooth.pbw)    |
+| `thin`                | ![](watchfaces/thin/screenshots/basalt.png)                | `A` `B` `C` `D` `E` | ✅    | [pbw](pbw/thin.pbw)                |
+| `time-dots-appstore`  | ![](watchfaces/time-dots-appstore/screenshots/basalt1.png) | `A` `B` `C` `D`     |      | [pbw](pbw/time-dots-appstore.pbw)  |
+| `void-statues`        | ![](watchfaces/void-statues/screenshots/basalt.png)        | `A` `B` `C` `D` `E` |      | [pbw](pbw/void-statues.pbw)        |
+| `eclipse-solar`       |                                                            | ❌ (WIP)             |      |                                    |
 
 
 ## `watchapps`

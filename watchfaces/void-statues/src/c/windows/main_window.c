@@ -1,7 +1,5 @@
 #include "main_window.h"
 
-// #define TEST
-
 static Window *s_window;
 static Layer *s_canvas_layer;
 
@@ -19,23 +17,22 @@ static bool s_animating = true;
 
 static void canvas_layer_update_proc(Layer *layer, GContext *ctx) {
   isometric_begin(ctx);
-  isometric_set_projection_offset(GPoint(31, (144 / 2) + 1));
+  isometric_set_projection_offset(PROJECTION_OFFSET);
 
   SimpleTime mode_time = s_animating ? s_anim_time : s_current_time;
 
 #ifdef TEST
-  // Example time such as 18:24
-  mode_time.hour_tens = 1;
-  mode_time.hour_units = 8;
-  mode_time.minute_tens = 2;
-  mode_time.minute_units = 4;
+  mode_time.hour_tens = T_HOURS / 10;
+  mode_time.hour_units = T_HOURS % 10;
+  mode_time.minute_tens = T_MINUTES / 10;
+  mode_time.minute_units = T_MINUTES % 10;
 #endif
 
   // Offsets for B&W shadow rendering
-  drawing_draw_number(mode_time.hour_tens, GPoint(0, 0));
-  drawing_draw_number(mode_time.hour_units, GPoint(1, -40));
-  drawing_draw_number(mode_time.minute_tens, GPoint(64, 45));
-  drawing_draw_number(mode_time.minute_units, GPoint(64, 5));
+  drawing_draw_number(mode_time.hour_tens, HOUR_TENS_ORIGIN);
+  drawing_draw_number(mode_time.hour_units, HOUR_UNITS_ORIGIN);
+  drawing_draw_number(mode_time.minute_tens, MINUTE_TENS_ORIGIN);
+  drawing_draw_number(mode_time.minute_units, MINUTE_UNITS_ORIGIN);
 
   // Finally
   isometric_finish(ctx);
@@ -90,7 +87,7 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
 
   // Colors update for day and night
 #ifdef TEST
-  bool is_day = true;
+  bool is_day = T_IS_DAY;
 #else
   bool is_day = tick_time->tm_hour >= 6 && tick_time->tm_hour < 18;
 #endif
@@ -161,7 +158,7 @@ void main_window_push() {
   bluetooth_connection_service_subscribe((BluetoothConnectionHandler)bt_handler);
   drawing_set_is_connected(bluetooth_connection_service_peek());
 #ifdef TEST
-  drawing_set_is_connected(true);
+  drawing_set_is_connected(T_IS_CONNECTED);
 #endif
 
   // Begin smooth animation

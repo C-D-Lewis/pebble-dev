@@ -35,7 +35,8 @@
     "targetPlatforms": [
       "aplite",
       "basalt",
-      "diorite"
+      "diorite",
+      "emery"
     ],
     "capabilities": []
   },
