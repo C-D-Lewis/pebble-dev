@@ -1,10 +1,16 @@
 {
   "name": "tube-status",
-  "version": "3.6.0",
+  "version": "3.7.0",
   "author": "Chris Lewis",
   "private": true,
   "dependencies": {
     "pebble-packet": "^1.2.0"
+  },
+  "devDependencies": {
+    "pkts": "^0.2.1"
+  },
+  "scripts": {
+    "build": "pkts build"
   },
   "keywords": [
     "pebble-app"
@@ -65,11 +71,5 @@
       "emery"
     ],
     "capabilities": []
-  },
-  "devDependencies": {
-    "pkts": "^0.2.1"
-  },
-  "scripts": {
-    "build": "pkts build"
   }
 }
