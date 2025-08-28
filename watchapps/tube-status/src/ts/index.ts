@@ -62,7 +62,6 @@ const sendToPebble = async (lineStates: LineStates) => {
 Pebble.addEventListener('ready', async (e) => {
   console.log('PebbleKit JS ready');
 
-  // 
   const lineStates = await downloadStatus([
     'tube',
     'dlr',
