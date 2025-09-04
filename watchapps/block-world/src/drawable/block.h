@@ -1,9 +1,10 @@
 #pragma once
 
 #include <pebble.h>
+#include <pebble-isometric/pebble-isometric.h>
 
 #include "../main.h"
-#include "../pge/modules/pge_isometric.h"
+
 
 typedef struct {
   Vec3 position;

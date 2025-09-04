@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <pebble-isometric/pebble-isometric.h>
+
 // Compile config
 // #define BENCHMARK
 // #define ROTATION
@@ -19,10 +21,28 @@ typedef struct {
 } __attribute__((__packed__)) GSizeSmall;
 
 // Map settings
+#ifdef PBL_PLATFORM_EMERY
+  #define DISPLAY_W 220
+  #define DISPLAY_H 228
+  #define STATUS_LAYER_INSETS GEdgeInsets(0, 0, 200, 0)
+  #define BLOCK_SIZE 6
+  #define PROJECTION_OFFSET GPoint((DISPLAY_W / 2) - 10, (DISPLAY_H / 2) + (DISPLAY_H / 15))
+#elif defined(PBL_PLATFORM_CHALK)
+  #define DISPLAY_W 180
+  #define DISPLAY_H 180
+  #define STATUS_LAYER_INSETS GEdgeInsets(30, 0, 130, 0)
+  #define BLOCK_SIZE 5
+  #define PROJECTION_OFFSET GPoint(DISPLAY_W / 2, (DISPLAY_H / 2) + (DISPLAY_H / 15))
+#else
+  #define DISPLAY_W 144
+  #define DISPLAY_H 168
+  #define STATUS_LAYER_INSETS GEdgeInsets(0, 0, 150, 0)
+  #define BLOCK_SIZE 5
+  #define PROJECTION_OFFSET GPoint(DISPLAY_W / 2, (DISPLAY_H / 2) + (DISPLAY_H / 15))
+#endif
 #define GRID_WIDTH 14
 #define GRID_HEIGHT 14
 #define GRID_DEPTH 14
-#define BLOCK_SIZE 5
 #define FRAME_RATE_IDLE 25
 #define SKY_HEIGHT BLOCK_SIZE * GRID_DEPTH
 

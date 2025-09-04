@@ -16,9 +16,9 @@ void block_destroy(Block *this) {
 
 void block_render(Block *this) {
   if(!gcolor_equal(this->color, COLOR_INVISIBLE)) {
-    pge_isometric_fill_box(this->position, GSize(this->size.w, this->size.h), this->size.w, this->color);
+    isometric_fill_box(this->position, GSize(this->size.w, this->size.h), this->size.w, this->color);
 #ifdef OUTLINES
-    pge_isometric_draw_box(this->position, GSize(this->size.w, this->size.h), this->size.w, GColorDarkGray);
+    isometric_draw_box(this->position, GSize(this->size.w, this->size.h), this->size.w, GColorDarkGray, false);
 #endif
   }
 }

@@ -1,22 +1,23 @@
 {
-  "name": "Block World",
+  "name": "block-world",
   "author": "Chris Lewis",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "keywords": [
     "pebble-app"
   ],
-  "dependencies": {},
+  "dependencies": {
+    "pebble-isometric": "^1.3.1"
+  },
   "pebble": {
     "sdkVersion": "3",
     "targetPlatforms": [
       "basalt",
-      "chalk"
+      "chalk",
+      "emery"
     ],
     "enableMultiJS": false,
-    "capabilities": [
-      ""
-    ],
+    "capabilities": [],
     "projectType": "native",
     "displayName": "Block World",
     "uuid": "3db3b261-f835-43ec-90c0-baf75b803172",

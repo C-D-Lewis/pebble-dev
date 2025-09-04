@@ -1,7 +1,7 @@
 #include <pebble.h>
 
 #include "main.h"
-#include "pge/modules/pge_isometric.h"
+// The below are here to allow import of GSizeSmall
 #include "pge/pge.h"
 #include "drawable/block.h"
 #include "drawable/cloud.h"
@@ -66,7 +66,7 @@ static void render(GContext *ctx) {
   uint16_t start = time_ms(NULL, NULL);
 #endif
 
-  pge_isometric_begin(ctx);
+  isometric_begin(ctx);
 
   // Tiles
   for(int z = 0; z < GRID_DEPTH; z++) {
@@ -84,21 +84,40 @@ static void render(GContext *ctx) {
   // Selection
   switch(s_input_mode) {
     case MODE_X:
-      pge_isometric_draw_rect(Vec3(0, s_cursor.y * BLOCK_SIZE, (s_cursor.z + 1) * BLOCK_SIZE), GSize(GRID_WIDTH * BLOCK_SIZE, BLOCK_SIZE), GColorWhite);
+      isometric_draw_rect(
+        Vec3(0, s_cursor.y * BLOCK_SIZE, (s_cursor.z + 1) * BLOCK_SIZE),
+        GSize(GRID_WIDTH * BLOCK_SIZE, BLOCK_SIZE),
+        GColorWhite
+      );
       break;
     case MODE_Y:
-      pge_isometric_draw_rect(Vec3(s_cursor.x * BLOCK_SIZE, 0, (s_cursor.z + 1) * BLOCK_SIZE), GSize(BLOCK_SIZE, GRID_HEIGHT * BLOCK_SIZE), GColorWhite);
+      isometric_draw_rect(
+        Vec3(s_cursor.x * BLOCK_SIZE, 0, (s_cursor.z + 1) * BLOCK_SIZE),
+        GSize(BLOCK_SIZE, GRID_HEIGHT * BLOCK_SIZE),
+        GColorWhite
+      );
       break;
     case MODE_Z:
-      pge_isometric_draw_box(Vec3(s_cursor.x * BLOCK_SIZE, s_cursor.y * BLOCK_SIZE,  BLOCK_SIZE), GSize(BLOCK_SIZE, BLOCK_SIZE), (GRID_DEPTH - 1) * BLOCK_SIZE, GColorWhite);
+      isometric_draw_box(
+        Vec3(s_cursor.x * BLOCK_SIZE, s_cursor.y * BLOCK_SIZE,  BLOCK_SIZE),
+        GSize(BLOCK_SIZE, BLOCK_SIZE), (GRID_DEPTH - 1) * BLOCK_SIZE,
+        GColorWhite,
+        false
+      );
       break;
   }
-  pge_isometric_draw_box(Vec3(s_cursor.x * BLOCK_SIZE, s_cursor.y * BLOCK_SIZE, s_cursor.z * BLOCK_SIZE), GSize(BLOCK_SIZE, BLOCK_SIZE), BLOCK_SIZE, GColorRed);
+  isometric_draw_box(
+    Vec3(s_cursor.x * BLOCK_SIZE, s_cursor.y * BLOCK_SIZE, s_cursor.z * BLOCK_SIZE),
+    GSize(BLOCK_SIZE, BLOCK_SIZE),
+    BLOCK_SIZE,
+    GColorRed,
+    false
+  );
 
   // Box
-  pge_isometric_draw_box(Vec3(0, 0, 0), GSize(BLOCK_SIZE * GRID_WIDTH, BLOCK_SIZE * GRID_HEIGHT), SKY_HEIGHT, GColorLightGray);
+  isometric_draw_box(Vec3(0, 0, 0), GSize(BLOCK_SIZE * GRID_WIDTH, BLOCK_SIZE * GRID_HEIGHT), SKY_HEIGHT, GColorLightGray, false);
 
-  pge_isometric_finish(ctx);
+  isometric_finish(ctx);
 
 #ifdef BENCHMARK
   uint16_t finish = time_ms(NULL, NULL);
@@ -323,35 +342,49 @@ void pge_init() {
   for(int z = 0; z < GRID_DEPTH; z++) {
     for(int y = 0; y < GRID_HEIGHT; y++) {
       for(int x = 0; x < GRID_WIDTH; x++) {
-        s_block_array[vec2i(Vec3(x, y, z))] = block_create(Vec3(x * BLOCK_SIZE, y * BLOCK_SIZE, z * BLOCK_SIZE), GSize(BLOCK_SIZE, BLOCK_SIZE), COLOR_INVISIBLE);
+        s_block_array[vec2i(Vec3(x, y, z))] = block_create(
+          Vec3(x * BLOCK_SIZE, y * BLOCK_SIZE, z * BLOCK_SIZE),
+          GSize(BLOCK_SIZE, BLOCK_SIZE),
+          COLOR_INVISIBLE
+        );
       }
     }
   }
   for(int i = 0; i < MAX_CLOUDS; i++) {
-    s_cloud_array[i] = cloud_create(Vec3(0, 0, SKY_HEIGHT), GSize(BLOCK_SIZE, BLOCK_SIZE), Vec3(GRID_WIDTH * BLOCK_SIZE, GRID_HEIGHT * BLOCK_SIZE, SKY_HEIGHT));
+    s_cloud_array[i] = cloud_create(
+      Vec3(0, 0, SKY_HEIGHT),
+      GSize(BLOCK_SIZE, BLOCK_SIZE),
+      Vec3(GRID_WIDTH * BLOCK_SIZE, GRID_HEIGHT * BLOCK_SIZE, SKY_HEIGHT)
+    );
   }
 
   // Set up world
   generate_world();
 
   // Set up engine
-  pge_isometric_set_projection_offset(PBL_IF_ROUND_ELSE(GPoint(90, 110), GPoint(72, 80)));
-  pge_isometric_set_enabled(true);
+  isometric_set_projection_offset(PROJECTION_OFFSET);
+  isometric_set_enabled(true);
   pge_set_framerate(FRAME_RATE_IDLE);
   pge_begin(GColorBlack, logic, render, click);
   s_main_window = pge_get_window();
 
-  s_status_layer = text_layer_create(grect_inset(
-    layer_get_bounds((window_get_root_layer(s_main_window))),
-    PBL_IF_ROUND_ELSE(GEdgeInsets(30, 0, 130, 0), GEdgeInsets(0, 0, 150, 0))));
+  Layer *root_layer = window_get_root_layer(s_main_window);
+
+  s_status_layer = text_layer_create(grect_inset(layer_get_bounds((root_layer)), STATUS_LAYER_INSETS));
   text_layer_set_background_color(s_status_layer, GColorBlack);
   text_layer_set_text_color(s_status_layer, GColorWhite);
   text_layer_set_text_alignment(s_status_layer, PBL_IF_ROUND_ELSE(GTextAlignmentCenter, GTextAlignmentLeft));
-  layer_add_child(window_get_root_layer(s_main_window), text_layer_get_layer(s_status_layer));
+  layer_add_child(root_layer, text_layer_get_layer(s_status_layer));
   update_status_text();
 
 #ifdef BENCHMARK
-  APP_LOG(APP_LOG_LEVEL_INFO, "Heap free: %dB after creating %d blocks (Size: %dB)", (int)heap_bytes_free(), (GRID_WIDTH * GRID_HEIGHT * GRID_DEPTH), get_world_size());
+  APP_LOG(
+    APP_LOG_LEVEL_INFO,
+    "Heap free: %dB after creating %d blocks (Size: %dB)",
+    (int)heap_bytes_free(),
+    (GRID_WIDTH * GRID_HEIGHT * GRID_DEPTH),
+    get_world_size()
+  );
 #endif
 }
 
