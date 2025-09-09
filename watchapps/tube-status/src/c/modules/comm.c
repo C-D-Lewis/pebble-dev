@@ -2,27 +2,34 @@
 
 static AppTimer *s_timeout_timer;
 
+void set_fast(bool fast) {
+  app_comm_set_sniff_interval(fast ? SNIFF_INTERVAL_REDUCED: SNIFF_INTERVAL_NORMAL);
+}
+
 static void inbox_received_handler(DictionaryIterator *iter, void *context) {
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "Size: %d", packet_get_size(iter));
+  // APP_LOG(APP_LOG_LEVEL_DEBUG, "Size: %d", packet_get_size(iter));
 
-  // TODO: Use pebble-packet
-  Tuple *t = dict_read_first(iter);
-  while (t) {
-    // With "messageKeys", it appears to start from 10000
-    int key = t->key - 10000;
-    // APP_LOG(APP_LOG_LEVEL_DEBUG, "Received key: %d, value: %s", key, t->value->cstring);
+  int index = 0;
+  if (packet_contains_key(iter, MESSAGE_KEY_LineIndex)) {
+    index = packet_get_integer(iter, MESSAGE_KEY_LineIndex);
+    // APP_LOG(APP_LOG_LEVEL_DEBUG, "Index: %d", index);
 
-    // Line keys are linear from 0
-    if (key >= 0 && key < LineTypeMax) {
-      char *line_state = data_get_line_state(key);
-      snprintf(line_state, strlen(t->value->cstring) + 1 /* EOF */, "%s", t->value->cstring);
-    }
+    char *line_state = data_get_line_state(index);
+    char *status = packet_get_string(iter, MESSAGE_KEY_LineStatus);
+    snprintf(line_state, strlen(status) + 1 /* EOF */, "%s", status);
 
-    t = dict_read_next(iter);
+    char *line_reason = data_get_line_reason(index);
+    char *reason = packet_get_string(iter, MESSAGE_KEY_LineReason);
+    snprintf(line_reason, strlen(reason) + 1 /* EOF */, "%s", reason);
   }
 
-  // All lines are received in the same message
-  line_window_push();
+  data_set_progress(index);
+  splash_window_update();
+
+  if (index == LineTypeMax - 1) {
+    set_fast(false);
+    line_window_push();
+  }
 }
 
 static void inbox_dropped_handler(AppMessageResult reason, void *context) {
@@ -30,9 +37,13 @@ static void inbox_dropped_handler(AppMessageResult reason, void *context) {
 }
 
 void comm_init() {
-  app_message_register_inbox_received(inbox_received_handler);
-  app_message_register_inbox_dropped(inbox_dropped_handler);
-  app_message_open(COMM_INBOX_SIZE, COMM_OUTBOX_SIZE);
+  events_app_message_request_inbox_size(COMM_INBOX_SIZE);
+  events_app_message_request_outbox_size(COMM_OUTBOX_SIZE);
+  events_app_message_open();
+  events_app_message_register_inbox_received(inbox_received_handler, NULL);
+  events_app_message_register_inbox_dropped(inbox_dropped_handler, NULL);
+
+  set_fast(true);
 }
 
 void comm_deinit() {
@@ -40,8 +51,4 @@ void comm_deinit() {
     app_timer_cancel(s_timeout_timer);
     s_timeout_timer = NULL;
   }
-}
-
-static void failed_callback() {
-  APP_LOG(APP_LOG_LEVEL_ERROR, "Packet send failed.");
 }

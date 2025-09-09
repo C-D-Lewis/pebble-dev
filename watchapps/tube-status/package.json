@@ -1,9 +1,10 @@
 {
   "name": "tube-status",
-  "version": "3.7.0",
+  "version": "3.8.0",
   "author": "Chris Lewis",
   "private": true,
   "dependencies": {
+    "pebble-events": "^1.2.0",
     "pebble-packet": "^1.2.0"
   },
   "devDependencies": {
@@ -35,26 +36,9 @@
     "projectType": "native",
     "uuid": "5120531c-9d73-4852-b26d-3d3cee90d92a",
     "messageKeys": [
-      "LineTypeBakerloo",
-      "LineTypeCentral",
-      "LineTypeCircle",
-      "LineTypeDistrict",
-      "LineTypeDLR",
-      "LineTypeElizabeth",
-      "LineTypeHammersmithAndCity",
-      "LineTypeJubilee",
-      "LineTypeLiberty",
-      "LineTypeLioness",
-      "LineTypeMetropolitan",
-      "LineTypeMildmay",
-      "LineTypeNorthern",
-      "LineTypePicadilly",
-      "LineTypeSuffragette",
-      "LineTypeVictoria",
-      "LineTypeWaterlooAndCity",
-      "LineTypeWeaver",
-      "LineTypeWindrush",
-      "JSReady"
+      "LineIndex",
+      "LineStatus",
+      "LineReason"
     ],
     "enableMultiJS": true,
     "displayName": "Tube Status",

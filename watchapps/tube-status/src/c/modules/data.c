@@ -1,6 +1,8 @@
 #include "data.h"
 
 static char s_line_states[LineTypeMax][32];
+static char s_line_reasons[LineTypeMax][256];
+static int s_progress = 0;
 
 void data_init() {
 }
@@ -32,8 +34,13 @@ char* data_get_line_name(int type) {
     default:                         return "?";
   }
 }
+
 char* data_get_line_state(int type) {
   return &s_line_states[type][0];
+}
+
+char* data_get_line_reason(int type) {
+  return &s_line_reasons[type][0];
 }
 
 GColor data_get_line_color(int type) {
@@ -72,8 +79,8 @@ GColor data_get_line_state_color(int type) {
     return PBL_IF_COLOR_ELSE(GColorChromeYellow, GColorDarkGray);
   }
 
-  // Severe, Planned, Closed
-  if(strstr(state, "evere") || strstr(state, "lanned") || strstr(state, "losed")) {
+  // Severe, Planned, Closed, Suspended
+  if(strstr(state, "evere") || strstr(state, "lanned") || strstr(state, "losed") || strstr(state, "uspended")) {
     return PBL_IF_COLOR_ELSE(GColorDarkCandyAppleRed, GColorDarkGray);
   }
 
@@ -94,4 +101,12 @@ bool data_get_line_color_is_striped(int type) {
     default:
       return false;
   }
+}
+
+void data_set_progress(int progress) {
+  s_progress = progress;
+}
+
+int data_get_progress() {
+  return s_progress;
 }
