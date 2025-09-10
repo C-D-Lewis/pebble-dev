@@ -78,7 +78,7 @@ static void window_unload(Window *window) {
 void splash_window_push() {
   if(!s_window) {
     s_window = window_create();
-    window_set_background_color(s_window, GColorWhite);
+    window_set_background_color(s_window, PBL_IF_COLOR_ELSE(GColorBlue, GColorLightGray));
     window_set_window_handlers(s_window, (WindowHandlers) {
       .load = window_load,
       .unload = window_unload

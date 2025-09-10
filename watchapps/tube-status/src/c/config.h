@@ -3,8 +3,9 @@
 #include <pebble.h>
 
 #define VERBOSE true
-#define VERSION "3.8"
+#define VERSION "3.9"
 
+// Order is very important - must match JS side
 typedef enum {
   LineTypeBakerloo = 0,
   LineTypeCentral,

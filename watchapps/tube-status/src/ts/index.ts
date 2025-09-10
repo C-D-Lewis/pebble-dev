@@ -20,45 +20,29 @@ type LineData = {
   reason: string;
 };
 
-/** Order lines should be transmitted in */
-const LINE_KEY_ORDER = [
-  'LineTypeBakerloo',
-  'LineTypeCentral',
-  'LineTypeCircle',
-  'LineTypeDistrict',
-  'LineTypeDLR',
-  'LineTypeElizabeth',
-  'LineTypeHammersmithAndCity',
-  'LineTypeJubilee',
-  'LineTypeLiberty',
-  'LineTypeLioness',
-  'LineTypeMetropolitan',
-  'LineTypeMildmay',
-  'LineTypeNorthern',
-  'LineTypePicadilly',
-  'LineTypeSuffragette',
-  'LineTypeVictoria',
-  'LineTypeWaterlooAndCity',
-  'LineTypeWeaver',
-  'LineTypeWindrush'
-];
+/** API modes to query */
+const MODES = ['tube', 'dlr', 'elizabeth-line', 'overground'];
+/** Number of lines the API returns */
+const NUM_LINES = 19;
 /** Max reason length */
 const MAX_REASON_LENGTH = 256;
 
 /**
  * Download all lines statuses.
  * Available modes: https://api.tfl.gov.uk/StopPoint/Meta/modes
- *
- * @param {string[]} modes Array of transport modes to include.
  */
-const downloadStatus = async (modes: string[]): Promise<LineData[]> => {
-  const json = await PebbleTS.fetchJSON(`https://api.tfl.gov.uk/line/mode/${modes.join(',')}/status`) as TfLApiResult[];
+const downloadStatus = async (): Promise<LineData[]> => {
+  const url = `https://api.tfl.gov.uk/line/mode/${MODES.join(',')}/status`;
+  const json = await PebbleTS.fetchJSON(url) as TfLApiResult[];
   // console.log(JSON.stringify(json, null, 2));
+
   return json.reduce((acc, obj: TfLApiResult): LineData[] => {
     let reason = obj.lineStatuses[0].reason || '';
     if (reason?.length > MAX_REASON_LENGTH) {
       reason = reason?.substring(0, MAX_REASON_LENGTH - 4) + '...';
     }
+
+    // Order is very important and must match C side
     return [
       ...acc,
       {
@@ -77,7 +61,10 @@ const downloadStatus = async (modes: string[]): Promise<LineData[]> => {
  * @param {number} index - Item to send.
  */
 const sendNextLine = async (data: LineData[], index: number) => {
-  if (index === LINE_KEY_ORDER.length) return;
+  if (index === NUM_LINES) {
+    console.log('All data sent!');
+    return;
+  }
 
   const lineData = data[index];
   if (!lineData) throw new Error(`No lineData for ${index}`);
@@ -96,12 +83,7 @@ const sendNextLine = async (data: LineData[], index: number) => {
 Pebble.addEventListener('ready', async (e) => {
   console.log('PebbleKit JS ready');
 
-  const lineData = await downloadStatus([
-    'tube',
-    'dlr',
-    'elizabeth-line',
-    'overground',
-  ]);
+  const lineData = await downloadStatus();
 
   try {
     await sendNextLine(lineData, 0);

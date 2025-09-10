@@ -5,10 +5,10 @@
 #include <pebble-packet/pebble-packet.h>
 #include <pebble-events/pebble-events.h>
 
-#include "../common/splash_window.h"
 #include "../config.h"
-#include "../rect/line_window.h"
-#include "../round/line_window.h"
+#include "../windows/common/splash_window.h"
+#include "../windows/rect/line_window.h"
+#include "../windows/round/line_window.h"
 #include "data.h"
 
 #define COMM_INBOX_SIZE 1024

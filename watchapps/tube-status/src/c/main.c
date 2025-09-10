@@ -4,7 +4,7 @@
 #include "modules/data.h"
 #include "modules/comm.h"
 
-#include "common/splash_window.h"
+#include "windows/common/splash_window.h"
   
 static void init() {
   data_init();

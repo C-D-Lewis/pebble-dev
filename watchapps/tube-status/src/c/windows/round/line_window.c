@@ -130,6 +130,7 @@ void line_window_push() {
   }
   window_stack_push(s_window, true);
 
+  // Begin with the first line
   s_selected_line = LineTypeBakerloo;
   layer_mark_dirty(s_ring_layer);
 }
