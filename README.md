@@ -103,11 +103,11 @@ Copy `wscript` from a working project.
 As of SDK 3, some image resource types like `png` were deprecated. `bitmap`
 should be used instead
 
-## Todo
+## To Do
 
 - [x] Fix build in GitHub Actions
 - [x] Finish importing all previous Pebble projects
 - [x] Merge all Split Horizon editions into config.
 - [x] Migrate all custom config to Clay.
+- [x] Verify correct tick unit used to save power.
 - [ ] Menu icons for all current watchfaces and watchapps
-- [ ] Verify correct tick unit used to save power.
