@@ -13,16 +13,11 @@ static Window *s_window;
 static MenuLayer *s_menu_layer;
 static StatusBarLayer *s_status_bar;
 
-bool line_has_reason(int index) {
-  char *reason = data_get_line_reason(index);
-  return strlen(reason) != 0;
-}
-
 /******************************** Click config *********************************/
 
 static void select_click_handler(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) {
   int index = (int)cell_index->row;
-  if (!line_has_reason(index)) return;
+  if (!data_get_line_has_reason(index)) return;
 
   reason_window_push(index);
 }
@@ -38,7 +33,7 @@ void draw_row_handler(GContext *ctx, const Layer *cell_layer, MenuIndex *cell_in
 #ifdef PBL_PLATFORM_EMERY
   const int logo_bounds_x = bounds.origin.x + (LOGO_MARGIN / 3) + 2;
 #else
-  const int logo_bounds_x = bounds.origin.x + (LOGO_MARGIN / 3);
+  const int logo_bounds_x = bounds.origin.x + (LOGO_MARGIN / 3) - 2;
 #endif
   GRect logo_bounds = GRect(
     logo_bounds_x,
@@ -76,19 +71,15 @@ void draw_row_handler(GContext *ctx, const Layer *cell_layer, MenuIndex *cell_in
   graphics_context_set_fill_color(ctx, GColorWhite);
   graphics_fill_circle(ctx, center, (5 * (LOGO_RADIUS - 1)) / 7);
 
-  // Issue?
-  graphics_context_set_fill_color(ctx, data_get_line_state_color(type));
-  graphics_fill_circle(ctx, center, (5 * (LOGO_RADIUS - 1)) / 7);
-
   // Show selected
-  if(menu_layer_is_index_selected(s_menu_layer, cell_index)) {
+  if (menu_layer_is_index_selected(s_menu_layer, cell_index)) {
     graphics_context_set_fill_color(ctx, GColorBlack);
     graphics_fill_circle(ctx, center, (4 * (LOGO_RADIUS - 2)) / 7);
   }
 
   // Info
   GRect text_bounds = GRect(
-    bounds.origin.x + (3 * LOGO_MARGIN) + 2,
+    bounds.origin.x + (3 * LOGO_MARGIN),
     bounds.origin.y - 5,
     bounds.size.w - (3 * LOGO_MARGIN),
     30
@@ -116,7 +107,17 @@ void draw_row_handler(GContext *ctx, const Layer *cell_layer, MenuIndex *cell_in
   );
 
   // Show if reason can be viewed
-  if(menu_layer_is_index_selected(s_menu_layer, cell_index) && line_has_reason(cell_index->row)) {
+  if (menu_layer_is_index_selected(s_menu_layer, cell_index) && data_get_line_has_reason(cell_index->row)) {
+    // Background
+    graphics_context_set_fill_color(ctx, data_get_line_state_color(type));
+    graphics_fill_rect(
+      ctx,
+      grect_inset(bounds, GEdgeInsets(0, 0, 0, bounds.size.w - LOGO_MARGIN - 2)),
+      GCornerNone,
+      0
+    );
+    
+    // Arrow
     graphics_draw_text(
       ctx,
       ">",
@@ -177,7 +178,7 @@ static void window_unload(Window *window) {
 }
 
 void line_window_push() {
-  if(!s_window) {
+  if (!s_window) {
     s_window = window_create();
     window_set_window_handlers(s_window, (WindowHandlers) {
       .load = window_load,

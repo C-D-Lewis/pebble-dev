@@ -60,10 +60,10 @@ GColor data_get_line_color(int type) {
     case LineTypeMildmay:            return GColorCobaltBlue;
     case LineTypeNorthern:           return GColorBlack;
     case LineTypePicadilly:          return GColorFromHEX(0x003688);
-    case LineTypeSuffragette:        return GColorFromHEX(0x00BA80);
+    case LineTypeSuffragette:        return GColorMayGreen;
     case LineTypeWaterlooAndCity:    return GColorFromHEX(0x95CDBA);
     case LineTypeWeaver:             return GColorFromHEX(0xA12860);
-    case LineTypeWindrush:           return GColorFolly;
+    case LineTypeWindrush:           return GColorFromHEX(0xE32017);
     case LineTypeVictoria:           return GColorFromHEX(0x0098D4);
     default:                         return GColorWhite;
   }
@@ -75,13 +75,13 @@ GColor data_get_line_state_color(int type) {
   char *state = s_line_states[type];
   
   // Minor, Part
-  if(strstr(state, "inor") || strstr(state, "art")) {
+  if (strstr(state, "inor") || strstr(state, "art")) {
     return PBL_IF_COLOR_ELSE(GColorChromeYellow, GColorDarkGray);
   }
 
   // Severe, Planned, Closed, Suspended
-  if(strstr(state, "evere") || strstr(state, "lanned") || strstr(state, "losed") || strstr(state, "uspended")) {
-    return PBL_IF_COLOR_ELSE(GColorDarkCandyAppleRed, GColorDarkGray);
+  if (strstr(state, "evere") || strstr(state, "lanned") || strstr(state, "losed") || strstr(state, "uspended")) {
+    return PBL_IF_COLOR_ELSE(GColorRed, GColorDarkGray);
   }
 
   return GColorClear;
@@ -109,4 +109,9 @@ void data_set_progress(int progress) {
 
 int data_get_progress() {
   return s_progress;
+}
+
+bool data_get_line_has_reason(int index) {
+  char *reason = data_get_line_reason(index);
+  return strlen(reason) != 0;
 }

@@ -23,3 +23,5 @@ bool data_get_line_color_is_striped(int type);
 void data_set_progress(int progress);
 
 int data_get_progress();
+
+bool data_get_line_has_reason(int index);

@@ -62,6 +62,7 @@ static void window_load(Window *window) {
     )
   );
   layer_set_update_proc(s_bar_layer, progress_bar_update_proc);
+  layer_set_hidden(s_bar_layer, true);
   layer_add_child(window_layer, s_bar_layer);
 }
 
@@ -76,7 +77,7 @@ static void window_unload(Window *window) {
 }
 
 void splash_window_push() {
-  if(!s_window) {
+  if (!s_window) {
     s_window = window_create();
     window_set_background_color(s_window, PBL_IF_COLOR_ELSE(GColorBlue, GColorLightGray));
     window_set_window_handlers(s_window, (WindowHandlers) {
@@ -89,4 +90,8 @@ void splash_window_push() {
 
 void splash_window_update() {
   layer_mark_dirty(s_bar_layer);
+
+  if (layer_get_hidden(s_bar_layer)) {
+    layer_set_hidden(s_bar_layer, false);
+  }
 }

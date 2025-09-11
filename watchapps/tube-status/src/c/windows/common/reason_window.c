@@ -29,6 +29,10 @@ static void window_load(Window *window) {
   text_layer_set_overflow_mode(s_reason_layer, GTextOverflowModeTrailingEllipsis);
   layer_add_child(window_layer, text_layer_get_layer(s_reason_layer));
 
+#if defined(PBL_ROUND)
+  text_layer_enable_screen_text_flow_and_paging(s_reason_layer, 6);
+#endif
+
   // Get reason string
   char *reason = data_get_line_reason(s_index);
 #ifdef PBL_PLATFORM_EMERY
@@ -51,11 +55,11 @@ static void window_unload(Window *window) {
 void reason_window_push(int index) {
   s_index = index;
 
-  if(!s_window) {
-      s_window = window_create();
+  if (!s_window) {
+    s_window = window_create();
     window_set_background_color(s_window, GColorWhite);
     window_set_window_handlers(s_window, (WindowHandlers) {
-        .load = window_load,
+      .load = window_load,
       .unload = window_unload
     });
   }
