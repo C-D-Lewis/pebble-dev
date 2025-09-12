@@ -22,9 +22,6 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
     case SettingsTypeNumStories:
       menu_cell_basic_draw(ctx, cell_layer, "Number of Stories", settings_get_num_stories_string(), NULL);
       break;
-    case SettingsTypeFontSize:
-      menu_cell_basic_draw(ctx, cell_layer, "Font Size", settings_get_font_size_string(), NULL);
-      break;
     case SettingsTypeAbout:
       menu_cell_basic_draw(ctx, cell_layer, "News Headlines", "Powered by BBC News", NULL);
       break;
@@ -62,22 +59,13 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
           break;
       }
       break;
-    case SettingsTypeFontSize:
-      switch(settings_get_font_size()) {
-        case FontSizeSmall:
-          settings_set_font_size(FontSizeLarge);
-          break;
-        case FontSizeLarge:
-          settings_set_font_size(FontSizeSmall);
-          break;
-      }
-      break;
     default: break;
   }
 
   menu_layer_reload_data(s_menu_layer);
 }
 
+#if !defined(PBL_ROUND)
 static int16_t get_header_height_callback(struct MenuLayer *menu_layer, uint16_t section_index, void *context) {
   return STATUS_BAR_LAYER_HEIGHT;
 }
@@ -85,6 +73,7 @@ static int16_t get_header_height_callback(struct MenuLayer *menu_layer, uint16_t
 static void draw_header_callback(GContext *ctx, const Layer *cell_layer, uint16_t section_index, void *context) {
   menu_cell_basic_header_draw(ctx, cell_layer, "Press Back to apply");
 }
+#endif
 
 static void main_window_load(Window *window) {
   Layer *window_layer = window_get_root_layer(window);
@@ -97,13 +86,13 @@ static void main_window_load(Window *window) {
   menu_layer_set_highlight_colors(s_menu_layer, GColorDarkCandyAppleRed, GColorWhite);
 #endif
   menu_layer_set_callbacks(s_menu_layer, NULL, (MenuLayerCallbacks) {
-      .get_num_rows = (MenuLayerGetNumberOfRowsInSectionsCallback)get_num_rows_callback,
-      .draw_row = (MenuLayerDrawRowCallback)draw_row_callback,
-      .get_cell_height = (MenuLayerGetCellHeightCallback)get_cell_height_callback,
-      .select_click = (MenuLayerSelectCallback)select_callback,
+    .get_num_rows = (MenuLayerGetNumberOfRowsInSectionsCallback)get_num_rows_callback,
+    .draw_row = (MenuLayerDrawRowCallback)draw_row_callback,
+    .get_cell_height = (MenuLayerGetCellHeightCallback)get_cell_height_callback,
+    .select_click = (MenuLayerSelectCallback)select_callback,
 #if !defined(PBL_ROUND)
-      .get_header_height = (MenuLayerGetHeaderHeightCallback)get_header_height_callback,
-      .draw_header = (MenuLayerDrawHeaderCallback)draw_header_callback,
+    .get_header_height = (MenuLayerGetHeaderHeightCallback)get_header_height_callback,
+    .draw_header = (MenuLayerDrawHeaderCallback)draw_header_callback,
 #endif
   });
   layer_add_child(window_layer, menu_layer_get_layer(s_menu_layer));

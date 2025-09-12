@@ -7,7 +7,6 @@ typedef enum {
   SettingsTypeRegion = 0,
   SettingsTypeCategory,
   SettingsTypeNumStories,
-  SettingsTypeFontSize,
   SettingsTypeAbout,
 } SettingsType;
 
@@ -24,11 +23,6 @@ typedef enum {
 
   CategoryCount
 } Category;
-
-typedef enum {
-  FontSizeSmall = 18,
-  FontSizeLarge = 24
-} FontSize;
 
 typedef enum {
   AppKeyTitle = 0,          // Story title

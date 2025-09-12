@@ -36,20 +36,22 @@ static void load_cache_handler(void *context) {
   }
 }
 
-// Who needs a 500 line file for this!?
+/**
+ * Simple progress bar with one pixel inset
+ */
 static void progress_bar_update_proc(Layer *layer, GContext *ctx) {
-  const int margin = 3;
+  const int margin = 4;
 
-  graphics_context_set_fill_color(ctx, GColorDarkGray);
+  graphics_context_set_fill_color(ctx, GColorBlack);
   graphics_fill_circle(ctx, GPoint(margin, margin), margin);
   graphics_fill_rect(ctx, GRect(margin, 0, BAR_WIDTH - (2 * margin), (2 * margin) + 1), 0, GCornerNone);
   graphics_fill_circle(ctx, GPoint(BAR_WIDTH - margin, margin), margin);
 
   int width = (s_progress * BAR_WIDTH) / s_quantity;
   graphics_context_set_fill_color(ctx, GColorWhite);
-  graphics_fill_circle(ctx, GPoint(margin, margin), margin);
-  graphics_fill_rect(ctx, GRect(margin, 0, width, (2 * margin) + 1), 0, GCornerNone);
-  graphics_fill_circle(ctx, GPoint(margin + width, margin), margin);
+  graphics_fill_circle(ctx, GPoint(margin, margin), margin - 1);
+  graphics_fill_rect(ctx, GRect(margin + 1, 1, width - 2, (2 * margin) - 1), 0, GCornerNone);
+  graphics_fill_circle(ctx, GPoint(margin + width, margin), margin - 1);
 }
 
 static void window_load(Window *this) {
@@ -106,7 +108,7 @@ static void window_appear(Window *window) {
 void splash_window_push() {
   if (!s_window) {
     s_window = window_create();
-    window_set_background_color(s_window, GColorBlack);
+    window_set_background_color(s_window, PBL_IF_COLOR_ELSE(GColorDarkCandyAppleRed, GColorLightGray));
     window_set_window_handlers(s_window, (WindowHandlers) {
         .appear = window_appear,  // Special case to reset layout state
         .load = window_load,

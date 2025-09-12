@@ -4,7 +4,6 @@ static void write_defaults() {
   // Set default settings
   settings_set_category(CategoryHeadlines);
   settings_set_number_of_stories(10);
-  settings_set_font_size(FontSizeLarge);
   settings_set_region(RegionUK);
 }
 
@@ -46,14 +45,6 @@ int settings_get_number_of_stories() {
   return persist_read_int(SettingsTypeNumStories);
 }
 
-void settings_set_font_size(FontSize size) {
-  persist_write_int(SettingsTypeFontSize, size);
-}
-
-FontSize settings_get_font_size() {
-  return persist_read_int(SettingsTypeFontSize);
-}
-
 char* settings_get_category_string() {
   switch(settings_get_category()) {
     case CategoryHeadlines:          return "Headlines";
@@ -76,16 +67,6 @@ char* settings_get_num_stories_string() {
     default: 
       settings_set_number_of_stories(10);
       return "10 stories (default)";
-  }
-}
-
-char* settings_get_font_size_string() {
-  switch(settings_get_font_size()) {
-    case FontSizeSmall: return "Small (18)";
-    case FontSizeLarge: return "Large (24)";
-    default: 
-      settings_set_font_size(FontSizeLarge);
-      return "Large (24) (default)";
   }
 }
 
