@@ -43,7 +43,6 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `thin`                | ![](watchfaces/thin/screenshots/basalt.png)                | `A` `B` `C` `D` `E` | ✅    | [pbw](pbw/thin.pbw)                |
 | `time-dots-appstore`  | ![](watchfaces/time-dots-appstore/screenshots/basalt1.png) | `A` `B` `C` `D`     |      | [pbw](pbw/time-dots-appstore.pbw)  |
 | `void-statues`        | ![](watchfaces/void-statues/screenshots/basalt.png)        | `A` `B` `C` `D` `E` |      | [pbw](pbw/void-statues.pbw)        |
-| `eclipse-solar`       |                                                            | ❌ (WIP)             |      |                                    |
 
 
 ## `watchapps`
