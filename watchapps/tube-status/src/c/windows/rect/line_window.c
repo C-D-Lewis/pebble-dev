@@ -26,9 +26,28 @@ static void select_click_handler(struct MenuLayer *menu_layer, MenuIndex *cell_i
 
 void draw_row_handler(GContext *ctx, const Layer *cell_layer, MenuIndex *cell_index, void *context) {
   GRect bounds = layer_get_bounds(cell_layer);
+  int index = cell_index->row;
 
-  // Important that all lines are in the same order as LineType and zero-indexed
-  int type = cell_index->row;
+  if (index >= data_get_progress_max()) {
+    // All other lines good
+    graphics_context_set_fill_color(ctx, GColorWhite);
+    graphics_fill_rect(ctx, bounds, GCornerNone, 0);
+
+    graphics_context_set_text_color(ctx, GColorBlack);
+    graphics_draw_text(
+      ctx,
+      "Good service on all other lines",
+      fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD),
+      bounds,
+      GTextOverflowModeTrailingEllipsis,
+      GTextAlignmentCenter,
+      NULL
+    );
+
+    return;
+  }
+
+  LineData *line_data = data_get_line(index);
 
 #ifdef PBL_PLATFORM_EMERY
   const int logo_bounds_x = bounds.origin.x + (LOGO_MARGIN / 3) + 2;
@@ -48,14 +67,14 @@ void draw_row_handler(GContext *ctx, const Layer *cell_layer, MenuIndex *cell_in
 
   // Line color
   int line_color_x = center.x - (STRIPE_WIDTH / 2);
-  graphics_context_set_fill_color(ctx, data_get_line_color(type));
+  graphics_context_set_fill_color(ctx, data_get_line_color(line_data->type));
   graphics_fill_rect(
     ctx,
     GRect(line_color_x, bounds.origin.y, STRIPE_WIDTH, bounds.size.h),
     GCornerNone,
     0
   );
-  if (data_get_line_color_is_striped(type)) {
+  if (data_get_line_color_is_striped(line_data->type)) {
     graphics_context_set_fill_color(ctx, GColorWhite);
     graphics_fill_rect(
       ctx,
@@ -87,7 +106,7 @@ void draw_row_handler(GContext *ctx, const Layer *cell_layer, MenuIndex *cell_in
   graphics_context_set_text_color(ctx, GColorBlack);
   graphics_draw_text(
     ctx,
-    data_get_line_name(type),
+    data_get_line_name(line_data->type),
     fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD),
     text_bounds,
     GTextOverflowModeTrailingEllipsis,
@@ -98,7 +117,7 @@ void draw_row_handler(GContext *ctx, const Layer *cell_layer, MenuIndex *cell_in
   text_bounds.size.w -= LOGO_MARGIN;
   graphics_draw_text(
     ctx,
-    data_get_line_state(type),
+    line_data->state,
     fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD),
     text_bounds,
     GTextOverflowModeTrailingEllipsis,
@@ -109,7 +128,7 @@ void draw_row_handler(GContext *ctx, const Layer *cell_layer, MenuIndex *cell_in
   // Show if reason can be viewed
   if (menu_layer_is_index_selected(s_menu_layer, cell_index) && data_get_line_has_reason(cell_index->row)) {
     // Background
-    graphics_context_set_fill_color(ctx, data_get_line_state_color(type));
+    graphics_context_set_fill_color(ctx, data_get_line_state_color(line_data->type));
     graphics_fill_rect(
       ctx,
       grect_inset(bounds, GEdgeInsets(0, 0, 0, bounds.size.w - LOGO_MARGIN - 2)),
@@ -135,7 +154,8 @@ void draw_row_handler(GContext *ctx, const Layer *cell_layer, MenuIndex *cell_in
 }
 
 uint16_t get_num_rows_handler(MenuLayer *menu_layer, uint16_t section_index, void *context) {
-  return LineTypeMax;
+  // Number of concern sent by JS plus one for 'all others are good' notice
+  return data_get_progress_max() + 1;
 }
 
 int16_t get_cell_height_handler(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) {

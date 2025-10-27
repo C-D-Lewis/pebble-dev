@@ -1,8 +1,8 @@
 #include "data.h"
 
-static char s_line_states[LineTypeMax][32];
-static char s_line_reasons[LineTypeMax][256];
+static LineData s_line_data[LineTypeMax];
 static int s_progress = 0;
+static int s_progress_max = LineTypeMax;
 
 void data_init() {
 }
@@ -35,14 +35,6 @@ char* data_get_line_name(int type) {
   }
 }
 
-char* data_get_line_state(int type) {
-  return &s_line_states[type][0];
-}
-
-char* data_get_line_reason(int type) {
-  return &s_line_reasons[type][0];
-}
-
 GColor data_get_line_color(int type) {
 #if defined(PBL_COLOR)
   switch(type) {
@@ -71,8 +63,12 @@ GColor data_get_line_color(int type) {
   return GColorBlack;
 }
 
-GColor data_get_line_state_color(int type) {
-  char *state = s_line_states[type];
+LineData* data_get_line(int index) {
+  return &s_line_data[index];
+}
+
+GColor data_get_line_state_color(int index) {
+  char *state = data_get_line(index)->state;
   
   // Minor, Part
   if (strstr(state, "inor") || strstr(state, "art")) {
@@ -112,6 +108,14 @@ int data_get_progress() {
 }
 
 bool data_get_line_has_reason(int index) {
-  char *reason = data_get_line_reason(index);
+  char *reason = data_get_line(index)->reason;
   return strlen(reason) != 0;
+}
+
+void data_set_progress_max(int max) {
+  s_progress_max = max;
+}
+
+int data_get_progress_max() {
+  return s_progress_max;
 }

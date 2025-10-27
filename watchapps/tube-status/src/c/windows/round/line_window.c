@@ -125,7 +125,7 @@ static void ring_update_proc(Layer *layer, GContext *ctx) {
   );
   graphics_draw_text(
     ctx,
-    data_get_line_state(s_selected_line),
+    data_get_line(s_selected_line)->state,
     fonts_get_system_font(FONT_KEY_GOTHIC_24),
     grect_inset(bounds, GEdgeInsets(name_y_margin + name_size.h, 0, 0, 0)),
     GTextOverflowModeWordWrap, 

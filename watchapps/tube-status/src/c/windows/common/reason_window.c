@@ -34,7 +34,7 @@ static void window_load(Window *window) {
 #endif
 
   // Get reason string
-  char *reason = data_get_line_reason(s_index);
+  char *reason = data_get_line(s_index)->reason;
 #ifdef PBL_PLATFORM_EMERY
   const char* font_key = FONT_KEY_GOTHIC_24_BOLD;
 #else

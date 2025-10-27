@@ -14,19 +14,25 @@ static void inbox_received_handler(DictionaryIterator *iter, void *context) {
     index = packet_get_integer(iter, MESSAGE_KEY_LineIndex);
     // APP_LOG(APP_LOG_LEVEL_DEBUG, "Index: %d", index);
 
-    char *line_state = data_get_line_state(index);
-    char *status = packet_get_string(iter, MESSAGE_KEY_LineStatus);
-    snprintf(line_state, strlen(status) + 1 /* EOF */, "%s", status);
+    LineData *line_data = data_get_line(index);
+    line_data->index = index;
+    line_data->type = packet_get_integer(iter, MESSAGE_KEY_LineType);
 
-    char *line_reason = data_get_line_reason(index);
+    char *status = packet_get_string(iter, MESSAGE_KEY_LineStatus);
+    snprintf(line_data->state, strlen(status) + 1 /* EOF */, "%s", status);
+
     char *reason = packet_get_string(iter, MESSAGE_KEY_LineReason);
-    snprintf(line_reason, strlen(reason) + 1 /* EOF */, "%s", reason);
+    snprintf(line_data->reason, strlen(reason) + 1 /* EOF */, "%s", reason);
   }
 
   data_set_progress(index);
+  data_set_progress_max(packet_get_integer(iter, MESSAGE_KEY_FlagLineCount));
   splash_window_update();
 
-  if (index == LineTypeMax - 1) {
+  if (
+    packet_contains_key(iter, MESSAGE_KEY_FlagIsComplete) &&
+    packet_get_integer(iter, MESSAGE_KEY_FlagIsComplete) == 1
+  ) {
     set_fast(false);
     line_window_push();
   }

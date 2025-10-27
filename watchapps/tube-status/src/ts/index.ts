@@ -20,6 +20,29 @@ type LineData = {
   reason: string;
 };
 
+/** Despite attempts to not rely on index, need to map these API IDs to C enum values */
+const LINE_TYPE_MAP: { [key in LineId]: number } = {
+  bakerloo: 0,
+  central: 1,
+  circle: 2,
+  district: 3,
+  dlr: 4,
+  elizabeth: 5,
+  'hammersmith-city': 6,
+  jubilee: 7,
+  liberty: 8,
+  lioness: 9,
+  metropolitan: 10,
+  mildmay: 11,
+  northern: 12,
+  piccadilly: 13,
+  suffragette: 14,
+  victoria: 15,
+  'waterloo-city': 16,
+  weaver: 17,
+  windrush: 18,
+};
+
 /** API modes to query */
 const MODES = ['tube', 'dlr', 'elizabeth-line', 'overground'];
 /** Number of lines the API returns */
@@ -36,22 +59,24 @@ const downloadStatus = async (): Promise<LineData[]> => {
   const json = await PebbleTS.fetchJSON(url) as TfLApiResult[];
   // console.log(JSON.stringify(json, null, 2));
 
-  return json.reduce((acc, obj: TfLApiResult): LineData[] => {
-    let reason = obj.lineStatuses[0].reason || '';
-    if (reason?.length > MAX_REASON_LENGTH) {
-      reason = reason?.substring(0, MAX_REASON_LENGTH - 4) + '...';
-    }
+  // Send only those with issues (will need better logic if a setting for this is implemented)
+  return json
+    .filter((obj: TfLApiResult) => obj.lineStatuses[0].statusSeverityDescription !== 'Good Service')
+    .reduce((acc, obj: TfLApiResult): LineData[] => {
+      let reason = obj.lineStatuses[0].reason || '';
+      if (reason?.length > MAX_REASON_LENGTH) {
+        reason = reason?.substring(0, MAX_REASON_LENGTH - 4) + '...';
+      }
 
-    // Order is very important and must match C side
-    return [
-      ...acc,
-      {
-        id: obj.id,
-        status: obj.lineStatuses[0].statusSeverityDescription || '?',
-        reason,
-      },
-    ];
-  }, []);
+      return [
+        ...acc,
+        {
+          id: obj.id,
+          status: obj.lineStatuses[0].statusSeverityDescription || '?',
+          reason,
+        },
+      ];
+    }, []);
 };
 
 /**
@@ -61,7 +86,7 @@ const downloadStatus = async (): Promise<LineData[]> => {
  * @param {number} index - Item to send.
  */
 const sendNextLine = async (data: LineData[], index: number) => {
-  if (index === NUM_LINES) {
+  if (index === data.length) {
     console.log('All data sent!');
     return;
   }
@@ -71,11 +96,14 @@ const sendNextLine = async (data: LineData[], index: number) => {
 
   const dict = {
     LineIndex: index,
+    LineType: LINE_TYPE_MAP[lineData.id as LineId],
     LineStatus: lineData.status,
     LineReason: lineData.reason,
+    FlagIsComplete: index === data.length - 1 ? 1 : 0,
+    FlagLineCount: data.length,
   };
   await PebbleTS.sendAppMessage(dict);
-  // console.log(`Sent item ${index}`);
+  console.log(`Sent item ${index}`);
 
   await sendNextLine(data, index + 1);
 };

@@ -27,7 +27,7 @@ static void progress_bar_update_proc(Layer *layer, GContext *ctx) {
   graphics_fill_rect(ctx, GRect(margin, 0, BAR_WIDTH - (2 * margin), (2 * margin) + 1), 0, GCornerNone);
   graphics_fill_circle(ctx, GPoint(BAR_WIDTH - margin, margin), margin);
 
-  int width = (data_get_progress() * BAR_WIDTH) / LineTypeMax;
+  int width = (data_get_progress() * BAR_WIDTH) / data_get_progress_max();
   graphics_context_set_fill_color(ctx, GColorWhite);
   graphics_fill_circle(ctx, GPoint(margin, margin), margin - 1);
   graphics_fill_rect(ctx, GRect(margin + 1, 1, width - 2, (2 * margin) - 1), 0, GCornerNone);
