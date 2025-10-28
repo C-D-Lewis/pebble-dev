@@ -54,12 +54,13 @@ const MAX_REASON_LENGTH = 256;
  * Download all lines statuses.
  * Available modes: https://api.tfl.gov.uk/StopPoint/Meta/modes
  */
-const downloadStatus = async (): Promise<LineData[]> => {
+const fetchLinesWithIssues = async (): Promise<LineData[]> => {
   const url = `https://api.tfl.gov.uk/line/mode/${MODES.join(',')}/status`;
   const json = await PebbleTS.fetchJSON(url) as TfLApiResult[];
   // console.log(JSON.stringify(json, null, 2));
 
   // Send only those with issues (will need better logic if a setting for this is implemented)
+  // return [];
   return json
     .filter((obj: TfLApiResult) => obj.lineStatuses[0].statusSeverityDescription !== 'Good Service')
     .reduce((acc, obj: TfLApiResult): LineData[] => {
@@ -82,16 +83,27 @@ const downloadStatus = async (): Promise<LineData[]> => {
 /**
  * Send next line's data.
  *
- * @param {LineData[]} data - All line data.
+ * @param {LineData[]} lines - Data for all lines with issues.
  * @param {number} index - Item to send.
  */
-const sendNextLine = async (data: LineData[], index: number) => {
-  if (index === data.length) {
+const sendNextLine = async (lines: LineData[], index: number) => {
+  // Everything is awesome!
+  if (lines.length === 0) {
+    const dict = {
+      FlagIsComplete: 1,
+      FlagLineCount: 0,
+    };
+    await PebbleTS.sendAppMessage(dict);
+    return;
+  }
+
+  // Completed
+  if (index === lines.length) {
     console.log('All data sent!');
     return;
   }
 
-  const lineData = data[index];
+  const lineData = lines[index];
   if (!lineData) throw new Error(`No lineData for ${index}`);
 
   const dict = {
@@ -99,22 +111,21 @@ const sendNextLine = async (data: LineData[], index: number) => {
     LineType: LINE_TYPE_MAP[lineData.id as LineId],
     LineStatus: lineData.status,
     LineReason: lineData.reason,
-    FlagIsComplete: index === data.length - 1 ? 1 : 0,
-    FlagLineCount: data.length,
+    FlagIsComplete: index === lines.length - 1 ? 1 : 0,
+    FlagLineCount: lines.length,
   };
   await PebbleTS.sendAppMessage(dict);
-  console.log(`Sent item ${index}`);
+  console.log(`Sent item ${index}: ${JSON.stringify(dict)}`);
 
-  await sendNextLine(data, index + 1);
+  await sendNextLine(lines, index + 1);
 };
 
 Pebble.addEventListener('ready', async (e) => {
   console.log('PebbleKit JS ready');
 
-  const lineData = await downloadStatus();
-
   try {
-    await sendNextLine(lineData, 0);
+    const lines = await fetchLinesWithIssues();
+    await sendNextLine(lines, 0);
   } catch (e) {
     console.log('Failed to send data');
     console.log(e);

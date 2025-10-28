@@ -119,3 +119,13 @@ void data_set_progress_max(int max) {
 int data_get_progress_max() {
   return s_progress_max;
 }
+
+int data_get_lines_received() {
+  int count = 0;
+  for (int i = 0; i < LineTypeMax; i++) {
+    if (strlen(s_line_data[i].state) != 0) {
+      count++;
+    }
+  }
+  return count;
+}

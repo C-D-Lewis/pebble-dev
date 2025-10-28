@@ -28,7 +28,8 @@ void draw_row_handler(GContext *ctx, const Layer *cell_layer, MenuIndex *cell_in
   GRect bounds = layer_get_bounds(cell_layer);
   int index = cell_index->row;
 
-  if (index >= data_get_progress_max()) {
+  int received = data_get_lines_received();
+  if (index >= received) {
     // All other lines good
     graphics_context_set_fill_color(ctx, GColorWhite);
     graphics_fill_rect(ctx, bounds, GCornerNone, 0);
@@ -36,14 +37,13 @@ void draw_row_handler(GContext *ctx, const Layer *cell_layer, MenuIndex *cell_in
     graphics_context_set_text_color(ctx, GColorBlack);
     graphics_draw_text(
       ctx,
-      "Good service on all other lines",
+      received == 0 ? "Good service on all lines" : "Good service on all other lines",
       fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD),
       bounds,
       GTextOverflowModeTrailingEllipsis,
       GTextAlignmentCenter,
       NULL
     );
-
     return;
   }
 
@@ -128,7 +128,7 @@ void draw_row_handler(GContext *ctx, const Layer *cell_layer, MenuIndex *cell_in
   // Show if reason can be viewed
   if (menu_layer_is_index_selected(s_menu_layer, cell_index) && data_get_line_has_reason(cell_index->row)) {
     // Background
-    graphics_context_set_fill_color(ctx, data_get_line_state_color(line_data->type));
+    graphics_context_set_fill_color(ctx, data_get_line_state_color(cell_index->row));
     graphics_fill_rect(
       ctx,
       grect_inset(bounds, GEdgeInsets(0, 0, 0, bounds.size.w - LOGO_MARGIN - 2)),
@@ -155,11 +155,17 @@ void draw_row_handler(GContext *ctx, const Layer *cell_layer, MenuIndex *cell_in
 
 uint16_t get_num_rows_handler(MenuLayer *menu_layer, uint16_t section_index, void *context) {
   // Number of concern sent by JS plus one for 'all others are good' notice
-  return data_get_progress_max() + 1;
+  return data_get_lines_received() + 1;
 }
 
 int16_t get_cell_height_handler(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) {
   return 45;
+}
+
+void selection_will_change_handler(struct MenuLayer *menu_layer, MenuIndex *new_index, MenuIndex old_index, void *context) {
+  if (new_index->row >= data_get_lines_received()) {
+    new_index->row = old_index.row;
+  }
 }
 
 /*********************************** Window ***********************************/
@@ -184,6 +190,7 @@ static void window_load(Window *window) {
     .get_num_rows = get_num_rows_handler,
     .get_cell_height = get_cell_height_handler,
     .select_click = select_click_handler,
+    .selection_will_change = selection_will_change_handler,
   });
   layer_add_child(window_layer, menu_layer_get_layer(s_menu_layer));
 }

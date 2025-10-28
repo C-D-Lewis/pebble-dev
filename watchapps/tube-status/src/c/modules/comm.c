@@ -26,8 +26,10 @@ static void inbox_received_handler(DictionaryIterator *iter, void *context) {
   }
 
   data_set_progress(index);
-  data_set_progress_max(packet_get_integer(iter, MESSAGE_KEY_FlagLineCount));
-  splash_window_update();
+  if (packet_contains_key(iter, MESSAGE_KEY_FlagLineCount)) {
+    data_set_progress_max(packet_get_integer(iter, MESSAGE_KEY_FlagLineCount));
+    splash_window_update();
+  }
 
   if (
     packet_contains_key(iter, MESSAGE_KEY_FlagIsComplete) &&

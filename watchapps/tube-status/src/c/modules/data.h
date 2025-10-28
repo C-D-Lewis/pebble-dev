@@ -34,3 +34,5 @@ void data_set_progress_max(int max);
 bool data_get_line_has_reason(int index);
 
 int data_get_progress_max();
+
+int data_get_lines_received();
