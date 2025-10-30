@@ -1,0 +1,55 @@
+{
+  "name": "z-hotel",
+  "version": "1.0.0",
+  "author": "Chris Lewis",
+  "private": true,
+  "dependencies": {
+    "pebble-events": "^1.2.0",
+    "pebble-packet": "^1.2.0"
+  },
+  "devDependencies": {
+    "pkts": "^0.2.1"
+  },
+  "scripts": {
+    "build": "pkts build"
+  },
+  "keywords": [
+    "pebble-app"
+  ],
+  "pebble": {
+    "sdkVersion": "3",
+    "resources": {
+      "media": [
+        {
+          "type": "bitmap",
+          "name": "IMAGE_APP_ICON",
+          "file": "images/app_icon.png",
+          "menuIcon": true
+        }
+      ]
+    },
+    "projectType": "native",
+    "uuid": "740121ae-a6b6-431e-b9b4-ea060d7ffb52",
+    "messageKeys": [
+      "HotelIndex",
+      "HotelName",
+      "HotelSummary",
+      "FlagHotelCount",
+      "FlagIsComplete",
+      "FlagUpdatedAt"
+    ],
+    "enableMultiJS": true,
+    "displayName": "Z Hotels",
+    "watchapp": {
+      "onlyShownOnCommunication": false,
+      "hiddenApp": false,
+      "watchface": false
+    },
+    "targetPlatforms": [
+      "aplite",
+      "basalt",
+      "diorite"
+    ],
+    "capabilities": []
+  }
+}
