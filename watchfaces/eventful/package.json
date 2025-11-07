@@ -37,7 +37,7 @@
         {
           "type": "font",
           "name": "DS_DIGIB_48",
-          "file": "fonts/DS-DIGIB.TTF"
+          "file": "fonts/DS-DIGIB.ttf"
         }
       ]
     }
