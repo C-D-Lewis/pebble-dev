@@ -37,6 +37,13 @@
           "file": "images/launcher.png",
           "menuIcon": true
         }
+      ],
+      "_publishedMedia": [
+        {
+          "name": "LAUNCHER_ICON",
+          "id": 1,
+          "glance": "LAUNCHER_ICON_TINY"
+        }
       ]
     },
     "projectType": "native",
