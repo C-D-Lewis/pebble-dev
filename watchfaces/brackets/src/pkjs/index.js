@@ -120,3 +120,7 @@ Pebble.addEventListener('ready', function() {
 
   getLocation();
 });
+
+Pebble.addEventListener('appmessage', function() {
+  getLocation();
+});

@@ -93,6 +93,13 @@ static void tick_handler(struct tm *tick_time, TimeUnits changed) {
     );
   }
   text_layer_set_text(s_time_layer, time_buffer);
+
+  // Weather refresh
+  if ((tick_time->tm_min == 0 || tick_time->tm_min == 30) && tick_time->tm_sec == 0) {
+    if (data_get_boolean(MESSAGE_KEY_WeatherStatus)) {
+      comm_request_weather();
+    }
+  }
 }
 
 static TextLayer* make_text_layer(GRect frame) {
@@ -103,7 +110,7 @@ static TextLayer* make_text_layer(GRect frame) {
 }
 
 static bool any_complication_enabled() {
-  return data_get_boolean(MESSAGE_KEY_BatteryAndBluetooth); // || weather
+  return data_get_boolean(MESSAGE_KEY_BatteryAndBluetooth) || data_get_boolean(MESSAGE_KEY_WeatherStatus);
 }
 
 static void window_load(Window *window) {

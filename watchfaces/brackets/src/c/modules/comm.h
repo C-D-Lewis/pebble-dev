@@ -7,3 +7,5 @@
 #include "../windows/main_window.h"
 
 void comm_init();
+
+void comm_request_weather();

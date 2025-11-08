@@ -28,3 +28,13 @@ void comm_init() {
   app_message_register_inbox_received(inbox_received_handler);
   app_message_open(512, 256);
 }
+
+void comm_request_weather() {
+  DictionaryIterator *iter;
+  app_message_outbox_begin(&iter);
+  
+  Tuplet value = TupletInteger(MESSAGE_KEY_WeatherRequest, 0);
+  dict_write_tuplet(iter, &value);
+  
+  app_message_outbox_send();
+}
