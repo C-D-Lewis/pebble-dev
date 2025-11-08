@@ -50,7 +50,7 @@ function build_project {
     echo ">>> Building $1"
     cd $1
 
-    if [[ "${PWD##*/}" == "test-app" ]] && grep -q '"pebble-package"' package.json 2>/dev/null; then
+    if [[ "${PWD##*/}" == "test-app" ]] && grep -q '"pebble-package"' test-app/package.json 2>/dev/null; then
       echo ">>> Detected test-app — building parent directory"
       cd ..
       $COMMAND build
