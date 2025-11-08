@@ -53,6 +53,13 @@ function build_project {
     $COMMAND build
     echo ">>> Exit code for $1: $?"
 
+    if [[ "${PWD##*/}" == "test-app" ]] && grep -q '"pebble-package"' package.json 2>/dev/null; then
+      echo ">>> Detected test-app — building parent directory"
+      cd ..
+      $COMMAND build
+      cd -
+    fi
+
     # Copy the build - note that generatedAt field means they will be new in git - disabled for now
     # name=$(basename $1)
     # cp "./build/$name.pbw" "../../pbw/$name.pbw"
