@@ -10,6 +10,6 @@ void data_set_boolean(uint32_t key, bool b);
 
 bool data_get_boolean(uint32_t key);
 
-void data_set_color(uint32_t key, GColor color);
+void data_set_weather_string(char *str);
 
-GColor data_get_color(uint32_t key);
+char* data_get_weather_string();

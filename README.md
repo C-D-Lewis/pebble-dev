@@ -19,7 +19,7 @@ Some PBWs can be found in `/pbw` for sideloading.
 | Name                  | Screenshot                                                 | Builds              | Icon | PBW                                |
 |-----------------------|------------------------------------------------------------|---------------------|------|------------------------------------|
 | `beam-up`             | ![](watchfaces/beam-up/screenshots/aplite.png)             | `A` `B` `C` `D`     | ✅    | [pbw](pbw/beam-up.pbw)             |
-| `brackets`            | ![](watchfaces/brackets/screenshots/aplite.png)            | `A` `B` `C` `D`     | ✅    | [pbw](pbw/brackets.pbw)            |
+| `brackets`            | ![](watchfaces/brackets/screenshots/basalt.png)            | `A` `B` `C` `D`     | ✅    | [pbw](pbw/brackets.pbw)            |
 | `cards`               | ![](watchfaces/cards/screenshots/diorite.png)              | `A` `B` `D`         |      | [pbw](pbw/cards.pbw)               |
 | `cmd-time-typed`      | ![](watchfaces/cmd-time-typed/screenshots/diorite.png)     | `A` `B` `C` `D` `E` | ✅    | [pbw](pbw/cmd-time-typed.pbw)      |
 | `cmd-time`            | ![](watchfaces/cmd-time/screenshots/diorite.png)           | `A` `B` `C` `D` `E` | ✅    | [pbw](pbw/cmd-time.pbw)            |
@@ -57,18 +57,18 @@ Some PBWs can be found in `/pbw` for sideloading.
 
 ## `libraries`
 
-| Name                      | Status | Test App |
-|---------------------------|--------|----------|
-| `InverterLayerCompat`     | ✅      | ✅        |
-| `notif-layer`             | ✅      | ✅        |
-| `pebble-isometric`        | ✅      | ✅        |
-| `pebble-packet`           | ✅      | ✅        |
-| `pebble-universal-fb`     | ✅      | ✅        |
-| `pge`                     | ✅      | ✅        |
-| `pebble-pge-simple`       |        |          |
-| `pebble-simple-request`   |        |          |
-| `pebble-timeline-js-node` |        |          |
-| `pebble-timeline-js`      |        |          |
+| Name                      | Status | Test App | Rebuilt? |
+|---------------------------|--------|----------|----------|
+| `InverterLayerCompat`     | ✅      | ✅        |          |
+| `notif-layer`             | ✅      | ✅        |          |
+| `pebble-isometric`        | ✅      | ✅        |          |
+| `pebble-packet`           | ✅      | ✅        | ✅        |
+| `pebble-universal-fb`     | ✅      | ✅        | ✅        |
+| `pge`                     | ✅      | ✅        |          |
+| `pebble-pge-simple`       |        |          |          |
+| `pebble-simple-request`   |        |          |          |
+| `pebble-timeline-js-node` |        |          |          |
+| `pebble-timeline-js`      |        |          |          |
 
 ## `other`
 
@@ -110,3 +110,4 @@ should be used instead
 - [x] Migrate all custom config to Clay.
 - [x] Verify correct tick unit used to save power.
 - [ ] Menu icons for all current watchfaces and watchapps
+- [ ] Rebuild and publish supported libraries with new SDK.

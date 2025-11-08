@@ -1,7 +1,7 @@
 {
   "name": "brackets",
   "author": "Chris Lewis",
-  "version": "1.5.0",
+  "version": "2.0.0",
   "private": true,
   "keywords": [
     "pebble-app"
@@ -30,41 +30,28 @@
       "media": [
         {
           "type": "font",
-          "name": "SHARE_20",
-          "file": "fonts/Share-TechMono.ttf",
-          "characterRegex": "[0-9%]"
-        },
-        {
-          "type": "font",
           "name": "SHARE_24",
           "file": "fonts/Share-TechMono.ttf",
-          "characterRegex": "[0-9A-GJ-PR-VY :]"
-        },
-        {
-          "type": "font",
-          "name": "SHARE_47",
-          "file": "fonts/Share-TechMono.ttf",
-          "characterRegex": "[ \\[\\]]"
+          "characterRegex": "[0-9A-Z :%.]"
         },
         {
           "type": "bitmap",
           "name": "MENU_ICON",
           "file": "images/menu_icon.png",
           "menuIcon": true
+        },
+        {
+          "type": "bitmap",
+          "name": "BRACKETS",
+          "file": "images/brackets.png"
         }
       ]
     },
     "messageKeys": [
-      "BatteryMeter",
-      "BluetoothAlert",
-      "DashedLine",
+      "BatteryAndBluetooth",
+      "WeatherStatus",
       "SecondTick",
-      "BackgroundColor",
-      "DateColor",
-      "TimeColor",
-      "BracketColor",
-      "LineColor",
-      "ComplicationColor"
+      "WeatherString"
     ]
   },
   "dependencies": {
