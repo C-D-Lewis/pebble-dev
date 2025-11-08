@@ -1,7 +1,7 @@
 {
   "name": "pebble-packet",
   "author": "Chris Lewis",
-  "version": "1.3.2",
+  "version": "1.4.0",
   "files": [
     "dist.zip"
   ],
@@ -9,7 +9,7 @@
     "pebble-package"
   ],
   "dependencies": {
-    "pebble-events": "^1.1.0"
+    "pebble-events": "^1.2.0"
   },
   "pebble": {
     "projectType": "package",
