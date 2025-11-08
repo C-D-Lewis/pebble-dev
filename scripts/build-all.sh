@@ -49,9 +49,6 @@ EOF
 function build_project {
     echo ">>> Building $1"
     cd $1
-    $COMMAND clean
-    $COMMAND build
-    echo ">>> Exit code for $1: $?"
 
     if [[ "${PWD##*/}" == "test-app" ]] && grep -q '"pebble-package"' package.json 2>/dev/null; then
       echo ">>> Detected test-app — building parent directory"
@@ -59,6 +56,10 @@ function build_project {
       $COMMAND build
       cd -
     fi
+
+    $COMMAND clean
+    $COMMAND build
+    echo ">>> Exit code for $1: $?"
 
     # Copy the build - note that generatedAt field means they will be new in git - disabled for now
     # name=$(basename $1)
