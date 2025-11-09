@@ -3,9 +3,17 @@
 set -eu
 
 COMMAND=${1:-pebble}
+INITIAL=$(pwd)
 
 # Projects expected to build successfully
 working_projects=$(cat <<EOF
+./libraries/pebble-packet/test-app/
+./libraries/pebble-universal-fb/test-app/
+./libraries/pebble-isometric/test-app/
+./libraries/notif-layer/test-app/
+./libraries/InverterLayerCompat/test-app/
+./libraries/pge/test-app/
+
 ./watchfaces/beam-up/
 ./watchfaces/brackets/
 ./watchfaces/cards/
@@ -36,35 +44,26 @@ working_projects=$(cat <<EOF
 ./watchapps/dashboard/pebble/
 ./watchapps/news-headlines/
 ./watchapps/tube-status/
-
-./libraries/notif-layer/test-app/
-./libraries/InverterLayerCompat/test-app/
-./libraries/pge/test-app/
-./libraries/pebble-packet/test-app/
-./libraries/pebble-isometric/test-app/
-./libraries/pebble-universal-fb/test-app/
 EOF
 )
 
 function build_project {
-    echo ">>> Building $1"
-    cd $1
+  echo ">>> Building $1"
+  cd $1
 
-    if [[ "${PWD##*/}" == "test-app" ]] && grep -q '"pebble-package"' test-app/package.json 2>/dev/null; then
-      echo ">>> Detected test-app — building parent directory"
-      cd ..
-      $COMMAND build
-      cd -
-    fi
-
-    $COMMAND clean
+  # Pebble packages will require dist populating on CI
+  if [[ "$PWD" == *pebble-* ]]; then
+    echo ">>> Detected pebble package — building parent directory first"
+    cd ..
     $COMMAND build
-    echo ">>> Exit code for $1: $?"
-
-    # Copy the build - note that generatedAt field means they will be new in git - disabled for now
-    # name=$(basename $1)
-    # cp "./build/$name.pbw" "../../pbw/$name.pbw"
     cd -
+  fi
+
+  $COMMAND clean
+  $COMMAND build
+  echo ">>> Exit code for $1: $?"
+
+  cd $INITIAL
 }
 
 function setup {
