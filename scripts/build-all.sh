@@ -52,7 +52,8 @@ function build_project {
   cd $1
 
   # Pebble packages will require dist populating on CI
-  if [[ "$PWD" == *pebble-* ]]; then
+  if [[ "$1" == *pebble-* ]]; then
+    echo $PWD
     echo ">>> Detected pebble package — building parent directory first"
     cd ..
     $COMMAND build
