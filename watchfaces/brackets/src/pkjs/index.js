@@ -40,13 +40,13 @@ function getWeatherStrFromCode(code) {
     case 65: // Heavy Rain
     case 66: // Light Freezing Rain
     case 67: // Heavy Freezing Rain
-      return "RAIN ";
+      return " RAIN";
     // Snow Fall and Snow Grains (71, 73, 75, 77)
     case 71: // Slight Snow fall
     case 73: // Moderate Snow fall
     case 75: // Heavy Snow fall
     case 77: // Snow grains
-      return "SNOW ";
+      return " SNOW";
     // Rain Showers (80, 81, 82)
     case 80: // Slight Rain showers
     case 81: // Moderate Rain showers
