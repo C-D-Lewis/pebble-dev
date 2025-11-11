@@ -1,0 +1,37 @@
+{
+  "name": "tiny-battery",
+  "author": "Chris Lewis",
+  "version": "1.0.0",
+  "private": true,
+  "keywords": [
+    "pebble-app"
+  ],
+  "pebble": {
+    "sdkVersion": "3",
+    "targetPlatforms": [
+      "aplite",
+      "basalt",
+      "chalk",
+      "diorite"
+    ],
+    "enableMultiJS": true,
+    "capabilities": [
+    ],
+    "projectType": "native",
+    "displayName": "Tiny Battery",
+    "uuid": "d008a08a-6e34-4cc4-98dc-bae02ce5e087",
+    "watchapp": {
+      "watchface": false,
+      "hiddenApp": false,
+      "onlyShownOnCommunication": false
+    },
+    "resources": {
+      "media": [
+      ]
+    },
+    "messageKeys": [
+    ]
+  },
+  "dependencies": {
+  }
+}
