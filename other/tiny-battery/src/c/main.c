@@ -3,7 +3,7 @@
 #include "modules/data.h"
 #include "modules/wakeup.h"
 
-#include "windows/main_window.h"
+#include "windows/stat_window.h"
 
 static void init() {
   data_init();
@@ -17,8 +17,11 @@ static void init() {
     wakeup_get_launch_event(&id, &reason);
     wakeup_handler(id, reason);
   } else {
-    main_window_push();
+    stat_window_push();
   }
+
+  // TODO: Detect if we missed a wakeup if the watch was off?
+  //       Notification or auto-re-enable?
 }
 
 static void deinit() {

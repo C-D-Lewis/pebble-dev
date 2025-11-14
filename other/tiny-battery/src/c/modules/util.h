@@ -2,4 +2,6 @@
 
 #include <pebble.h>
 
-TextLayer* util_make_text_layer(GRect frame);
+TextLayer* util_make_text_layer(GRect frame, GFont font);
+
+void util_fmt_time(int timestamp_s, char* buf, int buf_size);

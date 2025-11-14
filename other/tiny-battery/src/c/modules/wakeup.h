@@ -6,10 +6,7 @@
 
 #include "../windows/wakeup_window.h"
 
-// No wakeup scheduled anymore
-#define WAKEUP_NO_WAKEUP -1
-
-void wakeup_schedule_next();
+bool wakeup_schedule_next();
 
 void wakeup_unschedule();
 

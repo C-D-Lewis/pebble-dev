@@ -1,4 +1,4 @@
-#include "main_window.h"
+#include "wakeup_window.h"
 
 static Window *s_window;
 static TextLayer *s_summary_layer;
@@ -8,7 +8,7 @@ static void window_load(Window *window) {
   GRect bounds = layer_get_bounds(root_layer);
 
   // Current battery level
-  s_summary_layer = util_make_text_layer(GRect(10, 20, 144, 100));
+  s_summary_layer = util_make_text_layer(GRect(10, 20, 144, 100), fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD));
   text_layer_set_text(s_summary_layer, "Sample taken!");
   layer_add_child(root_layer, text_layer_get_layer(s_summary_layer));
 }
@@ -37,4 +37,5 @@ void wakeup_window_push() {
 
   // Pop after a while (progressbar?)
   app_timer_register(3000, timer_callback, NULL);
+  vibes_double_pulse();
 }

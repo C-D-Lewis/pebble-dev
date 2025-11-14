@@ -2,12 +2,10 @@
 
 #include <pebble.h>
 
-// Hours between wakeups
-// #define WAKEUP_INTERVAL_S (60 * 60 * 6) // 6 hours
-#define WAKEUP_INTERVAL_S (60 * 2) // 2 mins
+#include "../config.h"
 
 // If there is no data yet for this value
-#define NO_DATA -1
+#define DATA_EMPTY -1
 
 typedef enum {
   // Last time we stopped charging
@@ -16,19 +14,21 @@ typedef enum {
   SK_LastUpdateTime,
   // Last charge percent
   SK_LastChargePerc,
-  // Current discharge rate
-  SK_DischargeRate,
   // ID of the scheduled wakeup
   SK_WakeupId,
   // If we were charging on last update
   SK_WasPlugged,
-
-  // Base for stored discharge rates (previous 10)
-  SK_PreviousRatesBase = 100,
+  // Recent discharge rate values
+  SK_SampleData,
 
   // Max storage value used
-  SK_Max = 110
+  SK_Max = 10
 } StorageKey;
+
+typedef struct {
+  // History of discharge rate values used for averaging
+  int history[NUM_STORED_SAMPLES];
+} SampleData;
 
 void data_init();
 void data_deinit();
@@ -46,11 +46,15 @@ void data_set_last_update_time(int time);
 int data_get_last_charge_perc(void);
 void data_set_last_charge_perc(int perc);
 
-int data_get_discharge_rate(void);
-void data_set_discharge_rate(int rate);
-
 int data_get_wakeup_id();
 void data_set_wakeup_id(int id);
 
 bool data_get_was_plugged();
 void data_set_was_plugged(bool b);
+
+SampleData* data_get_sample_data();
+void data_push_sample_value(int v);
+
+int data_get_history_avg_rate();
+
+void data_sample_now();

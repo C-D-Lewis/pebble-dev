@@ -1,10 +1,11 @@
 #include "wakeup.h"
 
-void wakeup_schedule_next() {
+// TODO: Use retval for UI
+bool wakeup_schedule_next() {
   // Only once wakeup at a time
-  if (data_get_wakeup_id() != NO_DATA) {
+  if (data_get_wakeup_id() != DATA_EMPTY) {
     APP_LOG(APP_LOG_LEVEL_ERROR, "Wakeup already scheduled!");
-    return;
+    return false;
   }
 
   const time_t future = time(NULL) + WAKEUP_INTERVAL_S;
@@ -16,28 +17,29 @@ void wakeup_schedule_next() {
     // Verify scheduled
     if (!wakeup_query(id, NULL)) {
       APP_LOG(APP_LOG_LEVEL_ERROR, "Failed to schedule wakeup!");
-      return;
+      return false;
     }
 
     data_set_wakeup_id(id);
     APP_LOG(APP_LOG_LEVEL_INFO, "Scheduled wakeup: %d", id);
+    return true;
   } else {
     APP_LOG(APP_LOG_LEVEL_ERROR, "Failed to schedule wakeup: %d", id);
+    return false;
   }
 }
 
 void wakeup_unschedule() {
   wakeup_cancel_all();
-  data_set_wakeup_id(WAKEUP_NO_WAKEUP);
+  data_set_wakeup_id(DATA_EMPTY);
 
   APP_LOG(APP_LOG_LEVEL_INFO, "Unscheduled wakeup");
 }
 
-// Wait for 100% and charging before logging?
-
 void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
   // We popped
-  data_set_wakeup_id(NO_DATA);
+  data_set_wakeup_id(DATA_EMPTY);
+  wakeup_window_push();
 
   BatteryChargeState state = battery_state_service_peek();
   const bool is_plugged = state.is_plugged;
@@ -47,28 +49,32 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
   const time_t now = time(NULL);
 
   // First ever sample
-  if (last_update_time == NO_DATA) {
+  if (last_update_time == DATA_EMPTY) {
     APP_LOG(APP_LOG_LEVEL_INFO, "First sample!");
 
     data_set_discharge_start_time(now);
   } else {
-    if (data_get_was_plugged() && !is_plugged) {
-      APP_LOG(APP_LOG_LEVEL_INFO, "We are now discharging");
+    // Calculate change in charge
+    const int discharge_diff = data_get_last_charge_perc() - charge_percent;
 
-      data_set_discharge_start_time(now);
-    } else if (is_plugged) {
-      APP_LOG(APP_LOG_LEVEL_INFO, "Ignoring, plugged in");
+    // Calculate time since last sample
+    time_t diff_s = now - last_update_time;
+    if (diff_s == 0) diff_s = 1;
+    APP_LOG(APP_LOG_LEVEL_INFO, "diff_s: %ds, discharge_diff: %d%%", (int)diff_s, discharge_diff);
+
+    if (is_plugged || discharge_diff < 0) {
+      APP_LOG(APP_LOG_LEVEL_INFO, "Ignoring, plugged in or recently charged");
     } else {
-      // Calculate time since last sample
-      const time_t diff = now - last_update_time;
-      APP_LOG(APP_LOG_LEVEL_INFO, "Time diff: %ds", (int)diff);
+      if ((data_get_was_plugged() && !is_plugged)) {
+        data_set_discharge_start_time(now);
+      }
 
-      // Calculate change in charge
-      const int charge_diff = data_get_last_charge_perc() - charge_percent;
-      APP_LOG(APP_LOG_LEVEL_INFO, "Charge diff: %d", charge_diff);
-
-      // Calculate new discharge rate (inc. old value)
-      // % per hour = start_perc - end_perc / hour_diff
+      // Calculate new discharge rate
+      // This is done every 12 hours according to WAKEUP_INTERVAL_S
+      // Therefore we can derive the daily rate based on the interval in seconds
+      const int perc_per_day = (discharge_diff * SECONDS_PER_DAY) / WAKEUP_INTERVAL_S;
+      data_push_sample_value(perc_per_day);
+      APP_LOG(APP_LOG_LEVEL_INFO, "perc_per_day: %d", perc_per_day);
     }
   }
 
@@ -77,10 +83,8 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
   data_set_was_plugged(is_plugged);
   data_set_last_charge_perc(charge_percent);
 
+  data_log_state();
+
   // Re-schedule next sample
   wakeup_schedule_next();
-
-  // Show UI
-  data_log_state();
-  wakeup_window_push();
 }
