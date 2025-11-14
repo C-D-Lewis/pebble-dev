@@ -3,7 +3,6 @@
 #include "modules/data.h"
 #include "modules/wakeup.h"
 
-#include "windows/stat_window.h"
 #include "windows/main_window.h"
 
 static void battery_handler(BatteryChargeState state) {
