@@ -9,3 +9,6 @@
 #include "../modules/util.h"
 
 void stat_window_push();
+
+void stat_window_update_data();
+

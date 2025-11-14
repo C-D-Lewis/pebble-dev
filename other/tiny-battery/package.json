@@ -27,6 +27,11 @@
     },
     "resources": {
       "media": [
+        {
+          "type": "png",
+          "name": "WRITING",
+          "file": "images/writing.png"
+        }
       ]
     },
     "messageKeys": [

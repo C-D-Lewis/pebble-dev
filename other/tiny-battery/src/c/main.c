@@ -5,6 +5,18 @@
 
 #include "windows/stat_window.h"
 
+static void battery_handler(BatteryChargeState state) {
+  // Un/plugged while app is open
+  if (data_get_was_plugged() && !state.is_plugged) {
+    const time_t now = time(NULL);
+    data_set_discharge_start_time(now);
+  }
+
+  data_set_was_plugged(state.is_plugged);
+
+  stat_window_update_data();
+}
+
 static void init() {
   data_init();
 
@@ -19,6 +31,10 @@ static void init() {
   } else {
     stat_window_push();
   }
+
+  // If app is open, get more accurate battery data
+  battery_state_service_subscribe(battery_handler);
+  battery_handler(battery_state_service_peek());
 
   // TODO: Detect if we missed a wakeup if the watch was off?
   //       Notification or auto-re-enable?

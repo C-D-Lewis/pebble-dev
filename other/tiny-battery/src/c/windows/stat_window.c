@@ -4,7 +4,7 @@ static Window *s_window;
 static StatusBarLayer *s_status_bar;
 static TextLayer *s_enabled_layer, *s_stats_layer, *s_history_layer;;
 
-static void update_data() {
+void stat_window_update_data() {
   bool is_enabled = data_get_wakeup_id() != DATA_EMPTY;
   time_t wakeup_ts;
   wakeup_query(data_get_wakeup_id(), &wakeup_ts);
@@ -14,6 +14,7 @@ static void update_data() {
   text_layer_set_text(s_enabled_layer, s_enabled_buff);
 
   text_layer_set_text(s_stats_layer, "");
+  text_layer_set_text(s_history_layer, "");
 
   if (is_enabled) {
     // Current stats
@@ -102,24 +103,11 @@ static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
     wakeup_unschedule();
   }
 
-  update_data();
+  stat_window_update_data();
 }
 
 static void click_config_provider(void *context) {
   window_single_click_subscribe(BUTTON_ID_SELECT, select_click_handler);
-}
-
-// TODO: Move to main.c
-static void battery_handler(BatteryChargeState state) {
-  // Un/plugged while app is open
-  if (data_get_was_plugged() && !state.is_plugged) {
-    const time_t now = time(NULL);
-    data_set_discharge_start_time(now);
-  }
-
-  data_set_was_plugged(state.is_plugged);
-
-  update_data();
 }
 
 void stat_window_push() {
@@ -134,9 +122,5 @@ void stat_window_push() {
 
   window_stack_push(s_window, true);
 
-  // If app is open, get more accurate battery data
-  battery_state_service_subscribe(battery_handler);
-  battery_handler(battery_state_service_peek());
-
-  update_data();
+  stat_window_update_data();
 }
