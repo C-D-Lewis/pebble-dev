@@ -29,6 +29,16 @@
       "media": [
         {
           "type": "png",
+          "name": "AWAKE",
+          "file": "images/awake.png"
+        },
+        {
+          "type": "png",
+          "name": "ASLEEP",
+          "file": "images/asleep.png"
+        },
+        {
+          "type": "png",
           "name": "WRITING",
           "file": "images/writing.png"
         }

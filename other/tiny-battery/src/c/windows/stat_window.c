@@ -5,6 +5,8 @@ static StatusBarLayer *s_status_bar;
 static TextLayer *s_enabled_layer, *s_stats_layer, *s_history_layer;;
 
 void stat_window_update_data() {
+  if (!s_window) return;
+
   bool is_enabled = data_get_wakeup_id() != DATA_EMPTY;
   time_t wakeup_ts;
   wakeup_query(data_get_wakeup_id(), &wakeup_ts);
@@ -89,27 +91,6 @@ static void window_unload(Window *window) {
   s_window = NULL;
 }
 
-static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
-}
-
-static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
-  bool should_enable = data_get_wakeup_id() == DATA_EMPTY;
-
-  if (should_enable) {
-    data_prepare();
-    data_sample_now();
-    wakeup_schedule_next();
-  } else {
-    wakeup_unschedule();
-  }
-
-  stat_window_update_data();
-}
-
-static void click_config_provider(void *context) {
-  window_single_click_subscribe(BUTTON_ID_SELECT, select_click_handler);
-}
-
 void stat_window_push() {
   if (!s_window) {
     s_window = window_create();
@@ -117,7 +98,6 @@ void stat_window_push() {
       .load = window_load,
       .unload = window_unload,
     });
-    window_set_click_config_provider(s_window, click_config_provider);
   }
 
   window_stack_push(s_window, true);

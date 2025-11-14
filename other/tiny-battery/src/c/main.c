@@ -4,6 +4,7 @@
 #include "modules/wakeup.h"
 
 #include "windows/stat_window.h"
+#include "windows/main_window.h"
 
 static void battery_handler(BatteryChargeState state) {
   // Un/plugged while app is open
@@ -29,7 +30,7 @@ static void init() {
     wakeup_get_launch_event(&id, &reason);
     wakeup_handler(id, reason);
   } else {
-    stat_window_push();
+    main_window_push();
   }
 
   // If app is open, get more accurate battery data
