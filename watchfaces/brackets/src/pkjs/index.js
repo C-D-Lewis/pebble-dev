@@ -26,7 +26,7 @@ function getWeatherStrFromCode(code) {
     // Fog and Rime Fog (45, 48)
     case 45: // Fog
     case 48: // Depositing rime fog
-      return "FOG  ";
+      return "  FOG";
     // Drizzle (51, 53, 55) & Freezing Drizzle (56, 57)
     case 51: // Light Drizzle
     case 53: // Moderate Drizzle
