@@ -6,7 +6,7 @@
 
 #include "../windows/wakeup_window.h"
 
-bool wakeup_schedule_next();
+void wakeup_schedule_next();
 
 void wakeup_unschedule();
 

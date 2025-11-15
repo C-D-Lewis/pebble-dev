@@ -1,31 +1,40 @@
 #include "wakeup.h"
 
 // TODO: Use retval for UI
-bool wakeup_schedule_next() {
+void wakeup_schedule_next() {
   // Only once wakeup at a time
   if (data_get_wakeup_id() != DATA_EMPTY) {
     APP_LOG(APP_LOG_LEVEL_ERROR, "Wakeup already scheduled!");
-    return false;
+    data_set_error("Wakeup already scheduled");
+    return;
   }
 
-  const time_t future = time(NULL) + WAKEUP_INTERVAL_S;
-  const int cookie = 0;
-  const int id = wakeup_schedule(future, cookie, false);
+  // Next 12 o'clock, then every 12h after
+  const time_t temp = time(NULL);
+  const struct tm *now = gmtime(&temp);
+  
+  // Timestamp in seconds until next mid-day or mid-night, whichever is closest to now
+  const int seconds_today = now->tm_hour * 3600 + now->tm_min * 60 + now->tm_sec;
+  const int target = (seconds_today < 12 * 3600) ? (12 * 3600) : (24 * 3600);
+  const int interval_s = target - seconds_today;
+  const time_t future = temp + interval_s;
+  APP_LOG(APP_LOG_LEVEL_INFO, "Seconds until next 12h: %d", interval_s);
+  const int id = wakeup_schedule(future, 0, false);
 
   // Check the scheduling was successful
   if (id >= 0) {
     // Verify scheduled
     if (!wakeup_query(id, NULL)) {
       APP_LOG(APP_LOG_LEVEL_ERROR, "Failed to schedule wakeup!");
-      return false;
+      data_set_error("Scheduled wakeup not found");
+      return;
     }
 
     data_set_wakeup_id(id);
     APP_LOG(APP_LOG_LEVEL_INFO, "Scheduled wakeup: %d", id);
-    return true;
   } else {
     APP_LOG(APP_LOG_LEVEL_ERROR, "Failed to schedule wakeup: %d", id);
-    return false;
+    data_set_error("Failed to schedule wakeup");
   }
 }
 

@@ -21,16 +21,16 @@ void stat_window_update_data() {
   if (is_enabled) {
     // Current stats
     static char s_values_buff[128];
-    static char s_fmt_discharge_buff[8];
-    static char s_fmt_update_buff[8];
-    static char s_fmt_wakeup_buff[8];
+    static char s_fmt_discharge_buff[16];
+    static char s_fmt_update_buff[16];
+    static char s_fmt_wakeup_buff[16];
     util_fmt_time(data_get_discharge_start_time(), &s_fmt_discharge_buff[0], sizeof(s_fmt_discharge_buff));
     util_fmt_time(data_get_last_update_time(), &s_fmt_update_buff[0], sizeof(s_fmt_update_buff));
     util_fmt_time(wakeup_ts, &s_fmt_wakeup_buff[0], sizeof(s_fmt_wakeup_buff));
     snprintf(
       s_values_buff,
       sizeof(s_values_buff),
-      "Unplugged: %s\nLast sample: %s\nNext sample: %s\nLast value: %d\nWas plugged: %s",
+      "Unplugged: %s\nLast sample: %s\nNext sample: %s\nLast value: %d\nWas plugged in: %s",
       &s_fmt_discharge_buff[0],
       &s_fmt_update_buff[0],
       &s_fmt_wakeup_buff[0],
@@ -45,7 +45,7 @@ void stat_window_update_data() {
     snprintf(
       s_history_buff,
       sizeof(s_history_buff),
-      "Recent values:\n%d, %d, %d, %d, %d, %d\nAverage: %d",
+      "Recent samples:\n%d, %d, %d, %d, %d, %d\nAverage estimate: %d",
       sample_data->history[0],
       sample_data->history[1],
       sample_data->history[2],
@@ -60,7 +60,6 @@ void stat_window_update_data() {
 
 static void window_load(Window *window) {
   Layer *root_layer = window_get_root_layer(window);
-  GRect bounds = layer_get_bounds(root_layer);
 
   GFont sys_14 = fonts_get_system_font(FONT_KEY_GOTHIC_14);
   GFont sys_18 = fonts_get_system_font(FONT_KEY_GOTHIC_18);

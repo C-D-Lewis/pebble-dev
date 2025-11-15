@@ -1,11 +1,20 @@
 #include "data.h"
 
+// Persisted
 static int s_discharge_start_time;
 static int s_last_update_time;
 static int s_last_charge_perc;
 static int s_wakeup_id;
 static bool s_was_plugged;
 static SampleData s_sample_data;
+
+// Not persisted
+static char s_error_buff[64];
+
+// Test
+#if defined(TEST_DATA)
+static SampleData s_test_data;
+#endif
 
 void save_all() {
   persist_write_int(SK_DischargeStartTime, s_discharge_start_time);
@@ -91,50 +100,6 @@ void data_deinit() {
   save_all();
 }
 
-int data_get_discharge_start_time() {
-  return s_discharge_start_time;
-}
-
-void data_set_discharge_start_time(int time) {
-  s_discharge_start_time = time;
-}
-
-int data_get_last_update_time() {
-  return s_last_update_time;
-}
-
-void data_set_last_update_time(int time) {
-  s_last_update_time = time;
-}
-
-int data_get_last_charge_perc() {
-  return s_last_charge_perc;
-}
-
-void data_set_last_charge_perc(int perc) {
-  s_last_charge_perc = perc;
-}
-
-int data_get_wakeup_id() {
-  return s_wakeup_id;
-}
-
-void data_set_wakeup_id(int id) {
-  s_wakeup_id = id;
-}
-
-bool data_get_was_plugged() {
-  return s_was_plugged;
-}
-
-void data_set_was_plugged(bool b) {
-  s_was_plugged = b;
-}
-
-SampleData* data_get_sample_data() {
-  return &s_sample_data;
-}
-
 void data_push_sample_value(int v) {
   // Shift right
   for (int i = NUM_STORED_SAMPLES - 1; i > 0; i--) {
@@ -144,14 +109,32 @@ void data_push_sample_value(int v) {
 }
 
 int data_get_history_avg_rate() {
+  SampleData *data = data_get_sample_data();
+
   int acc = 0;
   int counted = 0;
   for (int i = 0; i < NUM_STORED_SAMPLES; i++) {
-    if (s_sample_data.history[i] == DATA_EMPTY) continue;
-    acc += s_sample_data.history[i];
+    if (data->history[i] == DATA_EMPTY) continue;
+    
+    acc += data->history[i];
     counted++;
   }
+
+  if (counted == 0) return DATA_EMPTY;
   return acc / counted;
+}
+
+int data_calculate_days_remaining() {
+  int rate = data_get_history_avg_rate();
+  int remaining = data_get_last_charge_perc();
+
+  if (rate == DATA_EMPTY || remaining == DATA_EMPTY) return DATA_EMPTY;
+  if (rate <= 0) {
+    APP_LOG(APP_LOG_LEVEL_ERROR, "Somehow rate was negative");
+    return DATA_EMPTY;
+  }
+
+  return remaining / rate;
 }
 
 void data_sample_now() {
@@ -166,4 +149,79 @@ void data_sample_now() {
 
   data_set_discharge_start_time(now);
   data_set_last_update_time(now);
+}
+
+int data_get_discharge_start_time() {
+#if defined(TEST_DATA)
+  return time(NULL) - 6 * SECONDS_PER_HOUR;
+#endif
+  return s_discharge_start_time;
+}
+
+void data_set_discharge_start_time(int time) {
+  s_discharge_start_time = time;
+}
+
+int data_get_last_update_time() {
+#if defined(TEST_DATA)
+  return time(NULL) - SECONDS_PER_HOUR;
+#endif
+  return s_last_update_time;
+}
+
+void data_set_last_update_time(int time) {
+  s_last_update_time = time;
+}
+
+int data_get_last_charge_perc() {
+#if defined(TEST_DATA)
+  return 50;
+#endif
+  return s_last_charge_perc;
+}
+
+void data_set_last_charge_perc(int perc) {
+  s_last_charge_perc = perc;
+}
+
+int data_get_wakeup_id() {
+  // Probably can't fake this
+  // #if defined(TEST_DATA)
+  //   return time(NULL) + (6 * SECONDS_PER_DAY);
+  // #endif
+  return s_wakeup_id;
+}
+
+void data_set_wakeup_id(int id) {
+  s_wakeup_id = id;
+}
+
+bool data_get_was_plugged() {
+#if defined(TEST_DATA)
+  return false;
+#endif
+  return s_was_plugged;
+}
+
+void data_set_was_plugged(bool b) {
+  s_was_plugged = b;
+}
+
+SampleData* data_get_sample_data() {
+#if defined(TEST_DATA)
+  for (int i = 0; i < NUM_STORED_SAMPLES; i++) {
+    s_test_data.history[i] = 2 * i;
+  }
+  return &s_test_data;
+#endif
+  return &s_sample_data;
+}
+
+void data_set_error(char *err) {
+  snprintf(s_error_buff, sizeof(s_error_buff), "Error: %s", err);
+  error_window_push();
+}
+
+char* data_get_error() {
+  return &s_error_buff[0];
 }

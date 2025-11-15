@@ -17,3 +17,6 @@
 
 // Wipe data on launch (debugging use)
 // #define WIPE_ON_LAUNCH true
+
+// Test data
+// #define TEST_DATA true

@@ -4,6 +4,8 @@
 
 #include "../config.h"
 
+#include "../windows/error_window.h"
+
 // If there is no data yet for this value
 #define DATA_EMPTY -1
 
@@ -37,6 +39,14 @@ void data_prepare();
 
 void data_log_state();
 
+void data_push_sample_value(int v);
+
+int data_get_history_avg_rate();
+
+int data_calculate_days_remaining();
+
+void data_sample_now();
+
 int data_get_discharge_start_time(void);
 void data_set_discharge_start_time(int time);
 
@@ -53,8 +63,6 @@ bool data_get_was_plugged();
 void data_set_was_plugged(bool b);
 
 SampleData* data_get_sample_data();
-void data_push_sample_value(int v);
 
-int data_get_history_avg_rate();
-
-void data_sample_now();
+void data_set_error(char *err);
+char* data_get_error();
