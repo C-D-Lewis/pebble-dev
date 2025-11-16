@@ -8,6 +8,11 @@ TextLayer* util_make_text_layer(GRect frame, GFont font) {
 }
 
 void util_fmt_time(int timestamp_s, char* buf, int buf_size) {
+  if (timestamp_s == DATA_EMPTY) {
+    snprintf(buf, buf_size, "-");
+    return;
+  }
+
   const time_t t = (time_t)timestamp_s;
   const struct tm *tm_info = gmtime(&t);
   const int hours = tm_info->tm_hour;
@@ -19,15 +24,28 @@ void util_fmt_time(int timestamp_s, char* buf, int buf_size) {
 void util_fmt_time_ago(int then, char *buf, int buf_size) {
   const time_t t = (time_t)then;
   const time_t now = time(NULL);
-  const int diff_s = now - then;
-
-  int value = (diff_s < SECONDS_PER_DAY) ? (diff_s / 3600) : (diff_s / (SECONDS_PER_DAY));
-  APP_LOG(APP_LOG_LEVEL_INFO, "%d %d %d %d", (int)t, (int)now, diff_s, value);
-  const char *unit = diff_s < SECONDS_PER_DAY ? "h" : "d";
+  int diff_s = now - then;
 
   // Nudge: always a positive amount of time for display purposes
-  if (value < 0) {
-    value *= -1;
+  if (diff_s < 0) {
+    diff_s *= -1;
+  }
+
+  int value = 0;
+  // APP_LOG(APP_LOG_LEVEL_INFO, "%d %d %d %d", (int)t, (int)now, diff_s, value);
+  const char *unit;
+  if (diff_s < 60) {
+    value = diff_s;
+    unit = "s";
+  } else if (diff_s < 3600) {
+    value = diff_s / 60;
+    unit = "m";
+  } else if (diff_s < SECONDS_PER_DAY) {
+    value = diff_s / 3600;
+    unit = "h";
+  } else {
+    value = diff_s / SECONDS_PER_DAY;
+    unit = "d";
   }
 
   snprintf(buf, buf_size, "%d %s", value, unit);

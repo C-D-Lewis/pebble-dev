@@ -11,7 +11,6 @@
     "targetPlatforms": [
       "aplite",
       "basalt",
-      "chalk",
       "diorite"
     ],
     "enableMultiJS": true,
@@ -61,6 +60,11 @@
           "type": "png",
           "name": "RATE",
           "file": "images/rate.png"
+        },
+        {
+          "type": "png",
+          "name": "BRAID",
+          "file": "images/braid.png"
         }
       ]
     },
