@@ -19,10 +19,16 @@ void util_fmt_time(int timestamp_s, char* buf, int buf_size) {
 void util_fmt_time_ago(int then, char *buf, int buf_size) {
   const time_t t = (time_t)then;
   const time_t now = time(NULL);
-  // const struct tm *tm_info = gmtime(&t);
   const int diff_s = now - then;
 
-  const int value = (diff_s < SECONDS_PER_DAY) ? (diff_s / 3600) : (diff_s / (SECONDS_PER_DAY));
-  const char *unit = diff_s < SECONDS_PER_DAY ? "hour" : "day";
-  snprintf(buf, buf_size, "%d %s%s ago", value, unit, value == 1 ? "" : "s");
+  int value = (diff_s < SECONDS_PER_DAY) ? (diff_s / 3600) : (diff_s / (SECONDS_PER_DAY));
+  APP_LOG(APP_LOG_LEVEL_INFO, "%d %d %d %d", (int)t, (int)now, diff_s, value);
+  const char *unit = diff_s < SECONDS_PER_DAY ? "h" : "d";
+
+  // Nudge: always a positive amount of time for display purposes
+  if (value < 0) {
+    value *= -1;
+  }
+
+  snprintf(buf, buf_size, "%d %s", value, unit);
 }

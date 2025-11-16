@@ -35,17 +35,17 @@ typedef struct {
 void data_init();
 void data_deinit();
 
+void data_log_state();
+
 void data_prepare();
 
-void data_log_state();
+void data_initial_sample();
 
 void data_push_sample_value(int v);
 
 int data_get_history_avg_rate();
 
 int data_calculate_days_remaining();
-
-void data_sample_now();
 
 int data_get_discharge_start_time(void);
 void data_set_discharge_start_time(int time);

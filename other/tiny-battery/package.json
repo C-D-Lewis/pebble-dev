@@ -41,6 +41,26 @@
           "type": "png",
           "name": "WRITING",
           "file": "images/writing.png"
+        },
+        {
+          "type": "png",
+          "name": "STARTED",
+          "file": "images/started.png"
+        },
+        {
+          "type": "png",
+          "name": "READING",
+          "file": "images/reading.png"
+        },
+        {
+          "type": "png",
+          "name": "REMAINING",
+          "file": "images/remaining.png"
+        },
+        {
+          "type": "png",
+          "name": "RATE",
+          "file": "images/rate.png"
         }
       ]
     },

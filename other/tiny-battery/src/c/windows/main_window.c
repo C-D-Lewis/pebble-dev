@@ -1,56 +1,76 @@
 #include "main_window.h"
 
 static Window *s_window;
-static BitmapLayer *s_image_layer;
 static TextLayer
   *s_status_label_layer,
   *s_status_value_layer,
-  *s_next_action_layer,
+  *s_desc_layer,
   *s_started_layer,
-  *s_remain_label_layer,
-  *s_remain_days_layer;
-static GBitmap *s_image_bitmap;
+  *s_reading_layer,
+  *s_remaining_layer,
+  *s_rate_layer;
+static BitmapLayer
+  *s_mascot_layer,
+  *s_started_bmp_layer,
+  *s_reading_bmp_layer,
+  *s_remaining_bmp_layer,
+  *s_rate_bmp_layer;
+static GBitmap
+  *s_mascot_bitmap,
+  *s_started_bitmap,
+  *s_reading_bitmap,
+  *s_remaining_bitmap,
+  *s_rate_bitmap;
 
 static void update_data() {
-  gbitmap_destroy(s_image_bitmap);
+  gbitmap_destroy(s_mascot_bitmap);
 
   bool is_enabled = data_get_wakeup_id() != DATA_EMPTY;
-  s_image_bitmap = gbitmap_create_with_resource(is_enabled ? RESOURCE_ID_AWAKE : RESOURCE_ID_ASLEEP);
+  s_mascot_bitmap = gbitmap_create_with_resource(is_enabled ? RESOURCE_ID_AWAKE : RESOURCE_ID_ASLEEP);
 
-  bitmap_layer_set_bitmap(s_image_layer, s_image_bitmap);
+  bitmap_layer_set_bitmap(s_mascot_layer, s_mascot_bitmap);
   text_layer_set_text(s_status_value_layer, is_enabled ? "AWAKE" : "ASLEEP");
 
-  // Next action?
   if (!is_enabled) {
-    text_layer_set_text(s_next_action_layer, "Not monitoring battery");
-    text_layer_set_text(s_started_layer, "");
-    text_layer_set_text(s_remain_label_layer, "");
-    text_layer_set_text(s_remain_days_layer, "");
+    text_layer_set_text(s_desc_layer, "Not monitoring battery");
+    text_layer_set_text(s_started_layer, "-");
+    text_layer_set_text(s_reading_layer, "-");
+    text_layer_set_text(s_remaining_layer, "-");
+    text_layer_set_text(s_rate_layer, "-");
   } else {
+    text_layer_set_text(s_desc_layer, "Passively monitoring");
+
+    // Started
+    static char s_started_buff[16];
+    util_fmt_time_ago(data_get_discharge_start_time(), &s_started_buff[0], sizeof(s_started_buff));
+    text_layer_set_text(s_started_layer, s_started_buff);
+
+    // // Next reading
     time_t wakeup_ts;
     wakeup_query(data_get_wakeup_id(), &wakeup_ts);
 
-    static char s_fmt_wakeup_buff[16];
-    util_fmt_time(wakeup_ts, &s_fmt_wakeup_buff[0], sizeof(s_fmt_wakeup_buff));
-    static char s_action_buff[32];
-    snprintf(s_action_buff, sizeof(s_action_buff), "Next sample %s", &s_fmt_wakeup_buff[0]);
-    text_layer_set_text(s_next_action_layer, s_action_buff);
+    static char s_wakeup_buff[8];
+    util_fmt_time_ago(wakeup_ts, &s_wakeup_buff[0], sizeof(s_wakeup_buff));
+    text_layer_set_text(s_reading_layer, s_wakeup_buff);
 
-    static char s_fmt_started_buff[16];
-    util_fmt_time_ago(data_get_discharge_start_time(), &s_fmt_started_buff[0], sizeof(s_fmt_started_buff));
-    static char s_started_buff[32];
-    snprintf(s_started_buff, sizeof(s_started_buff), "Started %s", &s_fmt_started_buff[0]);
-    text_layer_set_text(s_started_layer, s_started_buff);
-
-    text_layer_set_text(s_remain_label_layer, "Est. remaining");
-
+    // // Days remaining
     const int days_remaining = data_calculate_days_remaining();
     if (days_remaining == DATA_EMPTY) {
-      text_layer_set_text(s_remain_days_layer, "-");
+      text_layer_set_text(s_remaining_layer, "-");
     } else {
       static char s_remaining_buff[16];
-      snprintf(s_remaining_buff, sizeof(s_remaining_buff), "%d days", days_remaining);
-      text_layer_set_text(s_remain_days_layer, s_remaining_buff);
+      snprintf(s_remaining_buff, sizeof(s_remaining_buff), "%d d", days_remaining);
+      text_layer_set_text(s_remaining_layer, s_remaining_buff);
+    }
+
+    // Rate per day
+    const int rate = data_get_history_avg_rate();
+    if (rate == DATA_EMPTY) {
+      text_layer_set_text(s_rate_layer, "-");
+    } else {
+      static char s_rate_buff[16];
+      snprintf(s_rate_buff, sizeof(s_rate_buff), "%d%%/d", rate);
+      text_layer_set_text(s_rate_layer, s_rate_buff);
     }
   }
 }
@@ -60,7 +80,7 @@ static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
 
   if (should_enable) {
     data_prepare();
-    data_sample_now();
+    data_initial_sample();
     wakeup_schedule_next();
 
     vibes_double_pulse();
@@ -84,45 +104,93 @@ static void window_load(Window *window) {
   Layer *root_layer = window_get_root_layer(window);
 
   GFont sys_18 = fonts_get_system_font(FONT_KEY_GOTHIC_18);
-  GFont sys_18_bold = fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD);
+  GFont sys_24 = fonts_get_system_font(FONT_KEY_GOTHIC_24);
   GFont sys_28_bold = fonts_get_system_font(FONT_KEY_GOTHIC_28_BOLD);
 
-  s_image_layer = bitmap_layer_create(GRect(5, 5, 64, 64));
-  bitmap_layer_set_compositing_mode(s_image_layer, GCompOpSet);
-  layer_add_child(root_layer, bitmap_layer_get_layer(s_image_layer));
+  // Mascot
+  s_mascot_bitmap = gbitmap_create_with_resource(RESOURCE_ID_AWAKE);
+  s_mascot_layer = bitmap_layer_create(GRect(5, 0, 64, 64));
+  bitmap_layer_set_compositing_mode(s_mascot_layer, GCompOpSet);
+  bitmap_layer_set_bitmap(s_mascot_layer, s_mascot_bitmap);
+  layer_add_child(root_layer, bitmap_layer_get_layer(s_mascot_layer));
 
   s_status_label_layer = util_make_text_layer(GRect(72, 10, WIDTH - 75, 100), sys_18);
   text_layer_set_text(s_status_label_layer, "Muninn is");
   layer_add_child(root_layer, text_layer_get_layer(s_status_label_layer));
 
-  s_status_value_layer = util_make_text_layer(GRect(71, 22, WIDTH - 75, 100), sys_28_bold);
+  s_status_value_layer = util_make_text_layer(GRect(71, 23, WIDTH - 75, 100), sys_28_bold);
   layer_add_child(root_layer, text_layer_get_layer(s_status_value_layer));
 
-  s_next_action_layer = util_make_text_layer(GRect(5, 65, WIDTH - 10, 100), sys_18);
-  layer_add_child(root_layer, text_layer_get_layer(s_next_action_layer));
+  s_desc_layer = util_make_text_layer(GRect(5, 64, WIDTH - 10, 100), sys_18);
+  layer_add_child(root_layer, text_layer_get_layer(s_desc_layer));
 
-  s_started_layer = util_make_text_layer(GRect(5, 83, WIDTH - 10, 100), sys_18);
+  // Row 1
+  int row_x = 5;
+  int row_y = 90;
+
+  s_started_bitmap = gbitmap_create_with_resource(RESOURCE_ID_STARTED);
+  s_started_bmp_layer = bitmap_layer_create(GRect(row_x, row_y, 24, 24));
+  bitmap_layer_set_compositing_mode(s_started_bmp_layer, GCompOpSet);
+  bitmap_layer_set_bitmap(s_started_bmp_layer, s_started_bitmap);
+  layer_add_child(root_layer, bitmap_layer_get_layer(s_started_bmp_layer));
+  s_started_layer = util_make_text_layer(GRect(row_x + 28, row_y - 5, WIDTH, 100), sys_24);
   layer_add_child(root_layer, text_layer_get_layer(s_started_layer));
 
-  s_remain_label_layer = util_make_text_layer(GRect(5, 105, WIDTH - 10, 100), sys_18_bold);
-  layer_add_child(root_layer, text_layer_get_layer(s_remain_label_layer));
+  row_x += 63;
 
-  s_remain_days_layer = util_make_text_layer(GRect(5, 117, WIDTH - 10, 100), sys_28_bold);
-  layer_add_child(root_layer, text_layer_get_layer(s_remain_days_layer));
+  s_reading_bitmap = gbitmap_create_with_resource(RESOURCE_ID_READING);
+  s_reading_bmp_layer = bitmap_layer_create(GRect(row_x, row_y, 24, 24));
+  bitmap_layer_set_compositing_mode(s_reading_bmp_layer, GCompOpSet);
+  bitmap_layer_set_bitmap(s_reading_bmp_layer, s_reading_bitmap);
+  layer_add_child(root_layer, bitmap_layer_get_layer(s_reading_bmp_layer));
+  s_reading_layer = util_make_text_layer(GRect(row_x + 28, row_y - 5, WIDTH, 100), sys_24);
+  layer_add_child(root_layer, text_layer_get_layer(s_reading_layer));
+
+  // Row 2
+  row_x = 5;
+  row_y += 33;
+
+  s_remaining_bitmap = gbitmap_create_with_resource(RESOURCE_ID_REMAINING);
+  s_remaining_bmp_layer = bitmap_layer_create(GRect(row_x, row_y, 24, 24));
+  bitmap_layer_set_compositing_mode(s_remaining_bmp_layer, GCompOpSet);
+  bitmap_layer_set_bitmap(s_remaining_bmp_layer, s_remaining_bitmap);
+  layer_add_child(root_layer, bitmap_layer_get_layer(s_remaining_bmp_layer));
+  s_remaining_layer = util_make_text_layer(GRect(row_x + 28, row_y - 5, WIDTH, 100), sys_24);
+  layer_add_child(root_layer, text_layer_get_layer(s_remaining_layer));
+
+  row_x += 63;
+
+  s_rate_bitmap = gbitmap_create_with_resource(RESOURCE_ID_RATE);
+  s_rate_bmp_layer = bitmap_layer_create(GRect(row_x, row_y, 24, 24));
+  bitmap_layer_set_compositing_mode(s_rate_bmp_layer, GCompOpSet);
+  bitmap_layer_set_bitmap(s_rate_bmp_layer, s_rate_bitmap);
+  layer_add_child(root_layer, bitmap_layer_get_layer(s_rate_bmp_layer));
+  s_rate_layer = util_make_text_layer(GRect(row_x + 28, row_y - 5, WIDTH, 100), sys_24);
+  layer_add_child(root_layer, text_layer_get_layer(s_rate_layer));
 
   update_data();
 }
 
 static void window_unload(Window *window) {
-  bitmap_layer_destroy(s_image_layer);
   text_layer_destroy(s_status_label_layer);
   text_layer_destroy(s_status_value_layer);
-  text_layer_destroy(s_next_action_layer);
+  text_layer_destroy(s_desc_layer);
   text_layer_destroy(s_started_layer);
-  text_layer_destroy(s_remain_label_layer);
-  text_layer_destroy(s_remain_days_layer);
+  text_layer_destroy(s_reading_layer);
+  text_layer_destroy(s_remaining_layer);
+  text_layer_destroy(s_rate_layer);
 
-  gbitmap_destroy(s_image_bitmap);
+  gbitmap_destroy(s_mascot_bitmap);
+  gbitmap_destroy(s_started_bitmap);
+  gbitmap_destroy(s_reading_bitmap);
+  gbitmap_destroy(s_remaining_bitmap);
+  gbitmap_destroy(s_rate_bitmap);
+
+  bitmap_layer_destroy(s_mascot_layer);
+  bitmap_layer_destroy(s_started_bmp_layer);
+  bitmap_layer_destroy(s_reading_bmp_layer);
+  bitmap_layer_destroy(s_remaining_bmp_layer);
+  bitmap_layer_destroy(s_rate_bmp_layer);
 
   window_destroy(s_window);
   s_window = NULL;

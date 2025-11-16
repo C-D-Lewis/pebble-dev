@@ -6,17 +6,18 @@ static int s_last_update_time;
 static int s_last_charge_perc;
 static int s_wakeup_id;
 static bool s_was_plugged;
-static SampleData s_sample_data;
+static SampleData s_sample_data, s_test_data;
 
 // Not persisted
 static char s_error_buff[64];
 
-// Test
-#if defined(TEST_DATA)
-static SampleData s_test_data;
-#endif
+static void delete_all_data() {
+  for (int i = 0; i < SK_Max; i += 1) persist_delete(i);
+  wakeup_cancel_all();
+  APP_LOG(APP_LOG_LEVEL_INFO, "!!! RESET ALL DATA !!!");
+}
 
-void save_all() {
+static void save_all() {
   persist_write_int(SK_DischargeStartTime, s_discharge_start_time);
   persist_write_int(SK_LastUpdateTime, s_last_update_time);
   persist_write_int(SK_LastChargePerc, s_last_charge_perc);
@@ -26,39 +27,8 @@ void save_all() {
   status_t result = persist_write_data(SK_SampleData, &s_sample_data, sizeof(SampleData));
   if (result < 0) {
     APP_LOG(APP_LOG_LEVEL_ERROR, "Error writing sample data: %d", (int)result);
+    data_set_error("Error writing data to storage");
   }
-  // TODO: Handle error in UI
-}
-
-static void delete_all_data() {
-  for (int i = 0; i < SK_Max; i += 1) persist_delete(i);
-  wakeup_cancel_all();
-  APP_LOG(APP_LOG_LEVEL_INFO, "!!! RESET ALL DATA !!!");
-}
-
-void data_prepare() {
-  // Data that should be reset when re-enabling
-  s_discharge_start_time = DATA_EMPTY;
-  s_last_update_time = DATA_EMPTY;
-}
-
-void data_log_state() {
-  APP_LOG(
-    APP_LOG_LEVEL_INFO,
-    "S: %d, U: %d, W: %d, B: %d, P: %s",
-    s_discharge_start_time, s_last_update_time, s_wakeup_id, s_last_charge_perc,
-    s_was_plugged ? "true": "false"
-  );
-  APP_LOG(
-    APP_LOG_LEVEL_INFO,
-    "History: %d %d %d %d %d %d",
-    s_sample_data.history[0],
-    s_sample_data.history[1],
-    s_sample_data.history[2],
-    s_sample_data.history[3],
-    s_sample_data.history[4],
-    s_sample_data.history[5]
-  );
 }
 
 void data_init() {
@@ -88,9 +58,9 @@ void data_init() {
     status_t result = persist_read_data(SK_SampleData, &s_sample_data, sizeof(SampleData));
     if (result < 0) {
       APP_LOG(APP_LOG_LEVEL_ERROR, "Error reading sample data: %d", (int)result);
+      data_set_error("Error reading data from storage");
       return;
     }
-    // TODO Handle error in UI
 
     data_log_state();
   }
@@ -98,6 +68,46 @@ void data_init() {
 
 void data_deinit() {
   save_all();
+}
+
+void data_log_state() {
+  APP_LOG(
+    APP_LOG_LEVEL_INFO,
+    "S: %d, U: %d, W: %d, B: %d, P: %s",
+    s_discharge_start_time, s_last_update_time, s_wakeup_id, s_last_charge_perc,
+    s_was_plugged ? "true": "false"
+  );
+  APP_LOG(
+    APP_LOG_LEVEL_INFO,
+    "History: %d %d %d %d %d %d",
+    s_sample_data.history[0],
+    s_sample_data.history[1],
+    s_sample_data.history[2],
+    s_sample_data.history[3],
+    s_sample_data.history[4],
+    s_sample_data.history[5]
+  );
+}
+
+void data_prepare() {
+  // Data that should be reset when re-enabling
+  s_discharge_start_time = DATA_EMPTY;
+  s_last_update_time = DATA_EMPTY;
+}
+
+void data_initial_sample() {
+  BatteryChargeState state = battery_state_service_peek();
+  const bool is_plugged = state.is_plugged;
+  const int charge_percent = state.charge_percent;
+
+  data_set_was_plugged(is_plugged);
+  data_set_last_charge_perc(charge_percent);
+
+  const time_t now = time(NULL);
+  data_set_discharge_start_time(now);
+
+  // Don't set update_time - less than the period doesn't give good first estimates
+  // data_set_last_update_time(now);
 }
 
 void data_push_sample_value(int v) {
@@ -131,29 +141,16 @@ int data_calculate_days_remaining() {
   if (rate == DATA_EMPTY || remaining == DATA_EMPTY) return DATA_EMPTY;
   if (rate <= 0) {
     APP_LOG(APP_LOG_LEVEL_ERROR, "Somehow rate was negative");
+    APP_LOG(APP_LOG_LEVEL_INFO, "rate: %d remaining: %d", rate, remaining);
     return DATA_EMPTY;
   }
 
   return remaining / rate;
 }
 
-void data_sample_now() {
-  BatteryChargeState state = battery_state_service_peek();
-  const bool is_plugged = state.is_plugged;
-  const int charge_percent = state.charge_percent;
-
-  const time_t now = time(NULL);
-
-  data_set_was_plugged(is_plugged);
-  data_set_last_charge_perc(charge_percent);
-
-  data_set_discharge_start_time(now);
-  data_set_last_update_time(now);
-}
-
 int data_get_discharge_start_time() {
 #if defined(TEST_DATA)
-  return time(NULL) - 6 * SECONDS_PER_HOUR;
+  return time(NULL) - (6 * SECONDS_PER_HOUR);
 #endif
   return s_discharge_start_time;
 }
@@ -186,9 +183,9 @@ void data_set_last_charge_perc(int perc) {
 
 int data_get_wakeup_id() {
   // Probably can't fake this
-  // #if defined(TEST_DATA)
-  //   return time(NULL) + (6 * SECONDS_PER_DAY);
-  // #endif
+#if defined(TEST_DATA)
+  return time(NULL) + (6 * SECONDS_PER_HOUR);
+#endif
   return s_wakeup_id;
 }
 
@@ -210,7 +207,7 @@ void data_set_was_plugged(bool b) {
 SampleData* data_get_sample_data() {
 #if defined(TEST_DATA)
   for (int i = 0; i < NUM_STORED_SAMPLES; i++) {
-    s_test_data.history[i] = 2 * i;
+    s_test_data.history[i] = 5;
   }
   return &s_test_data;
 #endif

@@ -17,7 +17,7 @@ void wakeup_schedule_next() {
   const int seconds_today = now->tm_hour * 3600 + now->tm_min * 60 + now->tm_sec;
   const int target = (seconds_today < 12 * 3600) ? (12 * 3600) : (24 * 3600);
   const int interval_s = target - seconds_today;
-  const time_t future = temp + interval_s;
+  const time_t future = temp + interval_s + 10;
   APP_LOG(APP_LOG_LEVEL_INFO, "Seconds until next 12h: %d", interval_s);
   const int id = wakeup_schedule(future, 0, false);
 

@@ -50,4 +50,5 @@ void wakeup_window_push() {
 
   // Pop after a while (progressbar?)
   app_timer_register(3000, timer_callback, NULL);
+  vibes_short_pulse();
 }

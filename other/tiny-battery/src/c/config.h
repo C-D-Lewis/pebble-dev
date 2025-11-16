@@ -15,8 +15,6 @@
 // Screen height
 #define HEIGHT PBL_IF_ROUND_ELSE(180, 168)
 
-// Wipe data on launch (debugging use)
+// Testing area
 // #define WIPE_ON_LAUNCH true
-
-// Test data
 // #define TEST_DATA true
