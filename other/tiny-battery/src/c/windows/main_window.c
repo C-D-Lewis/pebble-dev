@@ -77,26 +77,31 @@ static void update_data() {
   }
 }
 
-static void hint_update_proc(Layer *layer, GContext *ctx) {
-  // Togggle hint
-  const int hint_w = 16;
-  const int hint_h = 32;
-  const int hint_x = WIDTH - (hint_w / 2);
-  const int hint_y = ((HEIGHT - hint_h) / 2) - 15;
-  GRect select_rect = GRect(hint_x, hint_y, hint_w, hint_h);
+static void canvas_update_proc(Layer *layer, GContext *ctx) {
+  // Togggle enable hint
+  int hint_w = 16;
+  int hint_h = 32;
+  int hint_x = WIDTH - (hint_w / 2);
+  int select_y = ((HEIGHT - hint_h) / 2) - 16;
+  GRect select_rect = GRect(hint_x, select_y, hint_w, hint_h);
   graphics_context_set_fill_color(ctx, GColorBlack);
   graphics_fill_rect(ctx, select_rect, 3, GCornersAll);
   graphics_context_set_fill_color(ctx, GColorWhite);
-  GPoint hint_center = {
+  GPoint select_center = {
     .x = hint_x + (hint_w / 2),
-    .y = hint_y + (hint_h / 2)
+    .y = select_y + (hint_h / 2)
   };
-  graphics_fill_circle(ctx, hint_center, 3);
+  graphics_fill_circle(ctx, select_center, 3);
 
   // Divider
-  // graphics_context_set_fill_color(ctx, GColorBlack);
   const GRect braid_rect = GRect(0, 90, WIDTH, 14);
   graphics_draw_bitmap_in_rect(ctx, s_braid_bitmap, braid_rect);
+
+  // Menu hint
+  int menu_y = HEIGHT - hint_h - 17;
+  GRect menu_rect = GRect(hint_x, menu_y, hint_w, hint_h);
+  graphics_context_set_fill_color(ctx, GColorBlack);
+  graphics_fill_rect(ctx, menu_rect, 3, GCornersAll);
 }
 
 static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
@@ -107,16 +112,17 @@ static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
     data_initial_sample();
     wakeup_schedule_next();
 
-    vibes_double_pulse();
+    vibes_long_pulse();
   } else {
     wakeup_unschedule();
+    vibes_long_pulse();
   }
 
   update_data();
 }
 
 static void down_click_handler(ClickRecognizerRef recognizer, void *context) {
-  stat_window_push();
+  menu_window_push();
 }
 
 static void click_config_provider(void *context) {
@@ -135,24 +141,24 @@ static void window_load(Window *window) {
   s_braid_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BRAID);
 
   s_canvas_layer = layer_create(bounds);
-  layer_set_update_proc(s_canvas_layer, hint_update_proc);
+  layer_set_update_proc(s_canvas_layer, canvas_update_proc);
   layer_add_child(root_layer, s_canvas_layer);
 
   // Mascot
   s_mascot_bitmap = gbitmap_create_with_resource(RESOURCE_ID_AWAKE);
-  s_mascot_layer = bitmap_layer_create(GRect(5, 0, 64, 64));
+  s_mascot_layer = bitmap_layer_create(GRect(0, 0, 64, 64));
   bitmap_layer_set_compositing_mode(s_mascot_layer, GCompOpSet);
   bitmap_layer_set_bitmap(s_mascot_layer, s_mascot_bitmap);
   layer_add_child(root_layer, bitmap_layer_get_layer(s_mascot_layer));
 
-  s_status_label_layer = util_make_text_layer(GRect(72, 5, WIDTH - 75, 100), sys_18);
+  s_status_label_layer = util_make_text_layer(GRect(67, 5, WIDTH - 75, 100), sys_18);
   text_layer_set_text(s_status_label_layer, "Muninn is");
   layer_add_child(root_layer, text_layer_get_layer(s_status_label_layer));
 
-  s_status_value_layer = util_make_text_layer(GRect(71, 18, WIDTH - 75, 100), sys_28_bold);
+  s_status_value_layer = util_make_text_layer(GRect(66, 18, WIDTH - 75, 100), sys_28_bold);
   layer_add_child(root_layer, text_layer_get_layer(s_status_value_layer));
 
-  s_desc_layer = util_make_text_layer(GRect(5, 64, WIDTH - 10, 100), sys_18);
+  s_desc_layer = util_make_text_layer(GRect(5, 62, WIDTH - 10, 100), sys_18);
   layer_add_child(root_layer, text_layer_get_layer(s_desc_layer));
 
   // Row 1
@@ -174,7 +180,7 @@ static void window_load(Window *window) {
   bitmap_layer_set_compositing_mode(s_reading_bmp_layer, GCompOpSet);
   bitmap_layer_set_bitmap(s_reading_bmp_layer, s_reading_bitmap);
   layer_add_child(root_layer, bitmap_layer_get_layer(s_reading_bmp_layer));
-  s_reading_layer = util_make_text_layer(GRect(row_x + 25, row_y - 5, WIDTH, 100), sys_24);
+  s_reading_layer = util_make_text_layer(GRect(row_x + 27, row_y - 5, WIDTH, 100), sys_24);
   layer_add_child(root_layer, text_layer_get_layer(s_reading_layer));
 
   // Row 2
@@ -186,7 +192,7 @@ static void window_load(Window *window) {
   bitmap_layer_set_compositing_mode(s_remaining_bmp_layer, GCompOpSet);
   bitmap_layer_set_bitmap(s_remaining_bmp_layer, s_remaining_bitmap);
   layer_add_child(root_layer, bitmap_layer_get_layer(s_remaining_bmp_layer));
-  s_remaining_layer = util_make_text_layer(GRect(row_x + 25, row_y - 5, WIDTH, 100), sys_24);
+  s_remaining_layer = util_make_text_layer(GRect(row_x + 27, row_y - 5, WIDTH, 100), sys_24);
   layer_add_child(root_layer, text_layer_get_layer(s_remaining_layer));
 
   row_x += 65;
@@ -196,7 +202,7 @@ static void window_load(Window *window) {
   bitmap_layer_set_compositing_mode(s_rate_bmp_layer, GCompOpSet);
   bitmap_layer_set_bitmap(s_rate_bmp_layer, s_rate_bitmap);
   layer_add_child(root_layer, bitmap_layer_get_layer(s_rate_bmp_layer));
-  s_rate_layer = util_make_text_layer(GRect(row_x + 25, row_y - 5, WIDTH, 100), sys_24);
+  s_rate_layer = util_make_text_layer(GRect(row_x + 27, row_y - 5, WIDTH, 100), sys_24);
   layer_add_child(root_layer, text_layer_get_layer(s_rate_layer));
 
   update_data();

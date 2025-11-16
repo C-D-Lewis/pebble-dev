@@ -33,10 +33,6 @@ static void window_unload(Window *window) {
   s_window = NULL;
 }
 
-static void timer_callback(void *data) {
-  window_stack_pop_all(true);
-}
-
 void error_window_push() {
   if (!s_window) {
     s_window = window_create();

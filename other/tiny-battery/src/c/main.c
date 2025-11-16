@@ -4,6 +4,7 @@
 #include "modules/wakeup.h"
 
 #include "windows/main_window.h"
+#include "windows/stat_window.h"
 
 static void battery_handler(BatteryChargeState state) {
   // Un/plugged while app is open
