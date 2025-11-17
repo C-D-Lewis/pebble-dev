@@ -6,7 +6,11 @@ static int s_last_update_time;
 static int s_last_charge_perc;
 static int s_wakeup_id;
 static bool s_was_plugged;
-static SampleData s_sample_data, s_test_data;
+static SampleData s_sample_data;
+
+#if defined(TEST_DATA)
+static SampleData s_test_data;
+#endif
 
 // Not persisted
 static char s_error_buff[64];
@@ -31,23 +35,30 @@ static void save_all() {
   }
 }
 
+void data_reset_all() {
+  delete_all_data();
+
+  // Write defaults - some will be init'd when tracking begins
+  s_discharge_start_time = DATA_EMPTY;
+  s_last_update_time = DATA_EMPTY;
+  s_last_charge_perc = DATA_EMPTY;
+  s_wakeup_id = DATA_EMPTY;
+  s_was_plugged = true;
+  for (int i = 0; i < NUM_STORED_SAMPLES; i++) {
+    s_sample_data.history[i] = DATA_EMPTY;
+  }
+
+  save_all();
+}
+
 void data_init() {
 #if defined(WIPE_ON_LAUNCH)
   delete_all_data();
 #endif
 
-  if (!persist_exists(SK_WakeupId)) {
-    // Write defaults - some will be init'd when tracking begins
-    s_discharge_start_time = DATA_EMPTY;
-    s_last_update_time = DATA_EMPTY;
-    s_last_charge_perc = DATA_EMPTY;
-    s_wakeup_id = DATA_EMPTY;
-    s_was_plugged = true;
-    for (int i = 0; i < NUM_STORED_SAMPLES; i++) {
-      s_sample_data.history[i] = DATA_EMPTY;
-    }
-
-    save_all();
+  // Never used, write defaults
+  if (!persist_exists(SK_SampleData)) {
+    data_reset_all();
   } else {
     // Load current data for foreground display
     s_discharge_start_time = persist_read_int(SK_DischargeStartTime);
@@ -87,12 +98,6 @@ void data_log_state() {
     s_sample_data.history[4],
     s_sample_data.history[5]
   );
-}
-
-void data_prepare() {
-  // Data that should be reset when re-enabling
-  s_discharge_start_time = DATA_EMPTY;
-  s_last_update_time = DATA_EMPTY;
 }
 
 void data_initial_sample() {
@@ -216,7 +221,12 @@ SampleData* data_get_sample_data() {
 
 void data_set_error(char *err) {
   snprintf(s_error_buff, sizeof(s_error_buff), "Error: %s", err);
-  error_window_push();
+  alert_window_push(
+    RESOURCE_ID_ASLEEP,
+    data_get_error(),
+    true,
+    false
+  );
 }
 
 char* data_get_error() {

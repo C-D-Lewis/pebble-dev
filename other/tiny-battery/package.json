@@ -1,5 +1,5 @@
 {
-  "name": "tiny-battery",
+  "name": "muninn",
   "author": "Chris Lewis",
   "version": "1.0.0",
   "private": true,
@@ -17,7 +17,7 @@
     "capabilities": [
     ],
     "projectType": "native",
-    "displayName": "Tiny Battery",
+    "displayName": "Muninn",
     "uuid": "d008a08a-6e34-4cc4-98dc-bae02ce5e087",
     "watchapp": {
       "watchface": false,
@@ -26,6 +26,12 @@
     },
     "resources": {
       "media": [
+        {
+          "type": "png",
+          "name": "MENU_ICON",
+          "file": "images/menu_icon.png",
+          "menuIcon": true
+        },
         {
           "type": "png",
           "name": "AWAKE",
@@ -43,8 +49,23 @@
         },
         {
           "type": "png",
-          "name": "STARTED",
-          "file": "images/started.png"
+          "name": "BATTERY",
+          "file": "images/battery.png"
+        },
+        {
+          "type": "png",
+          "name": "BATTERY_LOW",
+          "file": "images/battery-low.png"
+        },
+        {
+          "type": "png",
+          "name": "BATTERY_MEDIUM",
+          "file": "images/battery-medium.png"
+        },
+        {
+          "type": "png",
+          "name": "BATTERY_HIGH",
+          "file": "images/battery-high.png"
         },
         {
           "type": "png",

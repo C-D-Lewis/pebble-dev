@@ -4,8 +4,6 @@
 
 #include "../modules/data.h"
 
-#include "../windows/wakeup_window.h"
-
 void wakeup_schedule_next();
 
 void wakeup_unschedule();

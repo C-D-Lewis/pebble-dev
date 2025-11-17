@@ -7,12 +7,12 @@ static TextLayer *s_enabled_layer, *s_stats_layer, *s_history_layer;;
 void stat_window_update_data() {
   if (!s_window) return;
 
-  bool is_enabled = data_get_wakeup_id() != DATA_EMPTY;
+  const bool is_enabled = data_get_wakeup_id() != DATA_EMPTY;
   time_t wakeup_ts;
   wakeup_query(data_get_wakeup_id(), &wakeup_ts);
 
   static char s_enabled_buff[16];
-  snprintf(s_enabled_buff, sizeof(s_enabled_buff), "Enabled: %s", is_enabled ? "Yes": "No");
+  snprintf(s_enabled_buff, sizeof(s_enabled_buff), "Enabled: %s", is_enabled ? "true": "false");
   text_layer_set_text(s_enabled_layer, s_enabled_buff);
 
   text_layer_set_text(s_stats_layer, "");
@@ -24,13 +24,13 @@ void stat_window_update_data() {
     static char s_fmt_discharge_buff[16];
     static char s_fmt_update_buff[16];
     static char s_fmt_wakeup_buff[16];
-    util_fmt_time(data_get_discharge_start_time(), &s_fmt_discharge_buff[0], sizeof(s_fmt_discharge_buff));
+    util_fmt_time_ago(data_get_discharge_start_time(), &s_fmt_discharge_buff[0], sizeof(s_fmt_discharge_buff));
     util_fmt_time(data_get_last_update_time(), &s_fmt_update_buff[0], sizeof(s_fmt_update_buff));
     util_fmt_time(wakeup_ts, &s_fmt_wakeup_buff[0], sizeof(s_fmt_wakeup_buff));
     snprintf(
       s_values_buff,
       sizeof(s_values_buff),
-      "Unplugged: %s\nLast sample: %s\nNext sample: %s\nLast value: %d\nWas plugged in: %s",
+      "Started: %s ago\nLast sampled: %s\nNext sample: %s\nLast value: %d\nWas plugged in: %s",
       &s_fmt_discharge_buff[0],
       &s_fmt_update_buff[0],
       &s_fmt_wakeup_buff[0],
@@ -45,7 +45,7 @@ void stat_window_update_data() {
     snprintf(
       s_history_buff,
       sizeof(s_history_buff),
-      "Recent samples:\n%d, %d, %d, %d, %d, %d\nAverage estimate: %d",
+      "Recent samples:\n%d, %d, %d, %d, %d, %d\nAverage: %d",
       sample_data->history[0],
       sample_data->history[1],
       sample_data->history[2],

@@ -3,14 +3,24 @@
 static Window *s_window;
 static MenuLayer *s_menu_layer;
 
+static bool s_clear_confirm;
+
 static uint16_t get_num_rows_callback(MenuLayer *menu_layer, uint16_t section_index, void *context) {
-  return 1;
+  return 3;
 }
 
 static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_index, void *context) {
   switch(cell_index->row) {
     case 0:
-      menu_cell_basic_draw(ctx, cell_layer, "Title", "Description", NULL);
+      menu_cell_basic_draw(ctx, cell_layer, "About", NULL, NULL);
+      break;
+    // Vibe on sample?
+    // Custom battery level alert?
+    case 1:
+      menu_cell_basic_draw(ctx, cell_layer, "Statistics", NULL, NULL);
+      break;
+    case 2:
+      menu_cell_basic_draw(ctx, cell_layer, "Reset all data", s_clear_confirm ? "Tap again to confirm" : NULL, NULL);
       break;
     default: break;
   }
@@ -23,8 +33,20 @@ static int16_t get_cell_height_callback(struct MenuLayer *menu_layer, MenuIndex 
 static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) {
   switch(cell_index->row) {
     case 0:
-      // Do something
+      about_window_push();
       break;
+    case 1:
+      stat_window_push();
+      break;
+    case 2:
+      if (s_clear_confirm) {
+        data_reset_all();
+        vibes_double_pulse();
+      } else {
+        vibes_long_pulse();
+      }
+
+      s_clear_confirm = !s_clear_confirm;
     default: break;
   }
 
@@ -48,6 +70,8 @@ static void main_window_load(Window *window) {
 
 static void window_unload(Window *window) {
   menu_layer_destroy(s_menu_layer);
+
+  s_clear_confirm = false;
 
   window_destroy(window);
   s_window = NULL;

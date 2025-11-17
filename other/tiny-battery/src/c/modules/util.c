@@ -22,7 +22,6 @@ void util_fmt_time(int timestamp_s, char* buf, int buf_size) {
 }
 
 void util_fmt_time_ago(int then, char *buf, int buf_size) {
-  const time_t t = (time_t)then;
   const time_t now = time(NULL);
   int diff_s = now - then;
 
@@ -32,7 +31,6 @@ void util_fmt_time_ago(int then, char *buf, int buf_size) {
   }
 
   int value = 0;
-  // APP_LOG(APP_LOG_LEVEL_INFO, "%d %d %d %d", (int)t, (int)now, diff_s, value);
   const char *unit;
   if (diff_s < 60) {
     value = diff_s;

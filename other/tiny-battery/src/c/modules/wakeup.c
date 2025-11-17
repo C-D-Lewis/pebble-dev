@@ -1,13 +1,9 @@
 #include "wakeup.h"
 
-// TODO: Use retval for UI
 void wakeup_schedule_next() {
-  // Only once wakeup at a time
-  if (data_get_wakeup_id() != DATA_EMPTY) {
-    APP_LOG(APP_LOG_LEVEL_ERROR, "Wakeup already scheduled!");
-    data_set_error("Wakeup already scheduled");
-    return;
-  }
+  // We only want one - this one
+  wakeup_cancel_all();
+  data_set_wakeup_id(DATA_EMPTY);
 
   // Next 12 o'clock, then every 12h after
   const time_t temp = time(NULL);
@@ -17,6 +13,7 @@ void wakeup_schedule_next() {
   const int seconds_today = now->tm_hour * 3600 + now->tm_min * 60 + now->tm_sec;
   const int target = (seconds_today < 12 * 3600) ? (12 * 3600) : (24 * 3600);
   const int interval_s = target - seconds_today;
+  // const int interval_s = 120;  // Test short term wakeups
   const time_t future = temp + interval_s + 10;
   APP_LOG(APP_LOG_LEVEL_INFO, "Seconds until next 12h: %d", interval_s);
   const int id = wakeup_schedule(future, 0, false);
@@ -25,7 +22,7 @@ void wakeup_schedule_next() {
   if (id >= 0) {
     // Verify scheduled
     if (!wakeup_query(id, NULL)) {
-      APP_LOG(APP_LOG_LEVEL_ERROR, "Failed to schedule wakeup!");
+      APP_LOG(APP_LOG_LEVEL_ERROR, "Scheduled wakeup not found");
       data_set_error("Scheduled wakeup not found");
       return;
     }
@@ -48,7 +45,12 @@ void wakeup_unschedule() {
 void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
   // We popped
   data_set_wakeup_id(DATA_EMPTY);
-  wakeup_window_push();
+  alert_window_push(
+    RESOURCE_ID_WRITING,
+    "Muninn takes a note...",
+    true,
+    true
+  );
 
   BatteryChargeState state = battery_state_service_peek();
   const bool is_plugged = state.is_plugged;
@@ -79,9 +81,9 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
       }
 
       // Calculate new discharge rate
-      // This is done every 12 hours according to WAKEUP_INTERVAL_S
       // Therefore we can derive the daily rate based on the interval in seconds
-      const int perc_per_day = (discharge_diff * SECONDS_PER_DAY) / WAKEUP_INTERVAL_S;
+      // TODO: Calculation to next 12h is not directly tied to WAKEUP_H
+      const int perc_per_day = (discharge_diff * SECONDS_PER_DAY) / WAKEUP_H;
       data_push_sample_value(perc_per_day);
       APP_LOG(APP_LOG_LEVEL_INFO, "perc_per_day: %d", perc_per_day);
     }
@@ -94,6 +96,5 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
 
   data_log_state();
 
-  // Re-schedule next sample
   wakeup_schedule_next();
 }

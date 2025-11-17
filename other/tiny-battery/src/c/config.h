@@ -3,8 +3,7 @@
 #include <pebble.h>
 
 // Hours between wakeups
-#define WAKEUP_INTERVAL_S (60 * 60 * 12) // 12 hours
-// #define WAKEUP_INTERVAL_S (60 * 2) // 2 mins
+#define WAKEUP_H 12
 
 // Number of stores samples
 #define NUM_STORED_SAMPLES 6 // Careful changing this

@@ -4,7 +4,7 @@
 
 #include "../config.h"
 
-#include "../windows/error_window.h"
+#include "../windows/alert_window.h"
 
 // If there is no data yet for this value
 #define DATA_EMPTY -1
@@ -32,12 +32,12 @@ typedef struct {
   int history[NUM_STORED_SAMPLES];
 } SampleData;
 
+void data_reset_all();
+
 void data_init();
 void data_deinit();
 
 void data_log_state();
-
-void data_prepare();
 
 void data_initial_sample();
 

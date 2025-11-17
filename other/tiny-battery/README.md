@@ -1,11 +1,14 @@
-# tiny-battery
+# muninn
 
-Can we use wakeup instead of background worker to more efficiently track
-battery life? Can we do it without storing huge amounts of samples?
+Muninn is a simple battery tracking application that uses the Wakeup API
+instead of the Background Worker to monitor battery discharging trends.
+
+> Can we use wakeup instead of background worker to more efficiently track battery life?
+> Can we do it without storing huge amounts of samples?
 
 ## In scope:
 
-- Time since last charge
+- Time since last unplugged (rough)
 - Estimate time remaining
 - Enable/disable wakeups
 
@@ -22,18 +25,14 @@ battery life? Can we do it without storing huge amounts of samples?
 - Handling changing demands/watchface etc: moving rate?
 - Zero change since last sample (<1% per hour)
 
-## Names:
-
-- Tiny Battery
-- Muninn
-- Battery Guardian
-- Light Battery Monitor (LBM)
-
 ## TODO:
 
-- [x] Rolling window of N sample values for better average
+- [x] Rolling window of N values for better average
 - [x] App UI (summary > menu > state view)
 - [x] Wakeup UI
-- [ ] Bird blinking
-- [ ] Disable confirmation window
-- [ ] UI polish (more animations?)
+- [x] Bird blinking
+- [x] Disable confirmation (long press)
+- [x] UI polish
+- [x] Handle missing samples while off
+- [ ] Settings? Custom alert?
+- [ ] Emery screen size support

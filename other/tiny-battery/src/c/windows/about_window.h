@@ -2,7 +2,8 @@
 
 #include <pebble.h>
 
-#include "../modules/data.h"
 #include "../modules/util.h"
 
-void error_window_push();
+#include "../config.h"
+
+void about_window_push();

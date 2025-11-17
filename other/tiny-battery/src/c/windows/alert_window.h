@@ -5,4 +5,4 @@
 #include "../modules/data.h"
 #include "../modules/util.h"
 
-void wakeup_window_push();
+void alert_window_push(uint32_t res_id, char *message, bool do_vibe, bool do_dismiss);
