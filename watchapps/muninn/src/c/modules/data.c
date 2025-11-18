@@ -56,6 +56,27 @@ void data_init() {
   delete_all_data();
 #endif
 
+#if defined(TEST_DATA)
+  // Load test values for this launch
+  s_discharge_start_time = time(NULL) - (6 * SECONDS_PER_HOUR);
+  s_last_update_time = time(NULL) - SECONDS_PER_HOUR;
+  s_last_charge_perc = 50;
+  s_wakeup_id = 12345;
+  s_was_plugged = false;
+  for (int i = 0; i < NUM_STORED_SAMPLES; i++) {
+    s_test_data.history[i] = 4;
+  }
+  return;
+#endif
+
+#if defined(LOAD_DATA)
+  // Load some sample data into persist for testing
+  for (int i = 0; i < NUM_STORED_SAMPLES; i++) {
+    s_sample_data.history[i] = (i == 0) ? 4 : DATA_EMPTY;
+  }
+  persist_write_data(SK_SampleData, &s_sample_data, sizeof(SampleData));
+#endif
+
   // Never used, write defaults
   if (!persist_exists(SK_SampleData)) {
     data_reset_all();

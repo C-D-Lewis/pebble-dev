@@ -15,5 +15,6 @@
 #define HEIGHT PBL_IF_ROUND_ELSE(180, 168)
 
 // Testing area
-// #define WIPE_ON_LAUNCH true
-// #define TEST_DATA true
+// #define WIPE_ON_LAUNCH true // Wipe all data on launch
+// #define TEST_DATA true      // Use test data instead of real data
+// #define LOAD_DATA true      // Load some sample data into persist

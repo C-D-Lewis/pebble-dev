@@ -83,7 +83,7 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
       // Calculate new discharge rate
       // Therefore we can derive the daily rate based on the interval in seconds
       // TODO: Calculation to next 12h is not directly tied to WAKEUP_H
-      const int perc_per_day = (discharge_diff * SECONDS_PER_DAY) / WAKEUP_H;
+      const int perc_per_day = (discharge_diff * HOURS_PER_DAY) / WAKEUP_H;
       data_push_sample_value(perc_per_day);
       APP_LOG(APP_LOG_LEVEL_INFO, "perc_per_day: %d", perc_per_day);
     }
