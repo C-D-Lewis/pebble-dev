@@ -5,7 +5,8 @@
 #include "../modules/data.h"
 #include "../modules/util.h"
 
-#include "about_window.h"
+#include "message_window.h"
 #include "stat_window.h"
+#include "history_window.h"
 
 void menu_window_push();

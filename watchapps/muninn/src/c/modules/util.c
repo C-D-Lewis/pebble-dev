@@ -22,13 +22,10 @@ void util_fmt_time(int timestamp_s, char* buf, int buf_size) {
 }
 
 void util_fmt_time_ago(int then, char *buf, int buf_size) {
-  const time_t now = time(NULL);
-  int diff_s = now - then;
+  int diff_s = time(NULL) - then;
 
-  // Nudge: always a positive amount of time for display purposes
-  if (diff_s < 0) {
-    diff_s *= -1;
-  }
+  // Fudge: always a positive amount of time for display purposes
+  diff_s *= diff_s < 0 ? -1 : 1;
 
   int value = 0;
   const char *unit;

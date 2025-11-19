@@ -20,7 +20,10 @@ static void window_load(Window *window) {
   bitmap_layer_set_bitmap(s_image_layer, s_image_bitmap);
   layer_add_child(root_layer, bitmap_layer_get_layer(s_image_layer));
 
-  s_text_layer = util_make_text_layer(GRect(5, 90, WIDTH - 10, 100), fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD));
+  s_text_layer = util_make_text_layer(
+    GRect(5, 90, DISPLAY_W - 10, 100),
+    fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD)
+  );
   text_layer_set_text(s_text_layer, s_message);
   text_layer_set_text_alignment(s_text_layer, GTextAlignmentCenter);
   layer_add_child(root_layer, text_layer_get_layer(s_text_layer));

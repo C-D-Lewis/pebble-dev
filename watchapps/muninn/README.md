@@ -1,7 +1,8 @@
 # muninn
 
 Muninn is a simple battery tracking application that uses the Wakeup API
-instead of the Background Worker to monitor battery discharging trends.
+instead of the Background Worker to monitor battery discharging trends and
+provide insight into battery life remaining.
 
 > Can we use wakeup instead of background worker to more efficiently track battery life?
 > Can we do it without storing huge amounts of samples?
@@ -34,5 +35,8 @@ instead of the Background Worker to monitor battery discharging trends.
 - [x] Disable confirmation (long press)
 - [x] UI polish
 - [x] Handle missing samples while off
-- [ ] Settings? Custom alert?
+- [x] Settings? Custom alert?
+- [ ] Real-world testing over several days
+- [ ] Test power-off picks up correctly
+- [ ] Test charging and resuming works
 - [ ] Emery screen size support

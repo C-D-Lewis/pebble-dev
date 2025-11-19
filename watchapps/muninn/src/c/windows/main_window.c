@@ -148,8 +148,8 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   // Togggle enable hint
   int hint_w = 14;
   int hint_h = 32;
-  int hint_x = WIDTH - (hint_w / 2);
-  int select_y = ((HEIGHT - hint_h) / 2) - 16;
+  int hint_x = DISPLAY_W - (hint_w / 2);
+  int select_y = ((DISPLAY_H - hint_h) / 2) - 16;
   GRect select_rect = GRect(hint_x, select_y, hint_w, hint_h);
   graphics_context_set_fill_color(ctx, GColorBlack);
   graphics_fill_rect(ctx, select_rect, 3, GCornersAll);
@@ -169,11 +169,11 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   }
 
   // Divider
-  const GRect braid_rect = GRect(0, 90, WIDTH, 14);
+  const GRect braid_rect = GRect(0, 90, DISPLAY_W, 14);
   graphics_draw_bitmap_in_rect(ctx, s_braid_bitmap, braid_rect);
 
   // Menu hint
-  int menu_y = HEIGHT - hint_h - 17;
+  int menu_y = DISPLAY_H - hint_h - 17;
   GRect menu_rect = GRect(hint_x, menu_y, hint_w, hint_h);
   graphics_context_set_fill_color(ctx, GColorBlack);
   graphics_fill_rect(ctx, menu_rect, 3, GCornersAll);
@@ -227,14 +227,14 @@ static void window_load(Window *window) {
   layer_set_update_proc(s_canvas_layer, canvas_update_proc);
   layer_add_child(root_layer, s_canvas_layer);
 
-  s_status_label_layer = util_make_text_layer(GRect(67, 5, WIDTH - 75, 100), sys_18);
+  s_status_label_layer = util_make_text_layer(GRect(67, 5, DISPLAY_W - 75, 100), sys_18);
   text_layer_set_text(s_status_label_layer, "Muninn is");
   layer_add_child(root_layer, text_layer_get_layer(s_status_label_layer));
 
-  s_status_value_layer = util_make_text_layer(GRect(66, 18, WIDTH - 75, 100), sys_28_bold);
+  s_status_value_layer = util_make_text_layer(GRect(66, 18, DISPLAY_W - 75, 100), sys_28_bold);
   layer_add_child(root_layer, text_layer_get_layer(s_status_value_layer));
 
-  s_desc_layer = util_make_text_layer(GRect(5, 64, WIDTH - 10, 100), sys_18);
+  s_desc_layer = util_make_text_layer(GRect(5, 64, DISPLAY_W - 10, 100), sys_18);
   layer_add_child(root_layer, text_layer_get_layer(s_desc_layer));
 
   // Row 1
@@ -247,7 +247,10 @@ static void window_load(Window *window) {
   bitmap_layer_set_compositing_mode(s_battery_bmp_layer, GCompOpSet);
   bitmap_layer_set_bitmap(s_battery_bmp_layer, s_battery_bitmap);
   layer_add_child(root_layer, bitmap_layer_get_layer(s_battery_bmp_layer));
-  s_battery_layer = util_make_text_layer(GRect(row_x + text_offset, row_y - 5, WIDTH, 100), sys_24);
+  s_battery_layer = util_make_text_layer(
+    GRect(row_x + text_offset, row_y - 5, DISPLAY_W, 100),
+    sys_24
+  );
   layer_add_child(root_layer, text_layer_get_layer(s_battery_layer));
 
   row_x += 65;
@@ -257,7 +260,10 @@ static void window_load(Window *window) {
   bitmap_layer_set_compositing_mode(s_reading_bmp_layer, GCompOpSet);
   bitmap_layer_set_bitmap(s_reading_bmp_layer, s_reading_bitmap);
   layer_add_child(root_layer, bitmap_layer_get_layer(s_reading_bmp_layer));
-  s_reading_layer = util_make_text_layer(GRect(row_x + text_offset, row_y - 5, WIDTH, 100), sys_24);
+  s_reading_layer = util_make_text_layer(
+    GRect(row_x + text_offset, row_y - 5, DISPLAY_W, 100),
+    sys_24
+  );
   layer_add_child(root_layer, text_layer_get_layer(s_reading_layer));
 
   // Row 2
@@ -269,7 +275,10 @@ static void window_load(Window *window) {
   bitmap_layer_set_compositing_mode(s_remaining_bmp_layer, GCompOpSet);
   bitmap_layer_set_bitmap(s_remaining_bmp_layer, s_remaining_bitmap);
   layer_add_child(root_layer, bitmap_layer_get_layer(s_remaining_bmp_layer));
-  s_remaining_layer = util_make_text_layer(GRect(row_x + text_offset, row_y - 5, WIDTH, 100), sys_24);
+  s_remaining_layer = util_make_text_layer(
+    GRect(row_x + text_offset, row_y - 5, DISPLAY_W, 100),
+    sys_24
+  );
   layer_add_child(root_layer, text_layer_get_layer(s_remaining_layer));
 
   row_x += 65;
@@ -279,7 +288,7 @@ static void window_load(Window *window) {
   bitmap_layer_set_compositing_mode(s_rate_bmp_layer, GCompOpSet);
   bitmap_layer_set_bitmap(s_rate_bmp_layer, s_rate_bitmap);
   layer_add_child(root_layer, bitmap_layer_get_layer(s_rate_bmp_layer));
-  s_rate_layer = util_make_text_layer(GRect(row_x + text_offset, row_y - 5, WIDTH, 100), sys_24);
+  s_rate_layer = util_make_text_layer(GRect(row_x + text_offset, row_y - 5, DISPLAY_W, 100), sys_24);
   layer_add_child(root_layer, text_layer_get_layer(s_rate_layer));
 
   update_data();

@@ -6,4 +6,4 @@
 
 #include "../config.h"
 
-void about_window_push();
+void message_window_push(char *text);

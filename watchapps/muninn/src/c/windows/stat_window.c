@@ -2,7 +2,7 @@
 
 static Window *s_window;
 static StatusBarLayer *s_status_bar;
-static TextLayer *s_enabled_layer, *s_stats_layer, *s_history_layer;;
+static TextLayer *s_stats_layer, *s_history_layer;;
 
 void stat_window_update_data() {
   if (!s_window) return;
@@ -11,10 +11,6 @@ void stat_window_update_data() {
   time_t wakeup_ts;
   wakeup_query(data_get_wakeup_id(), &wakeup_ts);
 
-  static char s_enabled_buff[16];
-  snprintf(s_enabled_buff, sizeof(s_enabled_buff), "Enabled: %s", is_enabled ? "true": "false");
-  text_layer_set_text(s_enabled_layer, s_enabled_buff);
-
   text_layer_set_text(s_stats_layer, "");
   text_layer_set_text(s_history_layer, "");
 
@@ -22,17 +18,19 @@ void stat_window_update_data() {
     // Current stats
     static char s_values_buff[128];
     static char s_fmt_discharge_buff[16];
-    static char s_fmt_update_buff[16];
     static char s_fmt_wakeup_buff[16];
-    util_fmt_time_ago(data_get_discharge_start_time(), &s_fmt_discharge_buff[0], sizeof(s_fmt_discharge_buff));
-    util_fmt_time(data_get_last_update_time(), &s_fmt_update_buff[0], sizeof(s_fmt_update_buff));
+    util_fmt_time_ago(
+      data_get_discharge_start_time(),
+      &s_fmt_discharge_buff[0],
+      sizeof(s_fmt_discharge_buff)
+    );
     util_fmt_time(wakeup_ts, &s_fmt_wakeup_buff[0], sizeof(s_fmt_wakeup_buff));
     snprintf(
       s_values_buff,
       sizeof(s_values_buff),
-      "Started: %s ago\nLast sampled: %s\nNext sample: %s\nLast value: %d\nWas plugged in: %s",
+      "Enabled: %s\nStarted: %s ago\nNext sample: %s\nLast value: %d\nWas plugged in: %s",
+      is_enabled ? "true": "false",
       &s_fmt_discharge_buff[0],
-      &s_fmt_update_buff[0],
       &s_fmt_wakeup_buff[0],
       data_get_last_charge_perc(),
       data_get_was_plugged() ? "true": "false"
@@ -46,12 +44,12 @@ void stat_window_update_data() {
       s_history_buff,
       sizeof(s_history_buff),
       "Recent samples:\n%d, %d, %d, %d, %d, %d\nAverage: %d",
-      sample_data->history[0],
-      sample_data->history[1],
-      sample_data->history[2],
-      sample_data->history[3],
-      sample_data->history[4],
-      sample_data->history[5],
+      sample_data->values[0],
+      sample_data->values[1],
+      sample_data->values[2],
+      sample_data->values[3],
+      sample_data->values[4],
+      sample_data->values[5],
       data_get_history_avg_rate()
     );
     text_layer_set_text(s_history_layer, s_history_buff);
@@ -62,27 +60,28 @@ static void window_load(Window *window) {
   Layer *root_layer = window_get_root_layer(window);
 
   GFont sys_14 = fonts_get_system_font(FONT_KEY_GOTHIC_14);
-  GFont sys_18 = fonts_get_system_font(FONT_KEY_GOTHIC_18);
 
   s_status_bar = status_bar_layer_create();
   status_bar_layer_set_separator_mode(s_status_bar, StatusBarLayerSeparatorModeDotted);
   status_bar_layer_set_colors(s_status_bar, GColorWhite, GColorBlack);
   layer_add_child(root_layer, status_bar_layer_get_layer(s_status_bar));
 
-  s_enabled_layer = util_make_text_layer(GRect(5, STATUS_BAR_LAYER_HEIGHT, WIDTH - 10, 168), sys_18);
-  layer_add_child(root_layer, text_layer_get_layer(s_enabled_layer));
-
-  s_stats_layer = util_make_text_layer(GRect(5, STATUS_BAR_LAYER_HEIGHT + 23, WIDTH - 10, 168), sys_14);
+  s_stats_layer = util_make_text_layer(
+    GRect(5, STATUS_BAR_LAYER_HEIGHT, DISPLAY_W - 10, 168),
+    sys_14
+  );
   layer_add_child(root_layer, text_layer_get_layer(s_stats_layer));
 
-  s_history_layer = util_make_text_layer(GRect(5, STATUS_BAR_LAYER_HEIGHT + 100, WIDTH - 10, 168), sys_14);
+  s_history_layer = util_make_text_layer(
+    GRect(5, STATUS_BAR_LAYER_HEIGHT + 95, DISPLAY_W - 10, 168),
+    sys_14
+  );
   layer_add_child(root_layer, text_layer_get_layer(s_history_layer));
 }
 
 static void window_unload(Window *window) {
   status_bar_layer_destroy(s_status_bar);
 
-  text_layer_destroy(s_enabled_layer);
   text_layer_destroy(s_stats_layer);
   text_layer_destroy(s_history_layer);
 

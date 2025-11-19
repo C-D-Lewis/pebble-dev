@@ -7,6 +7,9 @@
 
 #include "windows/main_window.h"
 #include "windows/stat_window.h"
+#include "windows/message_window.h"
+
+char *welcome_text = "Welcome to Muninn!\n\nHe will track your battery over time.\n\nPlease launch after each reboot.";
 
 static void battery_handler(BatteryChargeState state) {
   // Un/plugged while app is open
@@ -24,20 +27,19 @@ static bool handle_missed_wakeup() {
   const int wakeup_id = data_get_wakeup_id();
   if (wakeup_id == DATA_EMPTY) return false;
 
-  time_t now = time(NULL);
   time_t wakeup_ts;
   const bool found = wakeup_query(wakeup_id, &wakeup_ts);
 
   // Doesn't exist or is too long ago, reschedule it
-  if (!found || (now - wakeup_ts) > (WAKEUP_H * SECONDS_PER_HOUR)) {
-    wakeup_schedule_next();
+  if (!found || (time(NULL) - wakeup_ts) > (WAKEUP_MOD_H * SECONDS_PER_HOUR)) {
     APP_LOG(
       APP_LOG_LEVEL_INFO,
-      "Re-scheduled stale wakeup: %d %d -> %d",
+      "Missed wakeup detected: %d %d %d",
       wakeup_id,
       found ? 1 : 0,
       (int)wakeup_ts
     );
+    wakeup_schedule_next();
     return true;
   }
 
@@ -48,6 +50,7 @@ static void init() {
   data_init();
 
   const bool missed = handle_missed_wakeup();
+  const bool first_launch = !data_get_seen_first_launch();
 
   if (launch_reason() == APP_LAUNCH_WAKEUP) {
     WakeupId id = 0;
@@ -71,6 +74,11 @@ static void init() {
         true,
         false
       );
+    }
+
+    if (first_launch) {
+      message_window_push(welcome_text);
+      data_set_seen_first_launch();
     }
   }
 }
