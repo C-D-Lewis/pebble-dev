@@ -2,11 +2,13 @@
 
 // Persisted
 static int s_discharge_start_time;
+static int s_last_sample_time;
 static int s_last_charge_perc;
 static int s_wakeup_id;
 static bool s_was_plugged;
 static bool s_seen_first_launch;
 static bool s_vibe_on_sample;
+static bool s_ca_has_notified;
 static int s_custom_alert_level;
 static SampleData s_sample_data;
 
@@ -21,12 +23,14 @@ static void delete_all_data() {
 
 static void save_all() {
   persist_write_int(SK_DischargeStartTime, s_discharge_start_time);
+  persist_write_int(SK_LastSampleTime, s_last_sample_time);
   persist_write_int(SK_LastChargePerc, s_last_charge_perc);
   persist_write_int(SK_WakeupId, s_wakeup_id);
   persist_write_bool(SK_WasPlugged, s_was_plugged);
   persist_write_bool(SK_SeenFirstLaunch, s_seen_first_launch);
   persist_write_bool(SK_VibeOnSample, s_vibe_on_sample);
   persist_write_int(SK_CustomAlertLevel, s_custom_alert_level);
+  persist_write_bool(SK_CAHasNotified, s_ca_has_notified);
 
   status_t result = persist_write_data(SK_SampleData, &s_sample_data, sizeof(SampleData));
   if (result < 0) {
@@ -40,12 +44,14 @@ void data_reset_all() {
 
   // Write defaults - some will be init'd when tracking begins
   s_discharge_start_time = DATA_EMPTY;
+  s_last_sample_time = DATA_EMPTY;
   s_last_charge_perc = DATA_EMPTY;
   s_wakeup_id = DATA_EMPTY;
   s_was_plugged = true;
   s_seen_first_launch = true; // Special case
   s_vibe_on_sample = false;
   s_custom_alert_level = AL_OFF;
+  s_ca_has_notified = false;
   for (int i = 0; i < NUM_STORED_SAMPLES; i++) {
     s_sample_data.values[i] = DATA_EMPTY;
   }
@@ -60,16 +66,18 @@ void data_init() {
 
 #if defined(TEST_DATA)
   // Load test values for this launch
-  s_discharge_start_time = time(NULL) - (6 * SECONDS_PER_HOUR);
-  s_last_charge_perc = 50;
-  s_wakeup_id = time(NULL) - (12 * SECONDS_PER_HOUR);   // Won't be found
+  s_discharge_start_time = time(NULL) - (12 * SECONDS_PER_HOUR);
+  s_last_sample_time = time(NULL) - (6 * SECONDS_PER_HOUR);
+  s_last_charge_perc = 80;
+  s_wakeup_id = time(NULL) + (12 * SECONDS_PER_HOUR);   // Won't be found
   s_was_plugged = false;
   s_seen_first_launch = true;
   s_vibe_on_sample = true;
   s_custom_alert_level = AL_20;
+  s_ca_has_notified = false;
   for (int i = 0; i < NUM_STORED_SAMPLES; i++) {
     s_sample_data.timestamps[i] = time(NULL) - ((i + 1) * SECONDS_PER_DAY);
-    s_sample_data.values[i] = (i < 3) ? 5 : DATA_EMPTY;
+    s_sample_data.values[i] = (i < NUM_STORED_SAMPLES) ? 4 : DATA_EMPTY;
   }
   return;
 #endif
@@ -80,6 +88,7 @@ void data_init() {
   } else {
     // Load current data for foreground display
     s_discharge_start_time = persist_read_int(SK_DischargeStartTime);
+    s_last_sample_time = persist_read_int(SK_LastSampleTime);
     s_last_charge_perc = persist_read_int(SK_LastChargePerc);
     s_wakeup_id = persist_read_int(SK_WakeupId);
     s_was_plugged = persist_read_bool(SK_WasPlugged);
@@ -92,9 +101,9 @@ void data_init() {
       data_set_error("Error reading data from storage");
       return;
     }
-
-    data_log_state();
   }
+
+  data_log_state();
 }
 
 void data_deinit() {
@@ -106,36 +115,33 @@ void data_deinit() {
 void data_log_state() {
   APP_LOG(
     APP_LOG_LEVEL_INFO,
-    "S: %d, W: %d, B: %d, P: %s",
-    s_discharge_start_time, s_wakeup_id, s_last_charge_perc, s_was_plugged ? "true": "false"
-  );
-  APP_LOG(
-    APP_LOG_LEVEL_INFO,
-    "History: %d %d %d %d %d %d",
-    s_sample_data.values[0],
-    s_sample_data.values[1],
-    s_sample_data.values[2],
-    s_sample_data.values[3],
-    s_sample_data.values[4],
-    s_sample_data.values[5]
+    "D: %d | S: %d | W: %d | B: %d | P: %s | H: %d %d %d %d %d %d",
+    s_discharge_start_time, s_last_sample_time, s_wakeup_id,
+    s_last_charge_perc, s_was_plugged ? "t": "f",
+    s_sample_data.values[0], s_sample_data.values[1],
+    s_sample_data.values[2], s_sample_data.values[3],
+    s_sample_data.values[4], s_sample_data.values[5]
   );
 }
 
-void data_initial_sample() {
+void data_initial_update() {
   BatteryChargeState state = battery_state_service_peek();
   const bool is_plugged = state.is_plugged;
   const int charge_percent = state.charge_percent;
-
-  data_set_was_plugged(is_plugged);
-  data_set_last_charge_perc(charge_percent);
-
   const time_t now = time(NULL);
+
+  // We set these when enabled to rely on the time diff and zero-diff mechanisms
+  data_set_last_charge_perc(charge_percent);
+  data_set_last_sample_time(now);
+
+  // Assume this is discharge start until events change that
   data_set_discharge_start_time(now);
+  data_set_was_plugged(is_plugged);
 }
 
 void data_push_sample_value(int v) {
   // Time of the new sample
-  time_t now = time(NULL);
+  const time_t now = time(NULL);
 
   // Shift right
   for (int i = NUM_STORED_SAMPLES - 1; i > 0; i--) {
@@ -154,7 +160,7 @@ int data_get_history_avg_rate() {
   int counted = 0;
   for (int i = 0; i < NUM_STORED_SAMPLES; i++) {
     if (data->values[i] == DATA_EMPTY) continue;
-    
+
     acc += data->values[i];
     counted++;
   }
@@ -183,6 +189,14 @@ int data_get_discharge_start_time() {
 
 void data_set_discharge_start_time(int time) {
   s_discharge_start_time = time;
+}
+
+int data_get_last_sample_time() {
+  return s_last_sample_time;
+}
+
+void data_set_last_sample_time(int time) {
+  s_last_sample_time = time;
 }
 
 int data_get_last_charge_perc() {
@@ -263,6 +277,9 @@ void data_cycle_custom_alert_level() {
       s_custom_alert_level = AL_OFF;
       break;
   }
+
+  // If changed to less than current, don't skip
+  set_ca_has_notified(false);
 }
 
 int data_get_samples_count() {
@@ -273,4 +290,12 @@ int data_get_samples_count() {
     }
   }
   return count;
+}
+
+bool get_ca_has_notified() {
+  return s_ca_has_notified;
+}
+
+void set_ca_has_notified(bool notified) {
+  s_ca_has_notified = notified;
 }

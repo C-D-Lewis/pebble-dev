@@ -49,15 +49,15 @@ static bool handle_missed_wakeup() {
 static void init() {
   data_init();
 
-  const bool missed = handle_missed_wakeup();
-  const bool first_launch = !data_get_seen_first_launch();
-
   if (launch_reason() == APP_LAUNCH_WAKEUP) {
     WakeupId id = 0;
     int32_t reason = 0;
     wakeup_get_launch_event(&id, &reason);
     wakeup_handler(id, reason);
   } else {
+    const bool missed = handle_missed_wakeup();
+    const bool first_launch = !data_get_seen_first_launch();
+
     main_window_push();
 
     // In case an event comes when the app is open

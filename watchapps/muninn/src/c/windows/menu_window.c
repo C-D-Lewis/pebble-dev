@@ -1,15 +1,29 @@
 #include "menu_window.h"
 
+#define NUM_ITEMS 6
+#define ROW_HEIGHT_SMALL 38
+#define ROW_HEIGHT_LARGE 44
+
 static Window *s_window;
 static MenuLayer *s_menu_layer;
 
 static bool s_clear_confirm;
 
-char *about_text = "Odin tasked Muninn with memory of the land...\n\nHe wakes every 12 hours to note the battery level.\n\nOver time, he will provide you with battery wisdom.";
+typedef enum {
+  MI_VIBE_ON_SAMPLE = 0,
+  MI_CUSTOM_ALERT_LEVEL = 1,
+  MI_ESTIMATE_LOG = 2,
+  MI_BATTERY_TIPS = 3,
+  MI_ABOUT = 4,
+  MI_DELETE_ALL_DATA = 5,
+  MI_MAX = 6
+} MenuItems;
+
+char *about_text = "Odin tasked Muninn with memory of the land...\n\nHe wakes every 6 hours to note the battery level.\n\nOver time, he will provide you with battery wisdom.";
 char *tips_text = "Use a watchface that updates every minute.\n\nFilter notifications from very noisy apps.\n\nDisable the motion activated backlight.";
 
 static uint16_t get_num_rows_callback(MenuLayer *menu_layer, uint16_t section_index, void *context) {
-  return 6;
+  return MI_MAX;
 }
 
 static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_index, void *context) {
@@ -21,7 +35,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
   }
 
   switch(cell_index->row) {
-    case 0:
+    case MI_VIBE_ON_SAMPLE:
       menu_cell_basic_draw(
         ctx,
         cell_layer,
@@ -30,25 +44,25 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
         NULL
       );
       break;
-    case 1:
+    case MI_CUSTOM_ALERT_LEVEL:
       menu_cell_basic_draw(
         ctx,
         cell_layer,
-        "Custom alert",
+        "Custom threshold",
         alert_disabled ? "Disabled" : s_alert_buff,
         NULL
       );
       break;
-    case 2:
-      menu_cell_basic_draw(ctx, cell_layer, "Samples log", NULL, NULL);
+    case MI_ESTIMATE_LOG:
+      menu_cell_basic_draw(ctx, cell_layer, "Estimate log", NULL, NULL);
       break;
-    case 3:
+    case MI_BATTERY_TIPS:
+      menu_cell_basic_draw(ctx, cell_layer, "Battery tips", NULL, NULL);
+      break;
+    case MI_ABOUT:
       menu_cell_basic_draw(ctx, cell_layer, "About", NULL, NULL);
       break;
-    case 4:
-      menu_cell_basic_draw(ctx, cell_layer, "Battery Tips", NULL, NULL);
-      break;
-    case 5:
+    case MI_DELETE_ALL_DATA:
       menu_cell_basic_draw(
         ctx,
         cell_layer,
@@ -62,22 +76,27 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
 }
 
 static int16_t get_cell_height_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) {
-  return 44;
+  switch(cell_index->row) {
+    case MI_VIBE_ON_SAMPLE:
+    case MI_CUSTOM_ALERT_LEVEL: return ROW_HEIGHT_LARGE;
+    case MI_DELETE_ALL_DATA: return s_clear_confirm ? ROW_HEIGHT_LARGE : ROW_HEIGHT_SMALL;
+    default: return ROW_HEIGHT_SMALL;
+  }
 }
 
 static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) {
   switch(cell_index->row) {
-    case 0:
+    case MI_VIBE_ON_SAMPLE:
       data_set_vibe_on_sample(!data_get_vibe_on_sample());
       break;
-    case 1:
+    case MI_CUSTOM_ALERT_LEVEL:
       data_cycle_custom_alert_level();
       break;
-    case 2:
+    case MI_ESTIMATE_LOG:
       if (data_get_samples_count() == 0) {
         alert_window_push(
           RESOURCE_ID_ASLEEP,
-          "No samples yet.\n\nMuninn will take a sample soon.",
+          "No estimates yet.\n\nMuninn will begin estimating soon.",
           true,
           false
         );
@@ -85,13 +104,13 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
         history_window_push();
       }
       break;
-    case 3:
-      message_window_push(about_text);
-      break;
-    case 4:
+    case MI_BATTERY_TIPS:
       message_window_push(tips_text);
       break;
-    case 5:
+    case MI_ABOUT:
+      message_window_push(about_text);
+      break;
+    case MI_DELETE_ALL_DATA:
       if (s_clear_confirm) {
         data_reset_all();
         vibes_double_pulse();

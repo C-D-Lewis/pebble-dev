@@ -22,17 +22,16 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
     return;
   }
 
-  int index = cell_index->row;
+  const int index = cell_index->row;
 
-  // Half these, since they are taken every 12 hours
-  int value = data_get_sample_data()->values[index] / 2;
-  static char s_level_buff[8];
-  snprintf(s_level_buff, sizeof(s_level_buff), "%d%%", value);
+  const int value = data_get_sample_data()->values[index];
+  static char s_level_buff[16];
+  snprintf(s_level_buff, sizeof(s_level_buff), "Around %d%% / day", value);
 
-  static char s_time_buff[16];
-  time_t sample_time = data_get_sample_data()->timestamps[index];
-  struct tm *tm_info = localtime(&sample_time);
-  strftime(s_time_buff, sizeof(s_time_buff), "%b %d %H:%M", tm_info);
+  static char s_time_buff[32];
+  const time_t sample_time = data_get_sample_data()->timestamps[index];
+  const struct tm *tm_info = localtime(&sample_time);
+  strftime(s_time_buff, sizeof(s_time_buff), "%b. %d %H:%M", tm_info);
 
   menu_cell_basic_draw(
     ctx,
@@ -55,7 +54,7 @@ static void main_window_load(Window *window) {
     GRect(0, -3, bounds.size.w, 24),
     fonts_get_system_font(FONT_KEY_GOTHIC_18)
   );
-  text_layer_set_text(s_header_layer, "Recent Samples");
+  text_layer_set_text(s_header_layer, "Recent Estimations");
   text_layer_set_text_alignment(s_header_layer, GTextAlignmentCenter);
   layer_add_child(window_layer, text_layer_get_layer(s_header_layer));
 

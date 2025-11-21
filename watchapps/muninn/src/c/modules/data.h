@@ -13,8 +13,8 @@
 typedef enum {
   // Last time we stopped charging
   SK_DischargeStartTime = 0,
-  // Last time we updated
-  __SK_LastUpdateTime = 1,
+  // Last time we sampled a value - this can vary if the last period yielded no change
+  SK_LastSampleTime = 1,
   // Last charge percent
   SK_LastChargePerc = 2,
   // ID of the scheduled wakeup
@@ -29,6 +29,8 @@ typedef enum {
   SK_VibeOnSample = 7,
   // Custom alert level value
   SK_CustomAlertLevel = 8,
+  // If the custom alert has already notified
+  SK_CAHasNotified = 9,
 
   // Max storage value used
   SK_Max = 25
@@ -54,7 +56,7 @@ void data_deinit();
 
 void data_log_state();
 
-void data_initial_sample();
+void data_initial_update();
 
 void data_push_sample_value(int v);
 
@@ -64,6 +66,9 @@ int data_calculate_days_remaining();
 
 int data_get_discharge_start_time(void);
 void data_set_discharge_start_time(int time);
+
+int data_get_last_sample_time(void);
+void data_set_last_sample_time(int time);
 
 int data_get_last_charge_perc(void);
 void data_set_last_charge_perc(int perc);
@@ -89,3 +94,6 @@ int data_get_custom_alert_level();
 void data_cycle_custom_alert_level();
 
 int data_get_samples_count();
+
+bool get_ca_has_notified();
+void set_ca_has_notified(bool notified);

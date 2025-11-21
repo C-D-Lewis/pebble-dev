@@ -3,10 +3,10 @@
 #include <pebble.h>
 
 // Hours between wakeups - don't intend to change this
-#define WAKEUP_MOD_H 12
+#define WAKEUP_MOD_H 6
 
 // Number of stores samples - careful changing this after release
-#define NUM_STORED_SAMPLES 6
+#define NUM_STORED_SAMPLES 12
 
 // Screen dimensions - not chalks
 #ifdef PBL_PLATFORM_EMERY

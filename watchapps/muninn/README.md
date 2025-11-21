@@ -39,4 +39,5 @@ provide insight into battery life remaining.
 - [ ] Real-world testing over several days
 - [ ] Test power-off picks up correctly
 - [ ] Test charging and resuming works
+- [ ] Single app data structure?
 - [ ] Emery screen size support
