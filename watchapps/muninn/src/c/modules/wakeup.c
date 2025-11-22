@@ -42,10 +42,10 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
   // Should we advise battery is low?
   const int alert_level = data_get_custom_alert_level();
   const bool is_low = alert_level != AL_OFF && data_get_last_charge_perc() <= alert_level;
-  const bool ca_has_notified = get_ca_has_notified();
+  const bool ca_has_notified = data_get_ca_has_notified();
 
   if (is_low && !ca_has_notified) {
-    set_ca_has_notified(true);
+    data_set_ca_has_notified(true);
 
     alert_window_push(
       RESOURCE_ID_WRITING,
@@ -56,7 +56,7 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
   } else {
     if (!is_low && ca_has_notified) {
       // Reset notification flag when above threshold
-      set_ca_has_notified(false);
+      data_set_ca_has_notified(false);
     }
 
     // Regular wakeup window
@@ -81,8 +81,6 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
   // First ever sample - nothing to compare to
   if (last_sample_time == DATA_EMPTY) {
     APP_LOG(APP_LOG_LEVEL_INFO, "First sample!");
-
-    data_set_discharge_start_time(now);
   } else {
     const int time_diff_s = now - last_sample_time;
     const int charge_diff = data_get_last_charge_perc() - charge_percent;
@@ -91,13 +89,16 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
     // Ignore if plugged in or recently charged (store discharge rates only)
     if (is_plugged || charge_diff < 0) {
       APP_LOG(APP_LOG_LEVEL_INFO, "Ignoring: plugged in or recently charged");
+
+      // Maintain charge level if it's going up
+      data_set_last_charge_perc(charge_percent);
     } else if (charge_diff == 0) {
       // No change since last sample
       APP_LOG(APP_LOG_LEVEL_INFO, "No change since last sample");
     } else {
       // Unplugged since last sample
       if ((data_get_was_plugged() && !is_plugged)) {
-        data_set_discharge_start_time(now);
+        // data_set_discharge_start_time(now);
       }
 
       // Calculate new discharge rate

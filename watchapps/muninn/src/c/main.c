@@ -12,10 +12,10 @@
 char *welcome_text = "Welcome to Muninn!\n\nHe will track your battery over time.\n\nPlease launch after each reboot.";
 
 static void battery_handler(BatteryChargeState state) {
-  // Un/plugged while app is open
-  if (data_get_was_plugged() && !state.is_plugged) {
-    const time_t now = time(NULL);
-    data_set_discharge_start_time(now);
+  // Went up
+  if (state.charge_percent > data_get_last_charge_perc()) {
+    // Maintain charge level if it's going up
+    data_set_last_charge_perc(state.charge_percent);
   }
 
   data_set_was_plugged(state.is_plugged);

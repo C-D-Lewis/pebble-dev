@@ -12,7 +12,7 @@
 // NOTE: ADD ONLY - Changing keys will affect existing users!
 typedef enum {
   // Last time we stopped charging
-  SK_DischargeStartTime = 0,
+  __SK_DischargeStartTime = 0,
   // Last time we sampled a value - this can vary if the last period yielded no change
   SK_LastSampleTime = 1,
   // Last charge percent
@@ -64,9 +64,6 @@ int data_get_history_avg_rate();
 
 int data_calculate_days_remaining();
 
-int data_get_discharge_start_time(void);
-void data_set_discharge_start_time(int time);
-
 int data_get_last_sample_time(void);
 void data_set_last_sample_time(int time);
 
@@ -95,5 +92,5 @@ void data_cycle_custom_alert_level();
 
 int data_get_samples_count();
 
-bool get_ca_has_notified();
-void set_ca_has_notified(bool notified);
+bool data_get_ca_has_notified();
+void data_set_ca_has_notified(bool notified);

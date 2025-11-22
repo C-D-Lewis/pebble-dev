@@ -17,20 +17,13 @@ void stat_window_update_data() {
   if (is_enabled) {
     // Current stats
     static char s_values_buff[128];
-    static char s_fmt_discharge_buff[16];
     static char s_fmt_wakeup_buff[16];
-    util_fmt_time_ago(
-      data_get_discharge_start_time(),
-      &s_fmt_discharge_buff[0],
-      sizeof(s_fmt_discharge_buff)
-    );
     util_fmt_time(wakeup_ts, &s_fmt_wakeup_buff[0], sizeof(s_fmt_wakeup_buff));
     snprintf(
       s_values_buff,
       sizeof(s_values_buff),
-      "Enabled: %s\nStarted: %s ago\nNext sample: %s\nLast value: %d\nWas plugged in: %s",
+      "Enabled: %s\nNext sample: %s\nLast value: %d\nWas plugged in: %s",
       is_enabled ? "true": "false",
-      &s_fmt_discharge_buff[0],
       &s_fmt_wakeup_buff[0],
       data_get_last_charge_perc(),
       data_get_was_plugged() ? "true": "false"

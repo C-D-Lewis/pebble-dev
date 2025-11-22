@@ -1,7 +1,6 @@
 #include "data.h"
 
 // Persisted
-static int s_discharge_start_time;
 static int s_last_sample_time;
 static int s_last_charge_perc;
 static int s_wakeup_id;
@@ -22,7 +21,6 @@ static void delete_all_data() {
 }
 
 static void save_all() {
-  persist_write_int(SK_DischargeStartTime, s_discharge_start_time);
   persist_write_int(SK_LastSampleTime, s_last_sample_time);
   persist_write_int(SK_LastChargePerc, s_last_charge_perc);
   persist_write_int(SK_WakeupId, s_wakeup_id);
@@ -43,7 +41,6 @@ void data_reset_all() {
   delete_all_data();
 
   // Write defaults - some will be init'd when tracking begins
-  s_discharge_start_time = DATA_EMPTY;
   s_last_sample_time = DATA_EMPTY;
   s_last_charge_perc = DATA_EMPTY;
   s_wakeup_id = DATA_EMPTY;
@@ -66,7 +63,6 @@ void data_init() {
 
 #if defined(TEST_DATA)
   // Load test values for this launch
-  s_discharge_start_time = time(NULL) - (12 * SECONDS_PER_HOUR);
   s_last_sample_time = time(NULL) - (6 * SECONDS_PER_HOUR);
   s_last_charge_perc = 80;
   s_wakeup_id = time(NULL) + (12 * SECONDS_PER_HOUR);   // Won't be found
@@ -87,7 +83,6 @@ void data_init() {
     data_reset_all();
   } else {
     // Load current data for foreground display
-    s_discharge_start_time = persist_read_int(SK_DischargeStartTime);
     s_last_sample_time = persist_read_int(SK_LastSampleTime);
     s_last_charge_perc = persist_read_int(SK_LastChargePerc);
     s_wakeup_id = persist_read_int(SK_WakeupId);
@@ -115,8 +110,8 @@ void data_deinit() {
 void data_log_state() {
   APP_LOG(
     APP_LOG_LEVEL_INFO,
-    "D: %d | S: %d | W: %d | B: %d | P: %s | H: %d %d %d %d %d %d",
-    s_discharge_start_time, s_last_sample_time, s_wakeup_id,
+    "D: %d | W: %d | B: %d | P: %s | H: %d %d %d %d %d %d",
+    s_last_sample_time, s_wakeup_id,
     s_last_charge_perc, s_was_plugged ? "t": "f",
     s_sample_data.values[0], s_sample_data.values[1],
     s_sample_data.values[2], s_sample_data.values[3],
@@ -135,7 +130,6 @@ void data_initial_update() {
   data_set_last_sample_time(now);
 
   // Assume this is discharge start until events change that
-  data_set_discharge_start_time(now);
   data_set_was_plugged(is_plugged);
 }
 
@@ -181,14 +175,6 @@ int data_calculate_days_remaining() {
   }
 
   return remaining / rate;
-}
-
-int data_get_discharge_start_time() {
-  return s_discharge_start_time;
-}
-
-void data_set_discharge_start_time(int time) {
-  s_discharge_start_time = time;
 }
 
 int data_get_last_sample_time() {
@@ -279,7 +265,7 @@ void data_cycle_custom_alert_level() {
   }
 
   // If changed to less than current, don't skip
-  set_ca_has_notified(false);
+  data_set_ca_has_notified(false);
 }
 
 int data_get_samples_count() {
@@ -292,10 +278,10 @@ int data_get_samples_count() {
   return count;
 }
 
-bool get_ca_has_notified() {
+bool data_get_ca_has_notified() {
   return s_ca_has_notified;
 }
 
-void set_ca_has_notified(bool notified) {
+void data_set_ca_has_notified(bool notified) {
   s_ca_has_notified = notified;
 }
