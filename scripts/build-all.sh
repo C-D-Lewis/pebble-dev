@@ -44,6 +44,7 @@ working_projects=$(cat <<EOF
 ./watchapps/dashboard/pebble/
 ./watchapps/news-headlines/
 ./watchapps/tube-status/
+./watchapps/muninn/
 EOF
 )
 
