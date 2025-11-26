@@ -44,30 +44,6 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
   const bool is_low = alert_level != AL_OFF && data_get_last_charge_perc() <= alert_level;
   const bool ca_has_notified = data_get_ca_has_notified();
 
-  if (is_low && !ca_has_notified) {
-    data_set_ca_has_notified(true);
-
-    alert_window_push(
-      RESOURCE_ID_WRITING,
-      "Muninn advises the battery is below your custom threshold.",
-      true,
-      false
-    );
-  } else {
-    if (!is_low && ca_has_notified) {
-      // Reset notification flag when above threshold
-      data_set_ca_has_notified(false);
-    }
-
-    // Regular wakeup window
-    alert_window_push(
-      RESOURCE_ID_WRITING,
-      "Muninn takes a note...",
-      data_get_vibe_on_sample(),
-      true
-    );
-  }
-
   // We popped
   data_set_wakeup_id(DATA_EMPTY);
 
@@ -93,7 +69,7 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
       // Maintain charge level if it's going up
       data_set_last_charge_perc(charge_percent);
     } else if (charge_diff == 0) {
-      // No change since last sample
+      // No change since last sample - probably on charge or very short period
       APP_LOG(APP_LOG_LEVEL_INFO, "No change since last sample");
     } else {
       // Unplugged since last sample
@@ -116,4 +92,28 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
 
   data_log_state();
   wakeup_schedule_next();
+
+  if (is_low && !ca_has_notified) {
+    data_set_ca_has_notified(true);
+
+    alert_window_push(
+      RESOURCE_ID_WRITING,
+      "Muninn advises the battery is below your custom threshold.",
+      true,
+      false
+    );
+  } else {
+    if (!is_low && ca_has_notified) {
+      // Reset notification flag when above threshold
+      data_set_ca_has_notified(false);
+    }
+
+    // Regular wakeup window
+    alert_window_push(
+      RESOURCE_ID_WRITING,
+      "Muninn takes a note...",
+      data_get_vibe_on_sample(),
+      true
+    );
+  }
 }

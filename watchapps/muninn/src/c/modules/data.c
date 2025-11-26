@@ -1,14 +1,7 @@
 #include "data.h"
 
 // Persisted
-static int s_last_sample_time;
-static int s_last_charge_perc;
-static int s_wakeup_id;
-static bool s_was_plugged;
-static bool s_seen_first_launch;
-static bool s_vibe_on_sample;
-static bool s_ca_has_notified;
-static int s_custom_alert_level;
+static AppData s_app_data;
 static SampleData s_sample_data;
 
 // Not persisted
@@ -21,19 +14,16 @@ static void delete_all_data() {
 }
 
 static void save_all() {
-  persist_write_int(SK_LastSampleTime, s_last_sample_time);
-  persist_write_int(SK_LastChargePerc, s_last_charge_perc);
-  persist_write_int(SK_WakeupId, s_wakeup_id);
-  persist_write_bool(SK_WasPlugged, s_was_plugged);
-  persist_write_bool(SK_SeenFirstLaunch, s_seen_first_launch);
-  persist_write_bool(SK_VibeOnSample, s_vibe_on_sample);
-  persist_write_int(SK_CustomAlertLevel, s_custom_alert_level);
-  persist_write_bool(SK_CAHasNotified, s_ca_has_notified);
+  status_t result = persist_write_data(SK_AppData, &s_app_data, sizeof(AppData));
+  if (result < 0) {
+    APP_LOG(APP_LOG_LEVEL_ERROR, "Error writing app data: %d", (int)result);
+    data_set_error("Error writing app data to storage");
+  }
 
-  status_t result = persist_write_data(SK_SampleData, &s_sample_data, sizeof(SampleData));
+  result = persist_write_data(SK_SampleData, &s_sample_data, sizeof(SampleData));
   if (result < 0) {
     APP_LOG(APP_LOG_LEVEL_ERROR, "Error writing sample data: %d", (int)result);
-    data_set_error("Error writing data to storage");
+    data_set_error("Error writing sample data to storage");
   }
 }
 
@@ -41,19 +31,34 @@ void data_reset_all() {
   delete_all_data();
 
   // Write defaults - some will be init'd when tracking begins
-  s_last_sample_time = DATA_EMPTY;
-  s_last_charge_perc = DATA_EMPTY;
-  s_wakeup_id = DATA_EMPTY;
-  s_was_plugged = true;
-  s_seen_first_launch = true; // Special case
-  s_vibe_on_sample = false;
-  s_custom_alert_level = AL_OFF;
-  s_ca_has_notified = false;
+  s_app_data.last_sample_time = DATA_EMPTY;
+  s_app_data.last_charge_perc = DATA_EMPTY;
+  s_app_data.wakeup_id = DATA_EMPTY;
+  s_app_data.was_plugged = true;
+  s_app_data.seen_first_launch = false;
+  s_app_data.vibe_on_sample = false;
+  s_app_data.custom_alert_level = AL_OFF;
+  s_app_data.ca_has_notified = false;
+
   for (int i = 0; i < NUM_STORED_SAMPLES; i++) {
+    s_sample_data.timestamps[i] = DATA_EMPTY;
     s_sample_data.values[i] = DATA_EMPTY;
   }
 
   save_all();
+}
+
+static void do_migrations() {
+  // NUM_STORED_SAMPLES increased
+  for (int i = 0; i < NUM_STORED_SAMPLES; i++) {
+    if (s_sample_data.values[i] == 0) {
+      // Due to expansion, new slots will be zeroed
+      s_sample_data.timestamps[i] = DATA_EMPTY;
+      s_sample_data.values[i] = DATA_EMPTY;
+    }
+  }
+
+  // Future migrations go here
 }
 
 void data_init() {
@@ -63,17 +68,19 @@ void data_init() {
 
 #if defined(TEST_DATA)
   // Load test values for this launch
-  s_last_sample_time = time(NULL) - (6 * SECONDS_PER_HOUR);
-  s_last_charge_perc = 80;
-  s_wakeup_id = time(NULL) + (12 * SECONDS_PER_HOUR);   // Won't be found
-  s_was_plugged = false;
-  s_seen_first_launch = true;
-  s_vibe_on_sample = true;
-  s_custom_alert_level = AL_20;
-  s_ca_has_notified = false;
+  s_app_data.last_sample_time = time(NULL) - (6 * SECONDS_PER_HOUR);
+  s_app_data.last_charge_perc = 80;
+  s_app_data.wakeup_id = time(NULL) + (12 * SECONDS_PER_HOUR);   // Won't be found
+  s_app_data.was_plugged = false;
+  s_app_data.seen_first_launch = true;
+  s_app_data.vibe_on_sample = true;
+  s_app_data.custom_alert_level = AL_20;
+  s_app_data.ca_has_notified = false;
+
   for (int i = 0; i < NUM_STORED_SAMPLES; i++) {
-    s_sample_data.timestamps[i] = time(NULL) - ((i + 1) * SECONDS_PER_DAY);
-    s_sample_data.values[i] = (i < NUM_STORED_SAMPLES) ? 4 : DATA_EMPTY;
+    // Going back i * six hours, on the hour
+    s_sample_data.timestamps[i] = time(NULL) - ((i + 1) * WAKEUP_MOD_H * SECONDS_PER_HOUR);
+    s_sample_data.values[i] = (i < 1) ? 4 : DATA_EMPTY;
   }
   return;
 #endif
@@ -82,20 +89,22 @@ void data_init() {
   if (!persist_exists(SK_SampleData)) {
     data_reset_all();
   } else {
-    // Load current data for foreground display
-    s_last_sample_time = persist_read_int(SK_LastSampleTime);
-    s_last_charge_perc = persist_read_int(SK_LastChargePerc);
-    s_wakeup_id = persist_read_int(SK_WakeupId);
-    s_was_plugged = persist_read_bool(SK_WasPlugged);
-    s_seen_first_launch = persist_read_bool(SK_SeenFirstLaunch);
-    s_vibe_on_sample = persist_read_bool(SK_VibeOnSample);
-    s_custom_alert_level = persist_read_int(SK_CustomAlertLevel);
-    status_t result = persist_read_data(SK_SampleData, &s_sample_data, sizeof(SampleData));
+    // Load current data
+    status_t result = persist_read_data(SK_AppData, &s_app_data, sizeof(AppData));
     if (result < 0) {
-      APP_LOG(APP_LOG_LEVEL_ERROR, "Error reading sample data: %d", (int)result);
-      data_set_error("Error reading data from storage");
+      APP_LOG(APP_LOG_LEVEL_ERROR, "Error reading app data: %d", (int)result);
+      data_set_error("Error reading app data from storage");
       return;
     }
+
+    result = persist_read_data(SK_SampleData, &s_sample_data, sizeof(SampleData));
+    if (result < 0) {
+      APP_LOG(APP_LOG_LEVEL_ERROR, "Error reading sample data: %d", (int)result);
+      data_set_error("Error reading sample data from storage");
+      return;
+    }
+
+    do_migrations();
   }
 
   data_log_state();
@@ -110,12 +119,11 @@ void data_deinit() {
 void data_log_state() {
   APP_LOG(
     APP_LOG_LEVEL_INFO,
-    "D: %d | W: %d | B: %d | P: %s | H: %d %d %d %d %d %d",
-    s_last_sample_time, s_wakeup_id,
-    s_last_charge_perc, s_was_plugged ? "t": "f",
+    "D: %d | W: %d | B: %d | P: %s | H: %d %d %d | A: %d",
+    s_app_data.last_sample_time, s_app_data.wakeup_id,
+    s_app_data.last_charge_perc, s_app_data.was_plugged ? "t": "f",
     s_sample_data.values[0], s_sample_data.values[1],
-    s_sample_data.values[2], s_sample_data.values[3],
-    s_sample_data.values[4], s_sample_data.values[5]
+    s_sample_data.values[2], s_app_data.ca_has_notified ? 1 : 0
   );
 }
 
@@ -159,54 +167,58 @@ int data_get_history_avg_rate() {
     counted++;
   }
 
-  if (counted == 0) return DATA_EMPTY;
+  // At least two samples to average
+  if (counted < 2) return DATA_EMPTY;
+
   return acc / counted;
 }
 
 int data_calculate_days_remaining() {
   int rate = data_get_history_avg_rate();
-  int remaining = data_get_last_charge_perc();
+  int charge_perc = data_get_last_charge_perc();
 
-  if (rate == DATA_EMPTY || remaining == DATA_EMPTY) return DATA_EMPTY;
+  if (rate == DATA_EMPTY || charge_perc == DATA_EMPTY) return DATA_EMPTY;
+
   if (rate <= 0) {
-    APP_LOG(APP_LOG_LEVEL_ERROR, "Somehow rate was negative");
-    APP_LOG(APP_LOG_LEVEL_INFO, "rate: %d remaining: %d", rate, remaining);
+    APP_LOG(APP_LOG_LEVEL_ERROR, "Somehow rate was <= 0 (negative)");
+    APP_LOG(APP_LOG_LEVEL_INFO, "rate: %d charge_perc: %d", rate, charge_perc);
     return DATA_EMPTY;
   }
 
-  return remaining / rate;
+
+  return charge_perc / rate;
 }
 
 int data_get_last_sample_time() {
-  return s_last_sample_time;
+  return s_app_data.last_sample_time;
 }
 
 void data_set_last_sample_time(int time) {
-  s_last_sample_time = time;
+  s_app_data.last_sample_time = time;
 }
 
 int data_get_last_charge_perc() {
-  return s_last_charge_perc;
+  return s_app_data.last_charge_perc;
 }
 
 void data_set_last_charge_perc(int perc) {
-  s_last_charge_perc = perc;
+  s_app_data.last_charge_perc = perc;
 }
 
 int data_get_wakeup_id() {
-  return s_wakeup_id;
+  return s_app_data.wakeup_id;
 }
 
 void data_set_wakeup_id(int id) {
-  s_wakeup_id = id;
+  s_app_data.wakeup_id = id;
 }
 
 bool data_get_was_plugged() {
-  return s_was_plugged;
+  return s_app_data.was_plugged;
 }
 
 void data_set_was_plugged(bool b) {
-  s_was_plugged = b;
+  s_app_data.was_plugged = b;
 }
 
 SampleData* data_get_sample_data() {
@@ -228,39 +240,39 @@ char* data_get_error() {
 }
 
 void data_set_seen_first_launch() {
-  s_seen_first_launch = true;
+  s_app_data.seen_first_launch = true;
 }
 
 bool data_get_seen_first_launch() {
-  return s_seen_first_launch;
+  return s_app_data.seen_first_launch;
 }
 
 bool data_get_vibe_on_sample() {
-  return s_vibe_on_sample;
+  return s_app_data.vibe_on_sample;
 }
 
 void data_set_vibe_on_sample(bool v) {
-  s_vibe_on_sample = v;
+  s_app_data.vibe_on_sample = v;
 }
 
 int data_get_custom_alert_level() {
-  return s_custom_alert_level;
+  return s_app_data.custom_alert_level;
 }
 
 void data_cycle_custom_alert_level() {
-  switch (s_custom_alert_level) {
+  switch (s_app_data.custom_alert_level) {
     case AL_OFF:
-      s_custom_alert_level = AL_50;
+      s_app_data.custom_alert_level = AL_50;
       break;
     case AL_50:
-      s_custom_alert_level = AL_20;
+      s_app_data.custom_alert_level = AL_20;
       break;
     case AL_20:
-      s_custom_alert_level = AL_10;
+      s_app_data.custom_alert_level = AL_10;
       break;
     case AL_10:
     default:
-      s_custom_alert_level = AL_OFF;
+      s_app_data.custom_alert_level = AL_OFF;
       break;
   }
 
@@ -279,9 +291,9 @@ int data_get_samples_count() {
 }
 
 bool data_get_ca_has_notified() {
-  return s_ca_has_notified;
+  return s_app_data.ca_has_notified;
 }
 
 void data_set_ca_has_notified(bool notified) {
-  s_ca_has_notified = notified;
+  s_app_data.ca_has_notified = notified;
 }

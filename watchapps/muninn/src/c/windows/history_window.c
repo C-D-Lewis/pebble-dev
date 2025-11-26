@@ -26,7 +26,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
 
   const int value = data_get_sample_data()->values[index];
   static char s_level_buff[16];
-  snprintf(s_level_buff, sizeof(s_level_buff), "Around %d%% / day", value);
+  snprintf(s_level_buff, sizeof(s_level_buff), "~ %d%% / day", value);
 
   static char s_time_buff[32];
   const time_t sample_time = data_get_sample_data()->timestamps[index];

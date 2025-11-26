@@ -9,7 +9,38 @@
 #include "windows/stat_window.h"
 #include "windows/message_window.h"
 
-char *welcome_text = "Welcome to Muninn!\n\nHe will track your battery over time.\n\nPlease launch after each reboot.";
+#if PBL_API_EXISTS(app_glance_reload)
+static void app_glance_callback(AppGlanceReloadSession *session, size_t limit, void *context) {
+  if (limit < 1) return;
+
+  static char s_buffer[32];
+  if (data_calculate_days_remaining() == DATA_EMPTY) {
+    snprintf(
+      s_buffer,
+      sizeof(s_buffer),
+      "No data yet"
+    );
+  } else {
+    snprintf(
+      s_buffer,
+      sizeof(s_buffer),
+      "About %d days left",
+      data_calculate_days_remaining()
+    );
+  }
+
+  const AppGlanceSlice slice = (AppGlanceSlice) {
+    .layout = {
+      .subtitle_template_string = &s_buffer[0]
+    },
+    .expiration_time = APP_GLANCE_SLICE_NO_EXPIRATION
+  };
+  const AppGlanceResult result = app_glance_add_slice(session, slice);
+  if (result != APP_GLANCE_RESULT_SUCCESS) {
+    APP_LOG(APP_LOG_LEVEL_ERROR, "AppGlance Error: %d", result);
+  }
+}
+#endif
 
 static void battery_handler(BatteryChargeState state) {
   // Went up
@@ -77,7 +108,7 @@ static void init() {
     }
 
     if (first_launch) {
-      message_window_push(welcome_text);
+      message_window_push(MSG_WELCOME);
       data_set_seen_first_launch();
     }
   }
@@ -85,6 +116,10 @@ static void init() {
 
 static void deinit() {
   data_deinit();
+
+#if PBL_API_EXISTS(app_glance_reload)
+  app_glance_reload(app_glance_callback, NULL);
+#endif
 }
 
 int main() {

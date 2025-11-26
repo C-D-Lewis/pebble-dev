@@ -2,13 +2,15 @@
 
 #include <pebble.h>
 
-// Hours between wakeups - don't intend to change this
-#define WAKEUP_MOD_H 6
+/////////////////////////////////////
+// DO NOT CHANGE WITHOUT MIGRATION //
+// Hours between wakeups           //
+#define WAKEUP_MOD_H 6             //
+// Number of stores samples        //
+#define NUM_STORED_SAMPLES 4       //
+/////////////////////////////////////
 
-// Number of stores samples - careful changing this after release
-#define NUM_STORED_SAMPLES 12
-
-// Screen dimensions - not chalks
+// Screen dimensions - not chalk for now
 #ifdef PBL_PLATFORM_EMERY
   #define DISPLAY_W 220
   #define DISPLAY_H 228
@@ -18,6 +20,6 @@
 #endif
 
 // Testing area
-// #define WIPE_ON_LAUNCH true // Wipe all data on launch
+#define WIPE_ON_LAUNCH true // Wipe all data on launch
 // #define TEST_DATA true      // Use test data instead of real data
-// #define SAVE_TEST_DATA true      // Load some sample data into persist
+// #define SAVE_TEST_DATA true // Load some sample data into persist

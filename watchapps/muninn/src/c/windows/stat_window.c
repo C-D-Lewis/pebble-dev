@@ -14,39 +14,41 @@ void stat_window_update_data() {
   text_layer_set_text(s_stats_layer, "");
   text_layer_set_text(s_history_layer, "");
 
-  if (is_enabled) {
-    // Current stats
-    static char s_values_buff[128];
-    static char s_fmt_wakeup_buff[16];
-    util_fmt_time(wakeup_ts, &s_fmt_wakeup_buff[0], sizeof(s_fmt_wakeup_buff));
-    snprintf(
-      s_values_buff,
-      sizeof(s_values_buff),
-      "Enabled: %s\nNext sample: %s\nLast value: %d\nWas plugged in: %s",
-      is_enabled ? "true": "false",
-      &s_fmt_wakeup_buff[0],
-      data_get_last_charge_perc(),
-      data_get_was_plugged() ? "true": "false"
-    );
-    text_layer_set_text(s_stats_layer, s_values_buff);
+  // Current stats
+  static char s_fmt_last_buff[16];
+  util_fmt_time(data_get_last_sample_time(), &s_fmt_last_buff[0], sizeof(s_fmt_last_buff));
 
-    // Recent history
-    SampleData *sample_data = data_get_sample_data();
-    static char s_history_buff[64];
-    snprintf(
-      s_history_buff,
-      sizeof(s_history_buff),
-      "Recent samples:\n%d, %d, %d, %d, %d, %d\nAverage: %d",
-      sample_data->values[0],
-      sample_data->values[1],
-      sample_data->values[2],
-      sample_data->values[3],
-      sample_data->values[4],
-      sample_data->values[5],
-      data_get_history_avg_rate()
-    );
-    text_layer_set_text(s_history_layer, s_history_buff);
-  }
+  static char s_fmt_next_buff[16];
+  util_fmt_time(wakeup_ts, &s_fmt_next_buff[0], sizeof(s_fmt_next_buff));
+
+  static char s_values_buff[128];
+  snprintf(
+    s_values_buff,
+    sizeof(s_values_buff),
+    "Enabled: %s\nLast sample: %s\nNext sample: %s\nLast value: %d\nWas plugged in: %s\nLaunched?: %s",
+    is_enabled ? "true": "false",
+    &s_fmt_last_buff[0],
+    &s_fmt_next_buff[0],
+    data_get_last_charge_perc(),
+    data_get_was_plugged() ? "true": "false",
+    data_get_seen_first_launch() ? "true": "false"
+  );
+  text_layer_set_text(s_stats_layer, s_values_buff);
+
+  // Recent history
+  SampleData *sample_data = data_get_sample_data();
+  static char s_history_buff[64];
+  snprintf(
+    s_history_buff,
+    sizeof(s_history_buff),
+    "Recent samples:\n%d, %d, %d, %d\nAverage: %d",
+    sample_data->values[0],
+    sample_data->values[1],
+    sample_data->values[2],
+    sample_data->values[3],
+    data_get_history_avg_rate()
+  );
+  text_layer_set_text(s_history_layer, s_history_buff);
 }
 
 static void window_load(Window *window) {

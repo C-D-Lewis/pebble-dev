@@ -49,11 +49,6 @@
         },
         {
           "type": "png",
-          "name": "BATTERY",
-          "file": "images/battery.png"
-        },
-        {
-          "type": "png",
           "name": "BATTERY_LOW",
           "file": "images/battery-low.png"
         },

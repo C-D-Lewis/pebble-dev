@@ -14,19 +14,19 @@ static void window_load(Window *window) {
   s_image_bitmap = gbitmap_create_with_resource(RESOURCE_ID_MENU_ICON);
   s_braid_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BRAID);
 
-  s_image_layer = bitmap_layer_create(GRect(0, 0, bounds.size.w, 25));
+  s_image_layer = bitmap_layer_create(GRect(0, -1, bounds.size.w, 25));
   bitmap_layer_set_alignment(s_image_layer, GAlignCenter);
   bitmap_layer_set_compositing_mode(s_image_layer, GCompOpSet);
   bitmap_layer_set_bitmap(s_image_layer, s_image_bitmap);
   layer_add_child(root_layer, bitmap_layer_get_layer(s_image_layer));
 
-  s_braid_layer = bitmap_layer_create(GRect(0, 30, DISPLAY_W, 14));
+  s_braid_layer = bitmap_layer_create(GRect(0, 28, DISPLAY_W, 7));
   bitmap_layer_set_compositing_mode(s_braid_layer, GCompOpSet);
   bitmap_layer_set_bitmap(s_braid_layer, s_braid_bitmap);
   layer_add_child(root_layer, bitmap_layer_get_layer(s_braid_layer));
 
   s_text_layer = util_make_text_layer(
-    GRect(5, 48, DISPLAY_W - 10, DISPLAY_H),
+    GRect(2, 38, DISPLAY_W - 4, DISPLAY_H),
     fonts_get_system_font(FONT_KEY_GOTHIC_14)
   );
   text_layer_set_text_alignment(s_text_layer, GTextAlignmentCenter);

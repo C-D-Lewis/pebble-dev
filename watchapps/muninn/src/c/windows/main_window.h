@@ -6,6 +6,7 @@
 #include "../modules/wakeup.h"
 #include "../modules/util.h"
 
-#include "../windows/menu_window.h"
+#include "menu_window.h"
+#include "stat_window.h"
 
 void main_window_push();

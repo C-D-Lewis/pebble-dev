@@ -43,5 +43,5 @@ void util_fmt_time_ago(int then, char *buf, int buf_size) {
     unit = "d";
   }
 
-  snprintf(buf, buf_size, "%d %s", value, unit);
+  snprintf(buf, buf_size, "%d%s", value, unit);
 }

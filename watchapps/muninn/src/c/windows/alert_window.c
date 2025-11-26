@@ -14,14 +14,14 @@ static void window_load(Window *window) {
 
   s_image_bitmap = gbitmap_create_with_resource(s_res_id);
 
-  s_image_layer = bitmap_layer_create(GRect(0, 20, bounds.size.w, 64));
+  s_image_layer = bitmap_layer_create(GRect(0, 15, bounds.size.w, 48));
   bitmap_layer_set_alignment(s_image_layer, GAlignCenter);
   bitmap_layer_set_compositing_mode(s_image_layer, GCompOpSet);
   bitmap_layer_set_bitmap(s_image_layer, s_image_bitmap);
   layer_add_child(root_layer, bitmap_layer_get_layer(s_image_layer));
 
   s_text_layer = util_make_text_layer(
-    GRect(5, 90, DISPLAY_W - 10, 100),
+    GRect(2, 70, DISPLAY_W - 4, DISPLAY_H),
     fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD)
   );
   text_layer_set_text(s_text_layer, s_message);
