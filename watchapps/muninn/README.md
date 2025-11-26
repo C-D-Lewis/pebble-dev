@@ -71,5 +71,5 @@ from 2016) and what kind of anomalous behavior you encountered.
 - [x] Test power-off picks up correctly
 - [x] Test charging and resuming works
 - [x] Attempt to set AppGlance
-- [ ] Pre-release: single app data structure?
+- [x] Pre-release: single app data structure?
 - [ ] Emery screen size support

@@ -80,7 +80,7 @@ void data_init() {
   for (int i = 0; i < NUM_STORED_SAMPLES; i++) {
     // Going back i * six hours, on the hour
     s_sample_data.timestamps[i] = time(NULL) - ((i + 1) * WAKEUP_MOD_H * SECONDS_PER_HOUR);
-    s_sample_data.values[i] = (i < 1) ? 4 : DATA_EMPTY;
+    s_sample_data.values[i] = (i < 3) ? 4 : DATA_EMPTY;
   }
   return;
 #endif
