@@ -89,7 +89,7 @@ function getWeather(pos) {
     console.log(JSON.stringify(json, null, 2));
 
     var temp = parseInt(json.current.temperature_2m, 10);
-    var tempStr = (temp < 10 ? ' ' : '') + temp;
+    var tempStr = '' + temp;
     var code = json.current.weather_code;
 
     var str = getWeatherStrFromCode(code);
