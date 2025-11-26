@@ -20,6 +20,6 @@
 #endif
 
 // Testing area
-#define WIPE_ON_LAUNCH true // Wipe all data on launch
+// #define WIPE_ON_LAUNCH true // Wipe all data on launch
 // #define TEST_DATA true      // Use test data instead of real data
 // #define SAVE_TEST_DATA true // Load some sample data into persist
