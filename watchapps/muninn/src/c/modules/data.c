@@ -183,7 +183,7 @@ void data_push_sample(int charge_perc, int last_sample_time, int last_charge_per
   Sample *s = &s_sample_data.samples[0];
   s->timestamp = time(NULL);
   s->charge_perc = charge_perc;
-  s->last_sample_time = last_charge_perc;
+  s->last_sample_time = last_sample_time;
   s->last_charge_perc = last_charge_perc;
   s->time_diff = time_diff;
   s->charge_diff = charge_diff;
