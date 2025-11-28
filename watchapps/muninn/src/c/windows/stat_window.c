@@ -1,8 +1,16 @@
 #include "stat_window.h"
 
+#if defined(PBL_PLATFORM_EMERY)
+  #define FONT_KEY FONT_KEY_GOTHIC_18
+  #define HISTORY_Y 115
+#else
+  #define FONT_KEY FONT_KEY_GOTHIC_14
+  #define HISTORY_Y 95
+#endif
+
 static Window *s_window;
 static StatusBarLayer *s_status_bar;
-static TextLayer *s_stats_layer, *s_history_layer;;
+static TextLayer *s_stats_layer, *s_history_layer;
 
 void stat_window_update_data() {
   if (!s_window) return;
@@ -25,28 +33,29 @@ void stat_window_update_data() {
   snprintf(
     s_values_buff,
     sizeof(s_values_buff),
-    "Enabled: %s\nLast sample: %s\nNext sample: %s\nLast value: %d\nWas plugged in: %s\nLaunched?: %s",
+    "Enabled: %s\nLast sample: %s\nNext sample: %s\nLast value: %d\nWas plugged in: %s",
     is_enabled ? "true": "false",
     &s_fmt_last_buff[0],
     &s_fmt_next_buff[0],
     data_get_last_charge_perc(),
-    data_get_was_plugged() ? "true": "false",
-    data_get_seen_first_launch() ? "true": "false"
+    data_get_was_plugged() ? "true": "false"
   );
   text_layer_set_text(s_stats_layer, s_values_buff);
 
   // Recent history
   SampleData *sample_data = data_get_sample_data();
-  static char s_history_buff[64];
+  static char s_history_buff[512];
   snprintf(
     s_history_buff,
     sizeof(s_history_buff),
-    "Recent samples:\n%d, %d, %d, %d\nAverage: %d",
-    sample_data->values[0],
-    sample_data->values[1],
-    sample_data->values[2],
-    sample_data->values[3],
-    data_get_history_avg_rate()
+    "Recent samples:\n%d, %d, %d, %d, %d, %d\nAverage: %d",
+    sample_data->samples[0].perc_per_day,
+    sample_data->samples[1].perc_per_day,
+    sample_data->samples[2].perc_per_day,
+    sample_data->samples[3].perc_per_day,
+    sample_data->samples[4].perc_per_day,
+    sample_data->samples[5].perc_per_day,
+    data_calculate_avg_discharge_rate()
   );
   text_layer_set_text(s_history_layer, s_history_buff);
 }
@@ -54,7 +63,7 @@ void stat_window_update_data() {
 static void window_load(Window *window) {
   Layer *root_layer = window_get_root_layer(window);
 
-  GFont sys_14 = fonts_get_system_font(FONT_KEY_GOTHIC_14);
+  GFont font = fonts_get_system_font(FONT_KEY);
 
   s_status_bar = status_bar_layer_create();
   status_bar_layer_set_separator_mode(s_status_bar, StatusBarLayerSeparatorModeDotted);
@@ -63,13 +72,13 @@ static void window_load(Window *window) {
 
   s_stats_layer = util_make_text_layer(
     GRect(5, STATUS_BAR_LAYER_HEIGHT, DISPLAY_W - 10, 168),
-    sys_14
+    font
   );
   layer_add_child(root_layer, text_layer_get_layer(s_stats_layer));
 
   s_history_layer = util_make_text_layer(
-    GRect(5, STATUS_BAR_LAYER_HEIGHT + 95, DISPLAY_W - 10, 168),
-    sys_14
+    GRect(5, STATUS_BAR_LAYER_HEIGHT + HISTORY_Y, DISPLAY_W - 10, 168),
+    font
   );
   layer_add_child(root_layer, text_layer_get_layer(s_history_layer));
 }

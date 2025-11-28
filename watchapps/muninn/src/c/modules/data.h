@@ -39,10 +39,27 @@ typedef struct {
   bool ca_has_notified;
 } AppData;
 
+// Capture more data for debugging purposes
+typedef struct {
+  // This sample
+  int timestamp;
+  int charge_perc;
+
+  // Previous values used in the calculation
+  int last_sample_time;
+  int last_charge_perc;
+  
+  // Comparison values
+  int time_diff;
+  int charge_diff;
+
+  // Result
+  int perc_per_day;
+} Sample;
+
 // History of discharge rate values used for averaging
 typedef struct {
-  int timestamps[NUM_STORED_SAMPLES];
-  int values[NUM_STORED_SAMPLES];
+  Sample samples[NUM_STORED_SAMPLES];
 } SampleData;
 
 // Methods
@@ -50,10 +67,11 @@ void data_init();
 void data_deinit();
 void data_reset_all();
 void data_log_state();
-void data_initial_update();
-void data_push_sample_value(int v);
-int data_get_history_avg_rate();
+void data_activation_update();
+void data_push_sample(int charge_perc, int last_sample_time, int last_charge_perc, int time_diff, int charge_diff, int perc_per_day);
+int data_calculate_avg_discharge_rate();
 int data_calculate_days_remaining();
+void data_cycle_custom_alert_level();
 
 // Interface getters/setters
 int data_get_last_sample_time(void);
@@ -72,12 +90,11 @@ bool data_get_seen_first_launch();
 bool data_get_vibe_on_sample();
 void data_set_vibe_on_sample(bool v);
 int data_get_custom_alert_level();
-void data_cycle_custom_alert_level();
 int data_get_samples_count();
 bool data_get_ca_has_notified();
 void data_set_ca_has_notified(bool notified);
 
 // Strings
-#define MSG_WELCOME "Welcome to Muninn!\n\nEstimates will be made over time.\n\nPlease launch me if the watch is rebooted."
+#define MSG_WELCOME "Welcome to Muninn!\n\nEstimates will appear after at least two meaningful samples.\n\nPlease launch me if the watch is rebooted."
 #define MSG_ABOUT "Odin tasked Muninn with memory of the land...\n\nHe wakes every 6 hours to note the battery level.\n\nOver time, he will provide you with battery wisdom."
 #define MSG_TIPS "Use a watchface that updates every minute.\n\nFilter notifications from very noisy apps.\n\nDisable the motion activated backlight."

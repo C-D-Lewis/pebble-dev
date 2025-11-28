@@ -39,10 +39,11 @@ void wakeup_schedule_next() {
 }
 
 void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
+  const int last_charge_perc = data_get_last_charge_perc();
+  
   // Should we advise battery is low?
   const int alert_level = data_get_custom_alert_level();
-  const bool is_low = alert_level != AL_OFF && data_get_last_charge_perc() <= alert_level;
-  const bool ca_has_notified = data_get_ca_has_notified();
+  const bool is_low = alert_level != AL_OFF && last_charge_perc <= alert_level;
 
   // We popped
   data_set_wakeup_id(DATA_EMPTY);
@@ -59,7 +60,7 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
     APP_LOG(APP_LOG_LEVEL_INFO, "First sample!");
   } else {
     const int time_diff_s = now - last_sample_time;
-    const int charge_diff = data_get_last_charge_perc() - charge_percent;
+    const int charge_diff = last_charge_perc - charge_percent;
     APP_LOG(APP_LOG_LEVEL_INFO, "Time diff: %d, Charge diff: %d", time_diff_s, charge_diff);
 
     // Ignore if plugged in or recently charged (store discharge rates only)
@@ -73,13 +74,14 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
       APP_LOG(APP_LOG_LEVEL_INFO, "No change since last sample");
     } else {
       // Unplugged since last sample
-      if ((data_get_was_plugged() && !is_plugged)) {
+      // if ((data_get_was_plugged() && !is_plugged)) {
         // data_set_discharge_start_time(now);
-      }
+      // }
 
       // Calculate new discharge rate
       const int perc_per_day = (charge_diff * SECONDS_PER_DAY) / time_diff_s;
-      data_push_sample_value(perc_per_day);
+      
+      data_push_sample(charge_percent, last_sample_time, last_charge_perc, time_diff_s, charge_diff, perc_per_day);
       APP_LOG(APP_LOG_LEVEL_INFO, "perc_per_day: %d", perc_per_day);
 
       // Remember these for next sample itself, not next wakeup
@@ -93,6 +95,7 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
   data_log_state();
   wakeup_schedule_next();
 
+  const bool ca_has_notified = data_get_ca_has_notified();
   if (is_low && !ca_has_notified) {
     data_set_ca_has_notified(true);
 
@@ -111,7 +114,7 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
     // Regular wakeup window
     alert_window_push(
       RESOURCE_ID_WRITING,
-      "Muninn takes a note...",
+      "Muninn is taking a note...",
       data_get_vibe_on_sample(),
       true
     );

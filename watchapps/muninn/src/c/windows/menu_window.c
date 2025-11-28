@@ -1,8 +1,14 @@
 #include "menu_window.h"
 
 #define NUM_ITEMS 6
-#define ROW_HEIGHT_SMALL 38
-#define ROW_HEIGHT_LARGE 44
+
+#if defined(PBL_PLATFORM_EMERY)
+  #define ROW_HEIGHT_SMALL 40
+  #define ROW_HEIGHT_LARGE 52
+#else
+  #define ROW_HEIGHT_SMALL 38
+  #define ROW_HEIGHT_LARGE 44
+#endif
 
 static Window *s_window;
 static MenuLayer *s_menu_layer;

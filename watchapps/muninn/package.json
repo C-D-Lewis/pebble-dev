@@ -11,7 +11,9 @@
     "targetPlatforms": [
       "aplite",
       "basalt",
-      "diorite"
+      "diorite",
+      "emery",
+      "flint"
     ],
     "enableMultiJS": true,
     "capabilities": [

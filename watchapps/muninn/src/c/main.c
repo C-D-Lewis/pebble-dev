@@ -43,7 +43,7 @@ static void app_glance_callback(AppGlanceReloadSession *session, size_t limit, v
 #endif
 
 static void battery_handler(BatteryChargeState state) {
-  // Went up
+  // Went up, will only go down from there
   if (state.charge_percent > data_get_last_charge_perc()) {
     // Maintain charge level if it's going up
     data_set_last_charge_perc(state.charge_percent);

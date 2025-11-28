@@ -45,3 +45,14 @@ void util_fmt_time_ago(int then, char *buf, int buf_size) {
 
   snprintf(buf, buf_size, "%d%s", value, unit);
 }
+
+int util_hours_until_next_interval() {
+  time_t now = time(NULL);
+  struct tm *tm_info = localtime(&now);
+
+  int hour = tm_info->tm_hour;
+  int rem = hour % WAKEUP_MOD_H;
+  int hours = WAKEUP_MOD_H - rem;
+  if (hours == 0) hours = WAKEUP_MOD_H;
+  return hours;
+}

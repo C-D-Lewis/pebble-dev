@@ -1,5 +1,17 @@
 #include "history_window.h"
 
+#if defined(PBL_PLATFORM_EMERY)
+  #define FMT_STRING_ESTIMATE "About %d%% / day"
+  #define ROW_HEIGHT 52
+  #define TITLE_FONT_KEY FONT_KEY_GOTHIC_24
+  #define MENU_INSET 28
+#else
+  #define FMT_STRING_ESTIMATE "~ %d%%/day"
+  #define ROW_HEIGHT 44
+  #define TITLE_FONT_KEY FONT_KEY_GOTHIC_18
+  #define MENU_INSET 20
+#endif
+
 static Window *s_window;
 static TextLayer *s_header_layer;
 static MenuLayer *s_menu_layer;
@@ -24,12 +36,13 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
 
   const int index = cell_index->row;
 
-  const int value = data_get_sample_data()->values[index];
+  const SampleData *data = data_get_sample_data();
+  const int value = data->samples[index].perc_per_day;
   static char s_level_buff[16];
-  snprintf(s_level_buff, sizeof(s_level_buff), "~ %d%% / day", value);
+  snprintf(s_level_buff, sizeof(s_level_buff), FMT_STRING_ESTIMATE, value);
 
   static char s_time_buff[32];
-  const time_t sample_time = data_get_sample_data()->timestamps[index];
+  const time_t sample_time = data->samples[index].timestamp;
   const struct tm *tm_info = localtime(&sample_time);
   strftime(s_time_buff, sizeof(s_time_buff), "%b. %d %H:%M", tm_info);
 
@@ -43,7 +56,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
 }
 
 static int16_t get_cell_height_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) {
-  return 44;
+  return ROW_HEIGHT;
 }
 
 static void main_window_load(Window *window) {
@@ -52,13 +65,13 @@ static void main_window_load(Window *window) {
 
   s_header_layer = util_make_text_layer(
     GRect(0, -3, bounds.size.w, 24),
-    fonts_get_system_font(FONT_KEY_GOTHIC_18)
+    fonts_get_system_font(TITLE_FONT_KEY)
   );
   text_layer_set_text(s_header_layer, "Recent Estimations");
   text_layer_set_text_alignment(s_header_layer, GTextAlignmentCenter);
   layer_add_child(window_layer, text_layer_get_layer(s_header_layer));
 
-  s_menu_layer = menu_layer_create(grect_inset(bounds, GEdgeInsets(20, 0, 0, 0)));
+  s_menu_layer = menu_layer_create(grect_inset(bounds, GEdgeInsets(MENU_INSET, 0, 0, 0)));
   menu_layer_set_click_config_onto_window(s_menu_layer, window);
   menu_layer_set_callbacks(s_menu_layer, NULL, (MenuLayerCallbacks) {
     .get_num_rows = (MenuLayerGetNumberOfRowsInSectionsCallback)get_num_rows_callback,

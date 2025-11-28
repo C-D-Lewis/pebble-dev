@@ -1,4 +1,4 @@
-# muninn :bird: :zap:
+# muninn :zap: :bird:
 
 _Odin tasked Muninn with memory of the land... Over time, he will provide you with battery wisdom._
 
@@ -19,18 +19,18 @@ days of battery life and rate of discharge.
 Features include:
 
 - Negligible battery impact.
-- Moving-average estimation of remaining battery life (days and hours).
-- Ability to disable temporarily.
+- Moving-average estimation of remaining battery life, weighted towards recent values.
 - Option to vibrate when a sample is taken.
 - Option to advise when battery charge is below a chosen threshold (50%/20%/10%).
 - Attempt to set AppGlance to show estimate in the launcher menu.
 - View logs of recent estimates.
 - View general battery tips and Muninn lore.
+- Ability to disable temporarily.
 - Completely delete and reset all app data.
 
 Important notes:
 
-Once installed it must be enabled, and after rebooting the watch the app must
+Once installed it must be woken up, and after rebooting the watch the app must
 be launched to allow wakeups to be resumed. If the first period is less than
 six hours, the initial estimate may be an overestimate but will smooth out soon.
 Any missed wakeups will be ignored.
@@ -71,5 +71,6 @@ from 2016) and what kind of anomalous behavior you encountered.
 - [x] Test power-off picks up correctly
 - [x] Test charging and resuming works
 - [x] Attempt to set AppGlance
-- [x] Pre-release: single app data structure?
-- [ ] Emery screen size support
+- [x] Pre-release: single app data structure
+- [x] Emery screen size support
+- [ ] Some kind of color flair for color watches
