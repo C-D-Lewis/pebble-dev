@@ -19,9 +19,6 @@ void stat_window_update_data() {
   time_t wakeup_ts;
   wakeup_query(data_get_wakeup_id(), &wakeup_ts);
 
-  text_layer_set_text(s_stats_layer, "");
-  text_layer_set_text(s_history_layer, "");
-
   // Current stats
   static char s_fmt_last_buff[16];
   util_fmt_time(data_get_last_sample_time(), &s_fmt_last_buff[0], sizeof(s_fmt_last_buff));
@@ -33,12 +30,11 @@ void stat_window_update_data() {
   snprintf(
     s_values_buff,
     sizeof(s_values_buff),
-    "Enabled: %s\nLast sample: %s\nNext sample: %s\nLast value: %d\nWas plugged in: %s",
+    "Enabled: %s\nLast sample: %s\nNext sample: %s\nLast value: %d",
     is_enabled ? "true": "false",
     &s_fmt_last_buff[0],
     &s_fmt_next_buff[0],
-    data_get_last_charge_perc(),
-    data_get_was_plugged() ? "true": "false"
+    data_get_last_charge_perc()
   );
   text_layer_set_text(s_stats_layer, s_values_buff);
 

@@ -34,7 +34,6 @@ void data_reset_all() {
   s_app_data.last_sample_time = DATA_EMPTY;
   s_app_data.last_charge_perc = DATA_EMPTY;
   s_app_data.wakeup_id = DATA_EMPTY;
-  s_app_data.was_plugged = true;
   s_app_data.seen_first_launch = false;
   s_app_data.vibe_on_sample = false;
   s_app_data.custom_alert_level = AL_OFF;
@@ -63,7 +62,7 @@ static void do_migrations() {
 
 void data_init() {
 #if defined(WIPE_ON_LAUNCH)
-  delete_all_data();
+  data_reset_all();
 #endif
 
 #if defined(TEST_DATA)
@@ -71,7 +70,6 @@ void data_init() {
   s_app_data.last_sample_time = time(NULL) - (WAKEUP_MOD_H * SECONDS_PER_HOUR);
   s_app_data.last_charge_perc = 80;
   s_app_data.wakeup_id = time(NULL) + (12 * SECONDS_PER_HOUR);   // Won't be found
-  s_app_data.was_plugged = false;
   s_app_data.seen_first_launch = true;
   s_app_data.vibe_on_sample = true;
   s_app_data.custom_alert_level = AL_20;
@@ -109,7 +107,7 @@ void data_init() {
       return;
     }
 
-    result = persist_read_data(SK_AppData, &s_sample_data, sizeof(SampleData));
+    result = persist_read_data(SK_SampleData, &s_sample_data, sizeof(SampleData));
     if (result < 0) {
       APP_LOG(APP_LOG_LEVEL_ERROR, "Error reading sample data: %d", (int)result);
       data_set_error("Error reading sample data from storage");
@@ -131,9 +129,8 @@ void data_deinit() {
 void data_log_state() {
   APP_LOG(
     APP_LOG_LEVEL_INFO,
-    "D: %d | W: %d | B: %d | P: %s | H: %d %d %d | A: %d",
-    s_app_data.last_sample_time, s_app_data.wakeup_id,
-    s_app_data.last_charge_perc, s_app_data.was_plugged ? "t": "f",
+    "D: %d | W: %d | B: %d | H: %d %d %d | A: %d",
+    s_app_data.last_sample_time, s_app_data.wakeup_id, s_app_data.last_charge_perc,
     s_sample_data.samples[0].perc_per_day, s_sample_data.samples[1].perc_per_day,
     s_sample_data.samples[2].perc_per_day, s_app_data.ca_has_notified ? 1 : 0
   );
@@ -160,11 +157,8 @@ void data_log_state() {
 
 void data_activation_update() {
   BatteryChargeState state = battery_state_service_peek();
-  const bool is_plugged = state.is_plugged;
   const int charge_percent = state.charge_percent;
   const time_t now = time(NULL);
-
-  data_set_was_plugged(is_plugged);
 
   // Set this as a time period start, so we can at least begin something now
   data_set_last_sample_time(now);
@@ -253,8 +247,7 @@ int data_calculate_days_remaining() {
   if (rate == DATA_EMPTY || charge_perc == DATA_EMPTY) return DATA_EMPTY;
 
   if (rate <= 0) {
-    APP_LOG(APP_LOG_LEVEL_ERROR, "Somehow rate was <= 0 (negative)");
-    APP_LOG(APP_LOG_LEVEL_INFO, "rate: %d charge_perc: %d", rate, charge_perc);
+    APP_LOG(APP_LOG_LEVEL_INFO, "zero or negative rate: %d charge_perc: %d", rate, charge_perc);
     return DATA_EMPTY;
   }
 
@@ -304,14 +297,6 @@ int data_get_wakeup_id() {
 
 void data_set_wakeup_id(int id) {
   s_app_data.wakeup_id = id;
-}
-
-bool data_get_was_plugged() {
-  return s_app_data.was_plugged;
-}
-
-void data_set_was_plugged(bool b) {
-  s_app_data.was_plugged = b;
 }
 
 SampleData* data_get_sample_data() {

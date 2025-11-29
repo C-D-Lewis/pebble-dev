@@ -86,9 +86,7 @@
         }
       ]
     },
-    "messageKeys": [
-    ]
+    "messageKeys": []
   },
-  "dependencies": {
-  }
+  "dependencies": {}
 }

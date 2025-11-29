@@ -49,10 +49,7 @@ static void window_load(Window *window) {
   layer_set_update_proc(s_braid_layer, braid_update_proc);
   layer_add_child(root_layer, s_braid_layer);
 
-  s_text_layer = util_make_text_layer(
-    TEXT_RECT,
-    fonts_get_system_font(FONT_KEY)
-  );
+  s_text_layer = util_make_text_layer(TEXT_RECT, fonts_get_system_font(FONT_KEY));
   text_layer_set_text_alignment(s_text_layer, GTextAlignmentCenter);
   text_layer_set_text(s_text_layer, s_text_ptr);
   layer_add_child(root_layer, text_layer_get_layer(s_text_layer));

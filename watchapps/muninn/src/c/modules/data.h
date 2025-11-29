@@ -32,7 +32,6 @@ typedef struct {
   int last_sample_time;
   int last_charge_perc;
   int wakeup_id;
-  bool was_plugged;
   bool seen_first_launch;
   bool vibe_on_sample;
   int custom_alert_level;
@@ -80,8 +79,6 @@ int data_get_last_charge_perc(void);
 void data_set_last_charge_perc(int perc);
 int data_get_wakeup_id();
 void data_set_wakeup_id(int id);
-bool data_get_was_plugged();
-void data_set_was_plugged(bool b);
 SampleData* data_get_sample_data();
 void data_set_error(char *err);
 char* data_get_error();

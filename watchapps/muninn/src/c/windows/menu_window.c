@@ -13,7 +13,7 @@
 static Window *s_window;
 static MenuLayer *s_menu_layer;
 
-static bool s_clear_confirm;
+static bool s_reset_confirm;
 
 typedef enum {
   MI_VIBE_ON_SAMPLE = 0,
@@ -70,7 +70,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
         ctx,
         cell_layer,
         "Delete all data",
-        s_clear_confirm ? "Tap again to confirm" : NULL,
+        s_reset_confirm ? "Tap again to confirm" : NULL,
         NULL
       );
       break;
@@ -82,7 +82,7 @@ static int16_t get_cell_height_callback(struct MenuLayer *menu_layer, MenuIndex 
   switch(cell_index->row) {
     case MI_VIBE_ON_SAMPLE:
     case MI_CUSTOM_ALERT_LEVEL: return ROW_HEIGHT_LARGE;
-    case MI_DELETE_ALL_DATA: return s_clear_confirm ? ROW_HEIGHT_LARGE : ROW_HEIGHT_SMALL;
+    case MI_DELETE_ALL_DATA: return s_reset_confirm ? ROW_HEIGHT_LARGE : ROW_HEIGHT_SMALL;
     default: return ROW_HEIGHT_SMALL;
   }
 }
@@ -114,7 +114,7 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
       message_window_push(MSG_ABOUT);
       break;
     case MI_DELETE_ALL_DATA:
-      if (s_clear_confirm) {
+      if (s_reset_confirm) {
         data_reset_all();
         vibes_double_pulse();
         window_stack_pop_all(true);
@@ -122,7 +122,7 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
         vibes_long_pulse();
       }
 
-      s_clear_confirm = !s_clear_confirm;
+      s_reset_confirm = !s_reset_confirm;
     default: break;
   }
 
@@ -147,7 +147,7 @@ static void main_window_load(Window *window) {
 static void window_unload(Window *window) {
   menu_layer_destroy(s_menu_layer);
 
-  s_clear_confirm = false;
+  s_reset_confirm = false;
 
   window_destroy(window);
   s_window = NULL;
