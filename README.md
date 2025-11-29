@@ -51,6 +51,7 @@ Some PBWs can be found in `/pbw` for sideloading.
 |------------------|---------------------------------------------------------|-----------------------|------|-------------------------------|
 | `block-world`    | ![](watchapps/block-world/screenshots/basalt.png)       | `B` `C` `E`           |      | [pbw](pbw/block-world.pbw)    |
 | `dashboard`      | ![](watchapps/dashboard/assets/screenshots/basalt1.png) | `A` `B` `C` `D`       | ✅    | [pbw](pbw/dashboard.pbw)      |
+| `muninn`         | ![](watchapps/muninn/screenshots/basalt.png)            | `A` `B` `D` `E`       | ✅    | [pbw](pbw/muninn.pbw)         |
 | `news-headlines` | ![](watchapps/news-headlines/screenshots/basalt.png)    | `A` `B` `C` `D`       | ✅    | [pbw](pbw/news-headlines.pbw) |
 | `tube-status`    | ![](watchapps/tube-status/screenshots/basalt.png)       | `A` `B` `C` `D` `E`   | ✅    | [pbw](pbw/tube-status.pbw)    |
 | `pge-examples`   |                                                         | ❌ (needs pge package) |      |                               |
@@ -104,10 +105,11 @@ should be used instead
 
 ## To Do
 
-- [x] Fix build in GitHub Actions
-- [x] Finish importing all previous Pebble projects
+- [x] Fix build in GitHub Actions.
+- [x] Finish importing all previous Pebble projects.
 - [x] Merge all Split Horizon editions into config.
 - [x] Migrate all custom config to Clay.
 - [x] Verify correct tick unit used to save power.
-- [ ] Menu icons for all current watchfaces and watchapps
+- [ ] Menu icons for all current watchfaces and watchapps.
 - [ ] Rebuild and publish supported libraries with new SDK.
+- [ ] Upgrade more for Emery.
