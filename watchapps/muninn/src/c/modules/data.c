@@ -88,7 +88,7 @@ void data_init() {
     s->last_sample_time = now - (((i + 2) * WAKEUP_MOD_H) * SECONDS_PER_HOUR);
     s->last_charge_perc = s_app_data.last_charge_perc - ((i + 1) * gap_perc);
     s->time_diff = WAKEUP_MOD_H * SECONDS_PER_HOUR;
-    s->charge_diff = 1;
+    s->charge_diff = gap_perc;
   }
   
   data_log_state();
