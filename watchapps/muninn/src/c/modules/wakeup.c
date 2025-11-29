@@ -20,7 +20,7 @@ void wakeup_schedule_next() {
   const time_t future = ts_now + interval_s + 2;
   // const time_t future = ts_now + 60; // For testing only
   APP_LOG(APP_LOG_LEVEL_INFO, "Seconds until next interval: %d", interval_s);
-  const int id = wakeup_schedule(future, 0, false);
+  const int id = wakeup_schedule(future, 0, true);
 
   if (id < 0) {
     APP_LOG(APP_LOG_LEVEL_ERROR, "Failed to schedule wakeup: %d", id);

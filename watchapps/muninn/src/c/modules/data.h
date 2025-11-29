@@ -92,6 +92,6 @@ bool data_get_ca_has_notified();
 void data_set_ca_has_notified(bool notified);
 
 // Strings
-#define MSG_WELCOME "Welcome to Muninn!\n\nEstimates will appear after at least two meaningful samples.\n\nPlease launch me if the watch is rebooted."
+#define MSG_WELCOME "Welcome to Muninn!\n\nEstimates will appear after two meaningful samples.\n\nPlease launch me if the watch is off during a 6h interval."
 #define MSG_ABOUT "Odin tasked Muninn with memory of the land...\n\nHe wakes every 6 hours to note the battery level.\n\nOver time, he will provide you with battery wisdom."
 #define MSG_TIPS "Use a watchface that updates every minute.\n\nFilter notifications from very noisy apps.\n\nDisable the motion activated backlight."

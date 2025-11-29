@@ -30,10 +30,10 @@ Features include:
 
 Important notes:
 
-Once installed it must be woken up, and after rebooting the watch the app must
-be launched to allow wakeups to be resumed. If the first period is less than
-six hours, the initial estimate may be an overestimate but will smooth out soon.
-Any missed wakeups will be ignored.
+Once installed it must be woken up, and if the watch is off at the next
+six-hourly interval, the app must be launched to allow wakeups to be resumed.
+If the first period is less than six hours, the initial estimate may be an
+overestimate but will smooth out soon. Any missed wakeups will be ignored.
 
 ## Notes
 
