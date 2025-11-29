@@ -57,7 +57,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
       );
       break;
     case MI_ESTIMATE_LOG:
-      menu_cell_basic_draw(ctx, cell_layer, "Estimate log", NULL, NULL);
+      menu_cell_basic_draw(ctx, cell_layer, "Data log", NULL, NULL);
       break;
     case MI_BATTERY_TIPS:
       menu_cell_basic_draw(ctx, cell_layer, "Battery tips", NULL, NULL);

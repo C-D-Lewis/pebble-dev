@@ -7,9 +7,9 @@ TextLayer* util_make_text_layer(GRect frame, GFont font) {
   return this;
 }
 
-void util_fmt_time(int timestamp_s, char* buf, int buf_size) {
+void util_fmt_time(int timestamp_s, char* buff, int size) {
   if (timestamp_s == DATA_EMPTY) {
-    snprintf(buf, buf_size, "-");
+    snprintf(buff, size, "-");
     return;
   }
 
@@ -18,10 +18,10 @@ void util_fmt_time(int timestamp_s, char* buf, int buf_size) {
   const int hours = tm_info->tm_hour;
   const int mins = tm_info->tm_min;
 
-  snprintf(buf, buf_size, "%02d:%02d %s", hours, mins, hours < 12 ? "AM" : "PM");
+  snprintf(buff, size, "%02d:%02d", hours, mins);
 }
 
-void util_fmt_time_ago(int then, char *buf, int buf_size) {
+void util_fmt_time_ago(time_t then, char *buff, int size) {
   int diff_s = time(NULL) - then;
 
   // Fudge: always a positive amount of time for display purposes
@@ -43,7 +43,7 @@ void util_fmt_time_ago(int then, char *buf, int buf_size) {
     unit = "d";
   }
 
-  snprintf(buf, buf_size, "%d%s", value, unit);
+  snprintf(buff, size, "%d%s", value, unit);
 }
 
 int util_hours_until_next_interval() {
@@ -55,4 +55,26 @@ int util_hours_until_next_interval() {
   int hours = WAKEUP_MOD_H - rem;
   if (hours == 0) hours = WAKEUP_MOD_H;
   return hours;
+}
+
+void util_fmt_time_unit(time_t ts, char *buff, int size) {
+  int value = 0;
+  const char *unit;
+
+  // TODO: DRY this out with util_fmt_time_ago()
+  if (ts < 60) {
+    value = ts;
+    unit = "s";
+  } else if (ts < 3600) {
+    value = ts / 60;
+    unit = "m";
+  } else if (ts < SECONDS_PER_DAY) {
+    value = ts / 3600;
+    unit = "h";
+  } else {
+    value = ts / SECONDS_PER_DAY;
+    unit = "d";
+  }
+
+  snprintf(buff, size, "%d%s", value, unit);
 }

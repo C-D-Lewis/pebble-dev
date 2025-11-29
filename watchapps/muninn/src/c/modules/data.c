@@ -68,7 +68,7 @@ void data_init() {
 
 #if defined(TEST_DATA)
   // Load test values for this launch
-  s_app_data.last_sample_time = time(NULL) - (6 * SECONDS_PER_HOUR);
+  s_app_data.last_sample_time = time(NULL) - (WAKEUP_MOD_H * SECONDS_PER_HOUR);
   s_app_data.last_charge_perc = 80;
   s_app_data.wakeup_id = time(NULL) + (12 * SECONDS_PER_HOUR);   // Won't be found
   s_app_data.was_plugged = false;
@@ -83,20 +83,22 @@ void data_init() {
   for (int i = 0; i < NUM_STORED_SAMPLES; i++) {
     Sample *s = &s_sample_data.samples[i];
 
-    // Hopefully this is backwards from now, every six hours, 4% estimate
+    // Hopefully this is backwards from now, every six hours, 4% estimates
     s->timestamp = now - ((i + 1) * WAKEUP_MOD_H * SECONDS_PER_HOUR);
     s->perc_per_day = gap_perc;
     s->charge_perc = s_app_data.last_charge_perc - (i * gap_perc);
-    s->last_sample_time = now - ((i + 2) * WAKEUP_MOD_H * SECONDS_PER_HOUR);
+    s->last_sample_time = now - (((i + 2) * WAKEUP_MOD_H) * SECONDS_PER_HOUR);
     s->last_charge_perc = s_app_data.last_charge_perc - ((i + 1) * gap_perc);
     s->time_diff = WAKEUP_MOD_H * SECONDS_PER_HOUR;
     s->charge_diff = 1;
   }
+  
+  data_log_state();
   return;
 #endif
 
   // Never used, write defaults
-  if (!persist_exists(SK_SampleData)) {
+  if (!persist_exists(SK_AppData)) {
     data_reset_all();
   } else {
     // Load current data
@@ -107,7 +109,7 @@ void data_init() {
       return;
     }
 
-    result = persist_read_data(SK_SampleData, &s_sample_data, sizeof(SampleData));
+    result = persist_read_data(SK_AppData, &s_sample_data, sizeof(SampleData));
     if (result < 0) {
       APP_LOG(APP_LOG_LEVEL_ERROR, "Error reading sample data: %d", (int)result);
       data_set_error("Error reading sample data from storage");
@@ -197,10 +199,14 @@ void data_push_sample(int charge_perc, int last_sample_time, int last_charge_per
 int data_calculate_avg_discharge_rate() {
   SampleData *data = data_get_sample_data();
   const int count = data_get_samples_count();
+
+  // Not enough samples yet
   if (count < MIN_SAMPLES) return DATA_EMPTY;
 
   const int half_index = (count + 1) / 2;
+#if defined(DEBUG_LOGS)
   APP_LOG(APP_LOG_LEVEL_INFO, "avg: count: %d half_index: %d", count, half_index);
+#endif
 
   int result_x2 = 0;
   int weight_x2 = 0;
@@ -208,8 +214,6 @@ int data_calculate_avg_discharge_rate() {
 
   for (int i = 0; i < NUM_STORED_SAMPLES; i++) {
     int v = data->samples[i].perc_per_day;
-#if defined(DEBUG_LOGS)
-#endif
     if (v == DATA_EMPTY) continue;
 
     seen++;
@@ -231,7 +235,13 @@ int data_calculate_avg_discharge_rate() {
   if (weight_x2 == 0) return DATA_EMPTY;
   const int avg = result_x2 / weight_x2;
 #if defined(DEBUG_LOGS)
-  APP_LOG(APP_LOG_LEVEL_INFO, "avg: result_x2 %d / weight_x2 %d => %d\n---", result_x2, weight_x2, avg);
+  APP_LOG(
+    APP_LOG_LEVEL_INFO,
+    "avg: result_x2 %d / weight_x2 %d => %d\n---",
+    result_x2,
+    weight_x2,
+    avg
+  );
 #endif
   return avg;
 }
@@ -248,8 +258,28 @@ int data_calculate_days_remaining() {
     return DATA_EMPTY;
   }
 
-
   return charge_perc / rate;
+}
+
+void data_cycle_custom_alert_level() {
+  switch (s_app_data.custom_alert_level) {
+    case AL_OFF:
+      s_app_data.custom_alert_level = AL_50;
+      break;
+    case AL_50:
+      s_app_data.custom_alert_level = AL_20;
+      break;
+    case AL_20:
+      s_app_data.custom_alert_level = AL_10;
+      break;
+    case AL_10:
+    default:
+      s_app_data.custom_alert_level = AL_OFF;
+      break;
+  }
+
+  // If changed to less than current, don't skip
+  data_set_ca_has_notified(false);
 }
 
 int data_get_last_sample_time() {
@@ -320,27 +350,6 @@ void data_set_vibe_on_sample(bool v) {
 
 int data_get_custom_alert_level() {
   return s_app_data.custom_alert_level;
-}
-
-void data_cycle_custom_alert_level() {
-  switch (s_app_data.custom_alert_level) {
-    case AL_OFF:
-      s_app_data.custom_alert_level = AL_50;
-      break;
-    case AL_50:
-      s_app_data.custom_alert_level = AL_20;
-      break;
-    case AL_20:
-      s_app_data.custom_alert_level = AL_10;
-      break;
-    case AL_10:
-    default:
-      s_app_data.custom_alert_level = AL_OFF;
-      break;
-  }
-
-  // If changed to less than current, don't skip
-  data_set_ca_has_notified(false);
 }
 
 int data_get_samples_count() {

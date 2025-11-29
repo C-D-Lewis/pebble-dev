@@ -143,7 +143,9 @@ static void update_data() {
     data_set_error("Scheduled wakeup was not found");
   }
   
-  s_mascot_bitmap = gbitmap_create_with_resource(is_enabled ? RESOURCE_ID_AWAKE : RESOURCE_ID_ASLEEP);
+  s_mascot_bitmap = gbitmap_create_with_resource(
+    is_enabled ? RESOURCE_ID_AWAKE : RESOURCE_ID_ASLEEP
+  );
   bitmap_layer_set_bitmap(s_mascot_layer, s_mascot_bitmap);
   text_layer_set_text(s_status_value_layer, is_enabled ? "AWAKE" : "ASLEEP");
 
@@ -211,7 +213,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
 
   int hint_x = DISPLAY_W - (HINT_W / 2);
 
-  // Toggle enable hint
+  // Enable hint
   int enable_y = DISPLAY_H / 6 - (HINT_H / 2);
   GRect enable_rect = GRect(hint_x, enable_y, HINT_W, HINT_H);
   graphics_context_set_fill_color(ctx, GColorBlack);
@@ -251,8 +253,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
 }
 
 static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
-  bool should_enable = data_get_wakeup_id() == DATA_EMPTY;
-
+  const bool should_enable = data_get_wakeup_id() == DATA_EMPTY;
   if (should_enable) {
     s_blink_budget = 5;
     schedule_blink();
@@ -271,7 +272,7 @@ static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
   menu_window_push();
 }
 
-static void down_click_handler(ClickRecognizerRef recognizer, void *context) {
+static void down_long_click_handler(ClickRecognizerRef recognizer, void *context) {
   stat_window_push();
 }
 
@@ -280,7 +281,7 @@ static void click_config_provider(void *context) {
   window_single_click_subscribe(BUTTON_ID_SELECT, select_click_handler);
 
   // Debugging info
-  window_long_click_subscribe(BUTTON_ID_DOWN, 3000, down_click_handler, NULL);
+  window_long_click_subscribe(BUTTON_ID_DOWN, 3000, down_long_click_handler, NULL);
 }
 
 static void window_load(Window *window) {

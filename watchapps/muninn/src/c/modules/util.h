@@ -6,8 +6,10 @@
 
 TextLayer* util_make_text_layer(GRect frame, GFont font);
 
-void util_fmt_time(int timestamp_s, char* buf, int buf_size);
+void util_fmt_time(int timestamp_s, char* buff, int size);
 
-void util_fmt_time_ago(int then, char *buf, int buf_size);
+void util_fmt_time_ago(time_t then, char *buff, int size);
 
 int util_hours_until_next_interval();
+
+void util_fmt_time_unit(time_t ts, char *buff, int size);

@@ -40,10 +40,6 @@ void wakeup_schedule_next() {
 
 void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
   const int last_charge_perc = data_get_last_charge_perc();
-  
-  // Should we advise battery is low?
-  const int alert_level = data_get_custom_alert_level();
-  const bool is_low = alert_level != AL_OFF && last_charge_perc <= alert_level;
 
   // We popped
   data_set_wakeup_id(DATA_EMPTY);
@@ -95,6 +91,9 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
   data_log_state();
   wakeup_schedule_next();
 
+  // Should we advise battery is low?
+  const int alert_level = data_get_custom_alert_level();
+  const bool is_low = alert_level != AL_OFF && last_charge_perc <= alert_level;
   const bool ca_has_notified = data_get_ca_has_notified();
   if (is_low && !ca_has_notified) {
     data_set_ca_has_notified(true);
@@ -107,11 +106,9 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
     );
   } else {
     if (!is_low && ca_has_notified) {
-      // Reset notification flag when above threshold
       data_set_ca_has_notified(false);
     }
 
-    // Regular wakeup window
     alert_window_push(
       RESOURCE_ID_WRITING,
       "Muninn is taking a note...",
