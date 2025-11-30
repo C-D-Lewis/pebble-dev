@@ -1,0 +1,51 @@
+{
+  "name": "PGE Asteroids Example",
+  "author": "Chris Lewis",
+  "version": "1.0.0",
+  "private": true,
+  "keywords": [
+    "pebble-app"
+  ],
+  "dependencies": {
+    "pebble-pge": "^1.7.0"
+  },
+  "pebble": {
+    "sdkVersion": "3",
+    "targetPlatforms": [
+      "aplite",
+      "basalt"
+    ],
+    "enableMultiJS": false,
+    "capabilities": [],
+    "projectType": "native",
+    "displayName": "PGE Asteroids Example",
+    "uuid": "6c5dadc1-3ed8-4ac5-a628-60192d2071d9",
+    "watchapp": {
+      "watchface": false,
+      "hiddenApp": false,
+      "onlyShownOnCommunication": false
+    },
+    "resources": {
+      "media": [
+        {
+          "type": "png",
+          "name": "SHIP",
+          "file": "images/ship.png"
+        },
+        {
+          "type": "png",
+          "name": "SHOT",
+          "file": "images/shot.png"
+        },
+        {
+          "type": "png",
+          "name": "ROCK",
+          "file": "images/rock.png"
+        }
+      ]
+    },
+    "messageKeys": {
+      "dummy": 0
+    }
+  }
+}

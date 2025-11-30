@@ -2,10 +2,10 @@
 
 #include <pebble.h>
 
-#include "pge/pge.h"
-#include "pge/modules/pge_collision.h"
-#include "pge/modules/pge_sprite.h"
-#include "pge/modules/pge_splash.h"
+#include <pebble-pge/pge.h>
+#include <pebble-pge/pge_collision.h>
+#include <pebble-pge/pge_sprite.h>
+#include <pebble-pge/pge_splash.h>
 
 #include "sprites/ship.h"
 #include "sprites/shot.h"
