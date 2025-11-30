@@ -1,7 +1,7 @@
 {
   "name": "pebble-isometric",
   "author": "Chris Lewis",
-  "version": "1.3.1",
+  "version": "1.4.0",
   "files": [
     "dist.zip"
   ],
@@ -9,10 +9,7 @@
     "pebble-package"
   ],
   "dependencies": {
-    "pebble-universal-fb": "^1.7.2"
-  },
-  "scripts": {
-    "prepublishOnly": "cp test-app/src/c/pebble-isometric.c src/c/ && cp test-app/src/c/pebble-isometric.h include/ && pebble build"
+    "pebble-universal-fb": "^1.9.0"
   },
   "pebble": {
     "projectType": "package",
@@ -22,7 +19,8 @@
       "basalt",
       "chalk",
       "diorite",
-      "emery"
+      "emery",
+      "flint"
     ],
     "resources": {
       "media": []

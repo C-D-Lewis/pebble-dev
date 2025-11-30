@@ -1,6 +1,6 @@
 #include <pebble.h>
 
-#include "pebble-isometric.h"
+#include <pebble-isometric/pebble-isometric.h>
 
 static Window *s_window;
 static Layer *s_canvas_layer;
