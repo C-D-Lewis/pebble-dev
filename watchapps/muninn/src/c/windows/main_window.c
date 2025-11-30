@@ -18,7 +18,7 @@
   #define ROW_2_Y 192
   #define ROW_1_GAP 90
   #define ROW_2_GAP 94
-  #define ROW_1_SUBTITLE "    Days left          Per day"
+  #define ROW_1_SUBTITLE "    Days left        Est. %/day"
   #define HINT_W 20
   #define HINT_H 48
   #define ROW_DIV_Y 178
@@ -44,7 +44,7 @@
   #define ROW_2_Y 142
   #define ROW_1_GAP 60
   #define ROW_2_GAP 67
-  #define ROW_1_SUBTITLE "  Days left      Per day"
+  #define ROW_1_SUBTITLE "  Days left     Est. %/day"
   #define HINT_W 14
   #define HINT_H 38
   #define ROW_DIV_Y 137
@@ -348,7 +348,7 @@ static void window_load(Window *window) {
   layer_add_child(root_layer, text_layer_get_layer(s_rate_layer));
 
   s_row_1_subtitle_layer = util_make_text_layer(
-    GRect(1, row_y + 22, DISPLAY_W - ACTION_BAR_W - 10, 40),
+    GRect(1, row_y + 22, DISPLAY_W - ACTION_BAR_W, 40),
 #if defined(PBL_PLATFORM_EMERY)
     font_s
 #else

@@ -160,12 +160,11 @@ void data_activation_update() {
   const int charge_percent = state.charge_percent;
   const time_t now = time(NULL);
 
-  // Set this as a time period start, so we can at least begin something now
-  data_set_last_sample_time(now);
-
   // If a fairly close amount of time to the full period is left, capture the level
   // This should help with initial under-estimation of the discharge rate
+  // and get started slightly quicker
   if (util_hours_until_next_interval() >= (3 * WAKEUP_MOD_H) / 4) {
+    data_set_last_sample_time(now);
     data_set_last_charge_perc(charge_percent);
   }
 }

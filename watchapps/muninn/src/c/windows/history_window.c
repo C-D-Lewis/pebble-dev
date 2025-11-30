@@ -1,9 +1,11 @@
 #include "history_window.h"
 
-#define ROW_HEIGHT 56
+#define ROW_HEIGHT 62
 #define FONT_KEY_S FONT_KEY_GOTHIC_14
 #define FONT_KEY_M FONT_KEY_GOTHIC_18
 #define FONT_KEY_L FONT_KEY_GOTHIC_24
+#define ROW_1_Y 16
+#define ROW_2_Y 34
 
 #if defined(PBL_PLATFORM_EMERY)
   #define FMT_STRING_ESTIMATE "About %d%% / day"
@@ -44,7 +46,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
   static char s_datetime_buff[32];
   const time_t ts_time = s->timestamp;
   const struct tm *ts_info = gmtime(&ts_time);
-  strftime(s_datetime_buff, sizeof(s_datetime_buff), "%b. %d %H:%M", ts_info);
+  strftime(s_datetime_buff, sizeof(s_datetime_buff), "%Y-%m-%d %H:%M", ts_info);
   static char s_dt_with_cp_buff[32];
   snprintf(
     s_dt_with_cp_buff,
@@ -72,7 +74,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
     ctx,
     s_lst_buff,
     s_font_m,
-    GRect(4, 16, bounds.size.w, 28),
+    GRect(2, ROW_1_Y, bounds.size.w, 28),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentLeft,
     NULL
@@ -85,7 +87,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
     ctx,
     s_lcp_buff,
     s_font_m,
-    GRect(4, 32, bounds.size.w, 28),
+    GRect(2, ROW_2_Y, bounds.size.w, 28),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentLeft,
     NULL
@@ -100,7 +102,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
     ctx,
     s_td_buff,
     s_font_m,
-    GRect(58, 16, bounds.size.w, 28),
+    GRect(60, ROW_1_Y, bounds.size.w, 28),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentLeft,
     NULL
@@ -108,36 +110,43 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
 
   // Charge diff
   static char s_cd_buff[16];
-  snprintf(s_cd_buff, sizeof(s_cd_buff), "dC: %d", s->charge_diff);
+  snprintf(s_cd_buff, sizeof(s_cd_buff), "dC: %d%%", s->charge_diff);
   graphics_draw_text(
     ctx,
     s_cd_buff,
     s_font_m,
-    GRect(58, 32, bounds.size.w, 28),
+    GRect(60, ROW_2_Y, bounds.size.w, 28),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentLeft,
     NULL
   );
 
   // Percentage per day
-  static char s_ppd_buff[8];
-  snprintf(s_ppd_buff, sizeof(s_ppd_buff), "~%d%%", s->perc_per_day);
   graphics_draw_text(
     ctx,
-    s_ppd_buff,
-    s_font_l,
-    GRect(bounds.size.w - 34, 8, 32, 28),
+    "Est.",
+    s_font_s,
+    GRect(0, 14, DISPLAY_W, 28),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentRight,
     NULL
   );
-
-  // Percentage per day label
+  static char s_ppd_buff[8];
+  snprintf(s_ppd_buff, sizeof(s_ppd_buff), "%d%%", s->perc_per_day);
   graphics_draw_text(
     ctx,
-    "per day",
+    s_ppd_buff,
+    s_font_l,
+    GRect(0, 21, DISPLAY_W, 28),
+    GTextOverflowModeTrailingEllipsis,
+    GTextAlignmentRight,
+    NULL
+  );
+  graphics_draw_text(
+    ctx,
+    "/day",
     s_font_s,
-    GRect(bounds.size.w - 40, 29, 38, 28),
+    GRect(0, 43, DISPLAY_W, 28),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentRight,
     NULL
