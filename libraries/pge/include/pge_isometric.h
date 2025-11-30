@@ -9,7 +9,7 @@
  
 #include <pebble.h>
 
-#include <universal-fb/universal_fb.h>
+#include <pebble-universal-fb/pebble-universal-fb.h>
 
 #define PGE_ISOMETRIC_OPTIMIZE_FILL_BOX // Only draw front of a box to save time
 

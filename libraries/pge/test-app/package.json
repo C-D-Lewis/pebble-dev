@@ -3,7 +3,8 @@
   "author": "Chris Lewis",
   "private": true,
   "dependencies": {
-    "pebble-pge": "1.4.0"
+    "pebble-pge": "..",
+    "pebble-universal-fb": "^1.9.0"
   },
   "keywords": [
     "pebble-app"
@@ -28,7 +29,10 @@
     "targetPlatforms": [
       "aplite",
       "basalt",
-      "chalk"
+      "chalk",
+      "diorite",
+      "emery",
+      "flint"
     ],
     "capabilities": []
   },

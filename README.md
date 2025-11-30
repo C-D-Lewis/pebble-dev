@@ -60,16 +60,16 @@ Some PBWs can be found in `/pbw` for sideloading.
 
 | Name                      | Status | Test App | Rebuilt? |
 |---------------------------|--------|----------|----------|
-| `InverterLayerCompat`     | ✅      | ✅        |          |
-| `notif-layer`             | ✅      | ✅        |          |
-| `pebble-isometric`        | ✅      | ✅        |          |
+| `pebble-isometric`        | ✅      | ✅        | ✅        |
 | `pebble-packet`           | ✅      | ✅        | ✅        |
 | `pebble-universal-fb`     | ✅      | ✅        | ✅        |
-| `pge`                     | ✅      | ✅        |          |
+| `pebble-pge`                     | ✅      | ✅        | ✅        |
 | `pebble-pge-simple`       |        |          |          |
 | `pebble-simple-request`   |        |          |          |
 | `pebble-timeline-js-node` |        |          |          |
 | `pebble-timeline-js`      |        |          |          |
+| `InverterLayerCompat`     | ✅      | ✅        |          |
+| `notif-layer`             | ✅      | ✅        |          |
 
 ## `other`
 
