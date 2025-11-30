@@ -10,9 +10,9 @@ working_projects=$(cat <<EOF
 ./libraries/pebble-packet/test-app/
 ./libraries/pebble-universal-fb/test-app/
 ./libraries/pebble-isometric/test-app/
+./libraries/pebble-pge/test-app/
 ./libraries/notif-layer/test-app/
 ./libraries/InverterLayerCompat/test-app/
-./libraries/pge/test-app/
 
 ./watchfaces/beam-up/
 ./watchfaces/brackets/
