@@ -42,7 +42,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     GPoint(GRAPH_MARGIN + x_width, root_y + GRAPH_SIZE)
   );
 
-  // Draw Y scale labels (0 and 100)
+  // Draw Y axis labels (0 and 100)
   graphics_context_set_text_color(ctx, GColorBlack);
   graphics_draw_text(
     ctx,
@@ -57,25 +57,63 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     ctx,
     "0",
     s_font_s,
-    GRect(0, GRAPH_SIZE - GRAPH_MARGIN + root_y + 12, 18, 32),
+    GRect(0, GRAPH_SIZE - GRAPH_MARGIN + root_y + 11, 18, 32),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentRight,
     NULL
   );
 
   // Draw data points
-  SampleData *data = data_get_sample_data();
-
+  graphics_context_set_fill_color(ctx, GColorBlack);
+  const SampleData *data = data_get_sample_data();
   const int count = NUM_STORED_SAMPLES;
   const int x_gap = GRAPH_SIZE / count;
 
+  // Draw Y axis notches at 10% intervals
+  for (int i = 0; i <= 10; i++) {
+    const int notch_y = root_y + GRAPH_SIZE - ((i * GRAPH_SIZE) / 10);
+    graphics_draw_line(
+      ctx,
+      GPoint(GRAPH_MARGIN - 4, notch_y),
+      GPoint(GRAPH_MARGIN, notch_y)
+    );
+  }
+
+  // Draw X axis notches at x_gap intervals
   for (int i = 0; i < count; i++) {
+    const int notch_x = GRAPH_MARGIN + (i * x_gap);
+    graphics_draw_line(
+      ctx,
+      GPoint(notch_x, root_y + GRAPH_SIZE),
+      GPoint(notch_x, root_y + GRAPH_SIZE + 4)
+    );
+  }
+
+  // Draw points
+  for (int i = count - 1; i >= 0; i--) {
     const int value = data->samples[i].charge_perc;
-    const int x = GRAPH_MARGIN + (i * x_gap);
+    if (value == DATA_EMPTY) continue;
+
+    const int x = GRAPH_MARGIN + GRAPH_SIZE - (((i + 1) * x_gap) + 4);
     const int y = root_y + GRAPH_SIZE - ((value * GRAPH_SIZE) / 100);
     
-    graphics_context_set_fill_color(ctx, GColorBlack);
     graphics_fill_circle(ctx, GPoint(x, y), 2);
+
+    if (i == 0 || i == count - 1) {
+      const time_t timestamp = data->samples[i].timestamp;
+      struct tm *tm_point = localtime(&timestamp);
+      static char s_time_buff[16];
+      strftime(s_time_buff, sizeof(s_time_buff), "%H:%M", tm_point);
+      graphics_draw_text(
+        ctx,
+        s_time_buff,
+        s_font_s,
+        GRect(x - 16, root_y + GRAPH_SIZE, 32, 20),
+        GTextOverflowModeTrailingEllipsis,
+        GTextAlignmentCenter,
+        NULL
+      );
+    }
   }
 }
 

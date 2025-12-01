@@ -6,8 +6,8 @@
   #define ROW_HEIGHT_SMALL 40
   #define ROW_HEIGHT_LARGE 52
 #else
-  #define ROW_HEIGHT_SMALL 38
-  #define ROW_HEIGHT_LARGE 44
+  #define ROW_HEIGHT_SMALL 36
+  #define ROW_HEIGHT_LARGE 46
 #endif
 
 static Window *s_window;
@@ -19,10 +19,11 @@ typedef enum {
   MI_VIBE_ON_SAMPLE = 0,
   MI_CUSTOM_ALERT_LEVEL = 1,
   MI_ESTIMATE_LOG = 2,
-  MI_BATTERY_TIPS = 3,
-  MI_ABOUT = 4,
-  MI_DELETE_ALL_DATA = 5,
-  MI_MAX = 6
+  MI_GRAPH = 3,
+  MI_BATTERY_TIPS = 4,
+  MI_ABOUT = 5,
+  MI_DELETE_ALL_DATA = 6,
+  MI_MAX = 7
 } MenuItems;
 
 static uint16_t get_num_rows_callback(MenuLayer *menu_layer, uint16_t section_index, void *context) {
@@ -59,6 +60,9 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
     case MI_ESTIMATE_LOG:
       menu_cell_basic_draw(ctx, cell_layer, "Data log", NULL, NULL);
       break;
+    case MI_GRAPH:
+      menu_cell_basic_draw(ctx, cell_layer, "Graph", "EXPERIMENTAL", NULL);
+      break;
     case MI_BATTERY_TIPS:
       menu_cell_basic_draw(ctx, cell_layer, "Battery tips", NULL, NULL);
       break;
@@ -81,9 +85,13 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
 static int16_t get_cell_height_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) {
   switch(cell_index->row) {
     case MI_VIBE_ON_SAMPLE:
-    case MI_CUSTOM_ALERT_LEVEL: return ROW_HEIGHT_LARGE;
-    case MI_DELETE_ALL_DATA: return s_reset_confirm ? ROW_HEIGHT_LARGE : ROW_HEIGHT_SMALL;
-    default: return ROW_HEIGHT_SMALL;
+    case MI_CUSTOM_ALERT_LEVEL:
+    case MI_GRAPH:
+      return ROW_HEIGHT_LARGE;
+    case MI_DELETE_ALL_DATA:
+      return s_reset_confirm ? ROW_HEIGHT_LARGE : ROW_HEIGHT_SMALL;
+    default:
+      return ROW_HEIGHT_SMALL;
   }
 }
 
@@ -106,6 +114,9 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
       } else {
         history_window_push();
       }
+      break;
+    case MI_GRAPH:
+      graph_window_push();
       break;
     case MI_BATTERY_TIPS:
       message_window_push(MSG_TIPS);

@@ -77,18 +77,18 @@ void data_init() {
 
   const time_t now = time(NULL);
   const int gap_perc = 4;
-
+  const int total_loss = gap_perc * NUM_STORED_SAMPLES;
   for (int i = 0; i < NUM_STORED_SAMPLES; i++) {
     Sample *s = &s_sample_data.samples[i];
 
-    // Hopefully this is backwards from now, every six hours, 4% estimates
+    // Backwards from now, every six hours, 4% estimates
     s->timestamp = now - ((i + 1) * WAKEUP_MOD_H * SECONDS_PER_HOUR);
     s->perc_per_day = gap_perc;
-    s->charge_perc = s_app_data.last_charge_perc - ((i + 1) * gap_perc);
-    s->last_sample_time = now - (((i + 2) * WAKEUP_MOD_H) * SECONDS_PER_HOUR);
-    s->last_charge_perc = s_app_data.last_charge_perc - ((i + 2) * gap_perc);
-    s->time_diff = WAKEUP_MOD_H * SECONDS_PER_HOUR;
     s->charge_diff = gap_perc;
+    s->last_sample_time = now - (((i + 2) * WAKEUP_MOD_H) * SECONDS_PER_HOUR);
+    s->time_diff = WAKEUP_MOD_H * SECONDS_PER_HOUR;
+    s->charge_perc = s_app_data.last_charge_perc - total_loss + ((i + 1) * gap_perc);
+    s->last_charge_perc = s->charge_perc + gap_perc;
   }
   
   data_log_state();
