@@ -26,6 +26,7 @@
   #define ROW_DIV_H 80
   #define ROW_2_TEXT_Y_OFF 7
   #define HOLD_RAD 5
+  #define MENU_BG_COLOR GColorJazzberryJam
 #else
   #define ACTION_BAR_W 12
   #define FONT_KEY_XS FONT_KEY_GOTHIC_14
@@ -52,6 +53,7 @@
   #define ROW_DIV_H 55
   #define ROW_2_TEXT_Y_OFF 5
   #define HOLD_RAD 3
+  #define MENU_BG_COLOR PBL_IF_COLOR_ELSE(GColorJazzberryJam, GColorLightGray)
 #endif
 
 static Window *s_window;
@@ -207,7 +209,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   graphics_draw_bitmap_in_rect(ctx, s_braid_bitmap, braid_rect);
 
   // Actions BG
-  graphics_context_set_fill_color(ctx, GColorLightGray);
+  graphics_context_set_fill_color(ctx, MENU_BG_COLOR);
   GRect actions_rect = GRect(DISPLAY_W - ACTION_BAR_W, 0, ACTION_BAR_W, DISPLAY_H);
   graphics_fill_rect(ctx, actions_rect, 0, GCornerNone);
 

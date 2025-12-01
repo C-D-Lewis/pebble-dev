@@ -73,6 +73,6 @@ from 2016) and what kind of anomalous behavior you encountered.
 - [x] Attempt to set AppGlance
 - [x] Pre-release: single app data structure
 - [x] Emery screen size support
-- [ ] Some kind of color flair for color watches
+- [x] Some kind of color flair for color watches
 - [ ] Show log entries for wakeups where charging was observed
-- [ ] Extremely simple chart using log timestamps?
+- [ ] Extremely simple chart using log timestamps? requires more stored samples (CHECK DATA LOADS OKAY)

@@ -84,9 +84,9 @@ void data_init() {
     // Hopefully this is backwards from now, every six hours, 4% estimates
     s->timestamp = now - ((i + 1) * WAKEUP_MOD_H * SECONDS_PER_HOUR);
     s->perc_per_day = gap_perc;
-    s->charge_perc = s_app_data.last_charge_perc - (i * gap_perc);
+    s->charge_perc = s_app_data.last_charge_perc - ((i + 1) * gap_perc);
     s->last_sample_time = now - (((i + 2) * WAKEUP_MOD_H) * SECONDS_PER_HOUR);
-    s->last_charge_perc = s_app_data.last_charge_perc - ((i + 1) * gap_perc);
+    s->last_charge_perc = s_app_data.last_charge_perc - ((i + 2) * gap_perc);
     s->time_diff = WAKEUP_MOD_H * SECONDS_PER_HOUR;
     s->charge_diff = gap_perc;
   }
