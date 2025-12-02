@@ -1,20 +1,21 @@
 #include "history_window.h"
 
-#define ROW_HEIGHT 62
+#define ROW_HEIGHT 66
 #define FONT_KEY_S FONT_KEY_GOTHIC_14
 #define FONT_KEY_M FONT_KEY_GOTHIC_18
 #define FONT_KEY_L FONT_KEY_GOTHIC_24
-#define ROW_1_Y 16
-#define ROW_2_Y 34
+#define ROW_1_Y 20
+#define ROW_2_Y 40
+#define STATUS_W 52
 
 #if defined(PBL_PLATFORM_EMERY)
-  #define FMT_STRING_ESTIMATE "About %d%% / day"
   #define TITLE_FONT_KEY FONT_KEY_GOTHIC_24
   #define MENU_INSET 28
+  #define DIV_X 140
 #else
-  #define FMT_STRING_ESTIMATE "~ %d%%/day"
   #define TITLE_FONT_KEY FONT_KEY_GOTHIC_18
   #define MENU_INSET 20
+  #define DIV_X 90
 #endif
 
 static Window *s_window;
@@ -22,6 +23,50 @@ static TextLayer *s_header_layer;
 static MenuLayer *s_menu_layer;
 
 static GFont s_font_s, s_font_m, s_font_l;
+
+static void draw_diffs(GContext *ctx, const GRect bounds, const Sample *s) {
+  // Time diff
+  static char s_fmt_lst_buff[8];
+  static char s_fmt_ts_buff[8];
+  util_fmt_time(s->last_sample_time, &s_fmt_lst_buff[0], sizeof(s_fmt_lst_buff));
+  util_fmt_time(s->timestamp, &s_fmt_ts_buff[0], sizeof(s_fmt_ts_buff));
+  static char s_lst_buff[32];
+  snprintf(s_lst_buff, sizeof(s_lst_buff), "%s -> %s", s_fmt_lst_buff, s_fmt_ts_buff);
+  graphics_draw_text(
+    ctx,
+    s_lst_buff,
+    s_font_m,
+    GRect(2, ROW_1_Y, bounds.size.w, 28),
+    GTextOverflowModeTrailingEllipsis,
+    GTextAlignmentLeft,
+    NULL
+  );
+
+  // Charge diff
+  static char s_lcp_buff[32];
+  snprintf(s_lcp_buff, sizeof(s_lcp_buff), "%d%% -> %d%%", s->last_charge_perc, s->charge_perc);
+  graphics_draw_text(
+    ctx,
+    s_lcp_buff,
+    s_font_m,
+    GRect(2, ROW_2_Y, bounds.size.w, 28),
+    GTextOverflowModeTrailingEllipsis,
+    GTextAlignmentLeft,
+    NULL
+  );
+}
+
+static void draw_status(GContext *ctx, const GRect bounds, const Sample *s, char *msg) {
+  graphics_draw_text(
+    ctx,
+    msg,
+    s_font_m,
+    GRect(bounds.size.w - STATUS_W, ROW_1_Y, STATUS_W, 100),
+    GTextOverflowModeWordWrap,
+    GTextAlignmentCenter,
+    NULL
+  );
+}
 
 static uint16_t get_num_rows_callback(MenuLayer *menu_layer, uint16_t section_index, void *context) {
   const int count = data_get_samples_count();
@@ -45,13 +90,13 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
   // Sample time
   static char s_datetime_buff[32];
   const time_t ts_time = s->timestamp;
-  const struct tm *ts_info = gmtime(&ts_time);
-  strftime(s_datetime_buff, sizeof(s_datetime_buff), "%Y-%m-%d %H:%M", ts_info);
+  const struct tm *ts_info = localtime(&ts_time);
+  strftime(s_datetime_buff, sizeof(s_datetime_buff), "%Y-%m-%d - %H:%M", ts_info);
   static char s_dt_with_cp_buff[32];
   snprintf(
     s_dt_with_cp_buff,
     sizeof(s_dt_with_cp_buff),
-    "%s - %d%%",
+    "%s: %d%%",
     s_datetime_buff,
     s->charge_perc
   );
@@ -65,92 +110,25 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
     NULL
   );
 
-  // Last time
-  static char s_fmt_lst_buff[16];
-  util_fmt_time(s->last_sample_time, &s_fmt_lst_buff[0], sizeof(s_fmt_lst_buff));
-  static char s_lst_buff[16];
-  snprintf(s_lst_buff, sizeof(s_lst_buff), "<- %s", s_fmt_lst_buff);
-  graphics_draw_text(
-    ctx,
-    s_lst_buff,
-    s_font_m,
-    GRect(2, ROW_1_Y, bounds.size.w, 28),
-    GTextOverflowModeTrailingEllipsis,
-    GTextAlignmentLeft,
-    NULL
-  );
+  // Divider
+  const GColor sep_color = menu_layer_is_index_selected(s_menu_layer, cell_index)
+    ? GColorWhite : GColorBlack;
+  graphics_context_set_stroke_color(ctx, sep_color);
+  graphics_draw_line(ctx, GPoint(0, 18), GPoint(bounds.size.w, 18));
+  graphics_draw_line(ctx, GPoint(DIV_X, 18), GPoint(DIV_X, bounds.size.h));
+  graphics_draw_line(ctx, GPoint(0, bounds.size.h - 1), GPoint(bounds.size.w, bounds.size.h - 1));
 
-  // Last charge
-  static char s_lcp_buff[16];
-  snprintf(s_lcp_buff, sizeof(s_lcp_buff), "<- %d%%", s->last_charge_perc);
-  graphics_draw_text(
-    ctx,
-    s_lcp_buff,
-    s_font_m,
-    GRect(2, ROW_2_Y, bounds.size.w, 28),
-    GTextOverflowModeTrailingEllipsis,
-    GTextAlignmentLeft,
-    NULL
-  );
+  draw_diffs(ctx, bounds, s);
 
-  // Time diff
-  static char s_td_buff[32];
-  static char s_fmt_td_buff[16];
-  util_fmt_time_unit(s->time_diff, &s_fmt_td_buff[0], sizeof(s_fmt_td_buff));
-  snprintf(s_td_buff, sizeof(s_td_buff), "dT: %s", s_fmt_td_buff);
-  graphics_draw_text(
-    ctx,
-    s_td_buff,
-    s_font_m,
-    GRect(60, ROW_1_Y, bounds.size.w, 28),
-    GTextOverflowModeTrailingEllipsis,
-    GTextAlignmentLeft,
-    NULL
-  );
-
-  // Charge diff
-  static char s_cd_buff[16];
-  snprintf(s_cd_buff, sizeof(s_cd_buff), "dC: %d%%", s->charge_diff);
-  graphics_draw_text(
-    ctx,
-    s_cd_buff,
-    s_font_m,
-    GRect(60, ROW_2_Y, bounds.size.w, 28),
-    GTextOverflowModeTrailingEllipsis,
-    GTextAlignmentLeft,
-    NULL
-  );
-
-  // Percentage per day
-  graphics_draw_text(
-    ctx,
-    "Est.",
-    s_font_s,
-    GRect(0, 14, DISPLAY_W, 28),
-    GTextOverflowModeTrailingEllipsis,
-    GTextAlignmentRight,
-    NULL
-  );
-  static char s_ppd_buff[8];
-  snprintf(s_ppd_buff, sizeof(s_ppd_buff), "%d%%", s->perc_per_day);
-  graphics_draw_text(
-    ctx,
-    s_ppd_buff,
-    s_font_l,
-    GRect(0, 21, DISPLAY_W, 28),
-    GTextOverflowModeTrailingEllipsis,
-    GTextAlignmentRight,
-    NULL
-  );
-  graphics_draw_text(
-    ctx,
-    "/day",
-    s_font_s,
-    GRect(0, 43, DISPLAY_W, 28),
-    GTextOverflowModeTrailingEllipsis,
-    GTextAlignmentRight,
-    NULL
-  );
+  if (s->result == STATUS_NO_CHANGE) {
+    draw_status(ctx, bounds, s, "No change");
+  } else if (s->result == STATUS_CHARGED) {
+    draw_status(ctx, bounds, s, "Charged up");
+  } else {
+    static char s_result_buff[16];
+    snprintf(s_result_buff, sizeof(s_result_buff), "Est.\n%d%%/d", s->result);
+    draw_status(ctx, bounds, s, &s_result_buff[0]);
+  }
 }
 
 static int16_t get_cell_height_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) {

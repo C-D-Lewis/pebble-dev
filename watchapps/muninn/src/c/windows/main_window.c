@@ -18,10 +18,10 @@
   #define ROW_2_Y 192
   #define ROW_1_GAP 90
   #define ROW_2_GAP 94
-  #define ROW_1_SUBTITLE "    Days left        Est. %/day"
+  #define ROW_1_SUBTITLE "    Days left       Est. %/day"
   #define HINT_W 20
   #define HINT_H 48
-  #define ROW_DIV_Y 178
+  #define ROW_DIV_Y 175
   #define ROW_DIV_X (DISPLAY_W / 2) - 8
   #define ROW_DIV_H 80
   #define ROW_2_TEXT_Y_OFF 7
@@ -38,7 +38,7 @@
   #define STATUS_VALUE_RECT GRect(58, 13, DISPLAY_W - 75, 100)
   #define EYE_RECT GRect(41, 7, 4, 4)
   #define BRAID_Y 68
-  #define DESC_RECT GRect(5, 47, DISPLAY_W - ACTION_BAR_W - 10, 100)
+  #define DESC_RECT GRect(5, 48, DISPLAY_W - ACTION_BAR_W - 10, 100)
   #define ROW_1_X 2
   #define ROW_1_Y 92
   #define ROW_2_X 2
@@ -88,12 +88,6 @@ static int s_blink_budget;
 
 static void schedule_blink();
 
-static uint32_t get_battery_resource_id(int charge_percent) {
-  if (charge_percent > 66) return RESOURCE_ID_BATTERY_HIGH;
-  if (charge_percent > 33) return RESOURCE_ID_BATTERY_MEDIUM;
-  return RESOURCE_ID_BATTERY_LOW;
-}
-
 static void unblink_handler(void *context) {
   s_is_blinking = false;
   layer_mark_dirty(s_canvas_layer);
@@ -138,10 +132,9 @@ static void update_data() {
 
   time_t wakeup_ts;
   const int wakeup_id = data_get_wakeup_id();
-  const bool is_enabled = wakeup_id != DATA_EMPTY;
+  const bool is_enabled = util_is_valid(wakeup_id);
   const bool found = wakeup_query(wakeup_id, &wakeup_ts);
   if (is_enabled && !found) {
-    // Something went wrong
     data_set_error("Scheduled wakeup was not found");
   }
   
@@ -156,15 +149,17 @@ static void update_data() {
   // Battery now
   BatteryChargeState state = battery_state_service_peek();
   const int charge_percent = state.charge_percent;
-  s_battery_bitmap = gbitmap_create_with_resource(get_battery_resource_id(charge_percent));
+  s_battery_bitmap = gbitmap_create_with_resource(util_get_battery_resource_id(charge_percent));
   bitmap_layer_set_bitmap(s_battery_bmp_layer, s_battery_bitmap);
   static char s_battery_buff[16];
   snprintf(s_battery_buff, sizeof(s_battery_buff), "%d%%", charge_percent);
   text_layer_set_text(s_battery_layer, s_battery_buff);
 
+  // Current status
+  text_layer_set_text(s_desc_layer, util_get_status_string());
+
   // Sometimes
   if (!is_enabled) {
-    text_layer_set_text(s_desc_layer, "Not monitoring");
     text_layer_set_text(s_reading_layer, "-");
     text_layer_set_text(s_remaining_layer, "-");
     text_layer_set_text(s_rate_layer, "-");
@@ -174,11 +169,9 @@ static void update_data() {
     layer_set_hidden(text_layer_get_layer(s_hint_layer), true);
     schedule_blink();
 
-    text_layer_set_text(s_desc_layer, "Passively monitoring");
-
     // Days remaining
     const int days_remaining = data_calculate_days_remaining();
-    if (days_remaining == DATA_EMPTY) {
+    if (!util_is_valid(days_remaining)) {
       text_layer_set_text(s_remaining_layer, "-");
     } else {
       static char s_remaining_buff[16];
@@ -188,7 +181,7 @@ static void update_data() {
 
     // Rate per day
     const int rate = data_calculate_avg_discharge_rate();
-    if (rate == DATA_EMPTY) {
+    if (!util_is_valid(rate)) {
       text_layer_set_text(s_rate_layer, "-");
     } else {
       static char s_rate_buff[16];
@@ -213,15 +206,15 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   GRect actions_rect = GRect(DISPLAY_W - ACTION_BAR_W, 0, ACTION_BAR_W, DISPLAY_H);
   graphics_fill_rect(ctx, actions_rect, 0, GCornerNone);
 
-  int hint_x = DISPLAY_W - (HINT_W / 2);
+  const int hint_x = DISPLAY_W - (HINT_W / 2);
 
   // Enable hint
-  int enable_y = DISPLAY_H / 6 - (HINT_H / 2);
-  GRect enable_rect = GRect(hint_x, enable_y, HINT_W, HINT_H);
+  const int enable_y = DISPLAY_H / 6 - (HINT_H / 2);
+  const GRect enable_rect = GRect(hint_x, enable_y, HINT_W, HINT_H);
   graphics_context_set_fill_color(ctx, GColorBlack);
   graphics_fill_rect(ctx, enable_rect, 3, GCornersAll);
   graphics_context_set_fill_color(ctx, GColorWhite);
-  GPoint select_center = {
+  const GPoint select_center = {
     .x = hint_x + (HINT_W / 2),
     .y = enable_y + (HINT_H / 2)
   };
@@ -255,7 +248,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
 }
 
 static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
-  const bool should_enable = data_get_wakeup_id() == DATA_EMPTY;
+  const bool should_enable = !util_is_valid(data_get_wakeup_id());
   if (should_enable) {
     s_blink_budget = 5;
     schedule_blink();
@@ -275,7 +268,7 @@ static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
 }
 
 static void down_long_click_handler(ClickRecognizerRef recognizer, void *context) {
-  stat_window_push();
+  graph_window_push();
 }
 
 static void click_config_provider(void *context) {
@@ -390,15 +383,15 @@ static void window_load(Window *window) {
 
   // Hint for when Muninn is asleep
   const GRect hint_rect = GRect(
-    8,
+    2,
     BRAID_Y + 14,
-    DISPLAY_W - ACTION_BAR_W - 16,
+    DISPLAY_W - ACTION_BAR_W - 4,
     (ROW_DIV_Y - BRAID_Y - 14)
   );
   s_hint_layer = util_make_text_layer(hint_rect, font_s);
   text_layer_set_background_color(s_hint_layer, GColorWhite);
   text_layer_set_text_alignment(s_hint_layer, GTextAlignmentCenter);
-  text_layer_set_text(s_hint_layer, "Wake Muninn to begin monitoring.");
+  text_layer_set_text(s_hint_layer, "Hold the Up button to wake Muninn.");
   layer_add_child(root_layer, text_layer_get_layer(s_hint_layer));
 
   update_data();

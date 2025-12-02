@@ -1,33 +1,34 @@
 #include "history_window.h"
 
-
 #if defined(PBL_PLATFORM_EMERY)
   #define TITLE_HEIGHT 28
-  #define GRAPH_MARGIN 22
+  #define GRAPH_MARGIN 28
+  #define DESC_Y 20
   #define GRAPH_SIZE (DISPLAY_W - (2 * GRAPH_MARGIN))
   #define FONT_KEY_M FONT_KEY_GOTHIC_18
   #define FONT_KEY_S FONT_KEY_GOTHIC_14
+  #define ZERO_OFFSET 18
 #else
-  #define TITLE_HEIGHT 28
-  #define GRAPH_MARGIN 22
+  #define TITLE_HEIGHT 22
+  #define GRAPH_MARGIN 24
+  #define DESC_Y 14
   #define GRAPH_SIZE (DISPLAY_W - (2 * GRAPH_MARGIN))
   #define FONT_KEY_M FONT_KEY_GOTHIC_18
   #define FONT_KEY_S FONT_KEY_GOTHIC_14
+  #define ZERO_OFFSET 17
 #endif
 
 static Window *s_window;
-static TextLayer *s_header_layer;
+static TextLayer *s_header_layer, *s_desc_layer;
 static Layer *s_canvas_layer;
 
 static GFont s_font_s, s_font_m;
 
 static void canvas_update_proc(Layer *layer, GContext *ctx) {
-  GRect bounds = layer_get_bounds(layer);
-
   graphics_context_set_stroke_color(ctx, GColorBlack);
   graphics_context_set_stroke_width(ctx, 1);
 
-  const int root_y = TITLE_HEIGHT + GRAPH_MARGIN;
+  const int root_y = TITLE_HEIGHT + GRAPH_MARGIN + 5;
   const int x_width = GRAPH_SIZE + (GRAPH_MARGIN / 2);
 
   // Draw Y and X axes
@@ -57,7 +58,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     ctx,
     "0",
     s_font_s,
-    GRect(0, GRAPH_SIZE - GRAPH_MARGIN + root_y + 11, 18, 32),
+    GRect(0, GRAPH_SIZE - GRAPH_MARGIN + root_y + ZERO_OFFSET, 18, 32),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentRight,
     NULL
@@ -66,8 +67,8 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   // Draw data points
   graphics_context_set_fill_color(ctx, GColorBlack);
   const SampleData *data = data_get_sample_data();
-  const int count = NUM_STORED_SAMPLES;
-  const int x_gap = GRAPH_SIZE / count;
+  const int count = NUM_SAMPLES;
+  const int x_gap = (GRAPH_SIZE + GRAPH_MARGIN) / count;
 
   // Draw Y axis notches at 10% intervals
   for (int i = 0; i <= 10; i++) {
@@ -89,18 +90,31 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     );
   }
 
-  // Draw points
-  for (int i = count - 1; i >= 0; i--) {
-    const int value = data->samples[i].charge_perc;
-    if (value == DATA_EMPTY) continue;
+  // Draw points - oldest is on the left
+  for (int i = 0; i < count; i++) {
+    const int value = data->samples[count - 1 - i].charge_perc;
+    if (!util_is_valid(value)) continue;
 
-    const int x = GRAPH_MARGIN + GRAPH_SIZE - (((i + 1) * x_gap) + 4);
+    const int x = GRAPH_MARGIN + (i * x_gap);
     const int y = root_y + GRAPH_SIZE - ((value * GRAPH_SIZE) / 100);
     
     graphics_fill_circle(ctx, GPoint(x, y), 2);
 
+    static char s_value_buff[4];
+    snprintf(s_value_buff, sizeof(s_value_buff), "%d", value);
+    graphics_draw_text(
+      ctx,
+      s_value_buff,
+      s_font_s,
+      GRect(x - 12, y - 17, 24, 14),
+      GTextOverflowModeTrailingEllipsis,
+      GTextAlignmentCenter,
+      NULL
+    );
+
+    // Time labels on X axis
     if (i == 0 || i == count - 1) {
-      const time_t timestamp = data->samples[i].timestamp;
+      const time_t timestamp = data->samples[count -1 - i].timestamp;
       struct tm *tm_point = localtime(&timestamp);
       static char s_time_buff[16];
       strftime(s_time_buff, sizeof(s_time_buff), "%H:%M", tm_point);
@@ -108,7 +122,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
         ctx,
         s_time_buff,
         s_font_s,
-        GRect(x - 16, root_y + GRAPH_SIZE, 32, 20),
+        GRect(x - 16, root_y + GRAPH_SIZE + 2, 32, 20),
         GTextOverflowModeTrailingEllipsis,
         GTextAlignmentCenter,
         NULL
@@ -134,10 +148,16 @@ static void main_window_load(Window *window) {
   );
   layer_set_update_proc(s_canvas_layer, canvas_update_proc);
   layer_add_child(root_layer, s_canvas_layer);
+
+  s_desc_layer = util_make_text_layer(GRect(4, DESC_Y, bounds.size.w - 8, 100), s_font_s);
+  text_layer_set_text(s_desc_layer, "Samples are shown oldest to newest.");
+  text_layer_set_overflow_mode(s_desc_layer, GTextOverflowModeWordWrap);
+  layer_add_child(root_layer, text_layer_get_layer(s_desc_layer));
 }
 
 static void window_unload(Window *window) {
   text_layer_destroy(s_header_layer);
+  text_layer_destroy(s_desc_layer);
   layer_destroy(s_canvas_layer);
 
   window_destroy(window);

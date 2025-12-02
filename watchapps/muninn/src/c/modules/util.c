@@ -8,13 +8,13 @@ TextLayer* util_make_text_layer(GRect frame, GFont font) {
 }
 
 void util_fmt_time(int timestamp_s, char* buff, int size) {
-  if (timestamp_s == DATA_EMPTY) {
+  if (!util_is_valid(timestamp_s)) {
     snprintf(buff, size, "-");
     return;
   }
 
   const time_t t = (time_t)timestamp_s;
-  const struct tm *tm_info = gmtime(&t);
+  const struct tm *tm_info = localtime(&t);
   const int hours = tm_info->tm_hour;
   const int mins = tm_info->tm_min;
 
@@ -77,4 +77,23 @@ void util_fmt_time_unit(time_t ts, char *buff, int size) {
   }
 
   snprintf(buff, size, "%d%s", value, unit);
+}
+
+char* util_get_status_string() {
+  const bool is_enabled = util_is_valid(data_get_wakeup_id());
+  if (!is_enabled) return "Not monitoring";
+
+  if (data_get_samples_count() < MIN_SAMPLES) return "Awaiting two samples...";
+
+  return "Passively monitoring";
+}
+
+uint32_t util_get_battery_resource_id(int charge_percent) {
+  if (charge_percent > 66) return RESOURCE_ID_BATTERY_HIGH;
+  if (charge_percent > 33) return RESOURCE_ID_BATTERY_MEDIUM;
+  return RESOURCE_ID_BATTERY_LOW;
+}
+
+bool util_is_valid(int v) {
+  return v != STATUS_EMPTY && v != STATUS_CHARGED && v != STATUS_NO_CHANGE;
 }

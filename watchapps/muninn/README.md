@@ -16,6 +16,8 @@ trends and provide insight without negatively affecting battery life. It uses a
 moving average of six-hourly readings over time to estimate remaining days of
 battery life and rate of discharge.
 
+Estimates will begin to appear after two of these readings have been taken.
+
 Features include:
 
 - Negligible battery impact.

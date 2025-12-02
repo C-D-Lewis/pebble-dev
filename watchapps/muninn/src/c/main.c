@@ -22,7 +22,7 @@ static void battery_handler(BatteryChargeState state) {
 
 static bool handle_missed_wakeup() {
   const int wakeup_id = data_get_wakeup_id();
-  if (wakeup_id == DATA_EMPTY) return false;
+  if (!util_is_valid(wakeup_id)) return false;
 
   time_t wakeup_ts;
   const bool found = wakeup_query(wakeup_id, &wakeup_ts);
@@ -67,12 +67,14 @@ static void init() {
   battery_handler(battery_state_service_peek());
 
   if (missed) {
+#if !defined(TEST_DATA)
     alert_window_push(
       RESOURCE_ID_ASLEEP,
       "Muninn missed a sample, but will continue.",
       true,
       false
     );
+#endif
   }
 
   if (first_launch) {

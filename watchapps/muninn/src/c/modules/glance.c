@@ -5,7 +5,7 @@ void glance_handler(AppGlanceReloadSession *session, size_t limit, void *context
   if (limit < 1) return;
 
   static char s_buffer[32];
-  if (data_calculate_days_remaining() == DATA_EMPTY) {
+  if (!util_is_valid(data_calculate_days_remaining())) {
     snprintf(
       s_buffer,
       sizeof(s_buffer),

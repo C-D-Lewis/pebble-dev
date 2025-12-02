@@ -10,5 +10,6 @@
 
 #include "menu_window.h"
 #include "stat_window.h"
+#include "graph_window.h"
 
 void main_window_push();

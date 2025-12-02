@@ -15,7 +15,7 @@ static TextLayer *s_stats_layer, *s_history_layer;
 void stat_window_update_data() {
   if (!s_window) return;
 
-  const bool is_enabled = data_get_wakeup_id() != DATA_EMPTY;
+  const bool is_enabled = util_is_valid(data_get_wakeup_id());
   time_t wakeup_ts;
   wakeup_query(data_get_wakeup_id(), &wakeup_ts);
 
@@ -45,12 +45,12 @@ void stat_window_update_data() {
     s_history_buff,
     sizeof(s_history_buff),
     "Recent samples:\n%d, %d, %d, %d, %d, %d\nAverage: %d",
-    sample_data->samples[0].perc_per_day,
-    sample_data->samples[1].perc_per_day,
-    sample_data->samples[2].perc_per_day,
-    sample_data->samples[3].perc_per_day,
-    sample_data->samples[4].perc_per_day,
-    sample_data->samples[5].perc_per_day,
+    sample_data->samples[0].result,
+    sample_data->samples[1].result,
+    sample_data->samples[2].result,
+    sample_data->samples[3].result,
+    sample_data->samples[4].result,
+    sample_data->samples[5].result,
     data_calculate_avg_discharge_rate()
   );
   text_layer_set_text(s_history_layer, s_history_buff);

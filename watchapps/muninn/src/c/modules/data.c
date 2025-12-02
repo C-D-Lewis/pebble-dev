@@ -31,32 +31,30 @@ void data_reset_all() {
   delete_all_data();
 
   // Write defaults - some will be init'd when tracking begins
-  s_app_data.last_sample_time = DATA_EMPTY;
-  s_app_data.last_charge_perc = DATA_EMPTY;
-  s_app_data.wakeup_id = DATA_EMPTY;
+  s_app_data.last_sample_time = STATUS_EMPTY;
+  s_app_data.last_charge_perc = STATUS_EMPTY;
+  s_app_data.wakeup_id = STATUS_EMPTY;
   s_app_data.seen_first_launch = false;
   s_app_data.vibe_on_sample = false;
   s_app_data.custom_alert_level = AL_OFF;
   s_app_data.ca_has_notified = false;
 
   // Init all fields in Sample struct
-  for (int i = 0; i < NUM_STORED_SAMPLES; i++) {
+  for (int i = 0; i < NUM_SAMPLES; i++) {
     Sample *s = &s_sample_data.samples[i];
-    s->timestamp = DATA_EMPTY;
-    s->charge_perc = DATA_EMPTY;
-    s->last_sample_time = DATA_EMPTY;
-    s->last_charge_perc = DATA_EMPTY;
-    s->time_diff = DATA_EMPTY;
-    s->charge_diff = DATA_EMPTY;
-    s->perc_per_day = DATA_EMPTY;
+    s->timestamp = STATUS_EMPTY;
+    s->charge_perc = STATUS_EMPTY;
+    s->last_sample_time = STATUS_EMPTY;
+    s->last_charge_perc = STATUS_EMPTY;
+    s->time_diff = STATUS_EMPTY;
+    s->charge_diff = STATUS_EMPTY;
+    s->result = STATUS_EMPTY;
   }
 
   save_all();
 }
 
 static void do_migrations() {
-  // NUM_STORED_SAMPLES increased - 4 ts + 4 values went into 8 timestamps... hard to migrate
-
   // Future migrations go here
 }
 
@@ -66,8 +64,22 @@ void data_init() {
 #endif
 
 #if defined(TEST_DATA)
+  // Test case: Should show 10 days at 8% per day
+  // const int changes[NUM_SAMPLES] = {2, 2, 2, 2, 2, 2, 2, 2};
+  // Test case: Should show 10 days at 8% (two other events are ignored)
+  const int changes[NUM_SAMPLES] = {2, 2, 2, 2, -20, 2, 0, 2};
+  // Arbitrary scenario - (reverse order)
+  // const int changes[NUM_SAMPLES] = {1, 2, 1, 2, 0, 4, -20, 1};
+
+  int total_change = 0;
+  for(int i = 0; i < NUM_SAMPLES; i++) {
+    total_change += changes[i];
+  }
+  const int interval_s = WAKEUP_MOD_H * SECONDS_PER_HOUR;
+
   // Load test values for this launch
-  s_app_data.last_sample_time = time(NULL) - (WAKEUP_MOD_H * SECONDS_PER_HOUR);
+  // TODO: Use the array's newest value here
+  s_app_data.last_sample_time = time(NULL) - interval_s;
   s_app_data.last_charge_perc = 80;
   s_app_data.wakeup_id = time(NULL) + (12 * SECONDS_PER_HOUR);   // Won't be found
   s_app_data.seen_first_launch = true;
@@ -76,21 +88,39 @@ void data_init() {
   s_app_data.ca_has_notified = false;
 
   const time_t now = time(NULL);
-  const int gap_perc = 4;
-  const int total_loss = gap_perc * NUM_STORED_SAMPLES;
-  for (int i = 0; i < NUM_STORED_SAMPLES; i++) {
+  for (int i = NUM_SAMPLES - 1; i >= 0; i--) {
     Sample *s = &s_sample_data.samples[i];
+    const int gap = changes[NUM_SAMPLES - 1 - i];
 
-    // Backwards from now, every six hours, 4% estimates
-    s->timestamp = now - ((i + 1) * WAKEUP_MOD_H * SECONDS_PER_HOUR);
-    s->perc_per_day = gap_perc;
-    s->charge_diff = gap_perc;
-    s->last_sample_time = now - (((i + 2) * WAKEUP_MOD_H) * SECONDS_PER_HOUR);
-    s->time_diff = WAKEUP_MOD_H * SECONDS_PER_HOUR;
-    s->charge_perc = s_app_data.last_charge_perc - total_loss + ((i + 1) * gap_perc);
-    s->last_charge_perc = s->charge_perc + gap_perc;
+    if (i == NUM_SAMPLES - 1) {
+      // Oldest sample
+      s->timestamp = now - ((NUM_SAMPLES - 1) * interval_s);
+      s->result = gap == 0 ? STATUS_NO_CHANGE : (gap * 4);
+      s->charge_diff = changes[NUM_SAMPLES - 1];
+      s->last_sample_time = now - ((NUM_SAMPLES - 2) * interval_s);
+      s->time_diff = interval_s;
+      s->charge_perc = 80;
+      s->last_charge_perc = s->charge_perc + s->charge_diff;
+      continue;
+    }
+
+    // Diff the last
+    Sample *last_s = &s_sample_data.samples[i + 1];
+
+    s->timestamp = last_s->timestamp - interval_s;
+    s->charge_diff = gap;
+    s->last_sample_time = s->timestamp + interval_s;
+    s->time_diff = interval_s;
+    s->charge_perc = last_s->charge_perc - s->charge_diff;
+    s->last_charge_perc = s->charge_perc + s->charge_diff;
+
+    // Hacky way to simulate both special statuses
+    s->result = gap == 0 ? STATUS_NO_CHANGE : (gap * 4);
+    if (s->charge_perc > last_s->charge_perc) {
+      s->result = STATUS_CHARGED;
+    }
   }
-  
+
   data_log_state();
   return;
 #endif
@@ -127,29 +157,21 @@ void data_deinit() {
 }
 
 void data_log_state() {
-  APP_LOG(
-    APP_LOG_LEVEL_INFO,
-    "D: %d | W: %d | B: %d | H: %d %d %d | A: %d",
-    s_app_data.last_sample_time, s_app_data.wakeup_id, s_app_data.last_charge_perc,
-    s_sample_data.samples[0].perc_per_day, s_sample_data.samples[1].perc_per_day,
-    s_sample_data.samples[2].perc_per_day, s_app_data.ca_has_notified ? 1 : 0
-  );
-
-#if defined(DEBUG_LOGS)
+#if defined(LOG_STATE)
   // Sample history
-  for (int i = 0; i < NUM_STORED_SAMPLES; i++) {
+  for (int i = 0; i < NUM_SAMPLES; i++) {
     Sample *s = &s_sample_data.samples[i];
     APP_LOG(
       APP_LOG_LEVEL_INFO,
-      "%d | t:%d c:%d ls:%d lc:%d td:%d cd:%d ppd:%d",
+      "%d | t:%d -> %d (%d) | c:%d -> %d (%d) | ~%d",
       i,
-      (int)s->timestamp,
-      (int)s->charge_perc,
       (int)s->last_sample_time,
-      (int)s->last_charge_perc,
+      (int)s->timestamp,
       (int)s->time_diff,
+      (int)s->last_charge_perc,
+      (int)s->charge_perc,
       (int)s->charge_diff,
-      (int)s->perc_per_day
+      (int)s->result
     );
   }
 #endif
@@ -169,9 +191,9 @@ void data_activation_update() {
   }
 }
 
-void data_push_sample(int charge_perc, int last_sample_time, int last_charge_perc, int time_diff, int charge_diff, int perc_per_day) {
+void data_push_sample(int charge_perc, int last_sample_time, int last_charge_perc, int time_diff, int charge_diff, int result) {
   // Shift right previous samples
-  for (int i = NUM_STORED_SAMPLES - 1; i > 0; i--) {
+  for (int i = NUM_SAMPLES - 1; i > 0; i--) {
     s_sample_data.samples[i] = s_sample_data.samples[i - 1];
   }
 
@@ -182,7 +204,7 @@ void data_push_sample(int charge_perc, int last_sample_time, int last_charge_per
   s->last_charge_perc = last_charge_perc;
   s->time_diff = time_diff;
   s->charge_diff = charge_diff;
-  s->perc_per_day = perc_per_day;
+  s->result = result;
 }
 
 /**
@@ -194,45 +216,51 @@ int data_calculate_avg_discharge_rate() {
   const int count = data_get_samples_count();
 
   // Not enough samples yet
-  if (count < MIN_SAMPLES) return DATA_EMPTY;
+  if (count < MIN_SAMPLES) return STATUS_EMPTY;
 
-  const int half_index = (count + 1) / 2;
-#if defined(DEBUG_LOGS)
-  APP_LOG(APP_LOG_LEVEL_INFO, "avg: count: %d half_index: %d", count, half_index);
+#if defined(LOG_AVERAGING)
+  APP_LOG(APP_LOG_LEVEL_INFO, "avg: count: %d", count);
 #endif
 
-  int result_x2 = 0;
-  int weight_x2 = 0;
+  int result_x3 = 0;
+  int weight_x3 = 0;
   int seen = 0;
 
-  for (int i = 0; i < NUM_STORED_SAMPLES; i++) {
-    int v = data->samples[i].perc_per_day;
-    if (v == DATA_EMPTY) continue;
+  for (int i = 0; i < NUM_SAMPLES; i++) {
+    const int v = data->samples[i].result;
+    // No discharge in this sample
+    if (!util_is_valid(v)) continue;
 
     seen++;
-    if (seen <= half_index) {
-      result_x2 += v * 2; // full weight -> doubled
-      weight_x2 += 2;
-#if defined(DEBUG_LOGS)
-      APP_LOG(APP_LOG_LEVEL_INFO, "avg: i:%d x2 %d -> %d (seen: %d)", i, v, 2 * v, seen);
+    if (seen == 1) {
+      result_x3 += v * 3; // first item -> 3x weight
+      weight_x3 += 3;
+#if defined(LOG_AVERAGING)
+      APP_LOG(APP_LOG_LEVEL_INFO, "avg: i:%d x3 %d (seen: %d)", i, v, seen);
+#endif
+    } else if (seen <= 4) {
+      result_x3 += v * 2; // next three -> 2x weight
+      weight_x3 += 2;
+#if defined(LOG_AVERAGING)
+      APP_LOG(APP_LOG_LEVEL_INFO, "avg: i:%d x2 %d (seen: %d)", i, v, seen);
 #endif
     } else {
-      result_x2 += v * 1; // half weight -> single
-      weight_x2 += 1;
-#if defined(DEBUG_LOGS)
+      result_x3 += v * 1; // rest -> 1x weight
+      weight_x3 += 1;
+#if defined(LOG_AVERAGING)
       APP_LOG(APP_LOG_LEVEL_INFO, "avg: i:%d x1 %d (seen: %d)", i, v, seen);
 #endif
     }
   }
 
-  if (weight_x2 == 0) return DATA_EMPTY;
-  const int avg = result_x2 / weight_x2;
-#if defined(DEBUG_LOGS)
+  if (weight_x3 == 0) return STATUS_EMPTY;
+  const int avg = result_x3 / weight_x3;
+#if defined(LOG_AVERAGING)
   APP_LOG(
     APP_LOG_LEVEL_INFO,
-    "avg: result_x2 %d / weight_x2 %d => %d\n---",
-    result_x2,
-    weight_x2,
+    "avg: result_x3 %d / weight_x3 %d => %d\n---",
+    result_x3,
+    weight_x3,
     avg
   );
 #endif
@@ -243,11 +271,11 @@ int data_calculate_days_remaining() {
   int rate = data_calculate_avg_discharge_rate();
   int charge_perc = data_get_last_charge_perc();
 
-  if (rate == DATA_EMPTY || charge_perc == DATA_EMPTY) return DATA_EMPTY;
+  if (!util_is_valid(rate) || !util_is_valid(charge_perc)) return STATUS_EMPTY;
 
   if (rate <= 0) {
     APP_LOG(APP_LOG_LEVEL_INFO, "zero or negative rate: %d charge_perc: %d", rate, charge_perc);
-    return DATA_EMPTY;
+    return STATUS_EMPTY;
   }
 
   return charge_perc / rate;
@@ -338,8 +366,8 @@ int data_get_custom_alert_level() {
 
 int data_get_samples_count() {
   int count = 0;
-  for (int i = 0; i < NUM_STORED_SAMPLES; i++) {
-    if (s_sample_data.samples[i].perc_per_day != DATA_EMPTY) {
+  for (int i = 0; i < NUM_SAMPLES; i++) {
+    if (util_is_valid(s_sample_data.samples[i].result)) {
       count++;
     }
   }

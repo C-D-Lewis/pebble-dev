@@ -2,12 +2,11 @@
 
 #include <pebble.h>
 
-/////////////////////////////////////
 // DO NOT CHANGE WITHOUT MIGRATION //
 // Hours between wakeups           //
 #define WAKEUP_MOD_H 6             //
 // Number of stored samples        //
-#define NUM_STORED_SAMPLES 8       //
+#define NUM_SAMPLES 8              //
 /////////////////////////////////////
 
 // Minimum samples before providing estimations
@@ -22,8 +21,15 @@
   #define DISPLAY_H 168
 #endif
 
-// Testing area
-// #define WIPE_ON_LAUNCH true // Wipe all data on launch
-// #define TEST_DATA true      // Use test data instead of real data
-// #define SAVE_TEST_DATA true // Load some sample data into persist
-#define DEBUG_LOGS true     // Log calculations
+///////////// Testing area /////////////
+// Wipe all data on launch            //
+// #define WIPE_ON_LAUNCH true        //
+// Use test data instead of real data //
+// #define TEST_DATA true             //
+// Load some sample data into persist //
+// #define SAVE_TEST_DATA true        //
+// Log state                          //
+#define LOG_STATE true             //
+// Log calculation detail             //
+// #define LOG_AVERAGING true         //
+////////////////////////////////////////
