@@ -158,6 +158,26 @@ void data_deinit() {
 
 void data_log_state() {
 #if defined(LOG_STATE)
+  time_t wakeup_ts = STATUS_EMPTY;
+  const bool is_enabled = util_is_valid(s_app_data.wakeup_id);
+  if (is_enabled) {
+    wakeup_query(s_app_data.wakeup_id, &wakeup_ts);
+  }
+
+  // App state
+  APP_LOG(
+    APP_LOG_LEVEL_INFO,
+    "lst:%d lcp:%d wi:%d wts:%d sfl:%s vos:%s cal:%d chn:%s",
+    s_app_data.last_sample_time,
+    s_app_data.last_charge_perc,
+    s_app_data.wakeup_id,
+    (int)wakeup_ts,
+    s_app_data.seen_first_launch == 1 ? "T" : "F",
+    s_app_data.vibe_on_sample == 1 ? "T" : "F",
+    s_app_data.custom_alert_level,
+    s_app_data.ca_has_notified == 1 ? "T" : "F"
+  );
+
   // Sample history
   for (int i = 0; i < NUM_SAMPLES; i++) {
     Sample *s = &s_sample_data.samples[i];

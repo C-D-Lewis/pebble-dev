@@ -21,6 +21,9 @@
   #define DISPLAY_H 168
 #endif
 
+// MUST match package.json
+#define VERSION "1.4.0"
+
 ///////////// Testing area /////////////
 // Wipe all data on launch            //
 // #define WIPE_ON_LAUNCH true        //
@@ -32,4 +35,6 @@
 #define LOG_STATE true             //
 // Log calculation detail             //
 // #define LOG_AVERAGING true         //
+// Wakeup every minute                //
+// #define WAKEUP_NEXT_MINUTE true    //
 ////////////////////////////////////////

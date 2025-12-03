@@ -22,6 +22,7 @@ typedef enum {
   MI_BATTERY_TIPS,
   MI_ABOUT,
   MI_DELETE_ALL_DATA,
+  MI_VERSION,
   MI_MAX,
 } MenuItems;
 
@@ -74,6 +75,18 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
         NULL
       );
       break;
+    case MI_VERSION: {
+      static char s_v_buff[16];
+      snprintf(s_v_buff, sizeof(s_v_buff), "Version %s", VERSION);
+      menu_cell_basic_draw(
+        ctx,
+        cell_layer,
+        "Muninn",
+        s_v_buff,
+        NULL
+      );
+      break;
+    }
     default: break;
   }
 }
@@ -82,6 +95,7 @@ static int16_t get_cell_height_callback(struct MenuLayer *menu_layer, MenuIndex 
   switch(cell_index->row) {
     case MI_VIBE_ON_SAMPLE:
     case MI_CUSTOM_ALERT_LEVEL:
+    case MI_VERSION:
       return ROW_HEIGHT_LARGE;
     case MI_DELETE_ALL_DATA:
       return s_reset_confirm ? ROW_HEIGHT_LARGE : ROW_HEIGHT_SMALL;
@@ -126,6 +140,7 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
       }
 
       s_reset_confirm = !s_reset_confirm;
+    case MI_VERSION:
     default: break;
   }
 

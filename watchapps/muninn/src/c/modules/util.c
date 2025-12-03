@@ -83,7 +83,13 @@ char* util_get_status_string() {
   const bool is_enabled = util_is_valid(data_get_wakeup_id());
   if (!is_enabled) return "Not monitoring";
 
-  if (data_get_samples_count() < MIN_SAMPLES) return "Awaiting two samples...";
+  if (data_get_samples_count() < MIN_SAMPLES) {
+    const int count = data_get_samples_count();
+    const int rem = MIN_SAMPLES - count;
+    static char s_buff[32];
+    snprintf(s_buff, sizeof(s_buff), "Awaiting %d sample%s...", rem, rem > 1 ? "s" : "");
+    return &s_buff[0];
+  }
 
   return "Passively monitoring";
 }

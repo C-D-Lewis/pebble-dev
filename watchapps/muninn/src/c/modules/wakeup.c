@@ -16,9 +16,15 @@ void wakeup_schedule_next() {
   const int elap_min_s = now->tm_min * SECONDS_PER_MINUTE;
   const int hours_rem = WAKEUP_MOD_H - (now->tm_hour % WAKEUP_MOD_H);
   const int interval_s = (hours_rem * SECONDS_PER_HOUR) - elap_min_s - now->tm_sec;
+
+#if defined(WAKEUP_NEXT_MINUTE)
+  // For testing only
+  const time_t future = ts_now + 60;
+#else
   // Tiny extra offset in case weird things happen exactly on the hour
   const time_t future = ts_now + interval_s + 5;
-  // const time_t future = ts_now + 60; // For testing only
+#endif
+
   APP_LOG(APP_LOG_LEVEL_INFO, "Seconds until next interval: %d", interval_s);
   const int id = wakeup_schedule(future, 0, true);
 
@@ -55,6 +61,10 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
   // First ever sample - nothing to compare to
   if (!util_is_valid(last_sample_time)) {
     APP_LOG(APP_LOG_LEVEL_INFO, "First sample!");
+
+    // Record state and wait for next time
+    data_set_last_charge_perc(charge_percent);
+    data_set_last_sample_time(now);
   } else {
     const int time_diff_s = now - last_sample_time;
     const int charge_diff = last_charge_perc - charge_percent;
@@ -101,16 +111,15 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
       true,
       false
     );
-  } else {
-    if (!is_low && ca_has_notified) {
-      data_set_ca_has_notified(false);
-    }
-
-    alert_window_push(
-      RESOURCE_ID_WRITING,
-      "Muninn is taking a note...",
-      data_get_vibe_on_sample(),
-      true
-    );
+    return;
   }
+  if (!is_low && ca_has_notified) data_set_ca_has_notified(false);
+
+  // Just a sample
+  alert_window_push(
+    RESOURCE_ID_WRITING,
+    "Muninn is taking a note...",
+    data_get_vibe_on_sample(),
+    true
+  );
 }
