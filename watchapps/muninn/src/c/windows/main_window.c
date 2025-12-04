@@ -16,7 +16,7 @@
   #define ROW_1_Y 115
   #define ROW_2_X 10
   #define ROW_2_Y 192
-  #define ROW_1_GAP 90
+  #define ROW_1_GAP 87
   #define ROW_2_GAP 94
   #define ROW_1_SUBTITLE "    Days left       Est. %/day"
   #define HINT_W 20
@@ -185,7 +185,7 @@ static void update_data() {
       text_layer_set_text(s_rate_layer, "-");
     } else {
       static char s_rate_buff[16];
-      snprintf(s_rate_buff, sizeof(s_rate_buff), "%d%%", rate);
+      snprintf(s_rate_buff, sizeof(s_rate_buff), rate > 99 ? "%d" : "%d%%", rate);
       text_layer_set_text(s_rate_layer, s_rate_buff);
     }
 
@@ -268,7 +268,7 @@ static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
 }
 
 static void down_long_click_handler(ClickRecognizerRef recognizer, void *context) {
-  graph_window_push();
+  stat_window_push();
 }
 
 static void click_config_provider(void *context) {

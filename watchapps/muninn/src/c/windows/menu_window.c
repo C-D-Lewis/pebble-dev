@@ -113,7 +113,7 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
       data_cycle_custom_alert_level();
       break;
     case MI_ESTIMATE_LOG:
-      if (data_get_samples_count() == 0) {
+      if (data_get_valid_samples_count() == 0) {
         alert_window_push(
           RESOURCE_ID_ASLEEP,
           "No estimates yet.\n\nMuninn will begin estimating soon.",

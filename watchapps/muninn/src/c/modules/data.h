@@ -91,7 +91,7 @@ bool data_get_seen_first_launch();
 bool data_get_vibe_on_sample();
 void data_set_vibe_on_sample(bool v);
 int data_get_custom_alert_level();
-int data_get_samples_count();
+int data_get_valid_samples_count();
 bool data_get_ca_has_notified();
 void data_set_ca_has_notified(bool notified);
 

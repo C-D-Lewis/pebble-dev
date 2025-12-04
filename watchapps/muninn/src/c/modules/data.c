@@ -63,13 +63,15 @@ void data_init() {
   data_reset_all();
 #endif
 
-#if defined(TEST_DATA)
+#if defined(USE_TEST_DATA)
+  // Arbitrary scenario - (reverse order)
+  const int changes[NUM_SAMPLES] = {30, 30, 30, 30, 30, 30, 30, 30};
   // Test case: Should show 10 days at 8% per day
-  const int changes[NUM_SAMPLES] = {2, 2, 2, 2, 2, 2, 2, 2};
+  // const int changes[NUM_SAMPLES] = {2, 2, 2, 2, 2, 2, 2, 2};
   // Test case: Should show 10 days at 8% (two other events are ignored)
   // const int changes[NUM_SAMPLES] = {2, 2, 2, 2, -20, 2, 0, 2};
-  // Arbitrary scenario - (reverse order)
-  // const int changes[NUM_SAMPLES] = {1, 2, 1, 2, 0, 4, -20, 1};
+  // Special status scenario
+  // const int changes[NUM_SAMPLES] = {2, 2, 2, 2, 0, 2, -20, 2};
 
   int total_change = 0;
   for(int i = 0; i < NUM_SAMPLES; i++) {
@@ -151,7 +153,7 @@ void data_init() {
 }
 
 void data_deinit() {
-#if !defined(TEST_DATA) || (defined(TEST_DATA) && defined(SAVE_TEST_DATA))
+#if !defined(USE_TEST_DATA) || (defined(USE_TEST_DATA) && defined(SAVE_TEST_DATA))
   save_all();
 #endif
 }
@@ -233,7 +235,7 @@ void data_push_sample(int charge_perc, int last_sample_time, int last_charge_per
  */
 int data_calculate_avg_discharge_rate() {
   SampleData *data = data_get_sample_data();
-  const int count = data_get_samples_count();
+  const int count = data_get_valid_samples_count();
 
   // Not enough samples yet
   if (count < MIN_SAMPLES) return STATUS_EMPTY;
@@ -384,7 +386,7 @@ int data_get_custom_alert_level() {
   return s_app_data.custom_alert_level;
 }
 
-int data_get_samples_count() {
+int data_get_valid_samples_count() {
   int count = 0;
   for (int i = 0; i < NUM_SAMPLES; i++) {
     if (util_is_valid(s_sample_data.samples[i].result)) {

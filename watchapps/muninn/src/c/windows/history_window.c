@@ -6,7 +6,7 @@
 #define FONT_KEY_L FONT_KEY_GOTHIC_24
 #define ROW_1_Y 20
 #define ROW_2_Y 40
-#define STATUS_W 52
+#define STATUS_W 56
 
 #if defined(PBL_PLATFORM_EMERY)
   #define TITLE_FONT_KEY FONT_KEY_GOTHIC_24
@@ -69,13 +69,13 @@ static void draw_status(GContext *ctx, const GRect bounds, const Sample *s, char
 }
 
 static uint16_t get_num_rows_callback(MenuLayer *menu_layer, uint16_t section_index, void *context) {
-  const int count = data_get_samples_count();
+  const int count = data_get_valid_samples_count();
   return count == 0 ? 1 : count;
 }
 
 static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_index, void *context) {
   const GRect bounds = layer_get_bounds(cell_layer);
-  const int count = data_get_samples_count();
+  const int count = data_get_valid_samples_count();
 
   // Menu guards against this, but cover the case anyway
   if (count == 0) {
@@ -125,8 +125,9 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
   } else if (s->result == STATUS_CHARGED) {
     draw_status(ctx, bounds, s, "Charged up");
   } else {
+    const char *str = s->result > 99 ? "Est.\n%d%%/d" : "Est.\n%d%%/d";
     static char s_result_buff[16];
-    snprintf(s_result_buff, sizeof(s_result_buff), "Est.\n%d%%/d", s->result);
+    snprintf(s_result_buff, sizeof(s_result_buff), str, s->result);
     draw_status(ctx, bounds, s, &s_result_buff[0]);
   }
 }

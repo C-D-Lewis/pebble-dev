@@ -8,7 +8,7 @@ TextLayer* util_make_text_layer(GRect frame, GFont font) {
 }
 
 void util_fmt_time(int timestamp_s, char* buff, int size) {
-  if (!util_is_valid(timestamp_s)) {
+  if (timestamp_s < 0) {
     snprintf(buff, size, "-");
     return;
   }
@@ -83,14 +83,20 @@ char* util_get_status_string() {
   const bool is_enabled = util_is_valid(data_get_wakeup_id());
   if (!is_enabled) return "Not monitoring";
 
-  if (data_get_samples_count() < MIN_SAMPLES) {
-    const int count = data_get_samples_count();
-    const int rem = MIN_SAMPLES - count;
+  // No readings at all yet
+  if (!util_is_valid(data_get_last_sample_time())) return "Awaiting first reading...";
+
+  // Edge case here: no change or charging samples don't count
+  // We can't produce a prediction AT ALL unless we have 'discharging' samples...
+  if (data_get_valid_samples_count() < MIN_SAMPLES) {
+    const int rem = MIN_SAMPLES - data_get_valid_samples_count();
+
     static char s_buff[32];
-    snprintf(s_buff, sizeof(s_buff), "Awaiting %d sample%s...", rem, rem > 1 ? "s" : "");
+    snprintf(s_buff, sizeof(s_buff), "Awaiting %d estimate%s...", rem, rem > 1 ? "s" : "");
     return &s_buff[0];
   }
 
+  // Ongoing readings
   return "Passively monitoring";
 }
 

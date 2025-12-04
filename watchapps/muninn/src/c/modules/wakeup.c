@@ -12,13 +12,13 @@ void wakeup_schedule_next() {
   const time_t ts_now = time(NULL);
   const struct tm *now = localtime(&ts_now);
 
-  // Next interval hour based on WAKEUP_MOD_H
-  const int elap_min_s = now->tm_min * SECONDS_PER_MINUTE;
+  // Find next interval hour based on WAKEUP_MOD_H
+  const int elap_min_s = now->tm_min * 60;
   const int hours_rem = WAKEUP_MOD_H - (now->tm_hour % WAKEUP_MOD_H);
   const int interval_s = (hours_rem * SECONDS_PER_HOUR) - elap_min_s - now->tm_sec;
 
 #if defined(WAKEUP_NEXT_MINUTE)
-  // For testing only
+  // For faster testing of wakeups
   const time_t future = ts_now + 60;
 #else
   // Tiny extra offset in case weird things happen exactly on the hour
@@ -26,15 +26,30 @@ void wakeup_schedule_next() {
 #endif
 
   APP_LOG(APP_LOG_LEVEL_INFO, "Seconds until next interval: %d", interval_s);
-  const int id = wakeup_schedule(future, 0, true);
+  int id = wakeup_schedule(future, 0, true);
+#if defined(TEST_COLLISION)
+  // To test collision rescheduling
+  id = wakeup_schedule(future, 0, true);
+#endif
 
+  // Failed for some reason
   if (id < 0) {
-    APP_LOG(APP_LOG_LEVEL_ERROR, "Failed to schedule wakeup: %d", id);
-    data_set_error("Failed to schedule wakeup");
-    return;
+    if (id == E_RANGE) {
+      // Try again in the future if a collision with another app
+      int extra_mins = 1;
+      while (id < 0 && extra_mins <= EXTRA_MINUTES_MAX) {
+        APP_LOG(APP_LOG_LEVEL_INFO, "E_RANGE, trying again with +%dm", extra_mins);
+        id = wakeup_schedule(future + (extra_mins * 60), 0, true);
+        extra_mins++;
+      }
+    } else {
+      APP_LOG(APP_LOG_LEVEL_ERROR, "Failed to schedule wakeup: %d", id);
+      data_set_error("Failed to schedule wakeup");
+      return;
+    }
   }
 
-  // Verify scheduled
+  // Verify scheduled - not observed but Dashboard checks for some reason
   if (!wakeup_query(id, NULL)) {
     APP_LOG(APP_LOG_LEVEL_ERROR, "Scheduled wakeup not found");
     data_set_error("Scheduled wakeup not found");

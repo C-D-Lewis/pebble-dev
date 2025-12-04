@@ -67,7 +67,7 @@ static void init() {
   battery_handler(battery_state_service_peek());
 
   if (missed) {
-#if !defined(TEST_DATA)
+#if !defined(USE_TEST_DATA)
     alert_window_push(
       RESOURCE_ID_ASLEEP,
       "Muninn missed a sample, but will continue.",

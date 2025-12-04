@@ -1,7 +1,8 @@
 {
   "name": "muninn",
   "author": "Chris Lewis",
-  "version": "1.4.0",
+  "version": "1.5.0",
+  "_note": "Also update config.h",
   "private": true,
   "keywords": [
     "pebble-app"
