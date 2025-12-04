@@ -65,9 +65,9 @@ void data_init() {
 
 #if defined(USE_TEST_DATA)
   // Arbitrary scenario - (reverse order)
-  const int changes[NUM_SAMPLES] = {30, 30, 30, 30, 30, 30, 30, 30};
+  // const int changes[NUM_SAMPLES] = {30, 30, 30, 30, 30, 30, 30, 30};
   // Test case: Should show 10 days at 8% per day
-  // const int changes[NUM_SAMPLES] = {2, 2, 2, 2, 2, 2, 2, 2};
+  const int changes[NUM_SAMPLES] = {2, 2, 2, 2, 2, 2, 2, 2};
   // Test case: Should show 10 days at 8% (two other events are ignored)
   // const int changes[NUM_SAMPLES] = {2, 2, 2, 2, -20, 2, 0, 2};
   // Special status scenario

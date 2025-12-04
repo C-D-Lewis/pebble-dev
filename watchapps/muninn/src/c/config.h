@@ -29,7 +29,7 @@
 //                                    //
 // #define WIPE_ON_LAUNCH true        //
 //                                    //
-#define USE_TEST_DATA true         //
+// #define USE_TEST_DATA true         //
 //                                    //
 // #define SAVE_TEST_DATA true        //
 //                                    //
