@@ -1,0 +1,36 @@
+{
+  "name": "test-app",
+  "author": "Chris Lewis",
+  "version": "1.0.0",
+  "keywords": [
+    "pebble-app"
+  ],
+  "private": true,
+  "dependencies": {
+    "pebble-layout": ".."
+  },
+  "scripts": {
+    "rebuild": "cd ../ && pebble clean && pebble build && cd - && rm -rf node_modules/ && npm i && pebble clean && pebble build && pebble install --emulator"
+  },
+  "pebble": {
+    "displayName": "test-app",
+    "uuid": "5ef09193-d082-486b-8585-deb0acfe72c8",
+    "sdkVersion": "3",
+    "enableMultiJS": true,
+    "targetPlatforms": [
+      "aplite",
+      "basalt",
+      "chalk",
+      "diorite",
+      "emery",
+      "flint"
+    ],
+    "watchapp": {
+      "watchface": false
+    },
+    "messageKeys": [],
+    "resources": {
+      "media": []
+    }
+  }
+}
