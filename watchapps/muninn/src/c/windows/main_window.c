@@ -44,7 +44,7 @@
   #define ROW_2_X 2
   #define ROW_2_Y 142
   #define ROW_1_GAP 60
-  #define ROW_2_GAP 72
+  #define ROW_2_GAP 68
   #define ROW_1_SUBTITLE "  Days left     Est. %/day"
   #define HINT_W 14
   #define HINT_H 38
