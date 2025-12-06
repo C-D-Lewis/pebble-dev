@@ -124,9 +124,12 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
     case MI_CUSTOM_ALERT_LEVEL:
       data_cycle_custom_alert_level();
       break;
-    case MI_PUSH_TIMELINE_PINS:
-      data_set_push_timeline_pins(!data_get_push_timeline_pins());
-      break;
+    case MI_PUSH_TIMELINE_PINS: {
+      const bool new_state = !data_get_push_timeline_pins();
+      data_set_push_timeline_pins(new_state);
+
+      if (new_state) comm_push_timeline_pins();
+    } break;
     case MI_ESTIMATE_LOG:
       if (data_get_valid_samples_count() == 0) {
         alert_window_push(

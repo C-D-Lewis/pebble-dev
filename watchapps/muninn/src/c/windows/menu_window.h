@@ -2,6 +2,7 @@
 
 #include <pebble.h>
 
+#include "../modules/comm.h"
 #include "../modules/data.h"
 #include "../modules/util.h"
 
