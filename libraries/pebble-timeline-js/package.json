@@ -1,8 +1,7 @@
 {
   "name": "pebble-timeline-js",
   "author": "Chris Lewis",
-  "version": "2.1.0",
-  "main": "src/js/index.js",
+  "version": "2.1.1",
   "keywords": [
     "pebble-package"
   ],
