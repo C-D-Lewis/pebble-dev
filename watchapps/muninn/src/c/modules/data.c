@@ -59,10 +59,6 @@ static void do_migrations() {
 }
 
 void data_init() {
-#if defined(WIPE_ON_LAUNCH)
-  data_reset_all();
-#endif
-
 #if defined(USE_TEST_DATA)
   // Arbitrary scenario - (reverse order)
   // const int changes[NUM_SAMPLES] = {30, 30, 30, 30, 30, 30, 30, 30};
@@ -402,4 +398,12 @@ bool data_get_ca_has_notified() {
 
 void data_set_ca_has_notified(bool notified) {
   s_app_data.ca_has_notified = notified;
+}
+
+bool data_get_push_timeline_pins() {
+  return s_app_data.push_timeline_pins;
+}
+
+void data_set_push_timeline_pins(bool b) {
+  s_app_data.push_timeline_pins = b;
 }

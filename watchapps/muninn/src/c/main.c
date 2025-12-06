@@ -2,23 +2,13 @@
 
 #include "config.h"
 
+#include "modules/comm.h"
 #include "modules/data.h"
 #include "modules/wakeup.h"
 #include "modules/glance.h"
 
 #include "windows/main_window.h"
-#include "windows/stat_window.h"
 #include "windows/message_window.h"
-
-static void battery_handler(BatteryChargeState state) {
-  // Went up, will only go down from there
-  if (state.charge_percent > data_get_last_charge_perc()) {
-    // Maintain charge level if it's going up
-    data_set_last_charge_perc(state.charge_percent);
-  }
-
-  stat_window_update_data();
-}
 
 static bool handle_missed_wakeup() {
   const int wakeup_id = data_get_wakeup_id();
@@ -45,6 +35,7 @@ static bool handle_missed_wakeup() {
 
 static void init() {
   data_init();
+  comm_init();
 
   if (launch_reason() == APP_LAUNCH_WAKEUP) {
     WakeupId id = 0;
@@ -59,12 +50,13 @@ static void init() {
 
   main_window_push();
 
+  if (data_get_push_timeline_pins()) {
+    // Try and push a pin
+    comm_push_timeline_pins();
+  }
+
   // In case an event comes when the app is open
   wakeup_service_subscribe(wakeup_handler);
-
-  // If app is open, get more accurate battery data
-  battery_state_service_subscribe(battery_handler);
-  battery_handler(battery_state_service_peek());
 
   if (missed) {
 #if !defined(USE_TEST_DATA)

@@ -40,6 +40,7 @@ typedef struct {
   bool vibe_on_sample;
   int custom_alert_level;
   bool ca_has_notified;
+  bool push_timeline_pins;
 } AppData;
 
 // Capture more data for debugging purposes
@@ -94,6 +95,8 @@ int data_get_custom_alert_level();
 int data_get_valid_samples_count();
 bool data_get_ca_has_notified();
 void data_set_ca_has_notified(bool notified);
+bool data_get_push_timeline_pins();
+void data_set_push_timeline_pins(bool b);
 
 // Strings
 #define MSG_WELCOME "Welcome to Muninn!\n\nEstimates will appear after two samples are taken.\n\nPlease launch me if the watch is turned off over a 6h interval."

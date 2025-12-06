@@ -25,6 +25,7 @@ Features include:
 - Option to vibrate when a sample is taken.
 - Option to advise when battery charge is below a chosen threshold (50%/20%/10%).
 - Attempt to set AppGlance to show estimate in the launcher menu.
+- Attempt to create a timeline pin at noon on the day the charge may run out.
 - View detailed logs of recent estimates.
 - View general battery tips and Muninn lore.
 - Ability to disable temporarily.
@@ -76,5 +77,7 @@ from 2016) and what kind of anomalous behavior you encountered.
 - [x] Pre-release: single app data structure
 - [x] Emery screen size support
 - [x] Some kind of color flair for color watches
-- [ ] Show log entries for wakeups where charging was observed
+- [x] Show log entries for wakeups where charging was observed
+- [ ] Push timeline pin for charging time prediction.
 - [ ] Extremely simple chart using log timestamps? requires more stored samples (CHECK DATA LOADS OKAY)
+- [ ] Use `pebble-packet` when `pebble-events` is updated with `flint`

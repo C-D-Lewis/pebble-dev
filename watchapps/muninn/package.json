@@ -1,7 +1,7 @@
 {
   "name": "muninn",
   "author": "Chris Lewis",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "_note": "Also update config.h",
   "private": true,
   "keywords": [
@@ -17,8 +17,7 @@
       "flint"
     ],
     "enableMultiJS": true,
-    "capabilities": [
-    ],
+    "capabilities": [],
     "projectType": "native",
     "displayName": "Muninn",
     "uuid": "d008a08a-6e34-4cc4-98dc-bae02ce5e087",
@@ -87,7 +86,12 @@
         }
       ]
     },
-    "messageKeys": []
+    "messageKeys": [
+      "DAYS_REMAINING",
+      "DISCHARGE_RATE"
+    ]
   },
-  "dependencies": {}
+  "dependencies": {
+    "pebble-timeline-js": "^2.1.1"
+  }
 }

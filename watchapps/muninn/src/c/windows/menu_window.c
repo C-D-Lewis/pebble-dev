@@ -18,6 +18,7 @@ static bool s_reset_confirm;
 typedef enum {
   MI_VIBE_ON_SAMPLE = 0,
   MI_CUSTOM_ALERT_LEVEL,
+  MI_PUSH_TIMELINE_PINS,
   MI_ESTIMATE_LOG,
   MI_BATTERY_TIPS,
   MI_ABOUT,
@@ -37,6 +38,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
   if (!alert_disabled) {
     snprintf(s_alert_buff, sizeof(s_alert_buff), "Will notify around %d%%", alert_level);
   }
+  const bool push_pins = data_get_push_timeline_pins();
 
   switch(cell_index->row) {
     case MI_VIBE_ON_SAMPLE:
@@ -54,6 +56,15 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
         cell_layer,
         "Custom threshold",
         alert_disabled ? "Disabled" : s_alert_buff,
+        NULL
+      );
+      break;
+    case MI_PUSH_TIMELINE_PINS:
+      menu_cell_basic_draw(
+        ctx,
+        cell_layer,
+        "Timeline pins",
+        push_pins ? "Enabled" : "Disabled",
         NULL
       );
       break;
@@ -95,6 +106,7 @@ static int16_t get_cell_height_callback(struct MenuLayer *menu_layer, MenuIndex 
   switch(cell_index->row) {
     case MI_VIBE_ON_SAMPLE:
     case MI_CUSTOM_ALERT_LEVEL:
+    case MI_PUSH_TIMELINE_PINS:
     case MI_VERSION:
       return ROW_HEIGHT_LARGE;
     case MI_DELETE_ALL_DATA:
@@ -111,6 +123,9 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
       break;
     case MI_CUSTOM_ALERT_LEVEL:
       data_cycle_custom_alert_level();
+      break;
+    case MI_PUSH_TIMELINE_PINS:
+      data_set_push_timeline_pins(!data_get_push_timeline_pins());
       break;
     case MI_ESTIMATE_LOG:
       if (data_get_valid_samples_count() == 0) {

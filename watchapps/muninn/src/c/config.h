@@ -10,7 +10,7 @@
 /////////////////////////////////////
 
 // MUST match package.json
-#define VERSION "1.5.0"
+#define VERSION "1.6.0"
 // Minimum samples before providing estimations
 #define MIN_SAMPLES 2
 // Maximum number of extra minutes if a collision
@@ -27,9 +27,7 @@
 
 ///////////// Testing area /////////////
 //                                    //
-// #define WIPE_ON_LAUNCH true        //
-//                                    //
-// #define USE_TEST_DATA true         //
+#define USE_TEST_DATA true         //
 //                                    //
 // #define SAVE_TEST_DATA true        //
 //                                    //
@@ -40,5 +38,7 @@
 // #define WAKEUP_NEXT_MINUTE true    //
 //                                    //
 // #define TEST_COLLISION true        //
+//                                    //
+// #define TEST_TIMELINE_PIN true     //
 //                                    //
 ////////////////////////////////////////

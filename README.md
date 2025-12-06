@@ -63,11 +63,11 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `pebble-isometric`        | ✅      | ✅        | ✅        |
 | `pebble-packet`           | ✅      | ✅        | ✅        |
 | `pebble-universal-fb`     | ✅      | ✅        | ✅        |
-| `pebble-pge`                     | ✅      | ✅        | ✅        |
+| `pebble-pge`              | ✅      | ✅        | ✅        |
 | `pebble-pge-simple`       |        |          |          |
 | `pebble-simple-request`   |        |          |          |
 | `pebble-timeline-js-node` |        |          |          |
-| `pebble-timeline-js`      |        |          |          |
+| `pebble-timeline-js`      | ✅      | ✅        | ✅        |
 | `InverterLayerCompat`     | ✅      | ✅        |          |
 | `notif-layer`             | ✅      | ✅        |          |
 
