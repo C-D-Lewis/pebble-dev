@@ -1,0 +1,34 @@
+{
+  "name": "test-app",
+  "author": "Chris Lewis",
+  "version": "1.0.0",
+  "keywords": [
+    "pebble-app"
+  ],
+  "private": true,
+  "dependencies": {
+    "pebble-timeline-js": ".."
+  },
+  "pebble": {
+    "displayName": "test-app",
+    "uuid": "2a5bc9dc-b7f9-42e2-8846-434ebaed565c",
+    "sdkVersion": "3",
+    "enableMultiJS": true,
+    "targetPlatforms": [
+      "aplite",
+      "basalt",
+      "chalk",
+      "diorite",
+      "emery",
+      "flint"
+    ],
+    "watchapp": {
+      "watchface": false
+    },
+    "messageKeys": [
+    ],
+    "resources": {
+      "media": []
+    }
+  }
+}

@@ -13,7 +13,6 @@ function Log(msg) {
  * @param callback The callback to receive the responseText after the request has completed.
  */
 function timelineRequest(pin, type, callback) {
-  // User or shared?
   var url = API_URL_ROOT + 'v1/user/pins/' + pin.id;
 
   var xhr = new XMLHttpRequest();
@@ -22,16 +21,12 @@ function timelineRequest(pin, type, callback) {
     callback(this.responseText);
   };
   xhr.open(type, url);
-
-  // Set headers
   xhr.setRequestHeader('Content-Type', 'application/json');
 
   // Get token
   Pebble.getTimelineToken(function(token) {
-    // Add headers
     xhr.setRequestHeader('X-User-Token', '' + token);
 
-    // Send
     xhr.send(JSON.stringify(pin));
     Log('request sent.');
   }, function() { Log('error getting timeline token'); });
@@ -57,7 +52,7 @@ function deleteUserPin(pin, callback) {
 
 /**
 * Set the user's AppGlances with an array of slice objects.
-* @param slices An array of AppGlance slice objects (https://developer.rebble.io/developer.pebble.com/guides/user-interfaces/appglance-rest/#creating-slices)
+* @param slices An array of AppGlance slice objects (https://developer.rebble.io/guides/user-interfaces/appglance-rest/)
 * @param callback Callback called when the request is resolved.
 */
 function setAppGlances(slices, callback) {
@@ -69,16 +64,11 @@ function setAppGlances(slices, callback) {
     callback(this.responseText);
   };
   xhr.open('PUT', url);
-
-  // Set headers
   xhr.setRequestHeader('Content-Type', 'application/json');
 
   // Get token
   Pebble.getTimelineToken(function(token) {
-    // Add headers
     xhr.setRequestHeader('X-User-Token', '' + token);
-
-    // Send
     xhr.send(JSON.stringify({ 'slices': slices }));
     Log('AppGlance request sent.');
   }, function() { Log('error getting timeline token'); });

@@ -1,7 +1,7 @@
 # pebble-timeline-js
 
-Simple JS package to allow inserting of personal (user) and shared (topic)
-timeline pins from PebbleKit JS directly or a Node.js server.
+Simple JS package to allow inserting of personal (user) timeline pins or
+AppGlances from PebbleKit JS.
 
 ## Installation
 
@@ -61,12 +61,3 @@ timelinejs.setAppGlances(glances, function(responseText) {
   console.log('AppGlance result: ' + responseText);
 });
 ```
-
-
-## Changelog
-
-**1.0.4**
-- Initial stable version
-
-**1.1.0**
-- Build for Emery

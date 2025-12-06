@@ -1,7 +1,7 @@
 {
   "name": "pebble-timeline-js",
   "author": "Chris Lewis",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "main": "src/js/index.js",
   "keywords": [
     "pebble-package"
@@ -15,7 +15,8 @@
       "basalt",
       "chalk",
       "diorite",
-      "emery"
+      "emery",
+      "flint"
     ],
     "resources": {
       "media": []
