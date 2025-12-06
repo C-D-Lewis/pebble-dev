@@ -25,7 +25,7 @@ Features include:
 - Option to vibrate when a sample is taken.
 - Option to advise when battery charge is below a chosen threshold (50%/20%/10%).
 - Attempt to set AppGlance to show estimate in the launcher menu.
-- Attempt to create a timeline pin at noon on the day the charge may run out.
+- Option to create a timeline pin at noon on the day the charge may run out.
 - View detailed logs of recent estimates.
 - View general battery tips and Muninn lore.
 - Ability to disable temporarily.
