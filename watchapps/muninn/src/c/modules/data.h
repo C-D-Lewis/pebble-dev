@@ -43,7 +43,7 @@ typedef struct {
   bool push_timeline_pins;
 } AppData;
 
-// Capture more data for debugging purposes
+// A full wakeup sample
 typedef struct {
   // This sample
   int timestamp;

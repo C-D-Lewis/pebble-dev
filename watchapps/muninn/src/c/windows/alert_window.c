@@ -1,11 +1,9 @@
 #include "alert_window.h"
 
 #if defined(PBL_PLATFORM_EMERY)
-  #define IMG_Y 35
   #define FONT_KEY FONT_KEY_GOTHIC_24_BOLD
   #define TEXT_RECT GRect(0, 95, DISPLAY_W, DISPLAY_H)
 #else
-  #define IMG_Y 25
   #define FONT_KEY FONT_KEY_GOTHIC_18_BOLD
   #define TEXT_RECT GRect(2, 72, DISPLAY_W - 4, DISPLAY_H)
 #endif
@@ -31,7 +29,7 @@ static void window_load(Window *window) {
   s_image_bitmap = gbitmap_create_with_resource(s_res_id);
   s_braid_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BRAID);
 
-  s_image_layer = bitmap_layer_create(GRect(0, IMG_Y, bounds.size.w, 48));
+  s_image_layer = bitmap_layer_create(GRect(0, scalable_y(15), bounds.size.w, 48));
   bitmap_layer_set_alignment(s_image_layer, GAlignCenter);
   bitmap_layer_set_compositing_mode(s_image_layer, GCompOpSet);
   bitmap_layer_set_bitmap(s_image_layer, s_image_bitmap);

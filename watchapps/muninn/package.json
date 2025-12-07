@@ -92,6 +92,7 @@
     ]
   },
   "dependencies": {
+    "pebble-scalable": "^1.0.0",
     "pebble-timeline-js": "^2.1.1"
   }
 }

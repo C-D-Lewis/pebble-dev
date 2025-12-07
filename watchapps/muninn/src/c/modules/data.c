@@ -63,11 +63,11 @@ void data_init() {
   // Arbitrary scenario - (reverse order)
   // const int changes[NUM_SAMPLES] = {30, 30, 30, 30, 30, 30, 30, 30};
   // Test case: Should show 10 days at 8% per day
-  const int changes[NUM_SAMPLES] = {2, 2, 2, 2, 2, 2, 2, 2};
+  // const int changes[NUM_SAMPLES] = {2, 2, 2, 2, 2, 2, 2, 2};
   // Test case: Should show 10 days at 8% (two other events are ignored)
   // const int changes[NUM_SAMPLES] = {2, 2, 2, 2, -20, 2, 0, 2};
   // Special status scenario
-  // const int changes[NUM_SAMPLES] = {2, 2, 2, 2, 0, 2, -20, 2};
+  const int changes[NUM_SAMPLES] = {2, 2, 2, 2, 0, 2, -20, 2};
 
   int total_change = 0;
   for(int i = 0; i < NUM_SAMPLES; i++) {
@@ -272,11 +272,12 @@ int data_calculate_avg_discharge_rate() {
 }
 
 int data_calculate_days_remaining() {
-  int rate = data_calculate_avg_discharge_rate();
-  int charge_perc = data_get_last_charge_perc();
+  const int rate = data_calculate_avg_discharge_rate();
+  const int charge_perc = data_get_last_charge_perc();
 
   if (!util_is_valid(rate) || !util_is_valid(charge_perc)) return STATUS_EMPTY;
 
+  // Given a 'valid' log entry is only one with a discharging change
   if (rate <= 0) {
     APP_LOG(APP_LOG_LEVEL_INFO, "zero or negative rate: %d charge_perc: %d", rate, charge_perc);
     return STATUS_EMPTY;
