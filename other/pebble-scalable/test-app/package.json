@@ -7,7 +7,7 @@
   ],
   "private": true,
   "dependencies": {
-    "pebble-layout": ".."
+    "pebble-scalable": ".."
   },
   "scripts": {
     "rebuild": "cd ../ && pebble clean && pebble build && cd - && pebble clean && pebble build && pebble install --emulator"
