@@ -89,6 +89,7 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
     if (is_plugged || charge_diff < 0) {
       APP_LOG(APP_LOG_LEVEL_INFO, "Ignoring: plugged in or recently charged");
       data_set_last_charge_perc(charge_percent);
+      data_set_last_sample_time(now);
 
       // Record special status sample
       data_push_sample(charge_percent, last_sample_time, last_charge_perc, time_diff_s, charge_diff, STATUS_CHARGED);

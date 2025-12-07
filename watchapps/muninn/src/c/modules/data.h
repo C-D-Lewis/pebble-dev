@@ -71,7 +71,6 @@ void data_init();
 void data_deinit();
 void data_reset_all();
 void data_log_state();
-void data_activation_update();
 void data_push_sample(int charge_perc, int last_sample_time, int last_charge_perc, int time_diff, int charge_diff, int result);
 int data_calculate_avg_discharge_rate();
 int data_calculate_days_remaining();

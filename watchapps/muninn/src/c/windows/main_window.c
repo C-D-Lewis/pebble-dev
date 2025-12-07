@@ -253,7 +253,6 @@ static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
     s_blink_budget = 5;
     schedule_blink();
 
-    data_activation_update();
     wakeup_schedule_next();
   } else {
     wakeup_unschedule();
