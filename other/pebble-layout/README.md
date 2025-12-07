@@ -3,26 +3,67 @@
 Package aiming to make it easy to make scaling layouts for different screen
 sizes.
 
+## Setting up
+
+Install the Pebble packages:
+
+```
+$ pebble package install pebble-layout
+```
+
+Add the includes at the top of your source.
+
+```c
+#include <pebble-layout/pebble-layout.h>
+```
+
 ## How to use
 
-1. Install the Pebble packages:
+Get values for layout dimensions based on screen size:
 
-  ```
-  $ pebble package install pebble-layout
-  ```
+```c
+// Get a percentage of the screen width and height
+const int half_w = pl_x(50);
+const int half_h = pl_y(50);
 
-2. Add the includes at the top of your source.
+// Get a GRect based only on percentage width/height
+const GRect center_third_rect = pl_grect(33, 33, 33, 33);
+```
 
-  ```c
-  #include <pebble-layout/pebble-layout.h>
-  ```
+Use different fonts for different screen sizes, based on a category of 'small',
+'medium', or 'large'.
 
-4. Begin using functions:
+```c
+// Load fonts to use in each case
+static GFont s_gothic_18, s_gothic_24;
 
-  ```c
-  TODO
-  ```
+// During init
+s_gothic_18 = fonts_get_system_font(FONT_KEY_GOTHIC_18);
+s_gothic_24 = fonts_get_system_font(FONT_KEY_GOTHIC_24);
+```
 
+Specify which screen sizes should use which fonts for each size
+
+```c
+// Regular screens use Gothic 18, Chalk is N/A, Emery uses Gothic 24
+pl_set_medium_fonts(&s_gothic_18, NULL, &s_gothic_24);
+```
+
+During layout or drawing, simply use the font by its size:
+
+```c
+// Text in the vertical middle third!
+graphics_context_set_text_color(ctx, GColorBlack);
+graphics_draw_text(
+  ctx,
+  "This text should appear in the middle third on any platform",
+  pl_get_medium_font(),
+  pl_grect(0, 33, 100, 33),
+  GTextOverflowModeTrailingEllipsis,
+  GTextAlignmentCenter,
+  NULL
+);
+```
 
 ## Documentation
 

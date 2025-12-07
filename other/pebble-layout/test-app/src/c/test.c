@@ -4,23 +4,38 @@
 static Window *s_window;
 static Layer *s_canvas_layer;
 
+static GFont s_gothic_18, s_gothic_24;
+
 static void canvas_update_proc(Layer *layer, GContext *ctx) {
   graphics_context_set_fill_color(ctx, GColorBlack);
 
   // Half width, 2% height
-  int w = pl_x(50);
-  int h = pl_y(2);
-  graphics_fill_rect(ctx, GRect(0, 10, w, h), 0, GCornerNone);
+  graphics_fill_rect(ctx, GRect(0, 10, pl_x(50), pl_y(2)), 0, GCornerNone);
 
-  // 10% size and position
-  GRect ten_perc_rect = pl_grect(10, 10, 10, 10);
-  graphics_fill_rect(ctx, ten_perc_rect, 0, GCornerNone);
+  // Half height, 2% width
+  graphics_fill_rect(ctx, GRect(10, 0, pl_x(2), pl_y(50)), 0, GCornerNone);
 
-  // Nudge just inside the 10% rect
-  GRect point = pl_grect(9, 9, 1, 1);
-  GRect inside_rect = pl_nudge_xy(point, 2, 2);
+  // 12% size and position
+  graphics_fill_rect(ctx, pl_grect(12, 12, 12, 12), 0, GCornerNone);
+
+  // Nudge just inside the 12% rect
   graphics_context_set_fill_color(ctx, GColorWhite);
-  graphics_fill_rect(ctx, inside_rect, 0, GCornerNone);
+  graphics_fill_rect(ctx, pl_nudge_xy(pl_grect(11, 11, 1, 1), 3, 3), 0, GCornerNone);
+
+  // Center third outline
+  graphics_draw_rect(ctx, pl_grect(33, 33, 33, 33));
+
+  // Text in the middle third
+  graphics_context_set_text_color(ctx, GColorBlack);
+  graphics_draw_text(
+    ctx,
+    "This text should appear in the middle third on any platform",
+    pl_get_medium_font(),
+    pl_grect(0, 33, 100, 33),
+    GTextOverflowModeTrailingEllipsis,
+    GTextAlignmentCenter,
+    NULL
+  );
 }
 
 static void window_load(Window *window) {
@@ -37,6 +52,12 @@ static void window_unload(Window *window) {
 }
 
 static void init(void) {
+  s_gothic_18 = fonts_get_system_font(FONT_KEY_GOTHIC_18);
+  s_gothic_24 = fonts_get_system_font(FONT_KEY_GOTHIC_24);
+
+  // Regular screens use Gothic 18, Emery uses Gothic 24
+  pl_set_medium_fonts(&s_gothic_18, NULL, &s_gothic_24);
+
   s_window = window_create();
   window_set_window_handlers(s_window, (WindowHandlers) {
     .load = window_load,

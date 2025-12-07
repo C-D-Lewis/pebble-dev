@@ -11,6 +11,15 @@
   #define PL_DISPLAY_H 168
 #endif
 
+#define PL_DISTINCT_SHAPES 3
+#define PL_DS_EMERY 2
+#define PL_DS_CHALK 1
+#define PL_DS_REGULAR 0
+
+static GFont *s_fonts_small[PL_DISTINCT_SHAPES];
+static GFont *s_fonts_medium[PL_DISTINCT_SHAPES];
+static GFont *s_fonts_large[PL_DISTINCT_SHAPES];
+
 static int min_1(int v) {
   return v < 1 ? 1 : v;
 }
@@ -37,4 +46,39 @@ GRect pl_nudge_wh(GRect r, int dw, int dh) {
   r.size.w += dw;
   r.size.h += dh;
   return r;
+}
+
+void pl_set_medium_fonts(GFont *regular, GFont *chalk, GFont *emery) {
+  s_fonts_medium[PL_DS_REGULAR] = regular;
+  s_fonts_medium[PL_DS_CHALK] = chalk;
+  s_fonts_medium[PL_DS_EMERY] = emery;
+}
+
+static GFont* get_font_if_set(GFont *ptr) {
+  if (ptr == NULL) {
+    APP_LOG(APP_LOG_LEVEL_ERROR, "Tried to get pebble-layout font that was not yet set");
+  }
+  return ptr;
+}
+
+static GFont* get_font_from_array(GFont **array) {
+#if defined(PBL_PLATFORM_EMERY)
+  return array[PL_DS_EMERY];
+#elif defined(PBL_PLATFORM_CHALK)
+  return array[PL_DS_CHALK];
+#else // aplite, basalt, diorite, flint
+  return array[PL_DS_REGULAR];
+#endif
+}
+
+GFont pl_get_small_font() {
+  return *(get_font_if_set(get_font_from_array(s_fonts_small)));
+}
+
+GFont pl_get_medium_font() {
+  return *(get_font_if_set(get_font_from_array(s_fonts_medium)));
+}
+
+GFont pl_get_large_font() {
+  return *(get_font_if_set(get_font_from_array(s_fonts_large)));
 }

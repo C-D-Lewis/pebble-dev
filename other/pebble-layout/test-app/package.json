@@ -10,7 +10,7 @@
     "pebble-layout": ".."
   },
   "scripts": {
-    "rebuild": "cd ../ && pebble clean && pebble build && cd - && rm -rf node_modules/ && npm i && pebble clean && pebble build && pebble install --emulator"
+    "rebuild": "cd ../ && pebble clean && pebble build && cd - && pebble clean && pebble build && pebble install --emulator"
   },
   "pebble": {
     "displayName": "test-app",
