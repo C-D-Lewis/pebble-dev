@@ -10,23 +10,38 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   graphics_context_set_fill_color(ctx, GColorBlack);
 
   // Half width, 2% height, specific position
-  graphics_fill_rect(ctx, GRect(0, 10, scalable_x(50), scalable_y(2)), 0, GCornerNone);
+  graphics_fill_rect(
+    ctx,
+    GRect(0, 10, scalable_x(50), scalable_y(2)),
+    0,
+    GCornerNone
+  );
 
   // Half height, 2% width, specific position
-  graphics_fill_rect(ctx, GRect(10, 0, scalable_x(2), scalable_y(50)), 0, GCornerNone);
+  graphics_fill_rect(
+    ctx,
+    GRect(10, 0, scalable_x(2), scalable_y(50)),
+    0,
+    GCornerNone
+  );
 
   // 12% size and position
   graphics_fill_rect(ctx, scalable_grect(12, 12, 12, 12), 0, GCornerNone);
 
   // Nudge just inside the 12% rect
   graphics_context_set_fill_color(ctx, GColorWhite);
-  graphics_fill_rect(ctx, scalable_nudge_xy(scalable_grect(11, 11, 1, 1), 3, 3), 0, GCornerNone);
+  graphics_fill_rect(
+    ctx,
+    scalable_nudge_xy(scalable_grect(11, 11, 1, 1), 3, 3),
+    0,
+    GCornerNone
+  );
 
   // Text in the middle third
   graphics_context_set_text_color(ctx, GColorBlack);
   graphics_draw_text(
     ctx,
-    "This text should appear in the middle third on any platform",
+    "This text should appear in the middle third on any platform or screen size",
     scalable_get_medium_font(),
     scalable_grect(0, 33, 100, 33),
     GTextOverflowModeTrailingEllipsis,
