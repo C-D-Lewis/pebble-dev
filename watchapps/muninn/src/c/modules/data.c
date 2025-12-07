@@ -378,6 +378,17 @@ int data_get_valid_samples_count() {
   return count;
 }
 
+int data_get_log_length() {
+  int count = 0;
+  for (int i = 0; i < NUM_SAMPLES; i++) {
+    // Count all, regardless of status unless they're truly empty
+    if (s_sample_data.samples[i].result != STATUS_EMPTY) {
+      count++;
+    }
+  }
+  return count;
+}
+
 bool data_get_ca_has_notified() {
   return s_app_data.ca_has_notified;
 }

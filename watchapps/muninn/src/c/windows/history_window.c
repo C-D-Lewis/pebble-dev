@@ -69,8 +69,7 @@ static void draw_status(GContext *ctx, const GRect bounds, const Sample *s, char
 }
 
 static uint16_t get_num_rows_callback(MenuLayer *menu_layer, uint16_t section_index, void *context) {
-  const int count = data_get_valid_samples_count();
-  return count == 0 ? 1 : count;
+  return data_get_log_length();
 }
 
 static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_index, void *context) {

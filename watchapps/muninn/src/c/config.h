@@ -31,7 +31,7 @@
 //                                    //
 // #define SAVE_TEST_DATA true        //
 //                                    //
-// #define LOG_STATE true             //
+#define LOG_STATE true             //
 //                                    //
 // #define LOG_AVERAGING true         //
 //                                    //
