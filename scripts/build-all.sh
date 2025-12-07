@@ -11,6 +11,7 @@ working_projects=$(cat <<EOF
 ./libraries/pebble-universal-fb/test-app/
 ./libraries/pebble-isometric/test-app/
 ./libraries/pebble-pge/test-app/
+./libraries/pebble-scalable/test-app/
 ./libraries/notif-layer/test-app/
 ./libraries/InverterLayerCompat/test-app/
 
