@@ -1,17 +1,11 @@
 #include "message_window.h"
 
+#define BRAID_H 14
+
 #if defined(PBL_PLATFORM_EMERY)
-  #define ICON_Y 6
-  #define BRAID_Y 38
-  #define BRAID_H 14
   #define FONT_KEY FONT_KEY_GOTHIC_18
-  #define TEXT_RECT GRect(6, BRAID_Y + 20, DISPLAY_W - 12, DISPLAY_H)
 #else
-  #define ICON_Y 1
-  #define BRAID_Y 30
-  #define BRAID_H 14
   #define FONT_KEY FONT_KEY_GOTHIC_14
-  #define TEXT_RECT GRect(2, BRAID_Y + 16, DISPLAY_W - 4, DISPLAY_H)
 #endif
 
 static Window *s_window;
@@ -34,22 +28,24 @@ static void braid_update_proc(Layer *layer, GContext *ctx) {
 
 static void window_load(Window *window) {
   Layer *root_layer = window_get_root_layer(window);
-  GRect bounds = layer_get_bounds(root_layer);
 
   s_image_bitmap = gbitmap_create_with_resource(RESOURCE_ID_MENU_ICON);
   s_braid_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BRAID);
 
-  s_image_layer = bitmap_layer_create(GRect(0, ICON_Y, bounds.size.w, 25));
+  s_image_layer = bitmap_layer_create(GRect(0, scalable_y(2), scalable_x(100), 25));
   bitmap_layer_set_alignment(s_image_layer, GAlignCenter);
   bitmap_layer_set_compositing_mode(s_image_layer, GCompOpSet);
   bitmap_layer_set_bitmap(s_image_layer, s_image_bitmap);
   layer_add_child(root_layer, bitmap_layer_get_layer(s_image_layer));
 
-  s_braid_layer = layer_create(GRect(0, BRAID_Y, DISPLAY_W, BRAID_H));
+  s_braid_layer = layer_create(GRect(0, scalable_y(17), DISPLAY_W, BRAID_H));
   layer_set_update_proc(s_braid_layer, braid_update_proc);
   layer_add_child(root_layer, s_braid_layer);
 
-  s_text_layer = util_make_text_layer(TEXT_RECT, fonts_get_system_font(FONT_KEY));
+  s_text_layer = util_make_text_layer(
+    scalable_grect(1, 26, 98, 100),
+    fonts_get_system_font(FONT_KEY)
+  );
   text_layer_set_text_alignment(s_text_layer, GTextAlignmentCenter);
   text_layer_set_text(s_text_layer, s_text_ptr);
   layer_add_child(root_layer, text_layer_get_layer(s_text_layer));

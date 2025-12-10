@@ -9,6 +9,7 @@
 
 #include "windows/main_window.h"
 #include "windows/message_window.h"
+#include "windows/graph_window.h"
 
 static bool handle_missed_wakeup() {
   const int wakeup_id = data_get_wakeup_id();
@@ -49,6 +50,7 @@ static void init() {
   const bool first_launch = !data_get_seen_first_launch();
 
   main_window_push();
+  // graph_window_push();
 
   if (data_get_push_timeline_pins()) {
     // Try and push a pin
