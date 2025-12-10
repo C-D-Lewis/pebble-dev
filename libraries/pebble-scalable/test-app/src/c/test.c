@@ -1,6 +1,11 @@
 #include <pebble.h>
 #include <pebble-scalable/pebble-scalable.h>
 
+typedef enum {
+  FontId_Small = 0,
+  FontId_Medium,
+} FontId;
+
 static Window *s_window;
 static Layer *s_canvas_layer;
 
@@ -42,7 +47,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   graphics_draw_text(
     ctx,
     "This text should appear in the middle third on any platform or screen size",
-    scalable_get_medium_font(),
+    scalable_get_font(FontId_Small),
     scalable_grect(0, 33, 100, 33),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentCenter,
@@ -75,8 +80,8 @@ static void init(void) {
   s_gothic_18 = fonts_get_system_font(FONT_KEY_GOTHIC_18);
   s_gothic_24 = fonts_get_system_font(FONT_KEY_GOTHIC_24);
 
-  // Regular screens use Gothic 18, Emery uses Gothic 24
-  scalable_set_medium_fonts(&s_gothic_18, NULL, &s_gothic_24);
+  // The small font - regular screens use Gothic 18, Emery uses Gothic 24
+  scalable_set_fonts(FontId_Small, &s_gothic_18, NULL, &s_gothic_24);
 
   s_window = window_create();
   window_set_window_handlers(s_window, (WindowHandlers) {

@@ -1,6 +1,6 @@
 # pebble-scalable
 
-Package aiming to make it easy to make scaling layouts for different screen
+Package aiming to make it easy to make scaling layouts for different display
 sizes by defining their dimension only one.
 
 - [Setting up](#setting-up)
@@ -26,10 +26,10 @@ Add the includes at the top of your source.
 
 ## Dimensions
 
-Get values for layout dimensions based on screen size:
+Get values for layout dimensions based on display size:
 
 ```c
-// Get a percentage of the screen width and height
+// Get a percentage of the display width and height
 const int half_w = scalable_x(50);
 const int half_h = scalable_y(50);
 
@@ -63,7 +63,7 @@ const GRect centered = scalable_center(r);
 
 ## Fonts
 
-Use different fonts for different screen sizes, based on a category of 'small',
+Use different fonts for different display sizes, based on a category of 'small',
 'medium', or 'large'.
 
 ```c
@@ -75,29 +75,30 @@ s_gothic_18 = fonts_get_system_font(FONT_KEY_GOTHIC_18);
 s_gothic_24 = fonts_get_system_font(FONT_KEY_GOTHIC_24);
 ```
 
-Specify which screen sizes should use which fonts for each size
+Specify which fonts to use for each display size:
 
 ```c
-// Regular screens use Gothic 18, Chalk is N/A, Emery uses Gothic 24
-scalable_set_medium_fonts(&s_gothic_18, NULL, &s_gothic_24);
+// The 'small font' set ID
+#define FONT_ID_SMALL 0
+
+...
+
+// The small font - regular screens use Gothic 18, Chalk N/A Emery uses Gothic 24
+scalable_set_fonts(FONT_ID_SMALL, &s_gothic_18, NULL, &s_gothic_24);
 ```
 
-During layout or drawing, simply use the font by its size:
+During layout or drawing, simply use the font by ID:
 
 ```c
 // Text in the vertical middle third!
 graphics_context_set_text_color(ctx, GColorBlack);
 graphics_draw_text(
   ctx,
-  "This text should appear in the middle third on any platform or screen size",
-  scalable_get_medium_font(),
+  "This text should appear in the middle third on any platform or display size",
+  scalable_get_font(FONT_ID_SMALL),
   scalable_grect(0, 33, 100, 33),
   GTextOverflowModeTrailingEllipsis,
   GTextAlignmentCenter,
   NULL
 );
 ```
-
-## TODO
-
-- [ ] What other things need to be set based on size and/or platform aside from position and font size?

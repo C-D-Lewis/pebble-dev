@@ -47,35 +47,22 @@ GRect scalable_center(GRect r);
 ////////////////////////////////////////////// Fonts ///////////////////////////////////////////////
 
 /**
- * Set fonts to use for 'small' size on various known screensizes.
+ * Set fonts to use on various known screensizes accoding to dev-specified IDs, such as small,
+ * medium, large, etc.
  *
  * The intention here is to provide an optional 'font theme' on a per-size basis.
  *
+ * Keys can be 0 - 15 in value.
+ *
  * Q: Can this be variadic for the future? Data structure?
  */
-void scalable_set_small_fonts(GFont *regular, GFont *chalk, GFont *emery);
+void scalable_set_fonts(int id, GFont *regular, GFont *chalk, GFont *emery);
 
 /**
- * Set fonts to use for 'medium' size on various known screensizes.
+ * Get a font for the current platform, if previously set.
  */
-void scalable_set_medium_fonts(GFont *regular, GFont *chalk, GFont *emery);
+GFont scalable_get_font(int id);
 
-/**
- * Set fonts to use for 'large' size on various known screensizes.
- */
-void scalable_set_large_fonts(GFont *regular, GFont *chalk, GFont *emery);
+////////////////////////////////////////////// Images //////////////////////////////////////////////
 
-/**
- * Get the small font for the current platform, if previously set.
- */
-GFont scalable_get_small_font();
-
-/**
- * Get the medium font for the current platform, if previously set.
- */
-GFont scalable_get_medium_font();
-
-/**
- * Get the large font for the current platform, if previously set.
- */
-GFont scalable_get_large_font();
+// Q: Images could vary by color/BW - scope for now is just physical dimensions
