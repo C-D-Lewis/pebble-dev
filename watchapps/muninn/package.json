@@ -1,7 +1,7 @@
 {
   "name": "muninn",
   "author": "Chris Lewis",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "_note": "Also update config.h",
   "private": true,
   "keywords": [

@@ -5,4 +5,4 @@
 #include "../modules/data.h"
 #include "../modules/util.h"
 
-void history_window_push();
+void log_window_push();

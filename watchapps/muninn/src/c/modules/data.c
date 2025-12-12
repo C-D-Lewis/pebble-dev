@@ -62,12 +62,14 @@ void data_init() {
 #if defined(USE_TEST_DATA)
   // Arbitrary scenario - (reverse order)
   // const int changes[NUM_SAMPLES] = {30, 30, 30, 30, 30, 30, 30, 30};
-  // Test case: Should show 10 days at 8% per day
+  // Test case: Should show 10 days at 8% per day (from 80%)
   // const int changes[NUM_SAMPLES] = {2, 2, 2, 2, 2, 2, 2, 2};
   // Test case: Should show 10 days at 8% (two other events are ignored)
   // const int changes[NUM_SAMPLES] = {2, 2, 2, 2, -20, 2, 0, 2};
-  // Special status scenario
+  // Special status test scenario
   const int changes[NUM_SAMPLES] = {2, 2, 2, 2, 0, 2, -20, 2};
+  // Test case: Should show 6 days at 12% per day (from 80%)
+  // const int changes[NUM_SAMPLES] = {3, 3, 3, 3, 3, 3, 3, 3};
 
   int total_change = 0;
   for(int i = 0; i < NUM_SAMPLES; i++) {
@@ -226,8 +228,8 @@ int data_calculate_avg_discharge_rate() {
   APP_LOG(APP_LOG_LEVEL_INFO, "avg: count: %d", count);
 #endif
 
-  int result_x3 = 0;
-  int weight_x3 = 0;
+  int result_x2 = 0;
+  int weight_x2 = 0;
   int seen = 0;
 
   for (int i = 0; i < NUM_SAMPLES; i++) {
@@ -236,35 +238,37 @@ int data_calculate_avg_discharge_rate() {
     if (!util_is_valid(v)) continue;
 
     seen++;
-    if (seen == 1) {
-      result_x3 += v * 3; // first item -> 3x weight
-      weight_x3 += 3;
-#if defined(LOG_AVERAGING)
-      APP_LOG(APP_LOG_LEVEL_INFO, "avg: i:%d x3 %d (seen: %d)", i, v, seen);
-#endif
-    } else if (seen <= 4) {
-      result_x3 += v * 2; // next three -> 2x weight
-      weight_x3 += 2;
+
+    // Removed this, a sudden change can really make the est. jump around
+//     if (seen == 1) {
+//       result_x2 += v * 3; // first item -> 3x weight
+//       weight_x2 += 3;
+// #if defined(LOG_AVERAGING)
+//       APP_LOG(APP_LOG_LEVEL_INFO, "avg: i:%d x3 %d (seen: %d)", i, v, seen);
+// #endif
+    if (seen <= 4) {
+      result_x2 += v * 2; // next three -> 2x weight
+      weight_x2 += 2;
 #if defined(LOG_AVERAGING)
       APP_LOG(APP_LOG_LEVEL_INFO, "avg: i:%d x2 %d (seen: %d)", i, v, seen);
 #endif
     } else {
-      result_x3 += v * 1; // rest -> 1x weight
-      weight_x3 += 1;
+      result_x2 += v * 1; // rest -> 1x weight
+      weight_x2 += 1;
 #if defined(LOG_AVERAGING)
       APP_LOG(APP_LOG_LEVEL_INFO, "avg: i:%d x1 %d (seen: %d)", i, v, seen);
 #endif
     }
   }
 
-  if (weight_x3 == 0) return STATUS_EMPTY;
-  const int avg = result_x3 / weight_x3;
+  if (weight_x2 == 0) return STATUS_EMPTY;
+  const int avg = result_x2 / weight_x2;
 #if defined(LOG_AVERAGING)
   APP_LOG(
     APP_LOG_LEVEL_INFO,
-    "avg: result_x3 %d / weight_x3 %d => %d\n---",
-    result_x3,
-    weight_x3,
+    "avg: result_x2 %d / weight_x2 %d => %d\n---",
+    result_x2,
+    weight_x2,
     avg
   );
 #endif

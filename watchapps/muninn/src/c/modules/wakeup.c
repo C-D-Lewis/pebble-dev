@@ -85,11 +85,13 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
     const int charge_diff = last_charge_perc - charge_percent;
     APP_LOG(APP_LOG_LEVEL_INFO, "Time diff: %d, Charge diff: %d", time_diff_s, charge_diff);
 
+    // Turns out, in all cases below we note both of these anyway
+    data_set_last_charge_perc(charge_percent);
+    data_set_last_sample_time(now);
+
     // Ignore if plugged in or recently charged (store discharge rates only)
     if (is_plugged || charge_diff < 0) {
       APP_LOG(APP_LOG_LEVEL_INFO, "Ignoring: plugged in or recently charged");
-      data_set_last_charge_perc(charge_percent);
-      data_set_last_sample_time(now);
 
       // Record special status sample
       data_push_sample(charge_percent, last_sample_time, last_charge_perc, time_diff_s, charge_diff, STATUS_CHARGED);
@@ -97,6 +99,7 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
       // No change since last sample - probably on charge or very short period
       APP_LOG(APP_LOG_LEVEL_INFO, "No change since last sample");
 
+      // Record special status sample
       data_push_sample(charge_percent, last_sample_time, last_charge_perc, time_diff_s, charge_diff, STATUS_NO_CHANGE);
     } else {
       // Calculate new discharge rate
@@ -104,10 +107,6 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
 
       data_push_sample(charge_percent, last_sample_time, last_charge_perc, time_diff_s, charge_diff, result);
       APP_LOG(APP_LOG_LEVEL_INFO, "result: %d", result);
-
-      // Remember these for next sample itself, not next wakeup
-      data_set_last_charge_perc(charge_percent);
-      data_set_last_sample_time(now);
     }
   }
 
@@ -118,7 +117,9 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
   const int alert_level = data_get_custom_alert_level();
   const bool is_low = alert_level != AL_OFF && last_charge_perc <= alert_level;
   const bool ca_has_notified = data_get_ca_has_notified();
-  if (is_low && !ca_has_notified) {
+
+  // If we have data, and it's lower, and we haven't notified
+  if (data_get_valid_samples_count() > MIN_SAMPLES && is_low && !ca_has_notified) {
     data_set_ca_has_notified(true);
 
     alert_window_push(

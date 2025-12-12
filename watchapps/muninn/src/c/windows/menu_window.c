@@ -1,18 +1,17 @@
 #include "menu_window.h"
 
-#define NUM_ITEMS 6
-
 #if defined(PBL_PLATFORM_EMERY)
   #define ROW_HEIGHT_SMALL 40
   #define ROW_HEIGHT_LARGE 52
 #else
   #define ROW_HEIGHT_SMALL 36
-  #define ROW_HEIGHT_LARGE 46
+  #define ROW_HEIGHT_LARGE 48
 #endif
 
 static Window *s_window;
 static MenuLayer *s_menu_layer;
 
+static GFont s_font_l, s_font_m;
 static bool s_reset_confirm;
 
 typedef enum {
@@ -31,70 +30,105 @@ static uint16_t get_num_rows_callback(MenuLayer *menu_layer, uint16_t section_in
   return MI_MAX;
 }
 
+// Like menu_cell_basic_draw but with larger subtitle
+static void menu_cell_draw(GContext *ctx, Layer *layer, char *title, char *desc) {
+  // TODO: Can we use ContentSize here without layout issues?
+  PreferredContentSize content_size = preferred_content_size();
+  // APP_LOG(APP_LOG_LEVEL_INFO, "content_size: %d", (int)content_size);
+
+  // Medium, use regular rendering
+  if (content_size <= PreferredContentSizeMedium) {
+    menu_cell_basic_draw(ctx, layer, title, desc, NULL);
+    return;
+  }
+
+  GRect title_rect = GRect(3, -5, DISPLAY_W, 28);
+  if (desc == NULL) {
+    title_rect.origin.y += 6;
+  }
+
+  graphics_draw_text(
+    ctx,
+    title,
+    s_font_l,
+    title_rect,
+    GTextOverflowModeTrailingEllipsis,
+    GTextAlignmentLeft,
+    NULL
+  );
+
+  if (desc != NULL) {
+    graphics_draw_text(
+      ctx,
+      desc,
+      s_font_m,
+      GRect(3, 16, DISPLAY_W, 28),
+      GTextOverflowModeTrailingEllipsis,
+      GTextAlignmentLeft,
+      NULL
+    );
+  }
+}
+
 static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_index, void *context) {
   const int alert_level = data_get_custom_alert_level();
   const bool alert_disabled = alert_level == AL_OFF;
   static char s_alert_buff[32];
   if (!alert_disabled) {
-    snprintf(s_alert_buff, sizeof(s_alert_buff), "Will notify around %d%%", alert_level);
+    snprintf(s_alert_buff, sizeof(s_alert_buff), "Notifying near %d%%", alert_level);
   }
   const bool push_pins = data_get_push_timeline_pins();
 
   switch(cell_index->row) {
     case MI_VIBE_ON_SAMPLE:
-      menu_cell_basic_draw(
+      menu_cell_draw(
         ctx,
         cell_layer,
         "Vibrate on sample",
-        data_get_vibe_on_sample() ? "Enabled" : "Disabled",
-        NULL
+        data_get_vibe_on_sample() ? "Enabled" : "Disabled"
       );
       break;
     case MI_CUSTOM_ALERT_LEVEL:
-      menu_cell_basic_draw(
+      menu_cell_draw(
         ctx,
         cell_layer,
         "Custom threshold",
-        alert_disabled ? "Disabled" : s_alert_buff,
-        NULL
+        alert_disabled ? "Disabled" : s_alert_buff
       );
       break;
     case MI_PUSH_TIMELINE_PINS:
-      menu_cell_basic_draw(
+      menu_cell_draw(
         ctx,
         cell_layer,
         "Timeline pins",
-        push_pins ? "Enabled" : "Disabled",
-        NULL
+        push_pins ? "Enabled" : "Disabled"
       );
       break;
     case MI_ESTIMATE_LOG:
-      menu_cell_basic_draw(ctx, cell_layer, "Data log", NULL, NULL);
+      menu_cell_draw(ctx, cell_layer, "Data log", NULL);
       break;
     case MI_BATTERY_TIPS:
-      menu_cell_basic_draw(ctx, cell_layer, "Battery tips", NULL, NULL);
+      menu_cell_draw(ctx, cell_layer, "Battery tips", NULL);
       break;
     case MI_ABOUT:
-      menu_cell_basic_draw(ctx, cell_layer, "About", NULL, NULL);
+      menu_cell_draw(ctx, cell_layer, "About", NULL);
       break;
     case MI_DELETE_ALL_DATA:
-      menu_cell_basic_draw(
+      menu_cell_draw(
         ctx,
         cell_layer,
         "Delete all data",
-        s_reset_confirm ? "Tap again to confirm" : NULL,
-        NULL
+        s_reset_confirm ? "Tap again to confirm" : NULL
       );
       break;
     case MI_VERSION: {
       static char s_v_buff[16];
       snprintf(s_v_buff, sizeof(s_v_buff), "Version %s", VERSION);
-      menu_cell_basic_draw(
+      menu_cell_draw(
         ctx,
         cell_layer,
         "Muninn",
-        s_v_buff,
-        NULL
+        s_v_buff
       );
       break;
     }
@@ -139,7 +173,7 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
           false
         );
       } else {
-        history_window_push();
+        log_window_push();
       }
       break;
     case MI_BATTERY_TIPS:
@@ -168,6 +202,9 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
 static void main_window_load(Window *window) {
   Layer *window_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(window_layer);
+
+  s_font_m = fonts_get_system_font(FONT_KEY_GOTHIC_24);
+  s_font_l = fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD);
 
   s_menu_layer = menu_layer_create(bounds);
   menu_layer_set_click_config_onto_window(s_menu_layer, window);

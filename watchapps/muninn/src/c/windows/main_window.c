@@ -28,8 +28,8 @@
   #define HOLD_RAD 5
   #define MENU_BG_COLOR GColorJazzberryJam
 #else
-  #define ACTION_BAR_W 12
-  #define FONT_KEY_XS FONT_KEY_GOTHIC_14
+  #define ACTION_BAR_W 10
+  #define FONT_KEY_XS FONT_KEY_GOTHIC_18 // TODO: Remove
   #define FONT_KEY_S FONT_KEY_GOTHIC_18
   #define FONT_KEY_M FONT_KEY_GOTHIC_24
   #define FONT_KEY_L_B FONT_KEY_GOTHIC_28_BOLD
@@ -37,16 +37,16 @@
   #define STATUS_LABEL_RECT GRect(60, 0, DISPLAY_W, 100)
   #define STATUS_VALUE_RECT GRect(58, 13, DISPLAY_W - 75, 100)
   #define EYE_RECT GRect(41, 7, 4, 4)
-  #define BRAID_Y 68
-  #define DESC_RECT GRect(5, 48, DISPLAY_W - ACTION_BAR_W - 10, 100)
+  #define BRAID_Y 69
+  #define DESC_RECT GRect(2, 46, DISPLAY_W - ACTION_BAR_W - 4, 100)
   #define ROW_1_X 2
-  #define ROW_1_Y 92
+  #define ROW_1_Y 90
   #define ROW_2_X 2
-  #define ROW_2_Y 142
+  #define ROW_2_Y 140
   #define ROW_1_GAP 60
   #define ROW_2_GAP 68
-  #define ROW_1_SUBTITLE "  Days left     Est. %/day"
-  #define HINT_W 14
+  #define ROW_1_SUBTITLE "    Days         Est. /day"
+  #define HINT_W 12
   #define HINT_H 38
   #define ROW_DIV_Y 137
   #define ROW_DIV_X (DISPLAY_W / 2) - 14
@@ -104,7 +104,10 @@ static void blink_handler(void *context) {
 
 static void schedule_blink() {
   // Only blink a few times in case app is left open
-  if (s_blink_budget == 0) return;
+  if (s_blink_budget == 0) {
+    s_blink_timer = NULL;
+    return;
+  }
 
   s_blink_budget--;
   s_blink_timer = app_timer_register(700 + (rand() % 3000), blink_handler, NULL);

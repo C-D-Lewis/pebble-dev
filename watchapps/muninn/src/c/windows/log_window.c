@@ -1,12 +1,12 @@
-#include "history_window.h"
+#include "log_window.h"
 
 #define ROW_HEIGHT 66
-#define FONT_KEY_S FONT_KEY_GOTHIC_14
 #define FONT_KEY_M FONT_KEY_GOTHIC_18
 #define FONT_KEY_L FONT_KEY_GOTHIC_24
-#define ROW_1_Y 20
-#define ROW_2_Y 40
+#define ROW_1_Y 23
+#define ROW_2_Y 41
 #define STATUS_W 56
+#define DIV_Y 24
 
 #if defined(PBL_PLATFORM_EMERY)
   #define TITLE_FONT_KEY FONT_KEY_GOTHIC_24
@@ -22,7 +22,7 @@ static Window *s_window;
 static TextLayer *s_header_layer;
 static MenuLayer *s_menu_layer;
 
-static GFont s_font_s, s_font_m, s_font_l;
+static GFont s_font_m, s_font_l;
 
 static void draw_diffs(GContext *ctx, const GRect bounds, const Sample *s) {
   // Time diff
@@ -90,19 +90,11 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
   static char s_datetime_buff[32];
   const time_t ts_time = s->timestamp;
   const struct tm *ts_info = localtime(&ts_time);
-  strftime(s_datetime_buff, sizeof(s_datetime_buff), "%Y-%m-%d - %H:%M", ts_info);
-  static char s_dt_with_cp_buff[32];
-  snprintf(
-    s_dt_with_cp_buff,
-    sizeof(s_dt_with_cp_buff),
-    "%s: %d%%",
-    s_datetime_buff,
-    s->charge_perc
-  );
+  strftime(s_datetime_buff, sizeof(s_datetime_buff), "%Y-%m-%d", ts_info);
   graphics_draw_text(
     ctx,
-    s_dt_with_cp_buff,
-    s_font_s,
+    s_datetime_buff,
+    s_font_m,
     GRect(2, 0, bounds.size.w, 28),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentLeft,
@@ -113,8 +105,8 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
   const GColor sep_color = menu_layer_is_index_selected(s_menu_layer, cell_index)
     ? GColorWhite : GColorBlack;
   graphics_context_set_stroke_color(ctx, sep_color);
-  graphics_draw_line(ctx, GPoint(0, 18), GPoint(bounds.size.w, 18));
-  graphics_draw_line(ctx, GPoint(DIV_X, 18), GPoint(DIV_X, bounds.size.h));
+  graphics_draw_line(ctx, GPoint(0, DIV_Y), GPoint(bounds.size.w, DIV_Y));
+  graphics_draw_line(ctx, GPoint(DIV_X, DIV_Y), GPoint(DIV_X, bounds.size.h));
   graphics_draw_line(ctx, GPoint(0, bounds.size.h - 1), GPoint(bounds.size.w, bounds.size.h - 1));
 
   draw_diffs(ctx, bounds, s);
@@ -147,7 +139,6 @@ static void main_window_load(Window *window) {
   text_layer_set_text_alignment(s_header_layer, GTextAlignmentCenter);
   layer_add_child(window_layer, text_layer_get_layer(s_header_layer));
 
-  s_font_s = fonts_get_system_font(FONT_KEY_S);
   s_font_m = fonts_get_system_font(FONT_KEY_M);
   s_font_l = fonts_get_system_font(FONT_KEY_L);
 
@@ -169,7 +160,7 @@ static void window_unload(Window *window) {
   s_window = NULL;
 }
 
-void history_window_push() {
+void log_window_push() {
   if (!s_window) {
     s_window = window_create();
     window_set_window_handlers(s_window, (WindowHandlers) {

@@ -1,4 +1,4 @@
-#include "history_window.h"
+#include "log_window.h"
 
 #if defined(PBL_PLATFORM_EMERY)
   #define TITLE_HEIGHT 28
