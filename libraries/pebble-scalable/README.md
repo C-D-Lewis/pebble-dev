@@ -1,7 +1,7 @@
 # pebble-scalable
 
 Package aiming to make it easy to make scaling layouts for different display
-sizes by defining their dimension only one.
+sizes by defining their dimension only once.
 
 - [Setting up](#setting-up)
 - [Dimensions](#dimensions)
@@ -29,19 +29,19 @@ Add the includes at the top of your source.
 Get values for layout dimensions based on display size:
 
 ```c
-// Get a percentage of the display width and height
-const int half_w = scalable_x(50);
-const int half_h = scalable_y(50);
+// Get a percentage (thousands) of the display width and height
+const int half_w = scalable_x(500);
+const int half_h = scalable_y(500);
 
 // Get a GRect based only on percentage width/height
-const GRect center_rect = scalable_grect(33, 33, 33, 33);
+const GRect center_rect = scalable_grect(330, 330, 330, 330);
 ```
 
 If a percentage isn't precise enough, the x/y or w/h can be nudged by some pixels:
 
 ```c
 // A rect nudged by 5px in x and 2px in y
-const GRect precise = scalable_nudge_xy(scalable_grect(10, 10, 20, 20), 5, 2);
+const GRect precise = scalable_nudge_xy(scalable_grect(100, 100, 200, 200), 5, 2);
 ```
 
 ## Centering
@@ -49,7 +49,7 @@ const GRect precise = scalable_nudge_xy(scalable_grect(10, 10, 20, 20), 5, 2);
 A GRect can be centered in either the X or Y axis, or both:
 
 ```c
-const GRect r = scalable_grect(10, 50, 20, 20);
+const GRect r = scalable_grect(100, 500, 200, 200);
 
 // Center horizontally
 const GRect centered_h = scalable_center_x(r);
@@ -96,7 +96,7 @@ graphics_draw_text(
   ctx,
   "This text should appear in the middle third on any platform or display size",
   scalable_get_font(FONT_ID_SMALL),
-  scalable_grect(0, 33, 100, 33),
+  scalable_grect(0, 330, 1000, 330),
   GTextOverflowModeTrailingEllipsis,
   GTextAlignmentCenter,
   NULL

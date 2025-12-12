@@ -5,19 +5,19 @@
 ///////////////////////////////////////////// Geometry /////////////////////////////////////////////
 
 /**
- * Get an X coordinate as a percentage of the screen width.
+ * Get an X coordinate as a thousandth of the screen width.
  */
-int scalable_x(int perc);
+int scalable_x(int thou);
 
 /**
- * Get a Y coordinate as a percentage of the screen height.
+ * Get a Y coordinate as a thousandth of the screen height.
  */
-int scalable_y(int perc);
+int scalable_y(int thou);
 
 /**
- * Get a GRect with all values as percentages of the screen.
+ * Get a GRect with all values as thousandths of the screen.
  */
-GRect scalable_grect(int x_perc, int y_perc, int w_perc, int h_perc);
+GRect scalable_grect(int x_thou, int y_thou, int w_thou, int h_thou);
 
 /**
  * Manually adjust a GRect position by a number of pixels.

@@ -23,6 +23,8 @@
 #define PS_DS_CHALK 1
 // All other screen shape (aplite, basalt, diorite, flint etc.) slot
 #define PS_DS_REGULAR 0
+// Half the scale input in thousandths
+#define PS_HALF_THOU 500
 
 static GFont *s_fonts_ptrs[PS_MAX_FONT_SETS][PS_DISTINCT_SHAPES];
 
@@ -49,19 +51,19 @@ static GFont* get_font_from_array(GFont **array) {
 
 ///////////////////////////////////////////// Geometry /////////////////////////////////////////////
 
-int scalable_x(int perc) {
-  return (perc * PS_DISPLAY_W) / 100;
+int scalable_x(int thou) {
+  return ((thou * PS_DISPLAY_W) + PS_HALF_THOU) / 1000;
 }
 
-int scalable_y(int perc) {
-  return (perc * PS_DISPLAY_H) / 100;
+int scalable_y(int thou) {
+  return ((thou * PS_DISPLAY_H) + PS_HALF_THOU) / 1000;
 }
 
 GRect scalable_grect(int x_perc, int y_perc, int w_perc, int h_perc) {
   return GRect(
-    scalable_x(x_perc), 
-    scalable_y(y_perc), 
-    scalable_x(w_perc), 
+    scalable_x(x_perc),
+    scalable_y(y_perc),
+    scalable_x(w_perc),
     scalable_y(h_perc)
   );
 }
