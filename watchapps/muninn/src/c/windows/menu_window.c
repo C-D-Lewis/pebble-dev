@@ -34,17 +34,21 @@ static uint16_t get_num_rows_callback(MenuLayer *menu_layer, uint16_t section_in
 static void menu_cell_draw(GContext *ctx, Layer *layer, char *title, char *desc) {
   // TODO: Can we use ContentSize here without layout issues?
   PreferredContentSize content_size = preferred_content_size();
-  // APP_LOG(APP_LOG_LEVEL_INFO, "content_size: %d", (int)content_size);
+  APP_LOG(APP_LOG_LEVEL_INFO, "content_size: %d", (int)content_size);
 
-  // Medium, use regular rendering
+  // Medium or smaller (rare?), use regular rendering
   if (content_size <= PreferredContentSizeMedium) {
     menu_cell_basic_draw(ctx, layer, title, desc, NULL);
     return;
   }
 
-  GRect title_rect = GRect(3, -5, DISPLAY_W, 28);
+  // Else, use larger one
+  GRect title_rect = scalable_grect(30, -30, 1000, 300);
+#if defined(PBL_PLATFORM_EMERY)
+  title_rect = scalable_nudge_xy(title_rect, 0, 4);
+#endif
   if (desc == NULL) {
-    title_rect.origin.y += 6;
+    title_rect.origin.y += scalable_y(40);
   }
 
   graphics_draw_text(
@@ -62,7 +66,7 @@ static void menu_cell_draw(GContext *ctx, Layer *layer, char *title, char *desc)
       ctx,
       desc,
       s_font_m,
-      GRect(3, 16, DISPLAY_W, 28),
+      scalable_grect(30, 95, 1000, 300),
       GTextOverflowModeTrailingEllipsis,
       GTextAlignmentLeft,
       NULL

@@ -29,7 +29,7 @@ static void window_load(Window *window) {
   s_image_bitmap = gbitmap_create_with_resource(s_res_id);
   s_braid_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BRAID);
 
-  s_image_layer = bitmap_layer_create(scalable_grect(0, 13, 100, 30));
+  s_image_layer = bitmap_layer_create(scalable_grect(0, 130, 1000, 300));
   bitmap_layer_set_alignment(s_image_layer, GAlignCenter);
   bitmap_layer_set_compositing_mode(s_image_layer, GCompOpSet);
   bitmap_layer_set_bitmap(s_image_layer, s_image_bitmap);
@@ -37,7 +37,7 @@ static void window_load(Window *window) {
 
   const GFont font = fonts_get_system_font(FONT_KEY);
 
-  s_text_layer = util_make_text_layer(scalable_grect(0, 43, 100, 100), font);
+  s_text_layer = util_make_text_layer(scalable_grect(0, 430, 1000, 1000), font);
   text_layer_set_text(s_text_layer, s_message);
   text_layer_set_text_alignment(s_text_layer, GTextAlignmentCenter);
   layer_add_child(root_layer, text_layer_get_layer(s_text_layer));

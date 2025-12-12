@@ -2,6 +2,8 @@
 
 #include <pebble.h>
 
+#include <pebble-scalable/pebble-scalable.h>
+
 #include "../modules/comm.h"
 #include "../modules/data.h"
 #include "../modules/util.h"

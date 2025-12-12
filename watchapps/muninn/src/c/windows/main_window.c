@@ -1,8 +1,7 @@
 #include "main_window.h"
 
 #if defined(PBL_PLATFORM_EMERY)
-  #define ACTION_BAR_W 18
-  #define FONT_KEY_XS FONT_KEY_GOTHIC_18
+  #define ACTION_BAR_W 14
   #define FONT_KEY_S FONT_KEY_GOTHIC_24
   #define FONT_KEY_M FONT_KEY_GOTHIC_28
   #define FONT_KEY_L_B FONT_KEY_GOTHIC_28_BOLD
@@ -11,7 +10,7 @@
   #define STATUS_VALUE_RECT GRect(93, 22, DISPLAY_W - 75, 100)
   #define EYE_RECT GRect(58, 12, 4, 4)
   #define BRAID_Y 85
-  #define DESC_RECT GRect(10, 57, DISPLAY_W - ACTION_BAR_W - 20, 100)
+  #define DESC_RECT GRect(10, 52, DISPLAY_W - ACTION_BAR_W - 20, 100)
   #define ROW_1_X 18
   #define ROW_1_Y 115
   #define ROW_2_X 10
@@ -19,7 +18,7 @@
   #define ROW_1_GAP 87
   #define ROW_2_GAP 94
   #define ROW_1_SUBTITLE "    Days left       Est. %/day"
-  #define HINT_W 20
+  #define HINT_W 16
   #define HINT_H 48
   #define ROW_DIV_Y 175
   #define ROW_DIV_X (DISPLAY_W / 2) - 8
@@ -29,7 +28,6 @@
   #define MENU_BG_COLOR GColorJazzberryJam
 #else
   #define ACTION_BAR_W 10
-  #define FONT_KEY_XS FONT_KEY_GOTHIC_18 // TODO: Remove
   #define FONT_KEY_S FONT_KEY_GOTHIC_18
   #define FONT_KEY_M FONT_KEY_GOTHIC_24
   #define FONT_KEY_L_B FONT_KEY_GOTHIC_28_BOLD
@@ -285,7 +283,6 @@ static void window_load(Window *window) {
   Layer *root_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(root_layer);
 
-  GFont font_xs = fonts_get_system_font(FONT_KEY_XS);
   GFont font_s = fonts_get_system_font(FONT_KEY_S);
   GFont font_m = fonts_get_system_font(FONT_KEY_M);
   GFont font_l_b = fonts_get_system_font(FONT_KEY_L_B);
@@ -311,7 +308,7 @@ static void window_load(Window *window) {
   s_status_value_layer = util_make_text_layer(STATUS_VALUE_RECT, font_l_b);
   layer_add_child(root_layer, text_layer_get_layer(s_status_value_layer));
 
-  s_desc_layer = util_make_text_layer(DESC_RECT, font_xs);
+  s_desc_layer = util_make_text_layer(DESC_RECT, font_s);
   text_layer_set_text_alignment(s_desc_layer, GTextAlignmentCenter);
   layer_add_child(root_layer, text_layer_get_layer(s_desc_layer));
 
@@ -346,11 +343,7 @@ static void window_load(Window *window) {
 
   s_row_1_subtitle_layer = util_make_text_layer(
     GRect(1, row_y + 22, DISPLAY_W - ACTION_BAR_W, 40),
-#if defined(PBL_PLATFORM_EMERY)
     font_s
-#else
-    font_xs
-#endif
   );
   text_layer_set_text(s_row_1_subtitle_layer, ROW_1_SUBTITLE);
   layer_add_child(root_layer, text_layer_get_layer(s_row_1_subtitle_layer));

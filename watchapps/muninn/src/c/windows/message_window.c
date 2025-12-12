@@ -32,18 +32,18 @@ static void window_load(Window *window) {
   s_image_bitmap = gbitmap_create_with_resource(RESOURCE_ID_MENU_ICON);
   s_braid_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BRAID);
 
-  s_image_layer = bitmap_layer_create(GRect(0, scalable_y(2), scalable_x(100), 25));
+  s_image_layer = bitmap_layer_create(scalable_grect(0, 20, 1000, 150));
   bitmap_layer_set_alignment(s_image_layer, GAlignCenter);
   bitmap_layer_set_compositing_mode(s_image_layer, GCompOpSet);
   bitmap_layer_set_bitmap(s_image_layer, s_image_bitmap);
   layer_add_child(root_layer, bitmap_layer_get_layer(s_image_layer));
 
-  s_braid_layer = layer_create(GRect(0, scalable_y(17), DISPLAY_W, BRAID_H));
+  s_braid_layer = layer_create(GRect(0, scalable_y(170), DISPLAY_W, BRAID_H));
   layer_set_update_proc(s_braid_layer, braid_update_proc);
   layer_add_child(root_layer, s_braid_layer);
 
   s_text_layer = util_make_text_layer(
-    scalable_grect(1, 26, 98, 100),
+    scalable_grect(10, 260, 980, 1000),
     fonts_get_system_font(FONT_KEY)
   );
   text_layer_set_text_alignment(s_text_layer, GTextAlignmentCenter);
