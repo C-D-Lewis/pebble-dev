@@ -61,6 +61,17 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
 
   // Center third outline
   graphics_draw_rect(ctx, scalable_center(scalable_grect(1, 1, 33, 33)));
+
+  // Text at a negative Y
+  graphics_draw_text(
+    ctx,
+    "Off the top",
+    scalable_get_font(FontId_Small),
+    scalable_grect(0, -6, 100, 33),
+    GTextOverflowModeTrailingEllipsis,
+    GTextAlignmentCenter,
+    NULL
+  );
 }
 
 static void window_load(Window *window) {

@@ -26,9 +26,9 @@
 
 static GFont *s_fonts_ptrs[PS_MAX_FONT_SETS][PS_DISTINCT_SHAPES];
 
-static int min_1(int v) {
-  return v < 1 ? 1 : v;
-}
+// static int min_1(int v) {
+//   return v < 1 ? 1 : v;
+// }
 
 static GFont* get_font_if_set(GFont *ptr) {
   if (ptr == NULL) {
@@ -50,11 +50,11 @@ static GFont* get_font_from_array(GFont **array) {
 ///////////////////////////////////////////// Geometry /////////////////////////////////////////////
 
 int scalable_x(int perc) {
-  return min_1((perc * PS_DISPLAY_W) / 100);
+  return (perc * PS_DISPLAY_W) / 100;
 }
 
 int scalable_y(int perc) {
-  return min_1((perc * PS_DISPLAY_H) / 100);
+  return (perc * PS_DISPLAY_H) / 100;
 }
 
 GRect scalable_grect(int x_perc, int y_perc, int w_perc, int h_perc) {
