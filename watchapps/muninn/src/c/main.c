@@ -10,7 +10,7 @@
 
 #include "windows/main_window.h"
 #include "windows/message_window.h"
-#include "windows/menu_window.h"
+// #include "windows/menu_window.h"
 
 static void init() {
   data_init();
@@ -29,7 +29,6 @@ static void init() {
   const bool first_launch = !data_get_seen_first_launch();
 
   main_window_push();
-  menu_window_push();
 
   if (data_get_push_timeline_pins()) {
     // Try and push a pin
@@ -50,10 +49,10 @@ static void init() {
 #endif
   }
 
-  if (first_launch) {
+  // if (first_launch) {
     message_window_push(MSG_WELCOME);
     data_set_seen_first_launch();
-  }
+  // }
 }
 
 static void deinit() {

@@ -2,13 +2,8 @@
 
 #define BRAID_H 14
 
-#if defined(PBL_PLATFORM_EMERY)
-  #define FONT_KEY FONT_KEY_GOTHIC_18
-#else
-  #define FONT_KEY FONT_KEY_GOTHIC_14
-#endif
-
 static Window *s_window;
+static ScrollLayer *s_scroll_layer;
 static TextLayer *s_text_layer;
 static BitmapLayer *s_image_layer;
 static Layer *s_braid_layer;
@@ -28,6 +23,7 @@ static void braid_update_proc(Layer *layer, GContext *ctx) {
 
 static void window_load(Window *window) {
   Layer *root_layer = window_get_root_layer(window);
+  GRect bounds = layer_get_bounds(root_layer);
 
   s_image_bitmap = gbitmap_create_with_resource(RESOURCE_ID_MENU_ICON);
   s_braid_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BRAID);
@@ -38,20 +34,42 @@ static void window_load(Window *window) {
   bitmap_layer_set_bitmap(s_image_layer, s_image_bitmap);
   layer_add_child(root_layer, bitmap_layer_get_layer(s_image_layer));
 
-  s_braid_layer = layer_create(GRect(0, scalable_y(170), DISPLAY_W, BRAID_H));
+  const int braid_y = scalable_y(170);
+  s_braid_layer = layer_create(GRect(0, braid_y, DISPLAY_W, BRAID_H));
   layer_set_update_proc(s_braid_layer, braid_update_proc);
   layer_add_child(root_layer, s_braid_layer);
 
-  s_text_layer = util_make_text_layer(
-    scalable_grect(10, 260, 980, 1000),
-    fonts_get_system_font(FONT_KEY)
+  // Code from devsite to try and fit text inside a TextLayer inside a ScrollLayer
+  GRect shrinking_rect = GRect(5, 0, bounds.size.w - 10, 2000);
+  GSize text_size = graphics_text_layout_get_content_size(
+    s_text_ptr,
+    scalable_get_font(SFI_Medium), 
+    shrinking_rect,
+    GTextOverflowModeWordWrap,
+    GTextAlignmentLeft
   );
-  text_layer_set_text_alignment(s_text_layer, GTextAlignmentCenter);
+  text_size.h += 10;
+  GRect text_bounds = bounds;
+  text_bounds.origin.x += 5;
+  text_bounds.size.w -= 10;
+  text_bounds.size.h = text_size.h;
+
+  s_text_layer = util_make_text_layer(text_bounds, scalable_get_font(SFI_Medium));
+  text_layer_set_text_alignment(s_text_layer, GTextAlignmentLeft);
   text_layer_set_text(s_text_layer, s_text_ptr);
-  layer_add_child(root_layer, text_layer_get_layer(s_text_layer));
+  
+  const int scroll_y = braid_y + BRAID_H;
+  s_scroll_layer = scroll_layer_create(
+    GRect(0, scroll_y, bounds.size.w, bounds.size.h - scroll_y)
+  );
+  scroll_layer_set_content_size(s_scroll_layer, text_size);
+  scroll_layer_set_click_config_onto_window(s_scroll_layer, window);
+  scroll_layer_add_child(s_scroll_layer, text_layer_get_layer(s_text_layer));
+  layer_add_child(root_layer, scroll_layer_get_layer(s_scroll_layer));
 }
 
 static void window_unload(Window *window) {
+  scroll_layer_destroy(s_scroll_layer);
   text_layer_destroy(s_text_layer);
   bitmap_layer_destroy(s_image_layer);
   layer_destroy(s_braid_layer);
