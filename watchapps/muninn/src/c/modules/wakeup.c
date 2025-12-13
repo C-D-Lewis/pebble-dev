@@ -12,20 +12,26 @@ void wakeup_schedule_next() {
   const time_t ts_now = time(NULL);
   const struct tm *now = localtime(&ts_now);
 
-  // Find next interval hour based on WAKEUP_MOD_H
-  const int elap_min_s = now->tm_min * 60;
-  const int hours_rem = WAKEUP_MOD_H - (now->tm_hour % WAKEUP_MOD_H);
-  const int interval_s = (hours_rem * SECONDS_PER_HOUR) - elap_min_s - now->tm_sec;
-
 #if defined(WAKEUP_NEXT_MINUTE)
   // For faster testing of wakeups
   const time_t future = ts_now + 60;
 #else
+  // Find next interval hour based on WAKEUP_MOD_H
+  const int hours_rem = WAKEUP_MOD_H - (now->tm_hour % WAKEUP_MOD_H);
+  // (old method)
+  // const int elap_min_s = now->tm_min * 60;
+  // const int interval_s = (hours_rem * SECONDS_PER_HOUR) - elap_min_s - now->tm_sec;
+  // time_t future = ts_now + interval_s + 5;
+
+  // Ensure it's exactly an interval of WAKEUP_MOD_H
+  struct tm tm_future = *now;
+  tm_future.tm_hour += hours_rem;
+  tm_future.tm_min = 0;
+  tm_future.tm_sec = 0;
   // Tiny extra offset in case weird things happen exactly on the hour
-  const time_t future = ts_now + interval_s + 5;
+  time_t future = mktime(&tm_future) + 5;
 #endif
 
-  APP_LOG(APP_LOG_LEVEL_INFO, "Seconds until next interval: %d", interval_s);
   int id = wakeup_schedule(future, 0, true);
 #if defined(TEST_COLLISION)
   // To test collision rescheduling

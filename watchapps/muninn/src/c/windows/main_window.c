@@ -18,7 +18,7 @@
   #define ROW_2_X 10
   #define ROW_2_Y 192
   #define ROW_1_GAP 87
-  #define ROW_2_GAP 94
+  #define ROW_2_GAP 88
   #define ROW_1_SUBTITLE "    Days left       Est. %/day"
   #define HINT_W 16
   #define HINT_H 48
@@ -28,6 +28,7 @@
   #define ROW_2_TEXT_Y_OFF 7
   #define HOLD_RAD 5
   #define MENU_BG_COLOR GColorJazzberryJam
+  #define TEXT_OFFSET 26
 #else
   #define ACTION_BAR_W 10
   #define FONT_KEY_S FONT_KEY_GOTHIC_18
@@ -39,12 +40,12 @@
   #define EYE_RECT GRect(41, 7, 4, 4)
   #define BRAID_Y 69
   #define DESC_RECT GRect(2, 46, DISPLAY_W - ACTION_BAR_W - 4, 100)
-  #define ROW_1_X 2
+  #define ROW_1_X 0
   #define ROW_1_Y 90
   #define ROW_2_X 2
   #define ROW_2_Y 140
   #define ROW_1_GAP 60
-  #define ROW_2_GAP 68
+  #define ROW_2_GAP 63
   #define ROW_1_SUBTITLE "    Days         Est. /day"
   #define HINT_W 12
   #define HINT_H 38
@@ -54,6 +55,7 @@
   #define ROW_2_TEXT_Y_OFF 5
   #define HOLD_RAD 3
   #define MENU_BG_COLOR PBL_IF_COLOR_ELSE(GColorJazzberryJam, GColorLightGray)
+  #define TEXT_OFFSET 25
 #endif
 
 static Window *s_window;
@@ -194,7 +196,7 @@ static void update_data() {
 
     // Next reading
     static char s_wakeup_buff[8];
-    util_fmt_time_ago(wakeup_ts, &s_wakeup_buff[0], sizeof(s_wakeup_buff));
+    util_fmt_time(wakeup_ts, &s_wakeup_buff[0], sizeof(s_wakeup_buff));
     text_layer_set_text(s_reading_layer, s_wakeup_buff);
   }
 }
@@ -315,7 +317,6 @@ static void window_load(Window *window) {
   layer_add_child(root_layer, text_layer_get_layer(s_desc_layer));
 
   // Top row
-  const int text_offset = 27;
   int row_x = ROW_1_X;
   int row_y = ROW_1_Y;
 
@@ -325,7 +326,7 @@ static void window_load(Window *window) {
   bitmap_layer_set_bitmap(s_remaining_bmp_layer, s_remaining_bitmap);
   layer_add_child(root_layer, bitmap_layer_get_layer(s_remaining_bmp_layer));
   s_remaining_layer = util_make_text_layer(
-    GRect(row_x + text_offset, row_y - 7, DISPLAY_W, 100),
+    GRect(row_x + TEXT_OFFSET, row_y - 7, DISPLAY_W, 100),
     font_l_b
   );
   layer_add_child(root_layer, text_layer_get_layer(s_remaining_layer));
@@ -338,7 +339,7 @@ static void window_load(Window *window) {
   bitmap_layer_set_bitmap(s_rate_bmp_layer, s_rate_bitmap);
   layer_add_child(root_layer, bitmap_layer_get_layer(s_rate_bmp_layer));
   s_rate_layer = util_make_text_layer(
-    GRect(row_x + text_offset, row_y - 7, DISPLAY_W, 100),
+    GRect(row_x + TEXT_OFFSET, row_y - 7, DISPLAY_W, 100),
     font_l_b
   );
   layer_add_child(root_layer, text_layer_get_layer(s_rate_layer));
@@ -360,7 +361,7 @@ static void window_load(Window *window) {
   bitmap_layer_set_bitmap(s_battery_bmp_layer, s_battery_bitmap);
   layer_add_child(root_layer, bitmap_layer_get_layer(s_battery_bmp_layer));
   s_battery_layer = util_make_text_layer(
-    GRect(row_x + text_offset - 2, row_y - ROW_2_TEXT_Y_OFF, DISPLAY_W, 100),
+    GRect(row_x + TEXT_OFFSET - 2, row_y - ROW_2_TEXT_Y_OFF, DISPLAY_W, 100),
     font_m
   );
   layer_add_child(root_layer, text_layer_get_layer(s_battery_layer));
@@ -373,7 +374,7 @@ static void window_load(Window *window) {
   bitmap_layer_set_bitmap(s_reading_bmp_layer, s_reading_bitmap);
   layer_add_child(root_layer, bitmap_layer_get_layer(s_reading_bmp_layer));
   s_reading_layer = util_make_text_layer(
-    GRect(row_x + text_offset, row_y - ROW_2_TEXT_Y_OFF, DISPLAY_W, 100),
+    GRect(row_x + TEXT_OFFSET, row_y - ROW_2_TEXT_Y_OFF, DISPLAY_W, 100),
     font_m
   );
   layer_add_child(root_layer, text_layer_get_layer(s_reading_layer));

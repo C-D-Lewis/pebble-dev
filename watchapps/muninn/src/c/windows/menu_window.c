@@ -29,7 +29,7 @@ static void menu_cell_draw(GContext *ctx, Layer *layer, char *title, char *desc)
   // TODO: Can we use ContentSize here without layout issues?
   //       It may conflict with pebble-scalable font system
   PreferredContentSize content_size = preferred_content_size();
-  APP_LOG(APP_LOG_LEVEL_INFO, "content_size: %d", (int)content_size);
+  // APP_LOG(APP_LOG_LEVEL_INFO, "content_size: %d", (int)content_size);
 
 #if !defined(TEST_FORCE_SCALING)
   // Medium or smaller (rare?), use regular rendering
@@ -40,10 +40,7 @@ static void menu_cell_draw(GContext *ctx, Layer *layer, char *title, char *desc)
 #endif
 
   // Else, use larger one
-  GRect title_rect = scalable_nudge_emery(
-    scalable_grect(30, -30, 1000, 300),
-    0, 4
-  );
+  GRect title_rect = scalable_nudge_emery(scalable_grect(30, -30, 1000, 300), 0, 4);
   if (desc == NULL) {
     title_rect.origin.y += scalable_y(30);
   }
