@@ -1,28 +1,17 @@
 #include "log_window.h"
 
-#define ROW_HEIGHT 66
-#define FONT_KEY_M FONT_KEY_GOTHIC_18
-#define FONT_KEY_L FONT_KEY_GOTHIC_24
-#define ROW_1_Y 23
-#define ROW_2_Y 41
-#define STATUS_W 56
-#define DIV_Y 24
-
+#define ROW_HEIGHT scalable_y(480)
+#define DIV_Y scalable_y(125)
+#define MENU_INSET scalable_y(135)
 #if defined(PBL_PLATFORM_EMERY)
-  #define TITLE_FONT_KEY FONT_KEY_GOTHIC_24
-  #define MENU_INSET 28
-  #define DIV_X 140
+  #define DIV_W 2
 #else
-  #define TITLE_FONT_KEY FONT_KEY_GOTHIC_18
-  #define MENU_INSET 20
-  #define DIV_X 90
+  #define DIV_W 1
 #endif
 
 static Window *s_window;
 static TextLayer *s_header_layer;
 static MenuLayer *s_menu_layer;
-
-static GFont s_font_m, s_font_l;
 
 static void draw_diffs(GContext *ctx, const GRect bounds, const Sample *s) {
   // Time diff
@@ -35,8 +24,8 @@ static void draw_diffs(GContext *ctx, const GRect bounds, const Sample *s) {
   graphics_draw_text(
     ctx,
     s_lst_buff,
-    s_font_m,
-    GRect(2, ROW_1_Y, bounds.size.w, 28),
+    scalable_get_font(SFI_Medium),
+    scalable_grect(20, 100, 1000, 280),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentLeft,
     NULL
@@ -48,8 +37,8 @@ static void draw_diffs(GContext *ctx, const GRect bounds, const Sample *s) {
   graphics_draw_text(
     ctx,
     s_lcp_buff,
-    s_font_m,
-    GRect(2, ROW_2_Y, bounds.size.w, 28),
+    scalable_get_font(SFI_Medium),
+    scalable_grect(20, 210, 1000, 280),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentLeft,
     NULL
@@ -60,10 +49,10 @@ static void draw_status(GContext *ctx, const GRect bounds, const Sample *s, char
   graphics_draw_text(
     ctx,
     msg,
-    s_font_m,
-    GRect(bounds.size.w - STATUS_W, ROW_1_Y, STATUS_W, 100),
+    scalable_get_font(SFI_Medium),
+    scalable_grect(40, 315, 960, 280),
     GTextOverflowModeWordWrap,
-    GTextAlignmentCenter,
+    GTextAlignmentRight,
     NULL
   );
 }
@@ -94,8 +83,8 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
   graphics_draw_text(
     ctx,
     s_datetime_buff,
-    s_font_m,
-    GRect(2, 0, bounds.size.w, 28),
+    scalable_get_font(SFI_Medium),
+    scalable_grect(20, -30, 1000, 280),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentLeft,
     NULL
@@ -104,21 +93,18 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
   // Divider
   const GColor sep_color = menu_layer_is_index_selected(s_menu_layer, cell_index)
     ? GColorWhite : GColorBlack;
-  graphics_context_set_stroke_color(ctx, sep_color);
-  graphics_draw_line(ctx, GPoint(0, DIV_Y), GPoint(bounds.size.w, DIV_Y));
-  graphics_draw_line(ctx, GPoint(DIV_X, DIV_Y), GPoint(DIV_X, bounds.size.h));
-  graphics_draw_line(ctx, GPoint(0, bounds.size.h - 1), GPoint(bounds.size.w, bounds.size.h - 1));
+  graphics_context_set_fill_color(ctx, sep_color);
+  graphics_fill_rect(ctx, GRect(0, DIV_Y, bounds.size.w, DIV_W), GCornerNone, 0);
 
   draw_diffs(ctx, bounds, s);
 
   if (s->result == STATUS_NO_CHANGE) {
-    draw_status(ctx, bounds, s, "No change");
+    draw_status(ctx, bounds, s, "= No change");
   } else if (s->result == STATUS_CHARGED) {
-    draw_status(ctx, bounds, s, "Charged up");
+    draw_status(ctx, bounds, s, "= Charged up");
   } else {
-    const char *str = s->result > 99 ? "Est.\n%d%%/d" : "Est.\n%d%%/d";
     static char s_result_buff[16];
-    snprintf(s_result_buff, sizeof(s_result_buff), str, s->result);
+    snprintf(s_result_buff, sizeof(s_result_buff), "= Est. %d%%/day", s->result);
     draw_status(ctx, bounds, s, &s_result_buff[0]);
   }
 }
@@ -131,16 +117,15 @@ static void main_window_load(Window *window) {
   Layer *window_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(window_layer);
 
-  s_header_layer = util_make_text_layer(
-    GRect(0, -3, bounds.size.w, 32),
-    fonts_get_system_font(TITLE_FONT_KEY)
-  );
+  GRect header_rect = scalable_grect(0, -40, 1000, 300);
+#if defined(PBL_PLATFORM_EMERY)
+  header_rect = scalable_nudge_xy(header_rect, 0, 6);
+#endif
+
+  s_header_layer = util_make_text_layer(header_rect, scalable_get_font(SFI_Medium));
   text_layer_set_text(s_header_layer, "Data Log");
   text_layer_set_text_alignment(s_header_layer, GTextAlignmentCenter);
   layer_add_child(window_layer, text_layer_get_layer(s_header_layer));
-
-  s_font_m = fonts_get_system_font(FONT_KEY_M);
-  s_font_l = fonts_get_system_font(FONT_KEY_L);
 
   s_menu_layer = menu_layer_create(grect_inset(bounds, GEdgeInsets(MENU_INSET, 0, 0, 0)));
   menu_layer_set_click_config_onto_window(s_menu_layer, window);

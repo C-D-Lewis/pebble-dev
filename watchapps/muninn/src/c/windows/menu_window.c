@@ -2,7 +2,7 @@
 
 #if defined(PBL_PLATFORM_EMERY)
   #define ROW_HEIGHT_SMALL 40
-  #define ROW_HEIGHT_LARGE 52
+  #define ROW_HEIGHT_LARGE 54
 #else
   #define ROW_HEIGHT_SMALL 36
   #define ROW_HEIGHT_LARGE 48
@@ -11,7 +11,6 @@
 static Window *s_window;
 static MenuLayer *s_menu_layer;
 
-static GFont s_font_l, s_font_m;
 static bool s_reset_confirm;
 
 typedef enum {
@@ -33,14 +32,17 @@ static uint16_t get_num_rows_callback(MenuLayer *menu_layer, uint16_t section_in
 // Like menu_cell_basic_draw but with larger subtitle
 static void menu_cell_draw(GContext *ctx, Layer *layer, char *title, char *desc) {
   // TODO: Can we use ContentSize here without layout issues?
+  //       It may conflict with pebble-scalable font system
   PreferredContentSize content_size = preferred_content_size();
   APP_LOG(APP_LOG_LEVEL_INFO, "content_size: %d", (int)content_size);
 
+#if !defined(TEST_FORCE_SCALING)
   // Medium or smaller (rare?), use regular rendering
   if (content_size <= PreferredContentSizeMedium) {
     menu_cell_basic_draw(ctx, layer, title, desc, NULL);
     return;
   }
+#endif
 
   // Else, use larger one
   GRect title_rect = scalable_grect(30, -30, 1000, 300);
@@ -48,13 +50,13 @@ static void menu_cell_draw(GContext *ctx, Layer *layer, char *title, char *desc)
   title_rect = scalable_nudge_xy(title_rect, 0, 4);
 #endif
   if (desc == NULL) {
-    title_rect.origin.y += scalable_y(40);
+    title_rect.origin.y += scalable_y(20);
   }
 
   graphics_draw_text(
     ctx,
     title,
-    s_font_l,
+    scalable_get_font(SFI_MediumBold),
     title_rect,
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentLeft,
@@ -65,7 +67,7 @@ static void menu_cell_draw(GContext *ctx, Layer *layer, char *title, char *desc)
     graphics_draw_text(
       ctx,
       desc,
-      s_font_m,
+      scalable_get_font(SFI_Medium),
       scalable_grect(30, 95, 1000, 300),
       GTextOverflowModeTrailingEllipsis,
       GTextAlignmentLeft,
@@ -206,9 +208,6 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
 static void main_window_load(Window *window) {
   Layer *window_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(window_layer);
-
-  s_font_m = fonts_get_system_font(FONT_KEY_GOTHIC_24);
-  s_font_l = fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD);
 
   s_menu_layer = menu_layer_create(bounds);
   menu_layer_set_click_config_onto_window(s_menu_layer, window);

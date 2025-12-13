@@ -41,4 +41,6 @@
 //                                    //
 // #define TEST_TIMELINE_PIN true     //
 //                                    //
+// #define TEST_FORCE_SCALING true    //
+//                                    //
 ////////////////////////////////////////

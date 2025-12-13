@@ -51,20 +51,20 @@ static GFont* get_font_from_array(GFont **array) {
 
 ///////////////////////////////////////////// Geometry /////////////////////////////////////////////
 
-int scalable_x(int thou) {
-  return ((thou * PS_DISPLAY_W) + PS_HALF_THOU) / 1000;
+int scalable_x(int t_perc) {
+  return ((t_perc * PS_DISPLAY_W) + PS_HALF_THOU) / 1000;
 }
 
-int scalable_y(int thou) {
-  return ((thou * PS_DISPLAY_H) + PS_HALF_THOU) / 1000;
+int scalable_y(int t_perc) {
+  return ((t_perc * PS_DISPLAY_H) + PS_HALF_THOU) / 1000;
 }
 
-GRect scalable_grect(int x_perc, int y_perc, int w_perc, int h_perc) {
+GRect scalable_grect(int x_t_perc, int y_t_perc, int w_t_perc, int h_t_perc) {
   return GRect(
-    scalable_x(x_perc),
-    scalable_y(y_perc),
-    scalable_x(w_perc),
-    scalable_y(h_perc)
+    scalable_x(x_t_perc),
+    scalable_y(y_t_perc),
+    scalable_x(w_t_perc),
+    scalable_y(h_t_perc)
   );
 }
 

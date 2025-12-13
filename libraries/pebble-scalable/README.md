@@ -102,3 +102,8 @@ graphics_draw_text(
   NULL
 );
 ```
+
+## TODO
+
+- [ ] Solution for picking bitmaps (to work with their scalable GRects)
+- [ ] Functions per-platform

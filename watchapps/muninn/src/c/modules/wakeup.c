@@ -140,3 +140,26 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
     true
   );
 }
+
+bool wakeup_handle_missed() {
+  const int wakeup_id = data_get_wakeup_id();
+  if (!util_is_valid(wakeup_id)) return false;
+
+  time_t wakeup_ts;
+  const bool found = wakeup_query(wakeup_id, &wakeup_ts);
+
+  // Doesn't exist or is too long ago, reschedule it
+  if (!found || (time(NULL) - wakeup_ts) > (WAKEUP_MOD_H * SECONDS_PER_HOUR)) {
+    APP_LOG(
+      APP_LOG_LEVEL_INFO,
+      "Missed wakeup detected: %d %d %d",
+      wakeup_id,
+      found ? 1 : 0,
+      (int)wakeup_ts
+    );
+    wakeup_schedule_next();
+    return true;
+  }
+
+  return false;
+}

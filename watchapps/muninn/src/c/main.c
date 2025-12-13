@@ -6,37 +6,17 @@
 #include "modules/data.h"
 #include "modules/wakeup.h"
 #include "modules/glance.h"
+#include "modules/scalable.h"
 
 #include "windows/main_window.h"
 #include "windows/message_window.h"
 #include "windows/graph_window.h"
-
-static bool handle_missed_wakeup() {
-  const int wakeup_id = data_get_wakeup_id();
-  if (!util_is_valid(wakeup_id)) return false;
-
-  time_t wakeup_ts;
-  const bool found = wakeup_query(wakeup_id, &wakeup_ts);
-
-  // Doesn't exist or is too long ago, reschedule it
-  if (!found || (time(NULL) - wakeup_ts) > (WAKEUP_MOD_H * SECONDS_PER_HOUR)) {
-    APP_LOG(
-      APP_LOG_LEVEL_INFO,
-      "Missed wakeup detected: %d %d %d",
-      wakeup_id,
-      found ? 1 : 0,
-      (int)wakeup_ts
-    );
-    wakeup_schedule_next();
-    return true;
-  }
-
-  return false;
-}
+#include "windows/log_window.h"
 
 static void init() {
   data_init();
   comm_init();
+  scalable_init();
 
   if (launch_reason() == APP_LAUNCH_WAKEUP) {
     WakeupId id = 0;
@@ -46,11 +26,12 @@ static void init() {
     return;
   }
   
-  const bool missed = handle_missed_wakeup();
+  const bool missed = wakeup_handle_missed();
   const bool first_launch = !data_get_seen_first_launch();
 
-  main_window_push();
+  // main_window_push();
   // graph_window_push();
+  log_window_push();
 
   if (data_get_push_timeline_pins()) {
     // Try and push a pin

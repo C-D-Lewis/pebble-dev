@@ -1,5 +1,7 @@
 #include "main_window.h"
 
+// TODO: Leverage pebble-scalable here
+
 #if defined(PBL_PLATFORM_EMERY)
   #define ACTION_BAR_W 14
   #define FONT_KEY_S FONT_KEY_GOTHIC_24

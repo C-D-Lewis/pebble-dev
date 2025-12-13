@@ -1,5 +1,7 @@
 #include "log_window.h"
 
+// TODO: Use pebble-scalable when finishing this off
+
 #if defined(PBL_PLATFORM_EMERY)
   #define TITLE_HEIGHT 28
   #define GRAPH_MARGIN 28
