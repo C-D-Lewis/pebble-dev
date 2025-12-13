@@ -38,8 +38,9 @@ void data_reset_all() {
   s_app_data.vibe_on_sample = false;
   s_app_data.custom_alert_level = AL_OFF;
   s_app_data.ca_has_notified = false;
+  s_app_data.push_timeline_pins = false;
 
-  // Init all fields in Sample struct
+  // Init all fields in Samples struct
   for (int i = 0; i < NUM_SAMPLES; i++) {
     Sample *s = &s_sample_data.samples[i];
     s->timestamp = STATUS_EMPTY;
