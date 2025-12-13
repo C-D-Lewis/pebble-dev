@@ -37,14 +37,17 @@ const int half_h = scalable_y(500);
 const GRect center_rect = scalable_grect(330, 330, 330, 330);
 ```
 
-If a percentage isn't precise enough, the x/y or w/h can be nudged by some pixels:
+If a percentage isn't precise enough, the x/y can be nudged by some pixels:
 
 ```c
 // A rect nudged by 5px in x and 2px in y
-GRect precise = scalable_nudge(scalable_grect(100, 100, 200, 200), 5, 2);
+GRect nudged = scalable_nudge(scalable_grect(100, 100, 200, 200), 5, 2);
 
 // Nudge more only on Emery
-precise = scalable_nudge_emery(precise, 5, 2);
+GRect emery = scalable_nudge_emery(
+  scalable_grect(100, 100, 200, 200),
+  5, 2
+);
 ```
 
 ## Centering
@@ -66,28 +69,41 @@ const GRect centered = scalable_center(r);
 
 ## Fonts
 
-Use different fonts for different display sizes, based on a category of 'small',
-'medium', or 'large'.
+Use different fonts for different display sizes, based on a category of your
+choosing. First, load the fonts, or use system fonts:
 
 ```c
 // Load fonts to use in each case
 static GFont s_gothic_18, s_gothic_24;
 
 // During init
+s_gothic_14 = fonts_get_system_font(FONT_KEY_GOTHIC_14);
 s_gothic_18 = fonts_get_system_font(FONT_KEY_GOTHIC_18);
 s_gothic_24 = fonts_get_system_font(FONT_KEY_GOTHIC_24);
+s_gothic_28 = fonts_get_system_font(FONT_KEY_GOTHIC_28);
 ```
 
-Specify which fonts to use for each display size:
+Next, define identifiers for each of your size categories:
 
 ```c
-// The 'small font' set ID
-#define FONT_ID_SMALL 0
+typedef enum {
+  MFS_Small = 0,
+  MFS_Medium,
+  MFS_Large
+} MyFontSizes;
+```
 
-...
+Now set which font to use per-platform shape for each category:
 
-// The small font - regular screens use Gothic 18, Chalk N/A Emery uses Gothic 24
-scalable_set_fonts(FONT_ID_SMALL, &s_gothic_18, NULL, &s_gothic_24);
+> TODO: is there a better way than adding more args per new screen shape?
+
+```c
+// The small font - regular screens use Gothic 14, Chalk N/A, Emery uses Gothic 18
+scalable_set_fonts(MFS_Small, &s_gothic_14, NULL, &s_gothic_18);
+
+// Same with larger categories
+scalable_set_fonts(MFS_Medium, &s_gothic_18, NULL, &s_gothic_24);
+scalable_set_fonts(MFS_Large, &s_gothic_24, NULL, &s_gothic_28);
 ```
 
 During layout or drawing, simply use the font by ID:
@@ -98,7 +114,7 @@ graphics_context_set_text_color(ctx, GColorBlack);
 graphics_draw_text(
   ctx,
   "This text should appear in the middle third on any platform or display size",
-  scalable_get_font(FONT_ID_SMALL),
+  scalable_get_font(MFS_Small),
   scalable_grect(0, 330, 1000, 330),
   GTextOverflowModeTrailingEllipsis,
   GTextAlignmentCenter,

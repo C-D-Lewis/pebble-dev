@@ -31,6 +31,7 @@ GRect scalable_nudge_regular(GRect r, int dx, int dy);
 
 /**
  * Adjust a GRect position on Emery only.
+ * So far, the need for this has been because larger fonts have annoying origin offets.
  */
 GRect scalable_nudge_emery(GRect r, int dx, int dy);
 
