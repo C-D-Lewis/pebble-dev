@@ -41,7 +41,10 @@ If a percentage isn't precise enough, the x/y or w/h can be nudged by some pixel
 
 ```c
 // A rect nudged by 5px in x and 2px in y
-const GRect precise = scalable_nudge_xy(scalable_grect(100, 100, 200, 200), 5, 2);
+GRect precise = scalable_nudge(scalable_grect(100, 100, 200, 200), 5, 2);
+
+// Nudge more only on Emery
+precise = scalable_nudge_emery(precise, 5, 2);
 ```
 
 ## Centering

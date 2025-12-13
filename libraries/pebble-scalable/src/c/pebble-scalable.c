@@ -68,16 +68,26 @@ GRect scalable_grect(int x_t_perc, int y_t_perc, int w_t_perc, int h_t_perc) {
   );
 }
 
-GRect scalable_nudge_xy(GRect r, int dx, int dy) {
+GRect scalable_nudge(GRect r, int dx, int dy) {
   r.origin.x += dx;
   r.origin.y += dy;
   return r;
 }
 
-GRect scalable_nudge_wh(GRect r, int dw, int dh) {
-  r.size.w += dw;
-  r.size.h += dh;
+GRect scalable_nudge_regular(GRect r, int dx, int dy) {
+#if defined(PBL_PLATFORM_CHALK) || defined(PBL_PLATFORM_EMERY)
+#else
+  return scalable_nudge(r, dx, dy);
+#endif
   return r;
+}
+
+GRect scalable_nudge_emery(GRect r, int dx, int dy) {
+#if defined(PBL_PLATFORM_EMERY)
+  return scalable_nudge(r, dx, dy);
+#else
+  return r;
+#endif
 }
 
 GRect scalable_center_x(GRect r) {

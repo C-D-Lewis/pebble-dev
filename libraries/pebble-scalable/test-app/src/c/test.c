@@ -37,7 +37,15 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   graphics_context_set_fill_color(ctx, GColorWhite);
   graphics_fill_rect(
     ctx,
-    scalable_nudge_xy(scalable_grect(110, 110, 10, 10), 3, 3),
+    scalable_nudge(scalable_grect(110, 110, 10, 10), 3, 3),
+    0,
+    GCornerNone
+  );
+
+  // Further inside only on Emery
+  graphics_fill_rect(
+    ctx,
+    scalable_nudge_emery(scalable_grect(110, 110, 10, 10), 8, 8),
     0,
     GCornerNone
   );

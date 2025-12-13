@@ -22,12 +22,17 @@ GRect scalable_grect(int x_t_perc, int y_t_perc, int w_t_perc, int h_t_perc);
 /**
  * Manually adjust a GRect position by a number of pixels.
  */
-GRect scalable_nudge_xy(GRect r, int dx, int dy);
+GRect scalable_nudge(GRect r, int dx, int dy);
 
 /**
- * Manually adjust a GRect size by a number of pixels.
+ * Manually adjust a GRect position by a number of pixels on regular platforms (original size)
  */
-GRect scalable_nudge_wh(GRect r, int dw, int dh);
+GRect scalable_nudge_regular(GRect r, int dx, int dy);
+
+/**
+ * Adjust a GRect position on Emery only.
+ */
+GRect scalable_nudge_emery(GRect r, int dx, int dy);
 
 /**
  * Center a GRect in the X axis based on its size.
