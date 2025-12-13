@@ -27,7 +27,7 @@
 
 ///////////// Testing area /////////////
 //                                    //
-// #define USE_TEST_DATA true         //
+#define USE_TEST_DATA true         //
 //                                    //
 // #define SAVE_TEST_DATA true        //
 //                                    //
@@ -41,6 +41,6 @@
 //                                    //
 // #define TEST_TIMELINE_PIN true     //
 //                                    //
-// #define TEST_FORCE_SCALING true    //
+#define TEST_FORCE_SCALING true    //
 //                                    //
 ////////////////////////////////////////

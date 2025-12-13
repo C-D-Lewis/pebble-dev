@@ -1,6 +1,6 @@
 #include "log_window.h"
 
-#define ROW_HEIGHT scalable_y(480)
+#define ROW_HEIGHT scalable_y(490)
 #define DIV_Y scalable_y(125)
 #define MENU_INSET scalable_y(135)
 #if defined(PBL_PLATFORM_EMERY)
@@ -25,7 +25,10 @@ static void draw_diffs(GContext *ctx, const GRect bounds, const Sample *s) {
     ctx,
     s_lst_buff,
     scalable_get_font(SFI_Medium),
-    scalable_grect(20, 100, 1000, 280),
+    scalable_nudge_emery(
+      scalable_grect(20, 100, 1000, 280),
+      0, 4
+    ),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentLeft,
     NULL
@@ -38,7 +41,10 @@ static void draw_diffs(GContext *ctx, const GRect bounds, const Sample *s) {
     ctx,
     s_lcp_buff,
     scalable_get_font(SFI_Medium),
-    scalable_grect(20, 210, 1000, 280),
+    scalable_nudge_emery(
+      scalable_grect(20, 210, 1000, 280),
+      0, 4
+    ),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentLeft,
     NULL
@@ -50,7 +56,10 @@ static void draw_status(GContext *ctx, const GRect bounds, const Sample *s, char
     ctx,
     msg,
     scalable_get_font(SFI_Medium),
-    scalable_grect(40, 315, 960, 280),
+    scalable_nudge_emery(
+      scalable_grect(40, 315, 950, 280),
+      0, 4
+    ),
     GTextOverflowModeWordWrap,
     GTextAlignmentRight,
     NULL
@@ -84,9 +93,12 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
     ctx,
     s_datetime_buff,
     scalable_get_font(SFI_Medium),
-    scalable_grect(20, -30, 1000, 280),
+    scalable_nudge_emery(
+      scalable_grect(0, -40, 1000, 280),
+      0, 4
+    ),
     GTextOverflowModeTrailingEllipsis,
-    GTextAlignmentLeft,
+    GTextAlignmentCenter,
     NULL
   );
 
@@ -117,10 +129,10 @@ static void main_window_load(Window *window) {
   Layer *window_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(window_layer);
 
-  GRect header_rect = scalable_grect(0, -40, 1000, 300);
-#if defined(PBL_PLATFORM_EMERY)
-  header_rect = scalable_nudge_xy(header_rect, 0, 6);
-#endif
+  const GRect header_rect = scalable_nudge_emery(
+    scalable_grect(0, -40, 1000, 300),
+    0, 4
+  );
 
   s_header_layer = util_make_text_layer(header_rect, scalable_get_font(SFI_Medium));
   text_layer_set_text(s_header_layer, "Data Log");

@@ -1,12 +1,7 @@
 #include "menu_window.h"
 
-#if defined(PBL_PLATFORM_EMERY)
-  #define ROW_HEIGHT_SMALL 40
-  #define ROW_HEIGHT_LARGE 54
-#else
-  #define ROW_HEIGHT_SMALL 36
-  #define ROW_HEIGHT_LARGE 48
-#endif
+#define ROW_HEIGHT_SMALL scalable_y(220)
+#define ROW_HEIGHT_LARGE scalable_y(300)
 
 static Window *s_window;
 static MenuLayer *s_menu_layer;
@@ -45,12 +40,12 @@ static void menu_cell_draw(GContext *ctx, Layer *layer, char *title, char *desc)
 #endif
 
   // Else, use larger one
-  GRect title_rect = scalable_grect(30, -30, 1000, 300);
-#if defined(PBL_PLATFORM_EMERY)
-  title_rect = scalable_nudge_xy(title_rect, 0, 4);
-#endif
+  GRect title_rect = scalable_nudge_emery(
+    scalable_grect(30, -30, 1000, 300),
+    0, 4
+  );
   if (desc == NULL) {
-    title_rect.origin.y += scalable_y(20);
+    title_rect.origin.y += scalable_y(30);
   }
 
   graphics_draw_text(
@@ -68,7 +63,10 @@ static void menu_cell_draw(GContext *ctx, Layer *layer, char *title, char *desc)
       ctx,
       desc,
       scalable_get_font(SFI_Medium),
-      scalable_grect(30, 95, 1000, 300),
+      scalable_nudge_emery(
+        scalable_grect(30, 110, 1000, 300),
+        0, 4
+      ),
       GTextOverflowModeTrailingEllipsis,
       GTextAlignmentLeft,
       NULL

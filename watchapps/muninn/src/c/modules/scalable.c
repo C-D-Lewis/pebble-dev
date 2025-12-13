@@ -12,7 +12,7 @@ void scalable_init() {
 
   scalable_set_fonts(SFI_Small, &s_font_g18, NULL, &s_font_g24);
   scalable_set_fonts(SFI_Medium, &s_font_g24, NULL, &s_font_g28);
-  scalable_set_fonts(SFI_MediumBold, &s_font_g24_b, NULL, &s_font_g24_b);
+  scalable_set_fonts(SFI_MediumBold, &s_font_g24_b, NULL, &s_font_g28_b);
   scalable_set_fonts(SFI_Large, &s_font_g28, NULL, &s_font_g28);
   scalable_set_fonts(SFI_LargeBold, &s_font_g28_b, NULL, &s_font_g28_b);
 }

@@ -10,8 +10,7 @@
 
 #include "windows/main_window.h"
 #include "windows/message_window.h"
-#include "windows/graph_window.h"
-#include "windows/log_window.h"
+#include "windows/menu_window.h"
 
 static void init() {
   data_init();
@@ -29,9 +28,8 @@ static void init() {
   const bool missed = wakeup_handle_missed();
   const bool first_launch = !data_get_seen_first_launch();
 
-  // main_window_push();
-  // graph_window_push();
-  log_window_push();
+  main_window_push();
+  menu_window_push();
 
   if (data_get_push_timeline_pins()) {
     // Try and push a pin
