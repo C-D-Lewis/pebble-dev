@@ -49,10 +49,10 @@ static void init() {
 #endif
   }
 
-  // if (first_launch) {
+  if (first_launch) {
     message_window_push(MSG_WELCOME);
     data_set_seen_first_launch();
-  // }
+  }
 }
 
 static void deinit() {
