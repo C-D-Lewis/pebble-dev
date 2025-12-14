@@ -195,6 +195,7 @@ static void update_data() {
       text_layer_set_text(s_remaining_layer, " -");
     } else {
       // Handled in animation
+      text_layer_set_text(s_remaining_layer, "0");
     }
 
     // Rate per day
@@ -203,6 +204,7 @@ static void update_data() {
       text_layer_set_text(s_rate_layer, " -");
     } else {
       // Handled in animation
+      text_layer_set_text(s_rate_layer, "0");
     }
 
     // Next reading
@@ -210,6 +212,10 @@ static void update_data() {
     util_fmt_time(wakeup_ts, &s_wakeup_buff[0], sizeof(s_wakeup_buff));
     text_layer_set_text(s_reading_layer, s_wakeup_buff);
   }
+
+  // Begin smooth animation
+  static AnimationImplementation anim_implementation = { .update = anim_update };
+  animate(1000, 100, &anim_implementation, true);
 }
 
 static void canvas_update_proc(Layer *layer, GContext *ctx) {
@@ -462,10 +468,6 @@ static void window_unload(Window *window) {
   s_window = NULL;
 }
 
-static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
-  update_data();
-}
-
 void main_window_push() {
   if (!s_window) {
     s_window = window_create();
@@ -475,15 +477,8 @@ void main_window_push() {
     });
     window_set_click_config_provider(s_window, click_config_provider);
 
-    // Update stuff while app is open
-    tick_timer_service_subscribe(MINUTE_UNIT, tick_handler);
-
     s_blink_budget = 5;
   }
 
   window_stack_push(s_window, true);
-
-  // Begin smooth animation
-  static AnimationImplementation anim_implementation = { .update = anim_update };
-  animate(1000, 100, &anim_implementation, true);
 }
