@@ -14,10 +14,10 @@ static GFont s_gothic_18, s_gothic_24;
 static void canvas_update_proc(Layer *layer, GContext *ctx) {
   graphics_context_set_fill_color(ctx, GColorBlack);
 
-  // Half width, 2% height, specific position
+  // Half width, 2% height, specific position just off the top text
   graphics_fill_rect(
     ctx,
-    GRect(0, 10, scalable_x(500), scalable_y(20)),
+    GRect(0, scalable_y_pp(60, 65), scalable_x(500), scalable_y(20)),
     0,
     GCornerNone
   );
@@ -33,19 +33,14 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   // 12% size and position
   graphics_fill_rect(ctx, scalable_grect(120, 120, 120, 120), 0, GCornerNone);
 
-  // Nudge just inside the 12% rect
+  // Further inside only on Emery
   graphics_context_set_fill_color(ctx, GColorWhite);
   graphics_fill_rect(
     ctx,
-    scalable_nudge(scalable_grect(110, 110, 10, 10), 3, 3),
-    0,
-    GCornerNone
-  );
-
-  // Further inside only on Emery
-  graphics_fill_rect(
-    ctx,
-    scalable_nudge_emery(scalable_grect(110, 110, 10, 10), 8, 8),
+    scalable_grect_pp(
+      GRect(110, 110, 10, 10),
+      GRect(130, 130, 10, 10)
+    ),
     0,
     GCornerNone
   );
@@ -100,7 +95,7 @@ static void init(void) {
   s_gothic_24 = fonts_get_system_font(FONT_KEY_GOTHIC_24);
 
   // The small font - regular screens use Gothic 18, Emery uses Gothic 24
-  scalable_set_fonts(FontId_Small, &s_gothic_18, NULL, &s_gothic_24);
+  scalable_set_fonts(FontId_Small, &s_gothic_18, &s_gothic_24);
 
   s_window = window_create();
   window_set_window_handlers(s_window, (WindowHandlers) {

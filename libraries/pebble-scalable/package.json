@@ -1,13 +1,16 @@
 {
   "name": "pebble-scalable",
   "author": "Chris Lewis",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "files": [
     "dist.zip"
   ],
   "keywords": [
     "pebble-package"
   ],
+  "scripts": {
+    "prepublish": "pebble clean && pebble build"
+  },
   "dependencies": {},
   "pebble": {
     "projectType": "package",
@@ -15,7 +18,6 @@
     "targetPlatforms": [
       "aplite",
       "basalt",
-      "chalk",
       "diorite",
       "emery",
       "flint"

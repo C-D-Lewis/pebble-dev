@@ -1,7 +1,7 @@
 # pebble-scalable
 
 Package aiming to make it easy to make scaling layouts for different display
-sizes by defining their dimension only once.
+sizes by defining their dimensions only once.
 
 - [Setting up](#setting-up)
 - [Dimensions](#dimensions)
@@ -37,17 +37,20 @@ const int half_h = scalable_y(500);
 const GRect center_rect = scalable_grect(330, 330, 330, 330);
 ```
 
-If a percentage isn't precise enough, the x/y can be nudged by some pixels:
+If a single percentage isn't precise enough, use 'per platform' variants to
+specify values up to 5% (50/1000 thousands) in precision for each platform
+(order is 'regular' shape, then 'emery' shape):
 
 ```c
-// A rect nudged by 5px in x and 2px in y
-GRect nudged = scalable_nudge(scalable_grect(100, 100, 200, 200), 5, 2);
-
-// Nudge more only on Emery
-GRect emery = scalable_nudge_emery(
-  scalable_grect(100, 100, 200, 200),
-  5, 2
+// Larger only on Emery (x/y: 10%, w/h per platform)
+const GRect emery = scalable_grect_pp(
+  GRect(100, 100, 200, 200),
+  GRect(100, 100, 250, 250)
 );
+
+// Further to the right and down on Emery
+const int x = scalable_x_pp(110, 120);
+const int y = scalable_y_pp(450, 480);
 ```
 
 ## Centering
@@ -74,7 +77,7 @@ choosing. First, load the fonts, or use system fonts:
 
 ```c
 // Load fonts to use in each case
-static GFont s_gothic_18, s_gothic_24;
+static GFont s_gothic_14, s_gothic_18, s_gothic_24, s_gothic_28;
 
 // During init
 s_gothic_14 = fonts_get_system_font(FONT_KEY_GOTHIC_14);
@@ -95,15 +98,13 @@ typedef enum {
 
 Now set which font to use per-platform shape for each category:
 
-> TODO: is there a better way than adding more args per new screen shape?
-
 ```c
-// The small font - regular screens use Gothic 14, Chalk N/A, Emery uses Gothic 18
-scalable_set_fonts(MFS_Small, &s_gothic_14, NULL, &s_gothic_18);
+// The small font - regular screens use Gothic 14, Emery uses Gothic 18
+scalable_set_fonts(MFS_Small, &s_gothic_14, &s_gothic_18);
 
 // Same with larger categories
-scalable_set_fonts(MFS_Medium, &s_gothic_18, NULL, &s_gothic_24);
-scalable_set_fonts(MFS_Large, &s_gothic_24, NULL, &s_gothic_28);
+scalable_set_fonts(MFS_Medium, &s_gothic_18, &s_gothic_24);
+scalable_set_fonts(MFS_Large, &s_gothic_24, &s_gothic_28);
 ```
 
 During layout or drawing, simply use the font by ID:
@@ -124,5 +125,6 @@ graphics_draw_text(
 
 ## TODO
 
+- [x] Support per-platform (per shape) values
 - [ ] Solution for picking bitmaps (to work with their scalable GRects)
-- [ ] Functions per-platform
+- [ ] Chalk? It's so different layouts might not be at all similar...

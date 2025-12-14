@@ -3,9 +3,6 @@
 #if defined(PBL_PLATFORM_EMERY)
   #define PS_DISPLAY_W 200
   #define PS_DISPLAY_H 228
-#elif defined(PBL_PLATFORM_CHALK)
-  #define PS_DISPLAY_W 180
-  #define PS_DISPLAY_H 180
 #else // aplite, basalt, diorite, flint
   #define PS_DISPLAY_W 144
   #define PS_DISPLAY_H 168
@@ -16,21 +13,15 @@
 // Max image ID sets that can be stored
 #define PS_MAX_GBITMAP_IDS 32
 // Number of distinct screen shapes
-#define PS_DISTINCT_SHAPES 3
-// Emery distinct screen shape slot
-#define PS_DS_EMERY 2
-// Chalk distinct screen shape slot
-#define PS_DS_CHALK 1
+#define PS_DISTINCT_SHAPES 2
 // All other screen shape (aplite, basalt, diorite, flint etc.) slot
 #define PS_DS_REGULAR 0
+// Emery distinct screen shape slot
+#define PS_DS_EMERY 1
 // Half the scale input in thousandths
-#define PS_HALF_THOU 500
+#define PS_HALF_RANGE 500
 
 static GFont *s_fonts_ptrs[PS_MAX_FONT_SETS][PS_DISTINCT_SHAPES];
-
-// static int min_1(int v) {
-//   return v < 1 ? 1 : v;
-// }
 
 static GFont* get_font_if_set(GFont *ptr) {
   if (ptr == NULL) {
@@ -42,8 +33,6 @@ static GFont* get_font_if_set(GFont *ptr) {
 static GFont* get_font_from_array(GFont **array) {
 #if defined(PBL_PLATFORM_EMERY)
   return array[PS_DS_EMERY];
-#elif defined(PBL_PLATFORM_CHALK)
-  return array[PS_DS_CHALK];
 #else // aplite, basalt, diorite, flint
   return array[PS_DS_REGULAR];
 #endif
@@ -52,11 +41,27 @@ static GFont* get_font_from_array(GFont **array) {
 ///////////////////////////////////////////// Geometry /////////////////////////////////////////////
 
 int scalable_x(int t_perc) {
-  return ((t_perc * PS_DISPLAY_W) + PS_HALF_THOU) / 1000;
+  return ((t_perc * PS_DISPLAY_W) + PS_HALF_RANGE) / 1000;
 }
 
 int scalable_y(int t_perc) {
-  return ((t_perc * PS_DISPLAY_H) + PS_HALF_THOU) / 1000;
+  return ((t_perc * PS_DISPLAY_H) + PS_HALF_RANGE) / 1000;
+}
+
+int scalable_x_pp(int regular, int emery) {
+#if defined(PBL_PLATFORM_EMERY)
+  return scalable_x(emery);
+#else // aplite, basalt, diorite, flint
+  return scalable_x(regular);
+#endif
+}
+
+int scalable_y_pp(int regular, int emery) {
+#if defined(PBL_PLATFORM_EMERY)
+  return scalable_y(emery);
+#else // aplite, basalt, diorite, flint
+  return scalable_y(regular);
+#endif
 }
 
 GRect scalable_grect(int x_t_perc, int y_t_perc, int w_t_perc, int h_t_perc) {
@@ -68,26 +73,18 @@ GRect scalable_grect(int x_t_perc, int y_t_perc, int w_t_perc, int h_t_perc) {
   );
 }
 
-GRect scalable_nudge(GRect r, int dx, int dy) {
-  r.origin.x += dx;
-  r.origin.y += dy;
-  return r;
-}
-
-GRect scalable_nudge_regular(GRect r, int dx, int dy) {
-#if defined(PBL_PLATFORM_CHALK) || defined(PBL_PLATFORM_EMERY)
-#else
-  return scalable_nudge(r, dx, dy);
-#endif
-  return r;
-}
-
-GRect scalable_nudge_emery(GRect r, int dx, int dy) {
+GRect scalable_grect_pp(GRect regular, GRect emery) {
 #if defined(PBL_PLATFORM_EMERY)
-  return scalable_nudge(r, dx, dy);
-#else
-  return r;
+  const GRect val = emery;
+#else // aplite, basalt, diorite, flint
+  const GRect val = regular;
 #endif
+  return GRect(
+    scalable_x(val.origin.x),
+    scalable_y(val.origin.y),
+    scalable_x(val.size.w),
+    scalable_y(val.size.h)
+  );
 }
 
 GRect scalable_center_x(GRect r) {
@@ -106,14 +103,13 @@ GRect scalable_center(GRect r) {
 
 /////////////////////////////////////////////// Fonts //////////////////////////////////////////////
 
-void scalable_set_fonts(int id, GFont *regular, GFont *chalk, GFont *emery) {
+void scalable_set_fonts(int id, GFont *regular, GFont *emery) {
   if (id >= PS_MAX_FONT_SETS) {
     APP_LOG(APP_LOG_LEVEL_ERROR, "pebble-scalable: font id must be <%d", PS_MAX_FONT_SETS);
     return;
   }
 
   s_fonts_ptrs[id][PS_DS_REGULAR] = regular;
-  s_fonts_ptrs[id][PS_DS_CHALK] = chalk;
   s_fonts_ptrs[id][PS_DS_EMERY] = emery;
 }
 
