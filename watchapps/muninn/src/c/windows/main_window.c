@@ -50,8 +50,56 @@ static GBitmap
   *s_braid_bitmap;
 
 static AppTimer *s_blink_timer;
-static bool s_is_blinking;
+static bool s_is_blinking, s_animating;
 static int s_blink_budget;
+static int s_days_remaining, s_rate, s_anim_days, s_anim_rate;
+
+//////////////////////////////////////////// Animations ////////////////////////////////////////////
+
+static int anim_percentage(AnimationProgress dist_normalized, int max) {
+  return (max * dist_normalized) / ANIMATION_NORMALIZED_MAX;
+}
+
+static void animation_started(Animation *anim, void *context) {
+  s_animating = true;
+}
+
+static void animation_stopped(Animation *anim, bool stopped, void *context) {
+  s_animating = false;
+}
+
+static void animate(int duration, int delay, AnimationImplementation *implementation, bool handlers) {
+  Animation *anim = animation_create();
+  if (anim) {
+    animation_set_duration(anim, duration);
+    animation_set_delay(anim, delay);
+    animation_set_curve(anim, AnimationCurveEaseInOut);
+    animation_set_implementation(anim, implementation);
+    if (handlers) {
+      animation_set_handlers(anim, (AnimationHandlers) {
+        .started = animation_started,
+        .stopped = animation_stopped
+      }, NULL);
+    }
+    animation_schedule(anim);
+  }
+}
+
+static void anim_update(Animation *anim, AnimationProgress dist_normalized) {
+  s_anim_days = anim_percentage(dist_normalized, s_days_remaining);
+  s_anim_rate = anim_percentage(dist_normalized, s_rate);
+
+  // Update text layers
+  static char s_remaining_buff[16];
+  snprintf(s_remaining_buff, sizeof(s_remaining_buff), "%d", s_anim_days);
+  text_layer_set_text(s_remaining_layer, s_remaining_buff);
+
+  static char s_rate_buff[16];
+  snprintf(s_rate_buff, sizeof(s_rate_buff), "%d", s_anim_rate);
+  text_layer_set_text(s_rate_layer, s_rate_buff);
+}
+
+///////////////////////////////////////////// Blinking /////////////////////////////////////////////
 
 static void schedule_blink();
 
@@ -89,6 +137,8 @@ static void cancel_blink() {
   s_is_blinking = false;
   layer_mark_dirty(s_canvas_layer);
 }
+
+///////////////////////////////////////////// Handlers /////////////////////////////////////////////
 
 static void update_data() {
   if (s_mascot_bitmap) {
@@ -140,23 +190,19 @@ static void update_data() {
     schedule_blink();
 
     // Days remaining
-    const int days_remaining = data_calculate_days_remaining();
-    if (!util_is_valid(days_remaining)) {
+    s_days_remaining = data_calculate_days_remaining();
+    if (!util_is_valid(s_days_remaining)) {
       text_layer_set_text(s_remaining_layer, " -");
     } else {
-      static char s_remaining_buff[16];
-      snprintf(s_remaining_buff, sizeof(s_remaining_buff), "%d", days_remaining);
-      text_layer_set_text(s_remaining_layer, s_remaining_buff);
+      // Handled in animation
     }
 
     // Rate per day
-    const int rate = data_calculate_avg_discharge_rate();
-    if (!util_is_valid(rate)) {
+    s_rate = data_calculate_avg_discharge_rate();
+    if (!util_is_valid(s_rate)) {
       text_layer_set_text(s_rate_layer, " -");
     } else {
-      static char s_rate_buff[16];
-      snprintf(s_rate_buff, sizeof(s_rate_buff), "%d", rate);
-      text_layer_set_text(s_rate_layer, s_rate_buff);
+      // Handled in animation
     }
 
     // Next reading
@@ -218,6 +264,8 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     GPoint(row_div_x, ROW_DIV_Y - row_div_h)
   );
 }
+
+////////////////////////////////////////////// Clicks //////////////////////////////////////////////
 
 static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
   const bool should_enable = !util_is_valid(data_get_wakeup_id());
@@ -304,7 +352,7 @@ static void window_load(Window *window) {
   int row_y = scalable_y_pp(535, 550);
 
   int text_icon_offset = scalable_x_pp(190, 160);
-  const int row_1_text_y_offset = scalable_y_pp(-35, -15);
+  const int row_1_text_y_offset = scalable_y_pp(-40, -20);
 
   s_remaining_bitmap = gbitmap_create_with_resource(RESOURCE_ID_REMAINING);
   s_remaining_bmp_layer = bitmap_layer_create(GRect(row_x, row_y, ICON_SIZE, ICON_SIZE));
@@ -434,4 +482,8 @@ void main_window_push() {
   }
 
   window_stack_push(s_window, true);
+
+  // Begin smooth animation
+  static AnimationImplementation anim_implementation = { .update = anim_update };
+  animate(1000, 100, &anim_implementation, true);
 }
