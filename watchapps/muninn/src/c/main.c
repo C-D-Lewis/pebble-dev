@@ -10,7 +10,7 @@
 
 #include "windows/main_window.h"
 #include "windows/message_window.h"
-// #include "windows/menu_window.h"
+#include "windows/alert_window.h"
 
 static void init() {
   data_init();

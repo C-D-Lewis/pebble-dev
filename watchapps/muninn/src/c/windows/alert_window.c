@@ -1,13 +1,5 @@
 #include "alert_window.h"
 
-#if defined(PBL_PLATFORM_EMERY)
-  #define FONT_KEY FONT_KEY_GOTHIC_24_BOLD
-  #define TEXT_RECT GRect(0, 95, DISPLAY_W, DISPLAY_H)
-#else
-  #define FONT_KEY FONT_KEY_GOTHIC_18_BOLD
-  #define TEXT_RECT GRect(2, 72, DISPLAY_W - 4, DISPLAY_H)
-#endif
-
 static Window *s_window;
 static TextLayer *s_text_layer;
 static BitmapLayer *s_image_layer;
@@ -35,9 +27,10 @@ static void window_load(Window *window) {
   bitmap_layer_set_bitmap(s_image_layer, s_image_bitmap);
   layer_add_child(root_layer, bitmap_layer_get_layer(s_image_layer));
 
-  const GFont font = fonts_get_system_font(FONT_KEY);
-
-  s_text_layer = util_make_text_layer(scalable_grect(0, 430, 1000, 1000), font);
+  s_text_layer = util_make_text_layer(
+    scalable_grect(0, 430, 1000, 1000), 
+    scalable_get_font(SFI_Medium)
+  );
   text_layer_set_text(s_text_layer, s_message);
   text_layer_set_text_alignment(s_text_layer, GTextAlignmentCenter);
   layer_add_child(root_layer, text_layer_get_layer(s_text_layer));

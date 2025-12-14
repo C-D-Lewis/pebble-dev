@@ -40,7 +40,10 @@ static void menu_cell_draw(GContext *ctx, Layer *layer, char *title, char *desc)
 #endif
 
   // Else, use larger one
-  GRect title_rect = scalable_nudge_emery(scalable_grect(30, -30, 1000, 300), 0, 4);
+  GRect title_rect = scalable_grect_pp(
+    GRect(30, -30, 1000, 300),
+    GRect(30, -10, 1000, 300)
+  );
   if (desc == NULL) {
     title_rect.origin.y += scalable_y(30);
   }
@@ -60,9 +63,9 @@ static void menu_cell_draw(GContext *ctx, Layer *layer, char *title, char *desc)
       ctx,
       desc,
       scalable_get_font(SFI_Medium),
-      scalable_nudge_emery(
-        scalable_grect(30, 110, 1000, 300),
-        0, 4
+      scalable_grect_pp(
+        GRect(30, 110, 1000, 300),
+        GRect(30, 130, 1000, 300)
       ),
       GTextOverflowModeTrailingEllipsis,
       GTextAlignmentLeft,

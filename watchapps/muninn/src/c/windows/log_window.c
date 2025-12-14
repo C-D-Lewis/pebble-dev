@@ -25,9 +25,9 @@ static void draw_diffs(GContext *ctx, const GRect bounds, const Sample *s) {
     ctx,
     s_lst_buff,
     scalable_get_font(SFI_Medium),
-    scalable_nudge_emery(
-      scalable_grect(20, 100, 1000, 280),
-      0, 4
+    scalable_grect_pp(
+      GRect(20, 100, 1000, 280),
+      GRect(20, 110, 1000, 280)
     ),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentLeft,
@@ -41,9 +41,9 @@ static void draw_diffs(GContext *ctx, const GRect bounds, const Sample *s) {
     ctx,
     s_lcp_buff,
     scalable_get_font(SFI_Medium),
-    scalable_nudge_emery(
-      scalable_grect(20, 210, 1000, 280),
-      0, 4
+    scalable_grect_pp(
+      GRect(20, 210, 1000, 280),
+      GRect(20, 220, 1000, 280)
     ),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentLeft,
@@ -55,10 +55,10 @@ static void draw_status(GContext *ctx, const GRect bounds, const Sample *s, char
   graphics_draw_text(
     ctx,
     msg,
-    scalable_get_font(SFI_Medium),
-    scalable_nudge_emery(
-      scalable_grect(40, 315, 950, 280),
-      0, 4
+    scalable_get_font(SFI_MediumBold),
+    scalable_grect_pp(
+      GRect(40, 315, 950, 280),
+      GRect(40, 330, 950, 280)
     ),
     GTextOverflowModeWordWrap,
     GTextAlignmentRight,
@@ -93,9 +93,9 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
     ctx,
     s_datetime_buff,
     scalable_get_font(SFI_Medium),
-    scalable_nudge_emery(
-      scalable_grect(0, -40, 1000, 280),
-      0, 4
+    scalable_grect_pp(
+      GRect(0, -40, 1000, 280),
+      GRect(0, -20, 1000, 280)
     ),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentCenter,
@@ -129,9 +129,9 @@ static void main_window_load(Window *window) {
   Layer *window_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(window_layer);
 
-  const GRect header_rect = scalable_nudge_emery(
-    scalable_grect(0, -40, 1000, 300),
-    0, 4
+  const GRect header_rect = scalable_grect_pp(
+    GRect(0, -40, 1000, 300),
+    GRect(0, -20, 1000, 300)
   );
 
   s_header_layer = util_make_text_layer(header_rect, scalable_get_font(SFI_Medium));

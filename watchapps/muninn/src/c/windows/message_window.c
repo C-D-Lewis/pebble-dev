@@ -1,6 +1,10 @@
 #include "message_window.h"
 
-#define BRAID_H 14
+#if defined(PBL_PLATFORM_EMERY)
+  #define BRAID_H 18
+#else
+  #define BRAID_H 14
+#endif
 
 static Window *s_window;
 static ScrollLayer *s_scroll_layer;
@@ -28,7 +32,12 @@ static void window_load(Window *window) {
   s_image_bitmap = gbitmap_create_with_resource(RESOURCE_ID_MENU_ICON);
   s_braid_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BRAID);
 
-  s_image_layer = bitmap_layer_create(scalable_grect(0, 20, 1000, 150));
+  s_image_layer = bitmap_layer_create(
+    scalable_grect_pp(
+      GRect(0, 10, 1000, 150),
+      GRect(0, 20, 1000, 150)
+    )
+  );
   bitmap_layer_set_alignment(s_image_layer, GAlignCenter);
   bitmap_layer_set_compositing_mode(s_image_layer, GCompOpSet);
   bitmap_layer_set_bitmap(s_image_layer, s_image_bitmap);
