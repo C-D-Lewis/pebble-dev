@@ -79,10 +79,11 @@ from 2016) and what kind of anomalous behavior you encountered.
 - [x] Some kind of color flair for color watches
 - [x] Show log entries for wakeups where charging was observed
 - [x] Push timeline pin for charging time prediction.
+- [x] Scalable layouts with library
+- [ ] Display status of timeline pin insert request in settings window.
 - [ ] Extremely simple chart using log timestamps? requires more stored samples (CHECK DATA LOADS OKAY)
 - [ ] Export/import data log to/from JS
 - [ ] Show more detailed data and charts on JS settings page?
 - [ ] Use `pebble-packet` when `pebble-events` is updated with `flint`
 - [ ] Use ContentSize API more
-- [ ] Display status of timeline pin insert request in settings window.
-- [ ] Chalk layouts
+- [ ] Simpler Chalk layouts
