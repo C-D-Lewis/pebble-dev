@@ -29,9 +29,10 @@ void wakeup_schedule_next() {
   tm_future.tm_min = 0;
   tm_future.tm_sec = 0;
   // Tiny extra offset in case weird things happen exactly on the hour
-  time_t future = mktime(&tm_future) + 5;
+  const time_t future = mktime(&tm_future) + 5;
 #endif
 
+  APP_LOG(APP_LOG_LEVEL_INFO, "future %d", (int)future);
   int id = wakeup_schedule(future, 0, true);
 #if defined(TEST_COLLISION)
   // To test collision rescheduling
@@ -67,16 +68,22 @@ void wakeup_schedule_next() {
 }
 
 void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
-  // TODO: Can we just use the last sample?
-  const int last_charge_perc = data_get_last_charge_perc();
-
   // We popped
   data_set_wakeup_id(STATUS_EMPTY);
 
+  // Did we wake too early? Seen on PT2
+  const time_t ts_now = time(NULL);
+  const struct tm *now = localtime(&ts_now);
+  if (now->tm_min > EXTRA_MINUTES_MAX) {
+    // Try scheduling again
+    wakeup_schedule_next();
+    return;
+  }
+
+  const int last_charge_perc = data_get_last_charge_perc();
   BatteryChargeState state = battery_state_service_peek();
   const bool is_plugged = state.is_plugged;
   const int charge_percent = state.charge_percent;
-  const time_t now = time(NULL);
   const int last_sample_time = data_get_last_sample_time();
 
   // First ever sample - nothing to compare to
@@ -85,33 +92,54 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
 
     // Record state and wait for next time
     data_set_last_charge_perc(charge_percent);
-    data_set_last_sample_time(now);
+    data_set_last_sample_time(ts_now);
   } else {
-    const int time_diff_s = now - last_sample_time;
+    const int time_diff_s = ts_now - last_sample_time;
     const int charge_diff = last_charge_perc - charge_percent;
     APP_LOG(APP_LOG_LEVEL_INFO, "Time diff: %d, Charge diff: %d", time_diff_s, charge_diff);
 
     // Turns out, in all cases below we note both of these anyway
     data_set_last_charge_perc(charge_percent);
-    data_set_last_sample_time(now);
+    data_set_last_sample_time(ts_now);
 
     // Ignore if plugged in or recently charged (store discharge rates only)
     if (is_plugged || charge_diff < 0) {
       APP_LOG(APP_LOG_LEVEL_INFO, "Ignoring: plugged in or recently charged");
 
       // Record special status sample
-      data_push_sample(charge_percent, last_sample_time, last_charge_perc, time_diff_s, charge_diff, STATUS_CHARGED);
+      data_push_sample(
+        charge_percent,
+        last_sample_time,
+        last_charge_perc,
+        time_diff_s,
+        charge_diff,
+        STATUS_CHARGED
+      );
     } else if (charge_diff == 0) {
       // No change since last sample - probably on charge or very short period
       APP_LOG(APP_LOG_LEVEL_INFO, "No change since last sample");
 
       // Record special status sample
-      data_push_sample(charge_percent, last_sample_time, last_charge_perc, time_diff_s, charge_diff, STATUS_NO_CHANGE);
+      data_push_sample(
+        charge_percent,
+        last_sample_time,
+        last_charge_perc,
+        time_diff_s,
+        charge_diff,
+        STATUS_NO_CHANGE
+      );
     } else {
       // Calculate new discharge rate
       const int result = (charge_diff * SECONDS_PER_DAY) / time_diff_s;
 
-      data_push_sample(charge_percent, last_sample_time, last_charge_perc, time_diff_s, charge_diff, result);
+      data_push_sample(
+        charge_percent,
+        last_sample_time,
+        last_charge_perc,
+        time_diff_s,
+        charge_diff,
+        result
+      );
       APP_LOG(APP_LOG_LEVEL_INFO, "result: %d", result);
     }
   }

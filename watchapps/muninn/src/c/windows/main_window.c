@@ -130,9 +130,9 @@ static void update_data() {
 
   // Sometimes
   if (!is_enabled) {
-    text_layer_set_text(s_reading_layer, "-");
-    text_layer_set_text(s_remaining_layer, "-");
-    text_layer_set_text(s_rate_layer, "-");
+    text_layer_set_text(s_reading_layer, " -");
+    text_layer_set_text(s_remaining_layer, " -");
+    text_layer_set_text(s_rate_layer, " -");
 
     layer_set_hidden(text_layer_get_layer(s_hint_layer), false);
   } else {
@@ -142,7 +142,7 @@ static void update_data() {
     // Days remaining
     const int days_remaining = data_calculate_days_remaining();
     if (!util_is_valid(days_remaining)) {
-      text_layer_set_text(s_remaining_layer, "-");
+      text_layer_set_text(s_remaining_layer, " -");
     } else {
       static char s_remaining_buff[16];
       snprintf(s_remaining_buff, sizeof(s_remaining_buff), "%d", days_remaining);
@@ -152,7 +152,7 @@ static void update_data() {
     // Rate per day
     const int rate = data_calculate_avg_discharge_rate();
     if (!util_is_valid(rate)) {
-      text_layer_set_text(s_rate_layer, "-");
+      text_layer_set_text(s_rate_layer, " -");
     } else {
       static char s_rate_buff[16];
       snprintf(s_rate_buff, sizeof(s_rate_buff), "%d", rate);
@@ -371,9 +371,9 @@ static void window_load(Window *window) {
   // Hint for when Muninn is asleep
   const GRect hint_rect = GRect(
     2,
-    BRAID_Y + 14,
+    BRAID_Y + BRAID_H,
     DISPLAY_W - ACTION_BAR_W - 4,
-    (ROW_DIV_Y - BRAID_Y - 14)
+    (ROW_DIV_Y - BRAID_Y - BRAID_H)
   );
   s_hint_layer = util_make_text_layer(hint_rect, scalable_get_font(SFI_Medium));
   text_layer_set_background_color(s_hint_layer, GColorWhite);

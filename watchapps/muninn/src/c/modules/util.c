@@ -84,7 +84,7 @@ char* util_get_status_string() {
   if (!is_enabled) return "Not monitoring";
 
   // No readings at all yet
-  if (!util_is_valid(data_get_last_sample_time())) return "Awaiting reading...";
+  if (!util_is_valid(data_get_last_sample_time())) return "Awaiting sample...";
 
   // Edge case here: no change or charging samples don't count
   // We can't produce a prediction AT ALL unless we have 'discharging' samples...
@@ -92,7 +92,7 @@ char* util_get_status_string() {
     const int rem = MIN_SAMPLES - data_get_valid_samples_count();
 
     static char s_buff[32];
-    snprintf(s_buff, sizeof(s_buff), "Awaiting %d reading%s...", rem, rem > 1 ? "s" : "");
+    snprintf(s_buff, sizeof(s_buff), "Awaiting %d sample%s...", rem, rem > 1 ? "s" : "");
     return &s_buff[0];
   }
 
