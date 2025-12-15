@@ -354,7 +354,7 @@ static void window_load(Window *window) {
   layer_add_child(root_layer, text_layer_get_layer(s_desc_layer));
 
   // Top row
-  int row_x = scalable_x(50);
+  int row_x = scalable_x(30);
   int row_y = scalable_y_pp(535, 550);
 
   int text_icon_offset = scalable_x_pp(190, 160);
@@ -371,7 +371,7 @@ static void window_load(Window *window) {
   );
   layer_add_child(root_layer, text_layer_get_layer(s_remaining_layer));
 
-  row_x += scalable_x_pp(440, 440);
+  row_x += scalable_x_pp(480, 480);
 
   s_rate_bitmap = gbitmap_create_with_resource(RESOURCE_ID_RATE);
   s_rate_bmp_layer = bitmap_layer_create(GRect(row_x, row_y, ICON_SIZE, ICON_SIZE));
