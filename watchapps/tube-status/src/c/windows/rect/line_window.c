@@ -1,13 +1,9 @@
 #if defined(PBL_RECT)
 #include "line_window.h"
 
-#define LOGO_RADIUS 13
-#define STRIPE_WIDTH 12
-#ifdef PBL_PLATFORM_EMERY
-  #define LOGO_MARGIN 12
-#else
-  #define LOGO_MARGIN 10
-#endif
+#define LOGO_RADIUS scalable_x(85)
+#define STRIPE_WIDTH scalable_x_pp(85, 90)
+#define LOGO_MARGIN scalable_x_pp(80, 80)
 
 static Window *s_window;
 static MenuLayer *s_menu_layer;
@@ -38,9 +34,12 @@ void draw_row_handler(GContext *ctx, const Layer *cell_layer, MenuIndex *cell_in
     graphics_draw_text(
       ctx,
       received == 0 ? "Good service on all lines" : "Good service on all other lines",
-      fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD),
-      bounds,
-      GTextOverflowModeTrailingEllipsis,
+      scalable_get_font(SFI_Small),
+      scalable_grect_pp(
+        GRect(0, -25, 1000, 250),
+        GRect(0, -25, 1000, 250)
+      ),
+      GTextOverflowModeWordWrap,
       GTextAlignmentCenter,
       NULL
     );
@@ -49,11 +48,7 @@ void draw_row_handler(GContext *ctx, const Layer *cell_layer, MenuIndex *cell_in
 
   LineData *line_data = data_get_line(index);
 
-#ifdef PBL_PLATFORM_EMERY
-  const int logo_bounds_x = bounds.origin.x + (LOGO_MARGIN / 3) + 2;
-#else
-  const int logo_bounds_x = bounds.origin.x + (LOGO_MARGIN / 3) - 2;
-#endif
+  const int logo_bounds_x = bounds.origin.x + (LOGO_MARGIN / 4);
   GRect logo_bounds = GRect(
     logo_bounds_x,
     (bounds.size.h - (2 * LOGO_RADIUS)) / 2,
@@ -86,9 +81,9 @@ void draw_row_handler(GContext *ctx, const Layer *cell_layer, MenuIndex *cell_in
 
   // Draw circle
   graphics_context_set_fill_color(ctx, GColorBlack);
-  graphics_fill_circle(ctx, center, LOGO_RADIUS - 1);
+  graphics_fill_circle(ctx, center, LOGO_RADIUS);
   graphics_context_set_fill_color(ctx, GColorWhite);
-  graphics_fill_circle(ctx, center, (5 * (LOGO_RADIUS - 1)) / 7);
+  graphics_fill_circle(ctx, center, (5 * (LOGO_RADIUS)) / 7);
 
   // Show selected
   if (menu_layer_is_index_selected(s_menu_layer, cell_index)) {
@@ -96,42 +91,40 @@ void draw_row_handler(GContext *ctx, const Layer *cell_layer, MenuIndex *cell_in
     graphics_fill_circle(ctx, center, (4 * (LOGO_RADIUS - 2)) / 7);
   }
 
-  // Info
-  GRect text_bounds = GRect(
-    bounds.origin.x + (3 * LOGO_MARGIN),
-    bounds.origin.y - 5,
-    bounds.size.w - (3 * LOGO_MARGIN),
-    30
-  );
+  // Name and status
   graphics_context_set_text_color(ctx, GColorBlack);
   graphics_draw_text(
     ctx,
     data_get_line_name(line_data->type),
-    fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD),
-    text_bounds,
+    scalable_get_font(SFI_Medium),
+    scalable_grect_pp(
+      GRect(220, -40, 750, 200),
+      GRect(230, -20, 750, 200)
+    ),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentLeft,
     NULL
   );
-  text_bounds.origin.y += 25;
-  text_bounds.size.w -= LOGO_MARGIN;
   graphics_draw_text(
     ctx,
     line_data->state,
-    fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD),
-    text_bounds,
+    scalable_get_font(SFI_MediumBold),
+    scalable_grect_pp(
+      GRect(220, 75, 750, 200),
+      GRect(230, 95, 750, 200)
+    ),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentLeft,
     NULL
   );
 
-  // Show if reason can be viewed
+  // Show hint arrow if reason can be viewed
   if (menu_layer_is_index_selected(s_menu_layer, cell_index) && data_get_line_has_reason(cell_index->row)) {
     // Background
     graphics_context_set_fill_color(ctx, data_get_line_state_color(cell_index->row));
     graphics_fill_rect(
       ctx,
-      grect_inset(bounds, GEdgeInsets(0, 0, 0, bounds.size.w - LOGO_MARGIN - 2)),
+      scalable_grect(915, 0, 90, 260),
       GCornerNone,
       0
     );
@@ -140,17 +133,21 @@ void draw_row_handler(GContext *ctx, const Layer *cell_layer, MenuIndex *cell_in
     graphics_draw_text(
       ctx,
       ">",
-      fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD),
-      GRect(bounds.size.w - 10, 2, 32, 32),
-      GTextOverflowModeTrailingEllipsis,
+      scalable_get_font(SFI_MediumBold),
+      scalable_grect_pp(
+        GRect(930, 25, 120, 500),
+        GRect(935, 40, 120, 500)
+      ),
+      GTextOverflowModeWordWrap,
       GTextAlignmentLeft,
       NULL
     );
   }
 
   // Sep
+  const int sep_h = scalable_y_pp(10, 15);
   graphics_context_set_fill_color(ctx, GColorBlack);
-  graphics_fill_rect(ctx, GRect(bounds.origin.x, bounds.size.h - 2, bounds.size.w, 2), GCornerNone, 0);
+  graphics_fill_rect(ctx, GRect(bounds.origin.x, bounds.size.h - sep_h, bounds.size.w, sep_h), GCornerNone, 0);
 }
 
 uint16_t get_num_rows_handler(MenuLayer *menu_layer, uint16_t section_index, void *context) {
@@ -159,7 +156,7 @@ uint16_t get_num_rows_handler(MenuLayer *menu_layer, uint16_t section_index, voi
 }
 
 int16_t get_cell_height_handler(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) {
-  return 45;
+  return scalable_y(260);
 }
 
 void selection_will_change_handler(struct MenuLayer *menu_layer, MenuIndex *new_index, MenuIndex old_index, void *context) {
@@ -174,7 +171,7 @@ static void window_load(Window *window) {
   Layer *window_layer = window_get_root_layer(s_window);
   GRect bounds = layer_get_bounds(window_layer);
 
-  GEdgeInsets menu_insets = (GEdgeInsets) {.top = STATUS_BAR_LAYER_HEIGHT};
+  GEdgeInsets menu_insets = (GEdgeInsets) { .top = STATUS_BAR_LAYER_HEIGHT - 1 };
   GRect menu_bounds = grect_inset(bounds, menu_insets);
 
   s_status_bar = status_bar_layer_create();

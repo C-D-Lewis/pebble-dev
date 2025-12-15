@@ -4,7 +4,7 @@ type LineId = 'bakerloo' | 'central' | 'circle' | 'district' | 'dlr' | 'elizabet
   'northern' | 'piccadilly' | 'suffragette' | 'victoria' | 'waterloo-city' | 'weaver' |
   'windrush';
 
-  /** API data type */
+/** API data type */
 type TfLApiResult = {
   id: LineId;
   lineStatuses: {
@@ -48,7 +48,7 @@ const MODES = ['tube', 'dlr', 'elizabeth-line', 'overground'];
 /** Number of lines the API returns */
 const NUM_LINES = 19;
 /** Max reason length */
-const MAX_REASON_LENGTH = 256;
+const MAX_REASON_LENGTH = 512;
 
 /**
  * Download all lines statuses.

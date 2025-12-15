@@ -7,6 +7,7 @@
 
 #include "../../config.h"
 #include "../../modules/data.h"
+#include "../../modules/scalable.h"
 
 void line_window_push();
 #endif

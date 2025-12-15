@@ -8,7 +8,7 @@ typedef struct {
   int index;  // Unused?
   int type;
   char state[32];
-  char reason[256];
+  char reason[512];
 } LineData;
 
 void data_init();

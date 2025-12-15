@@ -1,11 +1,12 @@
 {
   "name": "tube-status",
-  "version": "3.12.0",
+  "version": "3.13.0",
   "author": "Chris Lewis",
   "private": true,
   "dependencies": {
     "pebble-events": "^1.2.0",
-    "pebble-packet": "^1.2.0"
+    "pebble-packet": "^1.4.0",
+    "pebble-scalable": "^1.5.1"
   },
   "devDependencies": {
     "pkts": "^0.2.1"

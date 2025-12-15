@@ -1,7 +1,7 @@
 #include "splash_window.h"
 
-#define BAR_WIDTH 75
-#define SPLASH_LOGO_RADIUS 20
+#define BAR_WIDTH scalable_x(450)
+#define LOGO_RADIUS scalable_x(125)
 
 static Window *s_window;
 static Layer *s_logo_layer, *s_bar_layer;
@@ -11,34 +11,47 @@ static void logo_update_proc(Layer *layer, GContext *ctx) {
   GPoint center = grect_center_point(&bounds);
 
   graphics_context_set_fill_color(ctx, GColorBlack);
-  graphics_fill_circle(ctx, center, SPLASH_LOGO_RADIUS - 1);
+  graphics_fill_circle(ctx, center, LOGO_RADIUS - 1);
   graphics_context_set_fill_color(ctx, GColorWhite);
-  graphics_fill_circle(ctx, center, (5 * (SPLASH_LOGO_RADIUS - 1)) / 7); 
+  graphics_fill_circle(ctx, center, (5 * (LOGO_RADIUS - 1)) / 7); 
 }
 
 /**
- * Simple progress bar with one pixel inset
+ * Simple progress bar with inset
  */
 static void progress_bar_update_proc(Layer *layer, GContext *ctx) {
-  const int margin = 4;
+  const int cap_radius = scalable_x(35);
+  const int inset = 2;
 
+  // Background
   graphics_context_set_fill_color(ctx, GColorBlack);
-  graphics_fill_circle(ctx, GPoint(margin, margin), margin);
-  graphics_fill_rect(ctx, GRect(margin, 0, BAR_WIDTH - (2 * margin), (2 * margin) + 1), 0, GCornerNone);
-  graphics_fill_circle(ctx, GPoint(BAR_WIDTH - margin, margin), margin);
+  graphics_fill_circle(ctx, GPoint(cap_radius, cap_radius), cap_radius);
+  graphics_fill_rect(
+    ctx,
+    GRect(cap_radius, 0, BAR_WIDTH - (2 * cap_radius), (2 * cap_radius) + inset - 1),
+    0,
+    GCornerNone
+  );
+  graphics_fill_circle(ctx, GPoint(BAR_WIDTH - cap_radius, cap_radius), cap_radius);
 
-  int width = (data_get_progress() * BAR_WIDTH) / data_get_progress_max();
+  // Bar progress
+  const int width = (data_get_progress() * BAR_WIDTH) / data_get_progress_max();
   graphics_context_set_fill_color(ctx, GColorWhite);
-  graphics_fill_circle(ctx, GPoint(margin, margin), margin - 1);
-  graphics_fill_rect(ctx, GRect(margin + 1, 1, width - 2, (2 * margin) - 1), 0, GCornerNone);
-  graphics_fill_circle(ctx, GPoint(margin + width, margin), margin - 1);
+  graphics_fill_circle(ctx, GPoint(cap_radius, cap_radius), cap_radius - inset);
+  graphics_fill_rect(
+    ctx,
+    GRect(cap_radius + inset, inset, width - (2 * inset) + 1, (2 * cap_radius) - inset - 1),
+    0,
+    GCornerNone
+  );
+  graphics_fill_circle(ctx, GPoint(cap_radius + width, cap_radius), cap_radius - inset);
 }
 
 static void window_load(Window *window) {
   Layer *window_layer = window_get_root_layer(s_window);
   GRect bounds = layer_get_bounds(window_layer);
 
-  int diameter = 2 * SPLASH_LOGO_RADIUS;
+  const int diameter = 2 * LOGO_RADIUS;
   GEdgeInsets logo_insets = (GEdgeInsets) {
     .top = (bounds.size.h - diameter) / 2,
     .right = (bounds.size.w - diameter) / 2,
@@ -56,9 +69,9 @@ static void window_load(Window *window) {
   s_bar_layer = layer_create(
     GRect(
       x_margin,
-      logo_y_margin + logo_rect.size.h + 17,
+      logo_y_margin + logo_rect.size.h + scalable_y(100),
       bounds.size.w - (2 * x_margin),
-      10
+      25
     )
   );
   layer_set_update_proc(s_bar_layer, progress_bar_update_proc);
