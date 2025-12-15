@@ -48,19 +48,19 @@ int scalable_y(int t_perc) {
   return ((t_perc * PS_DISPLAY_H) + PS_HALF_RANGE) / 1000;
 }
 
-int scalable_x_pp(int regular, int emery) {
+int scalable_x_pp(int original, int emery) {
 #if defined(PBL_PLATFORM_EMERY)
   return scalable_x(emery);
 #else // aplite, basalt, diorite, flint
-  return scalable_x(regular);
+  return scalable_x(original);
 #endif
 }
 
-int scalable_y_pp(int regular, int emery) {
+int scalable_y_pp(int original, int emery) {
 #if defined(PBL_PLATFORM_EMERY)
   return scalable_y(emery);
 #else // aplite, basalt, diorite, flint
-  return scalable_y(regular);
+  return scalable_y(original);
 #endif
 }
 
@@ -73,11 +73,11 @@ GRect scalable_grect(int x_t_perc, int y_t_perc, int w_t_perc, int h_t_perc) {
   );
 }
 
-GRect scalable_grect_pp(GRect regular, GRect emery) {
+GRect scalable_grect_pp(GRect original, GRect emery) {
 #if defined(PBL_PLATFORM_EMERY)
   const GRect val = emery;
 #else // aplite, basalt, diorite, flint
-  const GRect val = regular;
+  const GRect val = original;
 #endif
   return GRect(
     scalable_x(val.origin.x),
@@ -103,13 +103,13 @@ GRect scalable_center(GRect r) {
 
 /////////////////////////////////////////////// Fonts //////////////////////////////////////////////
 
-void scalable_set_fonts(int id, GFont *regular, GFont *emery) {
+void scalable_set_fonts(int id, GFont *original, GFont *emery) {
   if (id >= PS_MAX_FONT_SETS) {
     APP_LOG(APP_LOG_LEVEL_ERROR, "pebble-scalable: font id must be <%d", PS_MAX_FONT_SETS);
     return;
   }
 
-  s_fonts_ptrs[id][PS_DS_REGULAR] = regular;
+  s_fonts_ptrs[id][PS_DS_REGULAR] = original;
   s_fonts_ptrs[id][PS_DS_EMERY] = emery;
 }
 
