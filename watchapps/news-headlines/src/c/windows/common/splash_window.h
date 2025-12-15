@@ -2,8 +2,14 @@
 
 #include <pebble.h>
 
-#include "../modules/data.h"
-#include "stories_window.h"
+#include "../../modules/data.h"
+#include "../../modules/scalable.h"
+
+#if defined(PBL_ROUND)
+  #include "../round/stories_window.h"
+#else
+  #include "../rect/stories_window.h"
+#endif
 
 // Push the splash Window
 void splash_window_push();

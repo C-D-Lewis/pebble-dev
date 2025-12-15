@@ -1,6 +1,6 @@
 #include "splash_window.h"
 
-#define BAR_WIDTH 75
+#define BAR_WIDTH scalable_x(450)
 
 static Window *s_window;
 static BitmapLayer *s_logo_layer;
@@ -29,7 +29,11 @@ static void load_cache_handler(void *context) {
   splash_window_cancel_timeout();
   if (data_load_cached_data()) {
     comm_set_fast(false);
-    stories_window_push();
+#if defined(PBL_ROUND)
+    stories_window_round_push();
+#else
+    stories_window_rect_push();
+#endif
   } else {
     // Cache not available (unlikely since even the first launch will be after install, which implies connection)
     splash_window_cancel_timeout();
@@ -37,28 +41,41 @@ static void load_cache_handler(void *context) {
 }
 
 /**
- * Simple progress bar with one pixel inset
+ * Simple progress bar with inset
  */
 static void progress_bar_update_proc(Layer *layer, GContext *ctx) {
-  const int margin = 4;
+  const int cap_radius = scalable_x(35);
+  const int inset = 2;
 
+  // Background
   graphics_context_set_fill_color(ctx, GColorBlack);
-  graphics_fill_circle(ctx, GPoint(margin, margin), margin);
-  graphics_fill_rect(ctx, GRect(margin, 0, BAR_WIDTH - (2 * margin), (2 * margin) + 1), 0, GCornerNone);
-  graphics_fill_circle(ctx, GPoint(BAR_WIDTH - margin, margin), margin);
+  graphics_fill_circle(ctx, GPoint(cap_radius, cap_radius), cap_radius);
+  graphics_fill_rect(
+    ctx,
+    GRect(cap_radius, 0, BAR_WIDTH - (2 * cap_radius), (2 * cap_radius) + inset - 1),
+    0,
+    GCornerNone
+  );
+  graphics_fill_circle(ctx, GPoint(BAR_WIDTH - cap_radius, cap_radius), cap_radius);
 
-  int width = (s_progress * BAR_WIDTH) / s_quantity;
+  // Bar progress - subtract one to avoid overrun
+  const int width = ((s_quantity > 0 ? s_progress - 1 : s_progress) * BAR_WIDTH) / s_quantity;
   graphics_context_set_fill_color(ctx, GColorWhite);
-  graphics_fill_circle(ctx, GPoint(margin, margin), margin - 1);
-  graphics_fill_rect(ctx, GRect(margin + 1, 1, width - 2, (2 * margin) - 1), 0, GCornerNone);
-  graphics_fill_circle(ctx, GPoint(margin + width, margin), margin - 1);
+  graphics_fill_circle(ctx, GPoint(cap_radius, cap_radius), cap_radius - inset);
+  graphics_fill_rect(
+    ctx,
+    GRect(cap_radius + inset, inset, width - (2 * inset) + 1, (2 * cap_radius) - inset - 1),
+    0,
+    GCornerNone
+  );
+  graphics_fill_circle(ctx, GPoint(cap_radius + width, cap_radius), cap_radius - inset);
 }
 
 static void window_load(Window *this) {
   Layer *window_layer = window_get_root_layer(this);
   GRect bounds = layer_get_bounds(window_layer);
 
-  s_logo_bitmap = gbitmap_create_with_resource(RESOURCE_ID_APP_ICON_LARGE);
+  s_logo_bitmap = gbitmap_create_with_resource(RESOURCE_ID_APP_ICON_SMALL);
   GSize logo_size = gbitmap_get_bounds(s_logo_bitmap).size;
 
   const int logo_x_margin = (bounds.size.w - logo_size.w) / 2;
@@ -69,7 +86,14 @@ static void window_load(Window *this) {
   layer_add_child(window_layer, bitmap_layer_get_layer(s_logo_layer));
 
   const int x_margin = (bounds.size.w - BAR_WIDTH) / 2;
-  s_bar_layer = layer_create(GRect(x_margin, logo_y_margin + logo_size.h + 17, bounds.size.w - (2 * x_margin), 10));
+  s_bar_layer = layer_create(
+    GRect(
+      x_margin,
+      logo_y_margin + logo_size.h + scalable_y(100),
+      bounds.size.w - (2 * x_margin),
+      25
+    )
+  );
   layer_set_update_proc(s_bar_layer, progress_bar_update_proc);
   layer_add_child(window_layer, s_bar_layer);
   layer_set_hidden(s_bar_layer, true);
@@ -122,7 +146,11 @@ void splash_window_push() {
 
 static void next_window_handler(void *context) {
   splash_window_cancel_timeout();
-  stories_window_push();
+#if defined(PBL_ROUND)
+    stories_window_round_push();
+#else
+    stories_window_rect_push();
+#endif
 }
 
 void splash_window_set_progress(int progress) {

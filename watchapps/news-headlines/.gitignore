@@ -7,3 +7,4 @@ assets/
 backend/PinServerOutputChecker
 releases
 pid
+ts-build

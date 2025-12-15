@@ -1,16 +1,17 @@
 #include <pebble.h>
 
-#include "windows/splash_window.h"
+#include "config.h"
+
+#include "windows/common/splash_window.h"
+
 #include "modules/comm.h"
 #include "modules/data.h"
 #include "modules/settings.h"
-#include "config.h"
+#include "modules/scalable.h"
 
 #if PBL_API_EXISTS(app_glance_reload)
 static void app_glance_callback(AppGlanceReloadSession *session, size_t limit, void *context) {
-  if (limit < 1) {
-    return;
-  }
+  if (limit < 1) return;
 
   const AppGlanceSlice entry = (AppGlanceSlice) {
     .layout = {
@@ -30,9 +31,11 @@ static void init() {
   settings_init();
   data_init();
   comm_init();
+  scalable_init();
+
   splash_window_push();
 
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "Heap free: %d", (int)heap_bytes_free());
+  // APP_LOG(APP_LOG_LEVEL_DEBUG, "Heap free: %d", (int)heap_bytes_free());
 }
 
 static void deinit() {

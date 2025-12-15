@@ -3,7 +3,6 @@
 #include <pebble.h>
 
 #include "../types.h"
-#include "../windows/settings_window.h"
 
 // Initialize settings
 void settings_init();

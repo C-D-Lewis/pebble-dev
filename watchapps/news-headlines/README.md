@@ -22,5 +22,6 @@ Open source since December 2016.
 
 ## TODO
 
-- [ ] Use messageKeys and pebble-packet
+- [ ] Use messageKeys and pebble-packet (when flint is available)
 - [x] Remove image stuff
+- [ ] Check Chalk layout

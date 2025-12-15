@@ -6,9 +6,13 @@
 #include "data.h"
 #include "settings.h"
 #include "../types.h"
-#include "../windows/stories_window.h"
-#include "../windows/splash_window.h"
-#include "../windows/settings_window.h"
+#if defined(PBL_ROUND)
+  #include "../windows/round/stories_window.h"
+#else
+  #include "../windows/rect/stories_window.h"
+#endif
+#include "../windows/common/splash_window.h"
+#include "../windows/common/settings_window.h"
 
 #define COMM_TIMEOUT_MS 10000
 

@@ -1,8 +1,12 @@
 #include "stories_window.h"
 
+// TODO: Revert scalable changes
+
+#define STATUS_BAR_H scalable_y(120)
+
 static Window *s_window;
 static Layer *s_title_layer;
-static GBitmap *s_wrench_bitmap, *s_thumb_icon_bitmap;
+static GBitmap *s_wrench_bitmap;
 static TextLayer *s_status_layer;
 static ContentIndicator *s_indicator;
 static Layer *s_up_indicator_layer, *s_down_indicator_layer;
@@ -16,21 +20,21 @@ static void anim_stopped_handler(Animation *animation, bool finished, void *cont
 }
 
 static void animate_in(int offset) {
-  if (!s_is_animating) {
-    s_is_animating = true;
+  if (s_is_animating) return;
 
-    GRect finish = layer_get_frame(s_title_layer);
-    GRect start = layer_get_frame(s_title_layer);
-    start.origin.y += offset;
+  s_is_animating = true;
 
-    PropertyAnimation *prop_anim = property_animation_create_layer_frame(s_title_layer, &start, &finish);
-    Animation *anim = property_animation_get_animation(prop_anim);
-    animation_set_handlers(anim, (AnimationHandlers) {
-      .stopped = anim_stopped_handler
-    }, NULL);
-    animation_set_duration(anim, 150);
-    animation_schedule(anim);
-  }
+  GRect finish = layer_get_frame(s_title_layer);
+  GRect start = layer_get_frame(s_title_layer);
+  start.origin.y += offset;
+
+  PropertyAnimation *prop_anim = property_animation_create_layer_frame(s_title_layer, &start, &finish);
+  Animation *anim = property_animation_get_animation(prop_anim);
+  animation_set_handlers(anim, (AnimationHandlers) {
+    .stopped = anim_stopped_handler
+  }, NULL);
+  animation_set_duration(anim, 150);
+  animation_schedule(anim);
 }
 
 static void regenerate_fake_paragraph_widths() {
@@ -164,8 +168,7 @@ static void window_load(Window *this) {
   Layer *window_layer = window_get_root_layer(this);
   GRect bounds = layer_get_bounds(window_layer);
 
-  s_wrench_bitmap = gbitmap_create_with_resource(RESOURCE_ID_GEAR);
-  s_thumb_icon_bitmap = gbitmap_create_with_resource(RESOURCE_ID_THUMB_ICON);
+  s_wrench_bitmap = gbitmap_create_with_resource(RESOURCE_ID_SPANNER);
 
   const int margin = (bounds.size.w - 144) / 2;
   const GEdgeInsets title_insets = {
@@ -206,9 +209,9 @@ static void window_load(Window *this) {
   });
 
 #if defined(PBL_ROUND)
-  GRect status_bounds = GRect(0, indicator_margin - 8, bounds.size.w, 36);
+  GRect status_bounds = GRect(0, indicator_margin - 8, bounds.size.w, STATUS_BAR_H);
 #elif defined(PBL_RECT)
-  GRect status_bounds = GRect(0, -3, bounds.size.w - 5, 36);
+  GRect status_bounds = GRect(0, -3, bounds.size.w - 5, STATUS_BAR_H);
 #endif
   s_status_layer = text_layer_create(status_bounds);
   text_layer_set_text_color(s_status_layer, GColorWhite);
@@ -229,7 +232,6 @@ static void window_unload(Window *this) {
   layer_destroy(s_up_indicator_layer);
   layer_destroy(s_down_indicator_layer);
   gbitmap_destroy(s_wrench_bitmap);
-  gbitmap_destroy(s_thumb_icon_bitmap);
 
   window_destroy(s_window);
   s_window = NULL;
@@ -240,7 +242,7 @@ static void window_unload(Window *this) {
 
 /************************************ API *************************************/
 
-void stories_window_push() {
+void stories_window_round_push() {
   if (!s_window) {
     s_window = window_create();
     window_set_background_color(s_window, PBL_IF_COLOR_ELSE(GColorDarkCandyAppleRed, GColorBlack));

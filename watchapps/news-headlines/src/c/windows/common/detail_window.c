@@ -42,7 +42,7 @@ static void window_load(Window *window) {
     PBL_IF_ROUND_ELSE(GTextAlignmentCenter, GTextAlignmentLeft)
   );
   text_layer_set_overflow_mode(s_desc_layer, GTextOverflowModeTrailingEllipsis);
-  text_layer_set_font(s_desc_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD));
+  text_layer_set_font(s_desc_layer, scalable_get_font(SFI_Medium));
   layer_add_child(window_layer, text_layer_get_layer(s_desc_layer));
 #if defined(PBL_ROUND)
   text_layer_enable_screen_text_flow_and_paging(s_desc_layer, 6);
