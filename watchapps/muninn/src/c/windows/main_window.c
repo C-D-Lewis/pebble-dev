@@ -195,7 +195,7 @@ static void update_data() {
       text_layer_set_text(s_remaining_layer, " -");
     } else {
       // Handled in animation
-      text_layer_set_text(s_remaining_layer, "0");
+      text_layer_set_text(s_remaining_layer, " -");
     }
 
     // Rate per day
@@ -204,7 +204,7 @@ static void update_data() {
       text_layer_set_text(s_rate_layer, " -");
     } else {
       // Handled in animation
-      text_layer_set_text(s_rate_layer, "0");
+      text_layer_set_text(s_rate_layer, " -");
     }
 
     // Next reading
@@ -213,9 +213,12 @@ static void update_data() {
     text_layer_set_text(s_reading_layer, s_wakeup_buff);
   }
 
-  // Begin smooth animation
-  static AnimationImplementation anim_implementation = { .update = anim_update };
-  animate(1000, 100, &anim_implementation, true);
+
+  if (data_calculate_avg_discharge_rate() != STATUS_EMPTY) {
+    // If data to show, begin smooth animation
+    static AnimationImplementation anim_implementation = { .update = anim_update };
+    animate(1000, 100, &anim_implementation, true);
+  }
 }
 
 static void canvas_update_proc(Layer *layer, GContext *ctx) {
