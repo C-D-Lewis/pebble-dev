@@ -106,7 +106,7 @@ static void title_update_proc(Layer *layer, GContext *ctx) {
   // Dummy text boxes
   graphics_context_set_fill_color(ctx, GColorLightGray);
   srand(time(NULL));
-  int y = bounds.origin.y + scalable_y(40) + title_size.h + scalable_y(60);
+  int y = bounds.origin.y + scalable_y(50) + title_size.h + scalable_y(60);
   graphics_fill_rect(
     ctx,
     GRect(

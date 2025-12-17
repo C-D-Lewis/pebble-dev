@@ -7,13 +7,23 @@ static Layer *s_deco_layer;
 static int s_index;
 
 static void deco_layer_update_proc(Layer *layer, GContext *ctx) {
-  GRect bounds = layer_get_bounds(layer);
+  const GRect bounds = layer_get_bounds(layer);
 
-  const int margin = 3;
+  const int margin = scalable_x(15);
   graphics_context_set_fill_color(ctx, GColorDarkGray);
-  graphics_fill_rect(ctx, GRect(margin, 2, bounds.size.w - 6, 9), 0, GCornerNone);
+  graphics_fill_rect(
+    ctx,
+    GRect(margin, margin, bounds.size.w - (2 * margin), scalable_y(40)),
+    0,
+    GCornerNone
+  );
   graphics_context_set_fill_color(ctx, GColorBlack);
-  graphics_fill_rect(ctx, GRect(margin, 14, bounds.size.w - 6, 2), 0, GCornerNone);
+  graphics_fill_rect(
+    ctx,
+    GRect(margin, scalable_y(60), bounds.size.w - (2 * margin), scalable_y(15)),
+    0,
+    GCornerNone
+  );
   graphics_fill_rect(
     ctx,
     grect_inset(bounds, GEdgeInsets(bounds.size.h - 4, margin, 2, margin)),
@@ -22,19 +32,13 @@ static void deco_layer_update_proc(Layer *layer, GContext *ctx) {
   );
 }
 
-static void update_data() {
-  Story *story = data_get_story(s_index);
-
-  text_layer_set_text(s_desc_layer, story->description);
-}
-
 static void window_load(Window *window) {
   Layer *window_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(window_layer);
 
-  const int x_margin = 4;
+  const int x_margin = scalable_x(20);
   s_desc_layer = text_layer_create(
-    GRect(x_margin, STATUS_BAR_LAYER_HEIGHT, bounds.size.w - (2 * x_margin), bounds.size.h)
+    GRect(x_margin, scalable_y(60), bounds.size.w - (2 * x_margin), bounds.size.h)
   );
   text_layer_set_background_color(s_desc_layer, GColorClear);
   text_layer_set_text_alignment(
@@ -52,7 +56,8 @@ static void window_load(Window *window) {
   layer_set_update_proc(s_deco_layer, deco_layer_update_proc);
   layer_add_child(window_layer, s_deco_layer);
 
-  update_data();
+  Story *story = data_get_story(s_index);
+  text_layer_set_text(s_desc_layer, story->description);
 }
 
 static void window_unload(Window *window) {

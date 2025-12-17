@@ -59,6 +59,8 @@ static void progress_bar_update_proc(Layer *layer, GContext *ctx) {
   graphics_fill_circle(ctx, GPoint(BAR_WIDTH - cap_radius, cap_radius), cap_radius);
 
   // Bar progress - subtract one to avoid overrun
+  if (s_progress < 1) return;
+  
   const int width = ((s_quantity > 0 ? s_progress - 1 : s_progress) * BAR_WIDTH) / s_quantity;
   graphics_context_set_fill_color(ctx, GColorWhite);
   graphics_fill_circle(ctx, GPoint(cap_radius, cap_radius), cap_radius - inset);
@@ -134,17 +136,18 @@ void splash_window_push() {
     s_window = window_create();
     window_set_background_color(s_window, PBL_IF_COLOR_ELSE(GColorDarkCandyAppleRed, GColorLightGray));
     window_set_window_handlers(s_window, (WindowHandlers) {
-        .appear = window_appear,  // Special case to reset layout state
-        .load = window_load,
-        .unload = window_unload,
+      .appear = window_appear,  // Special case to reset layout state
+      .load = window_load,
+      .unload = window_unload,
     });
   }
   window_stack_push(s_window, true);
 
+  s_quantity = data_get_quantity();
   s_progress = 0;
 }
 
-static void next_window_handler(void *context) {
+static void next_window_handler() {
   splash_window_cancel_timeout();
 #if defined(PBL_ROUND)
     stories_window_round_push();
@@ -163,9 +166,9 @@ void splash_window_set_progress(int progress) {
 
   if (progress == s_quantity - 1) {
     // All here
-    app_timer_register(500, next_window_handler, NULL);
     data_cache_data();
     comm_set_fast(false);
+    next_window_handler();
   }
 }
 
