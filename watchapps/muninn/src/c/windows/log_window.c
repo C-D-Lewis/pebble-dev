@@ -1,6 +1,6 @@
 #include "log_window.h"
 
-#define ROW_HEIGHT scalable_y(490)
+#define ROW_HEIGHT scalable_y(410)
 #define ROW_HEIGHT_SMALL scalable_y(240)
 #define DIV_Y scalable_y(125)
 #define MENU_INSET scalable_y(135)
@@ -16,7 +16,7 @@ static Window *s_window;
 static TextLayer *s_header_layer;
 static MenuLayer *s_menu_layer;
 
-static void draw_diffs(GContext *ctx, const GRect bounds, const Sample *s) {
+static void draw_changes(GContext *ctx, const GRect bounds, const Sample *s) {
   // Time diff
   static char s_fmt_lst_buff[8];
   static char s_fmt_ts_buff[8];
@@ -52,18 +52,80 @@ static void draw_diffs(GContext *ctx, const GRect bounds, const Sample *s) {
     GTextAlignmentLeft,
     NULL
   );
-}
 
-static void draw_status(GContext *ctx, const GRect bounds, const Sample *s, char *msg) {
+  // Right-aligned amounts
+  static char s_ts_diff_buff[8];
+  util_fmt_time_unit(s->time_diff, &s_ts_diff_buff[0], sizeof(s_ts_diff_buff));
   graphics_draw_text(
     ctx,
-    msg,
-    scalable_get_font(SFI_MediumBold),
+    s_ts_diff_buff,
+    scalable_get_font(SFI_Medium),
     scalable_grect_pp(
-      GRect(40, 315, 950, 280),
-      GRect(40, 330, 950, 280)
+      GRect(0, 100, 980, 280),
+      GRect(0, 110, 980, 280)
     ),
-    GTextOverflowModeWordWrap,
+    GTextOverflowModeTrailingEllipsis,
+    GTextAlignmentRight,
+    NULL
+  );
+
+  static char s_perc_diff_buff[8];
+  snprintf(s_perc_diff_buff, sizeof(s_perc_diff_buff), "%d%%", s->charge_diff);
+  graphics_draw_text(
+    ctx,
+    s_perc_diff_buff,
+    scalable_get_font(SFI_Medium),
+    scalable_grect_pp(
+      GRect(0, 210, 980, 280),
+      GRect(0, 220, 980, 280)
+    ),
+    GTextOverflowModeTrailingEllipsis,
+    GTextAlignmentRight,
+    NULL
+  );
+}
+
+static void draw_result_and_datetime(GContext *ctx, const GRect bounds, const Sample *s) {
+  static char s_datetime_buff[16];
+  const time_t ts_time = s->timestamp;
+  const struct tm *ts_info = localtime(&ts_time);
+  strftime(s_datetime_buff, sizeof(s_datetime_buff), "%d %b", ts_info);
+
+  static char s_result_buff[32];
+  if (s->result == STATUS_NO_CHANGE) {
+    snprintf(s_result_buff, sizeof(s_result_buff), "No change");
+  } else if (s->result == STATUS_CHARGED) {
+    snprintf(s_result_buff, sizeof(s_result_buff), "Charged up");
+  } else {
+    snprintf(
+      s_result_buff,
+      sizeof(s_result_buff),
+      "Est. %d%%/d",
+      s->result
+    );
+  }
+
+  graphics_draw_text(
+    ctx,
+    s_result_buff,
+    scalable_get_font(SFI_Medium),
+    scalable_grect_pp(
+      GRect(20, -50, 1000, 280),
+      GRect(20, -30, 1000, 280)
+    ),
+    GTextOverflowModeTrailingEllipsis,
+    GTextAlignmentLeft,
+    NULL
+  );
+  graphics_draw_text(
+    ctx,
+    s_datetime_buff,
+    scalable_get_font(SFI_Medium),
+    scalable_grect_pp(
+      GRect(0, -50, 980, 280),
+      GRect(0, -30, 980, 280)
+    ),
+    GTextOverflowModeTrailingEllipsis,
     GTextAlignmentRight,
     NULL
   );
@@ -101,41 +163,16 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
   const SampleData *data = data_get_sample_data();
   const Sample *s = &data->samples[index];
 
-  // Sample time
-  static char s_datetime_buff[32];
-  const time_t ts_time = s->timestamp;
-  const struct tm *ts_info = localtime(&ts_time);
-  strftime(s_datetime_buff, sizeof(s_datetime_buff), "%Y-%m-%d", ts_info);
-  graphics_draw_text(
-    ctx,
-    s_datetime_buff,
-    scalable_get_font(SFI_Medium),
-    scalable_grect_pp(
-      GRect(0, -40, 1000, 280),
-      GRect(0, -20, 1000, 280)
-    ),
-    GTextOverflowModeTrailingEllipsis,
-    GTextAlignmentCenter,
-    NULL
-  );
+  draw_result_and_datetime(ctx, bounds, s);
 
   // Divider
   const GColor sep_color = menu_layer_is_index_selected(s_menu_layer, cell_index)
     ? GColorWhite : GColorBlack;
   graphics_context_set_fill_color(ctx, sep_color);
-  graphics_fill_rect(ctx, GRect(0, DIV_Y, bounds.size.w, DIV_W), GCornerNone, 0);
+  graphics_fill_rect(ctx, GRect(0, DIV_Y, bounds.size.w, 1), GCornerNone, 0);  // Always 1h
+  graphics_fill_rect(ctx, GRect(0, bounds.size.h - DIV_W, bounds.size.w, DIV_W), GCornerNone, 0);
 
-  draw_diffs(ctx, bounds, s);
-
-  if (s->result == STATUS_NO_CHANGE) {
-    draw_status(ctx, bounds, s, "= No change");
-  } else if (s->result == STATUS_CHARGED) {
-    draw_status(ctx, bounds, s, "= Charged up");
-  } else {
-    static char s_result_buff[16];
-    snprintf(s_result_buff, sizeof(s_result_buff), "= Est. %d%%/day", s->result);
-    draw_status(ctx, bounds, s, &s_result_buff[0]);
-  }
+  draw_changes(ctx, bounds, s);
 }
 
 static void main_window_load(Window *window) {

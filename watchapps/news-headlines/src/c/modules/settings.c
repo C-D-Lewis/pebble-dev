@@ -53,9 +53,9 @@ char* settings_get_category_string() {
     case CategoryPolitics:           return "Politics";
     case CategoryHealth:             return "Health";
     case CategoryEducation:          return "Education";
-    case CategoryScienceEnvironment: return "Science & Environment";
+    case CategoryScienceEnvironment: return "Science & Env.";
     case CategoryTechnology:         return "Technology";
-    case CategoryEntertainment:      return "Entertainment & Arts";
+    case CategoryEntertainment:      return "Entertainment";
     default: return "Unknown!";
   }
 }

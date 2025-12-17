@@ -28,6 +28,11 @@ Add the includes at the top of your source.
 
 Get values for layout dimensions based on display size:
 
+> To convert existing layouts, simply divide the raw coordinate by either the
+> width or height of the preferred screen size to get a percentage.
+> For example, a Y coordinate of 40px - 40 / 168 = 0.238 = 23.8%, so the correct
+> call would be `scalable_y(235)`.
+
 ```c
 // Get a percentage (thousands) of the display width and height
 const int half_w = scalable_x(500);
@@ -40,6 +45,9 @@ const GRect center_rect = scalable_grect(330, 330, 330, 330);
 If a single percentage isn't precise enough, use 'per platform' variants to
 specify values up to 5% (50/1000 thousands) in precision for each platform
 (order is 'regular' shape, then 'emery' shape):
+
+> In actuality, thousandths values should allow per-pixel precision until a
+> display shape is larger than 1000px in any direction.
 
 ```c
 // Larger only on Emery (x/y: 10%, w/h per platform)
@@ -74,6 +82,10 @@ const GRect centered = scalable_center(r);
 
 Use different fonts for different display sizes, based on a category of your
 choosing. First, load the fonts, or use system fonts:
+
+> For custom fonts, scaling up the raw font size by the corresponding increase
+> in display size (such as 14% for basalt > emery) may not be enough.
+> Experiment!
 
 ```c
 // Load fonts to use in each case

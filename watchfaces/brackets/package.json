@@ -12,7 +12,8 @@
       "aplite",
       "basalt",
       "chalk",
-      "diorite"
+      "diorite",
+      "emery"
     ],
     "enableMultiJS": true,
     "capabilities": [
@@ -35,15 +36,16 @@
           "characterRegex": "[0-9A-Z :%.]"
         },
         {
+          "type": "font",
+          "name": "SHARE_36",
+          "file": "fonts/Share-TechMono.ttf",
+          "characterRegex": "[0-9A-Z :%.]"
+        },
+        {
           "type": "bitmap",
           "name": "MENU_ICON",
           "file": "images/menu_icon.png",
           "menuIcon": true
-        },
-        {
-          "type": "bitmap",
-          "name": "BRACKETS",
-          "file": "images/brackets.png"
         }
       ]
     },
@@ -56,6 +58,7 @@
     ]
   },
   "dependencies": {
-    "pebble-clay": "^1.0.4"
+    "pebble-clay": "^1.0.4",
+    "pebble-scalable": "^1.5.1"
   }
 }

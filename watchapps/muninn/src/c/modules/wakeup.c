@@ -82,7 +82,6 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
 
   const int last_charge_perc = data_get_last_charge_perc();
   const BatteryChargeState state = battery_state_service_peek();
-  const bool is_plugged = state.is_plugged;
   const int charge_percent = state.charge_percent;
   const int last_sample_time = data_get_last_sample_time();
 
@@ -102,11 +101,8 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
     data_set_last_charge_perc(charge_percent);
     data_set_last_sample_time(ts_now);
 
-    // Ignore if plugged in or recently charged (store discharge rates only)
-    if (is_plugged || charge_diff < 0) {
-      APP_LOG(APP_LOG_LEVEL_INFO, "Ignoring: plugged in or recently charged");
-
-      // Record special status sample
+    if (charge_diff < 0) {
+      // Recently charged
       data_push_sample(
         charge_percent,
         last_sample_time,
@@ -117,9 +113,6 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
       );
     } else if (charge_diff == 0) {
       // No change since last sample - probably on charge or very short period
-      APP_LOG(APP_LOG_LEVEL_INFO, "No change since last sample");
-
-      // Record special status sample
       data_push_sample(
         charge_percent,
         last_sample_time,
@@ -129,8 +122,8 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
         STATUS_NO_CHANGE
       );
     } else {
-      // Calculate new discharge rate
-      const int result = (charge_diff * SECONDS_PER_DAY) / time_diff_s;
+      // Calculate new daily discharge rate estimate!
+      const int estimate = (charge_diff * SECONDS_PER_DAY) / time_diff_s;
 
       data_push_sample(
         charge_percent,
@@ -138,9 +131,9 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
         last_charge_perc,
         time_diff_s,
         charge_diff,
-        result
+        estimate
       );
-      APP_LOG(APP_LOG_LEVEL_INFO, "result: %d", result);
+      APP_LOG(APP_LOG_LEVEL_INFO, "estimate: %d", estimate);
     }
   }
 

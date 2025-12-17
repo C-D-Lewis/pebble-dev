@@ -221,6 +221,16 @@ static void update_data() {
 }
 
 static void canvas_update_proc(Layer *layer, GContext *ctx) {
+  // Status divider
+  graphics_context_set_stroke_color(ctx, GColorBlack);
+  graphics_context_set_stroke_width(ctx, DIV_W);
+  const int status_div_y = scalable_y_pp(280, 280);
+  graphics_draw_line(
+    ctx,
+    GPoint(0, status_div_y),
+    GPoint(DISPLAY_W - ACTION_BAR_W, status_div_y)
+  );
+
   // Divider braid
   const GRect braid_rect = GRect(0, BRAID_Y, DISPLAY_W, BRAID_H);
   graphics_draw_bitmap_in_rect(ctx, s_braid_bitmap, braid_rect);
@@ -271,7 +281,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   graphics_draw_line(
     ctx,
     GPoint(0, ROW_DIV_Y),
-    GPoint(DISPLAY_W - (1 * ACTION_BAR_W), ROW_DIV_Y)
+    GPoint(DISPLAY_W - (ACTION_BAR_W), ROW_DIV_Y)
   );
   const int row_div_x = (DISPLAY_W / 2) - scalable_x(80);
   const int row_div_h = scalable_y(320);
@@ -343,16 +353,8 @@ static void window_load(Window *window) {
   bitmap_layer_set_bitmap(s_mascot_layer, s_mascot_bitmap);
   layer_add_child(root_layer, bitmap_layer_get_layer(s_mascot_layer));
 
-  // On top of mascot
-  s_canvas_layer = layer_create(bounds);
-  layer_set_update_proc(s_canvas_layer, canvas_update_proc);
-  layer_add_child(root_layer, s_canvas_layer);
-
   s_status_label_layer = util_make_text_layer(
-    scalable_grect_pp(
-      GRect(440, 20, 1000, 500),
-      GRect(440, 10, 1000, 500)
-    ),
+    scalable_grect(440, -10, 1000, 500),
     scalable_get_font(SFI_Small)
   );
   text_layer_set_text(s_status_label_layer, "Muninn is");
@@ -360,8 +362,8 @@ static void window_load(Window *window) {
 
   s_status_value_layer = util_make_text_layer(
     scalable_grect_pp(
-      GRect(430, 90, 1000, 500),
-      GRect(440, 130, 1000, 500)
+      GRect(430, 70, 1000, 500),
+      GRect(440, 110, 1000, 500)
     ),
     scalable_get_font(SFI_LargeBold)
   );
@@ -445,7 +447,12 @@ static void window_load(Window *window) {
   );
   layer_add_child(root_layer, text_layer_get_layer(s_reading_layer));
 
-  // Hint for when Muninn is asleep
+  // On top of almost everything
+  s_canvas_layer = layer_create(bounds);
+  layer_set_update_proc(s_canvas_layer, canvas_update_proc);
+  layer_add_child(root_layer, s_canvas_layer);
+
+  // Hint for when Muninn is asleep (topmost)
   const GRect hint_rect = GRect(
     2,
     BRAID_Y + BRAID_H,

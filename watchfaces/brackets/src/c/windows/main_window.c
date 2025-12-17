@@ -1,12 +1,19 @@
 #include "main_window.h"
 
-#define WIDTH PBL_IF_ROUND_ELSE(180, 144)
-#define HEIGHT PBL_IF_ROUND_ELSE(180, 168)
+#if defined(PBL_PLATFORM_EMERY)
+  #define DISPLAY_W 200
+  #define DISPLAY_H 228
+#elif defined(PBL_PLATFORM_CHALK)
+  #define DISPLAY_W 180
+  #define DISPLAY_H 180
+#else
+  #define DISPLAY_W 144
+  #define DISPLAY_H 168
+#endif
 
 static Window *s_window;
 static TextLayer *s_date_layer, *s_time_layer, *s_batt_and_bt_layer, *s_weather_layer;
-static BitmapLayer *s_top_brackets_layer, *s_bottom_brackets_layer;
-static GBitmap *s_brackets_bitmap;
+static Layer *s_canvas_layer;
 static GFont s_font;
 
 static void update_batt_and_bt() {
@@ -105,7 +112,7 @@ static void tick_handler(struct tm *tick_time, TimeUnits changed) {
 static TextLayer* make_text_layer(GRect frame) {
   TextLayer *this = text_layer_create(frame);
   text_layer_set_background_color(this, GColorClear);
-  text_layer_set_font(this, s_font);
+  text_layer_set_font(this, scalable_get_font(SFI_Medium));
   return this;
 }
 
@@ -113,30 +120,61 @@ static bool any_complication_enabled() {
   return data_get_boolean(MESSAGE_KEY_BatteryAndBluetooth) || data_get_boolean(MESSAGE_KEY_WeatherStatus);
 }
 
+static void draw_brackets(GContext *ctx, GRect bounds, int scl_y) {
+  GRect rect = scalable_grect(0, scl_y, 940, 270);
+  const int bracket_w = scalable_x(30);
+  const int bracket_x_inset = scalable_x(70);
+
+  graphics_context_set_fill_color(ctx, GColorBlack);
+  graphics_fill_rect(ctx, rect, GCornerNone, 0);
+
+  graphics_context_set_fill_color(ctx, GColorWhite);
+  graphics_fill_rect(
+    ctx,
+    grect_inset(rect, GEdgeInsets(bracket_w)),
+    GCornerNone,
+    0
+  );
+  graphics_fill_rect(
+    ctx,
+    grect_inset(rect, GEdgeInsets(0, bracket_x_inset, 0, bracket_x_inset)),
+    GCornerNone,
+    0
+  );
+}
+
+static void canvas_update_proc(Layer *layer, GContext *ctx) {
+  GRect bounds = layer_get_bounds(layer);
+
+  draw_brackets(ctx, bounds, 0);
+
+  if (any_complication_enabled()) {
+    draw_brackets(ctx, bounds, 365);
+  }
+}
+
 static void window_load(Window *window) {
   Layer *root_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(root_layer);
 
-  s_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_SHARE_24));
+  const int root_x = PBL_IF_ROUND_ELSE(scalable_x(150), scalable_x(25));
+  const int root_y = any_complication_enabled()
+    ? scalable_y(190)
+    : scalable_y(360);
+  int y = PBL_IF_ROUND_ELSE(scalable_y(200), root_y);
 
-  // TODO: based on display HEIGHT
-  int initial_y = any_complication_enabled() ? 32 : 55;
-  int origin = PBL_IF_ROUND_ELSE(59, initial_y);
+  s_canvas_layer = layer_create(GRect(root_x, root_y, DISPLAY_W, DISPLAY_H));
+  layer_set_update_proc(s_canvas_layer, canvas_update_proc);
+  layer_add_child(root_layer, s_canvas_layer);
 
-  s_brackets_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BRACKETS);
-
-  s_top_brackets_layer = bitmap_layer_create(GRect(5, origin, 135, 45));
-  bitmap_layer_set_compositing_mode(s_top_brackets_layer, GCompOpSet);
-  bitmap_layer_set_bitmap(s_top_brackets_layer, s_brackets_bitmap);
-  layer_add_child(root_layer, bitmap_layer_get_layer(s_top_brackets_layer));
-
-  origin -= 7;
-  GRect frame = grect_inset(bounds, GEdgeInsets(origin, 0, 0, 20));
+  const int text_x = PBL_IF_ROUND_ELSE(scalable_x(260), scalable_x_pp(140, 113));
+  y -= scalable_y_pp(40, 50);
+  GRect frame = grect_inset(bounds, GEdgeInsets(y, 0, 0, text_x));
   s_date_layer = make_text_layer(frame);
   layer_add_child(root_layer, text_layer_get_layer(s_date_layer));
 
-  origin += 28;
-  frame = grect_inset(bounds, GEdgeInsets(origin, 0, 0, 20));
+  y += scalable_y_pp(165, 162);
+  frame = grect_inset(bounds, GEdgeInsets(y, 0, 0, text_x));
   s_time_layer = make_text_layer(frame);
   layer_add_child(root_layer, text_layer_get_layer(s_time_layer));
 
@@ -144,19 +182,10 @@ static void window_load(Window *window) {
   s_batt_and_bt_layer = make_text_layer(frame);
   s_weather_layer = make_text_layer(frame);
 
-  // If settings enabled
-  if (any_complication_enabled()) {
-    origin += 40;
-
-    s_bottom_brackets_layer = bitmap_layer_create(GRect(5, origin, 135, 45));
-    bitmap_layer_set_compositing_mode(s_bottom_brackets_layer, GCompOpSet);
-    bitmap_layer_set_bitmap(s_bottom_brackets_layer, s_brackets_bitmap);
-    layer_add_child(root_layer, bitmap_layer_get_layer(s_bottom_brackets_layer));
-  }
+  y += scalable_y_pp(195, 200);
 
   if (data_get_boolean(MESSAGE_KEY_BatteryAndBluetooth)) {
-    origin += -7;
-    frame = grect_inset(bounds, GEdgeInsets(origin, 0, 0, 20));
+    frame = grect_inset(bounds, GEdgeInsets(y, 0, 0, text_x));
 
     // Battery & BT
     Layer *bbl = text_layer_get_layer(s_batt_and_bt_layer);
@@ -165,8 +194,8 @@ static void window_load(Window *window) {
   }
 
   if (data_get_boolean(MESSAGE_KEY_WeatherStatus)) {
-    origin += 28;
-    frame = grect_inset(bounds, GEdgeInsets(origin, 0, 0, 20));
+    y += scalable_y_pp(165, 163);
+    frame = grect_inset(bounds, GEdgeInsets(y, 0, 0, text_x));
 
     // Weather
     Layer *wl = text_layer_get_layer(s_weather_layer);
@@ -182,10 +211,7 @@ static void window_unload(Window *window) {
   text_layer_destroy(s_weather_layer);
   fonts_unload_custom_font(s_font);
 
-  bitmap_layer_destroy(s_top_brackets_layer);
-  bitmap_layer_destroy(s_bottom_brackets_layer);
-
-  gbitmap_destroy(s_brackets_bitmap);
+  layer_destroy(s_canvas_layer);
 
   window_destroy(s_window);
   s_window = NULL;
