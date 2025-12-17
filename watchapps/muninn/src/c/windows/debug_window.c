@@ -1,4 +1,4 @@
-#include "stat_window.h"
+#include "debug_window.h"
 
 #if defined(PBL_PLATFORM_EMERY)
   #define FONT_KEY FONT_KEY_GOTHIC_18
@@ -12,7 +12,7 @@ static Window *s_window;
 static StatusBarLayer *s_status_bar;
 static TextLayer *s_stats_layer;
 
-void stat_window_update_data() {
+void debug_window_update_data() {
   if (!s_window) return;
 
   const int wakeup_id = data_get_wakeup_id();
@@ -65,7 +65,7 @@ static void window_unload(Window *window) {
   s_window = NULL;
 }
 
-void stat_window_push() {
+void debug_window_push() {
   if (!s_window) {
     s_window = window_create();
     window_set_window_handlers(s_window, (WindowHandlers) {
@@ -76,5 +76,5 @@ void stat_window_push() {
 
   window_stack_push(s_window, true);
 
-  stat_window_update_data();
+  debug_window_update_data();
 }

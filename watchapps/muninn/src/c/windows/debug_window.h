@@ -8,6 +8,6 @@
 #include "../modules/wakeup.h"
 #include "../modules/util.h"
 
-void stat_window_push();
+void debug_window_push();
 
-void stat_window_update_data();
+void debug_window_update_data();

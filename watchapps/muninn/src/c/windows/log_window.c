@@ -1,8 +1,11 @@
 #include "log_window.h"
 
 #define ROW_HEIGHT scalable_y(490)
+#define ROW_HEIGHT_SMALL scalable_y(240)
 #define DIV_Y scalable_y(125)
 #define MENU_INSET scalable_y(135)
+
+// Extra precision needed
 #if defined(PBL_PLATFORM_EMERY)
   #define DIV_W 2
 #else
@@ -66,8 +69,14 @@ static void draw_status(GContext *ctx, const GRect bounds, const Sample *s, char
   );
 }
 
+static int16_t get_cell_height_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) {
+  const int length = data_get_log_length();
+  return length == 0 ? ROW_HEIGHT_SMALL : ROW_HEIGHT;
+}
+
 static uint16_t get_num_rows_callback(MenuLayer *menu_layer, uint16_t section_index, void *context) {
-  return data_get_log_length();
+  const int length = data_get_log_length();
+  return length == 0 ? 1 : length;
 }
 
 static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_index, void *context) {
@@ -76,7 +85,15 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
 
   // Menu guards against this, but cover the case anyway
   if (count == 0) {
-    menu_cell_basic_draw(ctx, cell_layer, "No samples yet", NULL, NULL);
+    graphics_draw_text(
+      ctx,
+      "No samples yet",
+      scalable_get_font(SFI_Medium),
+      scalable_grect(0, 20, 1000, 280),
+      GTextOverflowModeTrailingEllipsis,
+      GTextAlignmentCenter,
+      NULL
+    );
     return;
   }
 
@@ -119,10 +136,6 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
     snprintf(s_result_buff, sizeof(s_result_buff), "= Est. %d%%/day", s->result);
     draw_status(ctx, bounds, s, &s_result_buff[0]);
   }
-}
-
-static int16_t get_cell_height_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) {
-  return ROW_HEIGHT;
 }
 
 static void main_window_load(Window *window) {

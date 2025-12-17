@@ -81,7 +81,7 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
   }
 
   const int last_charge_perc = data_get_last_charge_perc();
-  BatteryChargeState state = battery_state_service_peek();
+  const BatteryChargeState state = battery_state_service_peek();
   const bool is_plugged = state.is_plugged;
   const int charge_percent = state.charge_percent;
   const int last_sample_time = data_get_last_sample_time();

@@ -10,7 +10,7 @@
 /////////////////////////////////////
 
 // MUST match package.json
-#define VERSION "1.8.0"
+#define VERSION "1.9.0"
 // Minimum samples before providing estimations
 #define MIN_SAMPLES 2
 // Maximum number of extra minutes if a collision
@@ -32,8 +32,6 @@
 // #define SAVE_TEST_DATA true        //
 //                                    //
 #define LOG_STATE true             //
-//                                    //
-// #define LOG_AVERAGING true         //
 //                                    //
 // #define WAKEUP_NEXT_MINUTE true    //
 //                                    //

@@ -12,7 +12,6 @@ typedef enum {
   MI_VIBE_ON_SAMPLE = 0,
   MI_CUSTOM_ALERT_LEVEL,
   MI_PUSH_TIMELINE_PINS,
-  MI_ESTIMATE_LOG,
   MI_BATTERY_TIPS,
   MI_ABOUT,
   MI_DELETE_ALL_DATA,
@@ -108,9 +107,6 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
         push_pins ? "Enabled" : "Disabled"
       );
       break;
-    case MI_ESTIMATE_LOG:
-      menu_cell_draw(ctx, cell_layer, "Data log", NULL);
-      break;
     case MI_BATTERY_TIPS:
       menu_cell_draw(ctx, cell_layer, "Battery tips", NULL);
       break;
@@ -168,18 +164,6 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
 
       if (new_state) comm_push_timeline_pins();
     } break;
-    case MI_ESTIMATE_LOG:
-      if (data_get_valid_samples_count() == 0) {
-        alert_window_push(
-          RESOURCE_ID_ASLEEP,
-          "No estimates yet.\n\nMuninn will begin estimating soon.",
-          true,
-          false
-        );
-      } else {
-        log_window_push();
-      }
-      break;
     case MI_BATTERY_TIPS:
       message_window_push(MSG_TIPS);
       break;

@@ -178,7 +178,6 @@ static void update_data() {
   // Current status
   text_layer_set_text(s_desc_layer, util_get_status_string());
 
-  // Sometimes
   if (!is_enabled) {
     text_layer_set_text(s_reading_layer, " -");
     text_layer_set_text(s_remaining_layer, " -");
@@ -227,7 +226,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   graphics_draw_bitmap_in_rect(ctx, s_braid_bitmap, braid_rect);
 
   // Actions BG
-  graphics_context_set_fill_color(ctx, PBL_IF_COLOR_ELSE(GColorJazzberryJam, GColorLightGray));
+  graphics_context_set_fill_color(ctx, PBL_IF_COLOR_ELSE(GColorDarkCandyAppleRed, GColorLightGray));
   GRect actions_rect = GRect(DISPLAY_W - ACTION_BAR_W, 0, ACTION_BAR_W, DISPLAY_H);
   graphics_fill_rect(ctx, actions_rect, 0, GCornerNone);
 
@@ -235,9 +234,12 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
 
   // Enable hint
   const int enable_y = DISPLAY_H / 6 - (HINT_H / 2);
-  const GRect enable_rect = GRect(hint_x, enable_y, HINT_W, HINT_H);
   graphics_context_set_fill_color(ctx, GColorBlack);
-  graphics_fill_rect(ctx, enable_rect, 3, GCornersAll);
+  graphics_fill_rect(
+    ctx, GRect(hint_x, enable_y, HINT_W, HINT_H),
+    3,
+    GCornersAll
+  );
   graphics_context_set_fill_color(ctx, GColorWhite);
   const GPoint select_center = {
     .x = hint_x + (HINT_W / 2),
@@ -245,17 +247,23 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   };
   graphics_fill_circle(ctx, select_center, scalable_x(20));
 
-  // Blink Muninn's eye
-  if (s_is_blinking) {
-    graphics_context_set_fill_color(ctx, GColorBlack);
-    graphics_fill_rect(ctx, EYE_RECT, 0, GCornerNone);
-  }
-
   // Menu hint
-  int menu_y = (DISPLAY_H / 2) - (HINT_H / 2);
-  GRect menu_rect = GRect(hint_x, menu_y, HINT_W, HINT_H);
+  const int menu_y = (DISPLAY_H / 2) - (HINT_H / 2);
   graphics_context_set_fill_color(ctx, GColorBlack);
-  graphics_fill_rect(ctx, menu_rect, 3, GCornersAll);
+  graphics_fill_rect(
+    ctx, GRect(hint_x, menu_y, HINT_W, HINT_H),
+    3,
+    GCornersAll
+  );
+
+  // Log hint
+  const int log_y = ((5 * DISPLAY_H) / 6) - (HINT_H / 2);
+  graphics_context_set_fill_color(ctx, GColorBlack);
+  graphics_fill_rect(
+    ctx, GRect(hint_x, log_y, HINT_W, HINT_H),
+    3,
+    GCornersAll
+  );
 
   // Row divider
   graphics_context_set_stroke_color(ctx, GColorBlack);
@@ -272,6 +280,12 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     GPoint(row_div_x, ROW_DIV_Y),
     GPoint(row_div_x, ROW_DIV_Y - row_div_h)
   );
+
+  // Blink Muninn's eye
+  if (s_is_blinking) {
+    graphics_context_set_fill_color(ctx, GColorBlack);
+    graphics_fill_rect(ctx, EYE_RECT, 0, GCornerNone);
+  }
 }
 
 ////////////////////////////////////////////// Clicks //////////////////////////////////////////////
@@ -295,17 +309,24 @@ static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
   menu_window_push();
 }
 
+static void down_click_handler(ClickRecognizerRef recognizer, void *context) {
+  log_window_push();
+}
+
 static void down_long_click_handler(ClickRecognizerRef recognizer, void *context) {
-  stat_window_push();
+  debug_window_push();
 }
 
 static void click_config_provider(void *context) {
   window_long_click_subscribe(BUTTON_ID_UP, 1000, up_click_handler, NULL);
   window_single_click_subscribe(BUTTON_ID_SELECT, select_click_handler);
+  window_single_click_subscribe(BUTTON_ID_DOWN, down_click_handler);
 
   // Debugging info
   window_long_click_subscribe(BUTTON_ID_DOWN, 3000, down_long_click_handler, NULL);
 }
+
+////////////////////////////////////////////// Window //////////////////////////////////////////////
 
 static void window_load(Window *window) {
   Layer *root_layer = window_get_root_layer(window);
@@ -316,7 +337,7 @@ static void window_load(Window *window) {
   // Mascot
   s_mascot_bitmap = gbitmap_create_with_resource(RESOURCE_ID_AWAKE);
   s_mascot_layer = bitmap_layer_create(
-    GRect(scalable_x(30), scalable_y(20), MASCOT_SIZE, MASCOT_SIZE)
+    GRect(scalable_x(30), scalable_y(10), MASCOT_SIZE, MASCOT_SIZE)
   );
   bitmap_layer_set_compositing_mode(s_mascot_layer, GCompOpSet);
   bitmap_layer_set_bitmap(s_mascot_layer, s_mascot_bitmap);
@@ -360,7 +381,7 @@ static void window_load(Window *window) {
   int row_x = scalable_x(30);
   int row_y = scalable_y_pp(535, 550);
 
-  int text_icon_offset = scalable_x_pp(190, 160);
+  const int row_1_text_icon_offset = scalable_x_pp(190, 160);
   const int row_1_text_y_offset = scalable_y_pp(-40, -20);
 
   s_remaining_bitmap = gbitmap_create_with_resource(RESOURCE_ID_REMAINING);
@@ -369,7 +390,7 @@ static void window_load(Window *window) {
   bitmap_layer_set_bitmap(s_remaining_bmp_layer, s_remaining_bitmap);
   layer_add_child(root_layer, bitmap_layer_get_layer(s_remaining_bmp_layer));
   s_remaining_layer = util_make_text_layer(
-    GRect(row_x + text_icon_offset, row_y + row_1_text_y_offset, DISPLAY_W, 100),
+    GRect(row_x + row_1_text_icon_offset, row_y + row_1_text_y_offset, DISPLAY_W, 100),
     scalable_get_font(SFI_LargeBold)
   );
   layer_add_child(root_layer, text_layer_get_layer(s_remaining_layer));
@@ -382,7 +403,7 @@ static void window_load(Window *window) {
   bitmap_layer_set_bitmap(s_rate_bmp_layer, s_rate_bitmap);
   layer_add_child(root_layer, bitmap_layer_get_layer(s_rate_bmp_layer));
   s_rate_layer = util_make_text_layer(
-    GRect(row_x + text_icon_offset, row_y + row_1_text_y_offset, DISPLAY_W, 100),
+    GRect(row_x + row_1_text_icon_offset, row_y + row_1_text_y_offset, DISPLAY_W, 100),
     scalable_get_font(SFI_LargeBold)
   );
   layer_add_child(root_layer, text_layer_get_layer(s_rate_layer));
@@ -395,10 +416,9 @@ static void window_load(Window *window) {
   layer_add_child(root_layer, text_layer_get_layer(s_row_1_subtitle_layer));
 
   // Bottom row
-  row_x = scalable_x(20);
+  row_x = scalable_x(10);
   row_y = scalable_y_pp(840, 850);
-  text_icon_offset = scalable_x_pp(160, 150);
-
+  const int row_2_text_icon_offset = scalable_x_pp(160, 150);
   const int row_2_text_y_offset = scalable_y_pp(-30, -20);
 
   s_battery_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_HIGH);
@@ -407,12 +427,12 @@ static void window_load(Window *window) {
   bitmap_layer_set_bitmap(s_battery_bmp_layer, s_battery_bitmap);
   layer_add_child(root_layer, bitmap_layer_get_layer(s_battery_bmp_layer));
   s_battery_layer = util_make_text_layer(
-    GRect(row_x + text_icon_offset, row_y + row_2_text_y_offset, DISPLAY_W, 100),
+    GRect(row_x + row_2_text_icon_offset, row_y + row_2_text_y_offset, DISPLAY_W, 100),
     scalable_get_font(SFI_Medium)
   );
   layer_add_child(root_layer, text_layer_get_layer(s_battery_layer));
 
-  row_x += scalable_x_pp(420, 430);
+  row_x += scalable_x_pp(450, 460);
 
   s_reading_bitmap = gbitmap_create_with_resource(RESOURCE_ID_READING);
   s_reading_bmp_layer = bitmap_layer_create(GRect(row_x, row_y, ICON_SIZE, ICON_SIZE));
@@ -420,7 +440,7 @@ static void window_load(Window *window) {
   bitmap_layer_set_bitmap(s_reading_bmp_layer, s_reading_bitmap);
   layer_add_child(root_layer, bitmap_layer_get_layer(s_reading_bmp_layer));
   s_reading_layer = util_make_text_layer(
-    GRect(row_x + text_icon_offset, row_y + row_2_text_y_offset, DISPLAY_W, 100),
+    GRect(row_x + row_2_text_icon_offset, row_y + row_2_text_y_offset, DISPLAY_W, 100),
     scalable_get_font(SFI_Medium)
   );
   layer_add_child(root_layer, text_layer_get_layer(s_reading_layer));

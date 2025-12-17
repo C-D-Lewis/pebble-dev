@@ -66,11 +66,13 @@ void data_init() {
   // Test case: Should show 10 days at 8% per day (from 80%)
   // const int changes[NUM_SAMPLES] = {2, 2, 2, 2, 2, 2, 2, 2};
   // Test case: Should show 10 days at 8% (two other events are ignored)
-  // const int changes[NUM_SAMPLES] = {2, 2, 2, 2, -20, 2, 0, 2};
+  const int changes[NUM_SAMPLES] = {2, 2, 2, 2, -20, 2, 0, 2};
   // Special status test scenario
-  const int changes[NUM_SAMPLES] = {2, 2, 2, 2, 0, 2, -20, 2};
+  // const int changes[NUM_SAMPLES] = {2, 2, 2, 2, 0, 2, -20, 2};
   // Test case: Should show 6 days at 12% per day (from 80%)
   // const int changes[NUM_SAMPLES] = {3, 3, 3, 3, 3, 3, 3, 3};
+  // Test case: Extremely high rate
+  // const int changes[NUM_SAMPLES] = {50, 50, 50, 50, 50, 50, 50, 50};
 
   int total_change = 0;
   for(int i = 0; i < NUM_SAMPLES; i++) {
@@ -225,10 +227,6 @@ int data_calculate_avg_discharge_rate() {
   // Not enough samples yet
   if (count < MIN_SAMPLES) return STATUS_EMPTY;
 
-#if defined(LOG_AVERAGING)
-  APP_LOG(APP_LOG_LEVEL_INFO, "avg: count: %d", count);
-#endif
-
   int result_x2 = 0;
   int weight_x2 = 0;
   int seen = 0;
@@ -244,45 +242,29 @@ int data_calculate_avg_discharge_rate() {
 //     if (seen == 1) {
 //       result_x2 += v * 3; // first item -> 3x weight
 //       weight_x2 += 3;
-// #if defined(LOG_AVERAGING)
-//       APP_LOG(APP_LOG_LEVEL_INFO, "avg: i:%d x3 %d (seen: %d)", i, v, seen);
-// #endif
     if (seen <= 4) {
       result_x2 += v * 2; // next three -> 2x weight
       weight_x2 += 2;
-#if defined(LOG_AVERAGING)
-      APP_LOG(APP_LOG_LEVEL_INFO, "avg: i:%d x2 %d (seen: %d)", i, v, seen);
-#endif
     } else {
       result_x2 += v * 1; // rest -> 1x weight
       weight_x2 += 1;
-#if defined(LOG_AVERAGING)
-      APP_LOG(APP_LOG_LEVEL_INFO, "avg: i:%d x1 %d (seen: %d)", i, v, seen);
-#endif
     }
   }
 
   if (weight_x2 == 0) return STATUS_EMPTY;
-  const int avg = result_x2 / weight_x2;
-#if defined(LOG_AVERAGING)
-  APP_LOG(
-    APP_LOG_LEVEL_INFO,
-    "avg: result_x2 %d / weight_x2 %d => %d\n---",
-    result_x2,
-    weight_x2,
-    avg
-  );
-#endif
-  return avg;
+
+  return result_x2 / weight_x2;
 }
 
 int data_calculate_days_remaining() {
+  // Use live battery level, not last reading
+  const BatteryChargeState state = battery_state_service_peek();
+  const int charge_perc = state.charge_percent;
   const int rate = data_calculate_avg_discharge_rate();
-  const int charge_perc = data_get_last_charge_perc();
-
-  if (!util_is_valid(rate) || !util_is_valid(charge_perc)) return STATUS_EMPTY;
 
   // Given a 'valid' log entry is only one with a discharging change
+  if (!util_is_valid(rate) || !util_is_valid(charge_perc)) return STATUS_EMPTY;
+
   if (rate <= 0) {
     APP_LOG(APP_LOG_LEVEL_INFO, "zero or negative rate: %d charge_perc: %d", rate, charge_perc);
     return STATUS_EMPTY;
