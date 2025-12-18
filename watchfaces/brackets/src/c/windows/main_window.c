@@ -14,7 +14,6 @@
 static Window *s_window;
 static TextLayer *s_date_layer, *s_time_layer, *s_batt_and_bt_layer, *s_weather_layer;
 static Layer *s_canvas_layer;
-static GFont s_font;
 
 static void update_batt_and_bt() {
   const bool connected = connection_service_peek_pebble_app_connection();
@@ -153,55 +152,66 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   }
 }
 
-static void window_load(Window *window) {
-  Layer *root_layer = window_get_root_layer(window);
+static GPoint get_root_point() {
+  const int root_x = PBL_IF_ROUND_ELSE(scalable_x(150), scalable_x(25));
+  const int root_y = any_complication_enabled() ? scalable_y(190) : scalable_y(360);
+  return GPoint(root_x, root_y);
+}
+
+static void layout() {
+  Layer *root_layer = window_get_root_layer(s_window);
   GRect bounds = layer_get_bounds(root_layer);
 
-  const int root_x = PBL_IF_ROUND_ELSE(scalable_x(150), scalable_x(25));
-  const int root_y = any_complication_enabled()
-    ? scalable_y(190)
-    : scalable_y(360);
-  int y = PBL_IF_ROUND_ELSE(scalable_y(200), root_y);
+  const GPoint root = get_root_point();
+  int y = PBL_IF_ROUND_ELSE(scalable_y(200), root.y);
 
-  s_canvas_layer = layer_create(GRect(root_x, root_y, DISPLAY_W, DISPLAY_H));
-  layer_set_update_proc(s_canvas_layer, canvas_update_proc);
-  layer_add_child(root_layer, s_canvas_layer);
+  layer_set_frame(s_canvas_layer, GRect(root.x, root.y, DISPLAY_W, DISPLAY_H));
 
   const int text_x = PBL_IF_ROUND_ELSE(scalable_x(260), scalable_x_pp(140, 113));
   y -= scalable_y_pp(40, 50);
   GRect frame = grect_inset(bounds, GEdgeInsets(y, 0, 0, text_x));
-  s_date_layer = make_text_layer(frame);
-  layer_add_child(root_layer, text_layer_get_layer(s_date_layer));
+  layer_set_frame(text_layer_get_layer(s_date_layer), frame);
 
   y += scalable_y_pp(165, 162);
   frame = grect_inset(bounds, GEdgeInsets(y, 0, 0, text_x));
-  s_time_layer = make_text_layer(frame);
-  layer_add_child(root_layer, text_layer_get_layer(s_time_layer));
-
-  // Always allocate
-  s_batt_and_bt_layer = make_text_layer(frame);
-  s_weather_layer = make_text_layer(frame);
+  layer_set_frame(text_layer_get_layer(s_time_layer), frame);
 
   y += scalable_y_pp(195, 200);
 
   if (data_get_boolean(MESSAGE_KEY_BatteryAndBluetooth)) {
     frame = grect_inset(bounds, GEdgeInsets(y, 0, 0, text_x));
-
-    // Battery & BT
-    Layer *bbl = text_layer_get_layer(s_batt_and_bt_layer);
-    layer_set_frame(bbl, frame);
-    layer_add_child(root_layer, bbl);
+    layer_set_frame(text_layer_get_layer(s_batt_and_bt_layer), frame);
   }
 
   if (data_get_boolean(MESSAGE_KEY_WeatherStatus)) {
     y += scalable_y_pp(165, 163);
     frame = grect_inset(bounds, GEdgeInsets(y, 0, 0, text_x));
-
-    // Weather
-    Layer *wl = text_layer_get_layer(s_weather_layer);
-    layer_set_frame(wl, frame);
-    layer_add_child(root_layer, wl);
+    layer_set_frame(text_layer_get_layer(s_weather_layer), frame);
   }
+
+  layer_mark_dirty(s_canvas_layer);
+}
+
+static void window_load(Window *window) {
+  Layer *root_layer = window_get_root_layer(s_window);
+  
+  const GPoint root = get_root_point();
+
+  s_canvas_layer = layer_create(GRect(root.x, root.y, DISPLAY_W, DISPLAY_H));
+  layer_set_update_proc(s_canvas_layer, canvas_update_proc);
+  layer_add_child(root_layer, s_canvas_layer);
+
+  s_date_layer = make_text_layer(GRectZero);
+  layer_add_child(root_layer, text_layer_get_layer(s_date_layer));
+
+  s_time_layer = make_text_layer(GRectZero);
+  layer_add_child(root_layer, text_layer_get_layer(s_time_layer));
+
+  s_batt_and_bt_layer = make_text_layer(GRectZero);
+  layer_add_child(root_layer, text_layer_get_layer(s_batt_and_bt_layer));
+
+  s_weather_layer = make_text_layer(GRectZero);
+  layer_add_child(root_layer, text_layer_get_layer(s_weather_layer));
 }
 
 static void window_unload(Window *window) {
@@ -209,7 +219,6 @@ static void window_unload(Window *window) {
   text_layer_destroy(s_time_layer);
   text_layer_destroy(s_batt_and_bt_layer);
   text_layer_destroy(s_weather_layer);
-  fonts_unload_custom_font(s_font);
 
   layer_destroy(s_canvas_layer);
 
@@ -236,6 +245,8 @@ void main_window_push() {
 }
 
 void main_window_reload() {
+  layout();
+
   // Battery and Bluetooth
   if (!data_get_boolean(MESSAGE_KEY_BatteryAndBluetooth)) {
     layer_set_hidden(text_layer_get_layer(s_batt_and_bt_layer), true);

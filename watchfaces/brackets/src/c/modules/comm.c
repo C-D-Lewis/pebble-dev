@@ -20,7 +20,6 @@ static void inbox_received_handler(DictionaryIterator *iter, void *context) {
     t = dict_read_next(iter);
   }
 
-  // Exit to reload
   main_window_reload();
 }
 
