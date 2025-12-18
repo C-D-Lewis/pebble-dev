@@ -6,8 +6,8 @@
 
 void health_init();
 
-bool is_health_available();
+bool health_is_health_available();
 
-int get_step_count();
+int health_get_step_count();
 
-bool step_data_is_available();
+bool health_step_data_is_available();

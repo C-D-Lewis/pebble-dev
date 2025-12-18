@@ -24,3 +24,8 @@ adjust which features you want from the following:
 GitHub stats prior to being moved to `pebble-dev`:
 
 ![](screenshots/ghstats.png)
+
+## TODO
+
+- [ ] Support `flint` once `pebble-clay` does
+- [ ] Custom colors!
