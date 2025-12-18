@@ -66,11 +66,11 @@ void data_init() {
   // Test case: Should show 10 days at 8% per day (from 80%)
   // const int changes[NUM_SAMPLES] = {2, 2, 2, 2, 2, 2, 2, 2};
   // Test case: Should show 10 days at 8% (two other events are ignored)
-  const int changes[NUM_SAMPLES] = {2, 2, 2, 2, -20, 2, 0, 2};
+  // const int changes[NUM_SAMPLES] = {2, 2, 2, 2, -20, 2, 0, 2};
   // Special status test scenario
   // const int changes[NUM_SAMPLES] = {2, 2, 2, 2, 0, 2, -20, 2};
   // Test case: Should show 6 days at 12% per day (from 80%)
-  // const int changes[NUM_SAMPLES] = {3, 3, 3, 3, 3, 3, 3, 3};
+  const int changes[NUM_SAMPLES] = {3, 3, 3, 3, 3, 3, 3, 3};
   // Test case: Extremely high rate
   // const int changes[NUM_SAMPLES] = {50, 50, 50, 50, 50, 50, 50, 50};
 

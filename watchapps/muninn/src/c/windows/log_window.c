@@ -100,14 +100,14 @@ static void draw_result_and_datetime(GContext *ctx, const GRect bounds, const Sa
     snprintf(
       s_result_buff,
       sizeof(s_result_buff),
-      "Est. %d%%/d",
+      "Rate: %d%%/d",
       s->result
     );
   }
 
   graphics_draw_text(
     ctx,
-    s_result_buff,
+    s_datetime_buff,
     scalable_get_font(SFI_Medium),
     scalable_grect_pp(
       GRect(20, -50, 1000, 280),
@@ -119,7 +119,7 @@ static void draw_result_and_datetime(GContext *ctx, const GRect bounds, const Sa
   );
   graphics_draw_text(
     ctx,
-    s_datetime_buff,
+    s_result_buff,
     scalable_get_font(SFI_Medium),
     scalable_grect_pp(
       GRect(0, -50, 980, 280),

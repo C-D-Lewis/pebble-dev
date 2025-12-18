@@ -18,7 +18,7 @@
 #endif
 
 #define ACTION_BAR_W scalable_x(70)
-#define BRAID_Y scalable_y_pp(415, 425)
+#define BRAID_Y scalable_y_pp(420, 415)
 #define HINT_W scalable_x(70)
 #define HINT_H scalable_y(200)
 #define ROW_DIV_Y scalable_y(810)
@@ -91,11 +91,16 @@ static void anim_update(Animation *anim, AnimationProgress dist_normalized) {
 
   // Update text layers
   static char s_remaining_buff[16];
-  snprintf(s_remaining_buff, sizeof(s_remaining_buff), "%d", s_anim_days);
+  snprintf(
+    s_remaining_buff,
+    sizeof(s_remaining_buff),
+    s_anim_days < 10 ? "0%d" : "%d",
+    s_anim_days
+  );
   text_layer_set_text(s_remaining_layer, s_remaining_buff);
 
   static char s_rate_buff[16];
-  snprintf(s_rate_buff, sizeof(s_rate_buff), "%d", s_anim_rate);
+  snprintf(s_rate_buff, sizeof(s_rate_buff), s_anim_rate < 10 ? "0%d" : "%d", s_anim_rate);
   text_layer_set_text(s_rate_layer, s_rate_buff);
 }
 
@@ -179,9 +184,9 @@ static void update_data() {
   text_layer_set_text(s_desc_layer, util_get_status_string());
 
   if (!is_enabled) {
-    text_layer_set_text(s_reading_layer, " -");
-    text_layer_set_text(s_remaining_layer, " -");
-    text_layer_set_text(s_rate_layer, " -");
+    text_layer_set_text(s_reading_layer, "--:--");
+    text_layer_set_text(s_remaining_layer, "--");
+    text_layer_set_text(s_rate_layer, "--");
 
     layer_set_hidden(text_layer_get_layer(s_hint_layer), false);
   } else {
@@ -191,19 +196,19 @@ static void update_data() {
     // Days remaining
     s_days_remaining = data_calculate_days_remaining();
     if (!util_is_valid(s_days_remaining)) {
-      text_layer_set_text(s_remaining_layer, " -");
+      text_layer_set_text(s_remaining_layer, "--");
     } else {
       // Handled in animation
-      text_layer_set_text(s_remaining_layer, " -");
+      text_layer_set_text(s_remaining_layer, "--");
     }
 
     // Rate per day
     s_rate = data_calculate_avg_discharge_rate();
     if (!util_is_valid(s_rate)) {
-      text_layer_set_text(s_rate_layer, " -");
+      text_layer_set_text(s_rate_layer, "--");
     } else {
       // Handled in animation
-      text_layer_set_text(s_rate_layer, " -");
+      text_layer_set_text(s_rate_layer, "--");
     }
 
     // Next reading
@@ -221,16 +226,6 @@ static void update_data() {
 }
 
 static void canvas_update_proc(Layer *layer, GContext *ctx) {
-  // Status divider
-  graphics_context_set_stroke_color(ctx, GColorBlack);
-  graphics_context_set_stroke_width(ctx, DIV_W);
-  const int status_div_y = scalable_y_pp(280, 280);
-  graphics_draw_line(
-    ctx,
-    GPoint(0, status_div_y),
-    GPoint(DISPLAY_W - ACTION_BAR_W, status_div_y)
-  );
-
   // Divider braid
   const GRect braid_rect = GRect(0, BRAID_Y, DISPLAY_W, BRAID_H);
   graphics_draw_bitmap_in_rect(ctx, s_braid_bitmap, braid_rect);
@@ -371,16 +366,18 @@ static void window_load(Window *window) {
 
   s_desc_layer = util_make_text_layer(
     scalable_grect_pp(
-      GRect(0, 270, 930, 300),
-      GRect(0, 280, 930, 300)
+      GRect(0, 280, 930, 150),
+      GRect(0, 270, 930, 150)
     ),
     scalable_get_font(SFI_Small)
   );
   text_layer_set_text_alignment(s_desc_layer, GTextAlignmentCenter);
+  text_layer_set_text_color(s_desc_layer, GColorWhite);
+  text_layer_set_background_color(s_desc_layer, GColorBlack);
   layer_add_child(root_layer, text_layer_get_layer(s_desc_layer));
 
   // Top row
-  int row_x = scalable_x(30);
+  int row_x = scalable_x_pp(30, 40);
   int row_y = scalable_y_pp(535, 550);
 
   const int row_1_text_icon_offset = scalable_x_pp(190, 160);
