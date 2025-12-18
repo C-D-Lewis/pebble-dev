@@ -1,92 +1,32 @@
-/** Expected Line ID values */
-type LineId = 'bakerloo' | 'central' | 'circle' | 'district' | 'dlr' | 'elizabeth' |
-  'hammersmith-city' | 'jubilee' | 'liberty' | 'lioness' | 'metropolitan' | 'mildmay' |
-  'northern' | 'piccadilly' | 'suffragette' | 'victoria' | 'waterloo-city' | 'weaver' |
-  'windrush';
+import { type TransitBackend, type LineConfig, type GenericLineData, londonUndergroundBackend } from './backends';
 
-/** API data type */
-type TfLApiResult = {
-  id: LineId;
-  lineStatuses: {
-    statusSeverityDescription: string;
-    reason?: string;
-  }[];
-};
-
-/** Processed data type */
-type LineData = {
-  id: string;
-  status: string;
-  reason: string;
-};
-
-/** Despite attempts to not rely on index, need to map these API IDs to C enum values */
-const LINE_TYPE_MAP: { [key in LineId]: number } = {
-  bakerloo: 0,
-  central: 1,
-  circle: 2,
-  district: 3,
-  dlr: 4,
-  elizabeth: 5,
-  'hammersmith-city': 6,
-  jubilee: 7,
-  liberty: 8,
-  lioness: 9,
-  metropolitan: 10,
-  mildmay: 11,
-  northern: 12,
-  piccadilly: 13,
-  suffragette: 14,
-  victoria: 15,
-  'waterloo-city': 16,
-  weaver: 17,
-  windrush: 18,
-};
-
-/** API modes to query */
-const MODES = ['tube', 'dlr', 'elizabeth-line', 'overground'];
-/** Number of lines the API returns */
-const NUM_LINES = 19;
-/** Max reason length */
-const MAX_REASON_LENGTH = 512;
+// TODO: Configure ACTIVE_BACKEND with settings in the future
+const ACTIVE_BACKEND: TransitBackend = londonUndergroundBackend;
 
 /**
- * Download all lines statuses.
- * Available modes: https://api.tfl.gov.uk/StopPoint/Meta/modes
+ * Send line configurations to the watch
  */
-const fetchLinesWithIssues = async (): Promise<LineData[]> => {
-  const url = `https://api.tfl.gov.uk/line/mode/${MODES.join(',')}/status`;
-  const json = await PebbleTS.fetchJSON(url) as TfLApiResult[];
-  // console.log(JSON.stringify(json, null, 2));
+const sendLineConfigs = async (configs: LineConfig[]): Promise<void> => {
+  console.log(`Sending ${configs.length} line configurations...`);
 
-  // Send only those with issues (will need better logic if a setting for this is implemented)
-  // return [];
-  return json
-    .filter((obj: TfLApiResult) => obj.lineStatuses[0].statusSeverityDescription !== 'Good Service')
-    .reduce((acc, obj: TfLApiResult): LineData[] => {
-      let reason = obj.lineStatuses[0].reason || '';
-      if (reason?.length > MAX_REASON_LENGTH) {
-        reason = reason?.substring(0, MAX_REASON_LENGTH - 4) + '...';
-      }
+  for (const config of configs) {
+    const dict = {
+      ConfigLineIndex: config.index,
+      ConfigLineName: config.name,
+      ConfigLineColor: config.color,
+      ConfigLineStriped: config.striped ? 1 : 0,
+    };
+    await PebbleTS.sendAppMessage(dict);
+    console.log(`Configured line ${config.index}: ${config.name}`);
+  }
 
-      return [
-        ...acc,
-        {
-          id: obj.id,
-          status: obj.lineStatuses[0].statusSeverityDescription || '?',
-          reason,
-        },
-      ];
-    }, []);
+  console.log('All line configurations sent!');
 };
 
 /**
- * Send next line's data.
- *
- * @param {LineData[]} lines - Data for all lines with issues.
- * @param {number} index - Item to send.
+ * Send all status updates with completion flags
  */
-const sendNextLine = async (lines: LineData[], index: number) => {
+const sendLineStatuses = async (lines: GenericLineData[]): Promise<void> => {
   // Everything is awesome!
   if (lines.length === 0) {
     const dict = {
@@ -97,35 +37,49 @@ const sendNextLine = async (lines: LineData[], index: number) => {
     return;
   }
 
-  // Completed
-  if (index === lines.length) {
-    console.log('All data sent!');
-    return;
+  // Send each line status
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const dict = {
+      LineStatusIndex: i,
+      LineStatus: line.status,
+      LineStatusSeverity: line.severity,
+      LineReason: line.reason,
+      FlagIsComplete: i === lines.length - 1 ? 1 : 0,
+      FlagLineCount: lines.length,
+    };
+    await PebbleTS.sendAppMessage(dict);
+    console.log(`Sent status ${i + 1}/${lines.length}: Line ${line.index} -> Display index ${i}`);
   }
 
-  const lineData = lines[index];
-  if (!lineData) throw new Error(`No lineData for ${index}`);
-
-  const dict = {
-    LineIndex: index,
-    LineType: LINE_TYPE_MAP[lineData.id as LineId],
-    LineStatus: lineData.status,
-    LineReason: lineData.reason,
-    FlagIsComplete: index === lines.length - 1 ? 1 : 0,
-    FlagLineCount: lines.length,
-  };
-  await PebbleTS.sendAppMessage(dict);
-  console.log(`Sent item ${index}: ${JSON.stringify(dict)}`);
-
-  await sendNextLine(lines, index + 1);
+  console.log('All status updates sent!');
 };
 
 Pebble.addEventListener('ready', async (e) => {
   console.log('PebbleKit JS ready');
+  console.log(`Active backend: ${ACTIVE_BACKEND.name}`);
 
   try {
-    const lines = await fetchLinesWithIssues();
-    await sendNextLine(lines, 0);
+    // Fetch lines with issues first
+    const lines = await ACTIVE_BACKEND.fetchLines();
+
+    // Only send configs for lines that have issues
+    if (lines.length > 0) {
+      const allConfigs = ACTIVE_BACKEND.getLineConfigs();
+
+      const neededConfigs = lines.configMapping.map((configIndex: number, displayIndex: number) => {
+        const config = allConfigs[configIndex];
+        return { ...config, index: displayIndex }; // Remap to sequential index
+      });
+
+      console.log(`Sending configs for ${neededConfigs.length} lines with issues (out of ${allConfigs.length} total)`);
+      await sendLineConfigs(neededConfigs);
+    } else {
+      console.log('No issues detected, skipping line configurations');
+    }
+
+    // Send status updates
+    await sendLineStatuses(lines);
   } catch (e) {
     console.log('Failed to send data');
     console.log(e);
