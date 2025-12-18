@@ -1,7 +1,7 @@
-import { type TransitBackend, type LineConfig, type GenericLineData, londonUndergroundBackend } from './backends';
+import { type TransitBackend, type LineConfig, type GenericLineData, jrEastKantoBackend } from './backends';
 
 // TODO: Configure ACTIVE_BACKEND with settings in the future
-const ACTIVE_BACKEND: TransitBackend = londonUndergroundBackend;
+const ACTIVE_BACKEND: TransitBackend = jrEastKantoBackend;
 
 /**
  * Send line configurations to the watch

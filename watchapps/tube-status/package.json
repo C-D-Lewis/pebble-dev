@@ -49,7 +49,7 @@
       "LineStatusSeverity"
     ],
     "enableMultiJS": true,
-    "displayName": "Tube Status",
+    "displayName": "Transit Status",
     "watchapp": {
       "onlyShownOnCommunication": false,
       "hiddenApp": false,
