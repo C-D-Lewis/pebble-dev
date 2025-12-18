@@ -8,6 +8,7 @@ typedef enum {
 
 static Window *s_window;
 static Layer *s_canvas_layer;
+static GBitmap *s_rate_bitmap;
 
 static GFont s_gothic_18, s_gothic_24;
 
@@ -75,11 +76,20 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     GTextAlignmentCenter,
     NULL
   );
+
+  // Draw image centered at the bottom - image is 24x24px as a base size, so about 15% width
+  graphics_draw_bitmap_in_rect(
+    ctx,
+    s_rate_bitmap,
+    scalable_center_x(scalable_grect(0, 850, 150, 150))
+  );
 }
 
 static void window_load(Window *window) {
   Layer *root_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(root_layer);
+
+  s_rate_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_RATE);
 
   s_canvas_layer = layer_create(bounds);
   layer_set_update_proc(s_canvas_layer, canvas_update_proc);
@@ -88,6 +98,8 @@ static void window_load(Window *window) {
 
 static void window_unload(Window *window) {
   layer_destroy(s_canvas_layer);
+
+  gbitmap_destroy(s_rate_bitmap);
 }
 
 static void init(void) {

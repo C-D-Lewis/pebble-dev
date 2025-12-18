@@ -29,7 +29,13 @@
     },
     "messageKeys": [],
     "resources": {
-      "media": []
+      "media": [
+        {
+          "type": "bitmap",
+          "name": "IMAGE_RATE",
+          "file": "images/rate.png"
+        }
+      ]
     }
   }
 }

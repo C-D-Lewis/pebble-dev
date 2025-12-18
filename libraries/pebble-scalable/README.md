@@ -4,9 +4,10 @@ Package aiming to make it easy to make scaling layouts for different display
 sizes by defining their dimensions only once.
 
 - [Setting up](#setting-up)
-- [Dimensions](#dimensions)
+- [Layout](#layout)
 - [Centering](#centering)
 - [Fonts](#fonts)
+- [Images](#images)
 
 See `include/pebble-scalable.h` for function documentation.
 
@@ -24,7 +25,7 @@ Add the includes at the top of your source.
 #include <pebble-scalable/pebble-scalable.h>
 ```
 
-## Dimensions
+## Layout
 
 Get values for layout dimensions based on display size:
 
@@ -135,8 +136,24 @@ graphics_draw_text(
 );
 ```
 
+## Images
+
+Images can be selected per-platform using the SDK's
+[resource tagging](https://developer.rebble.io/guides/app-resources/platform-specific/)
+system. From there, scalable layout functions can be used to set the position
+and size. For example, `icon.png` and `icon~emery.png`.
+
+```c
+// Draw image centered at the bottom - image is 24x24px as a base size, so about 15% width
+graphics_draw_bitmap_in_rect(
+  ctx,
+  s_icon_bitmap,
+  scalable_center_x(scalable_grect(0, 850, 150, 150))
+);
+```
+
 ## TODO
 
 - [x] Support per-platform (per shape) values
-- [ ] Solution for picking bitmaps (to work with their scalable GRects)
+- [x] Solution for picking bitmaps (to work with their scalable GRects)
 - [ ] Chalk? It's so different layouts might not be at all similar...

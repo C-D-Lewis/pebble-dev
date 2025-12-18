@@ -68,4 +68,4 @@ GFont scalable_get_font(int id);
 
 ////////////////////////////////////////////// Images //////////////////////////////////////////////
 
-// Q: Images could vary by color/BW - scope for now is just physical dimensions
+// Images can use the SDK's resource tagging system, position can use regular scalable functions.
