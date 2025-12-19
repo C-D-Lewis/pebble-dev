@@ -158,6 +158,7 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
       true,
       false
     );
+    return;
   }
 
   // Just a sample
