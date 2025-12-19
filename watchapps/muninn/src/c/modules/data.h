@@ -41,6 +41,7 @@ typedef struct {
   int custom_alert_level;
   bool ca_has_notified;
   bool push_timeline_pins;
+  bool elevated_rate_alert;
 } AppData;
 
 // A full wakeup sample
@@ -75,6 +76,7 @@ void data_push_sample(int charge_perc, int last_sample_time, int last_charge_per
 int data_calculate_avg_discharge_rate();
 int data_calculate_days_remaining();
 void data_cycle_custom_alert_level();
+bool data_get_rate_is_elevated();
 
 // Interface getters/setters
 int data_get_last_sample_time(void);
@@ -97,6 +99,8 @@ bool data_get_ca_has_notified();
 void data_set_ca_has_notified(bool notified);
 bool data_get_push_timeline_pins();
 void data_set_push_timeline_pins(bool b);
+bool data_get_elevated_rate_alert();
+void data_set_elevated_rate_alert(bool b);
 
 // Strings
 #define MSG_WELCOME "Welcome to Muninn!\n\nEstimates will appear after two samples are taken.\n\nPlease launch me if the watch is off and a sample is missed."

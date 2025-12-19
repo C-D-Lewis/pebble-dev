@@ -10,11 +10,13 @@
 /////////////////////////////////////
 
 // MUST match package.json
-#define VERSION "1.10.0"
+#define VERSION "1.11.0"
 // Minimum samples before providing estimations
 #define MIN_SAMPLES 2
 // Maximum number of extra minutes if a collision
 #define EXTRA_MINUTES_MAX 10
+// Multipler for elevated rate alarm
+#define EVEVATED_RATE_MULT 2
 
 // Platform-dependant values
 #if defined(PBL_PLATFORM_EMERY)

@@ -18,18 +18,14 @@ void wakeup_schedule_next() {
 #else
   // Find next interval hour based on WAKEUP_MOD_H
   const int hours_rem = WAKEUP_MOD_H - (now->tm_hour % WAKEUP_MOD_H);
-  // (old method)
-  // const int elap_min_s = now->tm_min * 60;
-  // const int interval_s = (hours_rem * SECONDS_PER_HOUR) - elap_min_s - now->tm_sec;
-  // time_t future = ts_now + interval_s + 5;
 
   // Ensure it's exactly an interval of WAKEUP_MOD_H
   struct tm tm_future = *now;
   tm_future.tm_hour += hours_rem;
   tm_future.tm_min = 0;
-  tm_future.tm_sec = 0;
   // Tiny extra offset in case weird things happen exactly on the hour
-  const time_t future = mktime(&tm_future) + 5;
+  tm_future.tm_sec = 5;
+  const time_t future = mktime(&tm_future);
 #endif
 
   APP_LOG(APP_LOG_LEVEL_INFO, "future %d", (int)future);
@@ -54,13 +50,6 @@ void wakeup_schedule_next() {
       data_set_error("Failed to schedule wakeup");
       return;
     }
-  }
-
-  // Verify scheduled - not observed but Dashboard checks for some reason
-  if (!wakeup_query(id, NULL)) {
-    APP_LOG(APP_LOG_LEVEL_ERROR, "Scheduled wakeup not found");
-    data_set_error("Scheduled wakeup not found");
-    return;
   }
 
   data_set_wakeup_id(id);
@@ -149,15 +138,27 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
   if (data_get_valid_samples_count() > MIN_SAMPLES && is_low && !ca_has_notified) {
     data_set_ca_has_notified(true);
 
+    vibes_double_pulse();
     alert_window_push(
-      RESOURCE_ID_WRITING,
-      "Muninn advises the battery is below your custom threshold.",
+      RESOURCE_ID_AWAKE,
+      "Muninn advises the battery is below your chosen threshold.",
       true,
       false
     );
     return;
   }
   if (!is_low && ca_has_notified) data_set_ca_has_notified(false);
+
+  // Rate is unusually high
+  if (data_get_rate_is_elevated() && data_get_elevated_rate_alert()) {
+    vibes_double_pulse();
+    alert_window_push(
+      RESOURCE_ID_AWAKE,
+      "Muninn advises the battery is draining faster than usual.",
+      true,
+      false
+    );
+  }
 
   // Just a sample
   alert_window_push(

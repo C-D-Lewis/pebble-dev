@@ -10,9 +10,11 @@ function handlePushTimelinePin(dict) {
   var days = dict.DAYS_REMAINING;
   var rate = dict.DISCHARGE_RATE;
 
-  // Put the pin in the future at noon
+  // Put the pin in the future at noon, or today late if no days remaining
+  var now = new Date();
   var date = new Date(Date.now() + (days * SECONDS_PER_DAY * 1000));
-  date.setHours(12);
+  var targetHour = (days == 0 && now.getHours() > 12) ? 23 : 12;
+  date.setHours(targetHour);
   date.setMinutes(0);
   date.setSeconds(0);
 
@@ -43,7 +45,7 @@ Pebble.addEventListener('appmessage', function(e) {
   var dict = e.payload;
   console.log('dict: ' + JSON.stringify(dict));
 
-  if (dict.DAYS_REMAINING) {
+  if (typeof dict.DAYS_REMAINING !== 'undefined') {
     handlePushTimelinePin(dict);
     return;
   }

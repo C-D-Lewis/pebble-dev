@@ -39,6 +39,7 @@ void data_reset_all() {
   s_app_data.custom_alert_level = AL_OFF;
   s_app_data.ca_has_notified = false;
   s_app_data.push_timeline_pins = false;
+  s_app_data.elevated_rate_alert = false;
 
   // Init all fields in Samples struct
   for (int i = 0; i < NUM_SAMPLES; i++) {
@@ -59,20 +60,42 @@ static void do_migrations() {
   // Future migrations go here
 }
 
+#if defined(USE_TEST_DATA)
+static int result_from_gap(int gap) {
+  if (gap < 0) {
+    return STATUS_CHARGED;
+  } else if (gap == 0) {
+    return STATUS_NO_CHANGE;
+  } else {
+    return (gap * 4);
+  }
+}
+#endif
+
 void data_init() {
 #if defined(USE_TEST_DATA)
-  // Arbitrary scenario - (reverse order)
+  //
+  // Test data scenarios
+  //
+  // 1 - Arbitrary scenario
   // const int changes[NUM_SAMPLES] = {30, 30, 30, 30, 30, 30, 30, 30};
-  // Test case: Should show 10 days at 8% per day (from 80%)
+  //
+  // 2 - Test case: Should show 10 days at 8% per day (from 80%)
   // const int changes[NUM_SAMPLES] = {2, 2, 2, 2, 2, 2, 2, 2};
-  // Test case: Should show 10 days at 8% (two other events are ignored)
-  // const int changes[NUM_SAMPLES] = {2, 2, 2, 2, -20, 2, 0, 2};
-  // Special status test scenario
-  // const int changes[NUM_SAMPLES] = {2, 2, 2, 2, 0, 2, -20, 2};
-  // Test case: Should show 6 days at 12% per day (from 80%)
-  const int changes[NUM_SAMPLES] = {3, 3, 3, 3, 3, 3, 3, 3};
-  // Test case: Extremely high rate
-  // const int changes[NUM_SAMPLES] = {50, 50, 50, 50, 50, 50, 50, 50};
+  //
+  // 3 - Test case: Should show 11 days at 7% (two other events are ignored)
+  //     Note: includes the two special statuses
+  const int changes[NUM_SAMPLES] = {2, 2, 2, 2, -20, 2, 0, 2};
+  //
+  // 4 - Test case: Should show 6 days at 12% per day (from 80%)
+  // const int changes[NUM_SAMPLES] = {3, 3, 3, 3, 3, 3, 3, 3};
+  //
+  // 5 - Test case: User submitted scenario for ~12% rate (not 40!)
+  //     Note: the code to set up fake scenarios won't show the correct overlapping periods
+  // const int changes[NUM_SAMPLES] = {0, 10, 0, 0, 10, 0, 10, 0};
+  //
+  // 6 - Test case: Last estimation was a significant uptick
+  // const int changes[NUM_SAMPLES] = {20, 10, 0, 0, 10, 0, 10, 0};
 
   int total_change = 0;
   for(int i = 0; i < NUM_SAMPLES; i++) {
@@ -80,48 +103,50 @@ void data_init() {
   }
   const int interval_s = WAKEUP_MOD_H * SECONDS_PER_HOUR;
 
+  // Use the most recent interval time as a base with 0 minutes
+  const time_t now = time(NULL);
+  struct tm *ts_info = localtime(&now);
+  ts_info->tm_hour -= (ts_info->tm_hour % WAKEUP_MOD_H);
+  ts_info->tm_min = 0;
+  ts_info->tm_sec = 5;
+  const time_t base = mktime(ts_info);
+
   // Load test values for this launch
-  // TODO: Use the array's newest value here
-  s_app_data.last_sample_time = time(NULL) - interval_s;
-  s_app_data.last_charge_perc = 80;
-  s_app_data.wakeup_id = time(NULL) + (12 * SECONDS_PER_HOUR);   // Won't be found
+  // TODO: Use the array's newest value here?
+  s_app_data.last_sample_time = base;
+  s_app_data.last_charge_perc = 80;  // Agrees with emulator
+  s_app_data.wakeup_id = base + (12 * SECONDS_PER_HOUR);   // Won't be found
   s_app_data.seen_first_launch = true;
   s_app_data.vibe_on_sample = true;
   s_app_data.custom_alert_level = AL_20;
   s_app_data.ca_has_notified = false;
+  s_app_data.elevated_rate_alert = false;
 
-  const time_t now = time(NULL);
-  for (int i = NUM_SAMPLES - 1; i >= 0; i--) {
+  for (int i = 0; i < NUM_SAMPLES; i++) {
     Sample *s = &s_sample_data.samples[i];
-    const int gap = changes[NUM_SAMPLES - 1 - i];
+    const int gap = changes[i];
 
-    if (i == NUM_SAMPLES - 1) {
-      // Oldest sample
-      s->timestamp = now - ((NUM_SAMPLES - 1) * interval_s);
-      s->result = gap == 0 ? STATUS_NO_CHANGE : (gap * 4);
-      s->charge_diff = changes[NUM_SAMPLES - 1];
-      s->last_sample_time = now - ((NUM_SAMPLES - 2) * interval_s);
+    if (i == 0) {
+      s->timestamp = base;
+      s->charge_perc = s_app_data.last_charge_perc;
+      s->last_sample_time = base - interval_s;
+      s->last_charge_perc = s->charge_perc + gap;
+      s->charge_diff = gap;
       s->time_diff = interval_s;
-      s->charge_perc = 80;
-      s->last_charge_perc = s->charge_perc + s->charge_diff;
+      s->result = result_from_gap(gap);
       continue;
     }
 
-    // Diff the last
-    Sample *last_s = &s_sample_data.samples[i + 1];
+    // Use the previous in the array which is more recent
+    Sample *newer_s = &s_sample_data.samples[i - 1];
 
-    s->timestamp = last_s->timestamp - interval_s;
+    s->timestamp = newer_s->last_sample_time;
+    s->charge_perc = newer_s->last_charge_perc;
+    s->last_sample_time = s->timestamp - interval_s;
+    s->last_charge_perc = s->charge_perc + gap;
     s->charge_diff = gap;
-    s->last_sample_time = s->timestamp + interval_s;
     s->time_diff = interval_s;
-    s->charge_perc = last_s->charge_perc - s->charge_diff;
-    s->last_charge_perc = s->charge_perc + s->charge_diff;
-
-    // Hacky way to simulate both special statuses
-    s->result = gap == 0 ? STATUS_NO_CHANGE : (gap * 4);
-    if (s->charge_perc > last_s->charge_perc) {
-      s->result = STATUS_CHARGED;
-    }
+    s->result = result_from_gap(gap);
   }
 
   data_log_state();
@@ -216,11 +241,8 @@ void data_push_sample(int charge_perc, int last_sample_time, int last_charge_per
   s->result = result;
 }
 
-/**
- * This _should_ place twice as much emphasis on the most recent half of values,
- * so recent changes in watchface or activity are more quickly reflected.
- */
-int data_calculate_avg_discharge_rate() {
+// Old algo for comparison
+int data_calculate_avg_discharge_rate_v1() {
   SampleData *data = data_get_sample_data();
   const int count = data_get_valid_samples_count();
 
@@ -237,11 +259,6 @@ int data_calculate_avg_discharge_rate() {
     if (!util_is_valid(v)) continue;
 
     seen++;
-
-    // Removed this, a sudden change can really make the est. jump around
-//     if (seen == 1) {
-//       result_x2 += v * 3; // first item -> 3x weight
-//       weight_x2 += 3;
     if (seen <= 4) {
       result_x2 += v * 2; // next three -> 2x weight
       weight_x2 += 2;
@@ -256,6 +273,51 @@ int data_calculate_avg_discharge_rate() {
   return result_x2 / weight_x2;
 }
 
+/**
+ * This _should_ place twice as much emphasis on the most recent half of values,
+ * so recent changes in watchface or activity are more quickly reflected.
+ *
+ * Important: count all time periods in the log, not just those with a drop!
+ */
+int data_calculate_avg_discharge_rate() {
+  SampleData *data = data_get_sample_data();
+  const int total = data_get_log_length();
+
+  // Not enough samples yet
+  if (total < MIN_SAMPLES) return STATUS_EMPTY;
+
+  int result_x2 = 0;
+  int weight_x2 = 0;
+  int count = 0;
+
+  for (int i = 0; i < NUM_SAMPLES; i++) {
+    int r = data->samples[i].result;
+
+    // Log ends here, we never skip a slot when adding to it
+    if (r == STATUS_EMPTY) break;
+    // No charge change but we still count the time period elapsed
+    if (r == STATUS_NO_CHANGE) {
+      r = 0;
+    }
+    // Tricky - decision to ignore this time period for now (not discharging)
+    if (r == STATUS_CHARGED) continue;
+
+    count++;
+    if (count <= 4) {
+      result_x2 += r * 2; // next three -> 2x weight
+      weight_x2 += 2;
+    } else {
+      result_x2 += r * 1; // rest -> 1x weight
+      weight_x2 += 1;
+    }
+  }
+
+  // We didn't count anything - empty log?
+  if (weight_x2 == 0) return STATUS_EMPTY;
+
+  return result_x2 / weight_x2;
+}
+
 int data_calculate_days_remaining() {
   // Use live battery level, not last reading
   const BatteryChargeState state = battery_state_service_peek();
@@ -263,14 +325,23 @@ int data_calculate_days_remaining() {
   const int rate = data_calculate_avg_discharge_rate();
 
   // Given a 'valid' log entry is only one with a discharging change
-  if (!util_is_valid(rate) || !util_is_valid(charge_perc)) return STATUS_EMPTY;
+  if (!util_is_valid(rate)) return STATUS_EMPTY;
 
-  if (rate <= 0) {
-    APP_LOG(APP_LOG_LEVEL_INFO, "zero or negative rate: %d charge_perc: %d", rate, charge_perc);
-    return STATUS_EMPTY;
-  }
+  // We only ever charged in every non-empty log entry...
+  if (rate <= 0) return STATUS_EMPTY;
 
   return charge_perc / rate;
+}
+
+bool data_get_rate_is_elevated() {
+  // Return true if the most recent value is much higher than usual
+  const int avg = data_calculate_avg_discharge_rate();
+  const int last = 40; // UNDO ME s_sample_data.samples[0].result;
+
+  // Last value wasn't a significant one of discharge
+  if (!util_is_valid(avg) || !util_is_valid(last)) return false;
+
+  return last >= avg * EVEVATED_RATE_MULT;
 }
 
 void data_cycle_custom_alert_level() {
@@ -391,4 +462,12 @@ bool data_get_push_timeline_pins() {
 
 void data_set_push_timeline_pins(bool b) {
   s_app_data.push_timeline_pins = b;
+}
+
+bool data_get_elevated_rate_alert() {
+  return s_app_data.elevated_rate_alert;
+}
+
+void data_set_elevated_rate_alert(bool b) {
+  s_app_data.elevated_rate_alert = b;
 }

@@ -54,6 +54,17 @@ static bool s_is_blinking, s_animating;
 static int s_blink_budget;
 static int s_days_remaining, s_rate, s_anim_days, s_anim_rate;
 
+static void update_subtitle(int days) {
+  static char s_subtitle_buff[48];
+#if defined(PBL_PLATFORM_EMERY)
+  const char *template = "   Day%s left       Est. %%/day";
+#else
+  const char *template = "    Day%s          Est. %%/d";
+#endif
+  snprintf(s_subtitle_buff, sizeof(s_subtitle_buff), template, days == 1 ? " " : "s");
+  text_layer_set_text(s_row_1_subtitle_layer, s_subtitle_buff);
+}
+
 //////////////////////////////////////////// Animations ////////////////////////////////////////////
 
 static int anim_percentage(AnimationProgress dist_normalized, int max) {
@@ -201,6 +212,8 @@ static void update_data() {
       // Handled in animation
       text_layer_set_text(s_remaining_layer, "--");
     }
+
+    update_subtitle(s_days_remaining);
 
     // Rate per day
     s_rate = data_calculate_avg_discharge_rate();
@@ -411,7 +424,6 @@ static void window_load(Window *window) {
     GRect(2, row_y + scalable_y_pp(120, 110), DISPLAY_W - ACTION_BAR_W, 40),
     scalable_get_font(SFI_Small)
   );
-  text_layer_set_text(s_row_1_subtitle_layer, ROW_1_SUBTITLE);
   layer_add_child(root_layer, text_layer_get_layer(s_row_1_subtitle_layer));
 
   // Bottom row

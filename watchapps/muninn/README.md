@@ -24,8 +24,9 @@ Features include:
 - Moving-average estimation of remaining battery life, weighted towards recent values.
 - Option to vibrate when a sample is taken.
 - Option to advise when battery charge is below a chosen threshold (50%/20%/10%).
-- Attempt to set AppGlance to show estimate in the launcher menu.
 - Option to create a timeline pin at noon on the day the charge may run out.
+- Option to get alerted if the latest estimated rate is 2x average.
+- Attempt to set AppGlance to show estimate in the launcher menu.
 - View detailed logs of recent estimates.
 - View general battery tips and Muninn lore.
 - Ability to disable temporarily.
@@ -80,6 +81,7 @@ from 2016) and what kind of anomalous behavior you encountered.
 - [x] Show log entries for wakeups where charging was observed
 - [x] Push timeline pin for charging time prediction.
 - [x] Scalable layouts with library
+- [x] Elevated drain alert option
 - [ ] Display status of timeline pin insert request in settings window.
 - [ ] Extremely simple chart using log timestamps? requires more stored samples (CHECK DATA LOADS OKAY)
 - [ ] Export/import data log to/from JS

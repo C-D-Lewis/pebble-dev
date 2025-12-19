@@ -17,11 +17,14 @@ static TextLayer *s_header_layer;
 static MenuLayer *s_menu_layer;
 
 static void draw_changes(GContext *ctx, const GRect bounds, const Sample *s) {
+  // Adjust timestamp back by a minute so it's within the interval
+  int adj_ts = s->timestamp - SECONDS_PER_MINUTE;
+
   // Time diff
   static char s_fmt_lst_buff[8];
   static char s_fmt_ts_buff[8];
   util_fmt_time(s->last_sample_time, &s_fmt_lst_buff[0], sizeof(s_fmt_lst_buff));
-  util_fmt_time(s->timestamp, &s_fmt_ts_buff[0], sizeof(s_fmt_ts_buff));
+  util_fmt_time(adj_ts, &s_fmt_ts_buff[0], sizeof(s_fmt_ts_buff));
   static char s_lst_buff[32];
   snprintf(s_lst_buff, sizeof(s_lst_buff), "%s -> %s", s_fmt_lst_buff, s_fmt_ts_buff);
   graphics_draw_text(
@@ -87,7 +90,11 @@ static void draw_changes(GContext *ctx, const GRect bounds, const Sample *s) {
 
 static void draw_result_and_datetime(GContext *ctx, const GRect bounds, const Sample *s) {
   static char s_datetime_buff[16];
-  const time_t ts_time = s->timestamp;
+  time_t ts_time = s->timestamp;
+
+  // We subtract a minute so the date is within the majority of the interval
+  ts_time -= SECONDS_PER_MINUTE;
+
   const struct tm *ts_info = localtime(&ts_time);
   strftime(s_datetime_buff, sizeof(s_datetime_buff), "%d %b", ts_info);
 
@@ -100,7 +107,7 @@ static void draw_result_and_datetime(GContext *ctx, const GRect bounds, const Sa
     snprintf(
       s_result_buff,
       sizeof(s_result_buff),
-      "Rate: %d%%/d",
+      "Est: %d%%/d",
       s->result
     );
   }

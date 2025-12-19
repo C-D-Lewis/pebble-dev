@@ -1,5 +1,12 @@
 #include "alert_window.h"
 
+// Not scaled
+#if defined(PBL_PLATFORM_EMERY)
+  #define BRAID_H 18
+#else
+  #define BRAID_H 14
+#endif
+
 static Window *s_window;
 static TextLayer *s_text_layer;
 static BitmapLayer *s_image_layer;
@@ -10,8 +17,12 @@ static uint32_t s_res_id;
 static char *s_message;
 
 static void canvas_update_proc(Layer *layer, GContext *ctx) {
-  graphics_draw_bitmap_in_rect(ctx, s_braid_bitmap, GRect(0, 0, DISPLAY_W, 14));
-  graphics_draw_bitmap_in_rect(ctx, s_braid_bitmap, GRect(0, DISPLAY_H - 14, DISPLAY_W, 14));
+  graphics_draw_bitmap_in_rect(ctx, s_braid_bitmap, GRect(0, 0, DISPLAY_W, BRAID_H));
+  graphics_draw_bitmap_in_rect(
+    ctx,
+    s_braid_bitmap,
+    GRect(0, DISPLAY_H - BRAID_H, DISPLAY_W, BRAID_H)
+  );
 }
 
 static void window_load(Window *window) {

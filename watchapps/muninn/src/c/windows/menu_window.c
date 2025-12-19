@@ -12,6 +12,7 @@ typedef enum {
   MI_VIBE_ON_SAMPLE = 0,
   MI_CUSTOM_ALERT_LEVEL,
   MI_PUSH_TIMELINE_PINS,
+  MI_ELEVATED_RATE_ALERT,
   MI_BATTERY_TIPS,
   MI_ABOUT,
   MI_DELETE_ALL_DATA,
@@ -80,7 +81,6 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
   if (!alert_disabled) {
     snprintf(s_alert_buff, sizeof(s_alert_buff), "Notifying near %d%%", alert_level);
   }
-  const bool push_pins = data_get_push_timeline_pins();
 
   switch(cell_index->row) {
     case MI_VIBE_ON_SAMPLE:
@@ -95,7 +95,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
       menu_cell_draw(
         ctx,
         cell_layer,
-        "Custom threshold",
+        "Custom alert",
         alert_disabled ? "Disabled" : s_alert_buff
       );
       break;
@@ -104,7 +104,15 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
         ctx,
         cell_layer,
         "Timeline pins",
-        push_pins ? "Enabled" : "Disabled"
+        data_get_push_timeline_pins() ? "Enabled" : "Disabled"
+      );
+      break;
+    case MI_ELEVATED_RATE_ALERT:
+      menu_cell_draw(
+        ctx,
+        cell_layer,
+        "High drain alert",
+        data_get_elevated_rate_alert() ? "Enabled" : "Disabled"
       );
       break;
     case MI_BATTERY_TIPS:
@@ -141,6 +149,7 @@ static int16_t get_cell_height_callback(struct MenuLayer *menu_layer, MenuIndex 
     case MI_VIBE_ON_SAMPLE:
     case MI_CUSTOM_ALERT_LEVEL:
     case MI_PUSH_TIMELINE_PINS:
+    case MI_ELEVATED_RATE_ALERT:
     case MI_VERSION:
       return ROW_HEIGHT_LARGE;
     case MI_DELETE_ALL_DATA:
@@ -164,6 +173,9 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
 
       if (new_state) comm_push_timeline_pins();
     } break;
+    case MI_ELEVATED_RATE_ALERT:
+      data_set_elevated_rate_alert(!data_get_elevated_rate_alert());
+      break;
     case MI_BATTERY_TIPS:
       message_window_push(MSG_TIPS);
       break;
