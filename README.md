@@ -19,7 +19,7 @@ Some PBWs can be found in `/pbw` for sideloading.
 | Name                  | Screenshot                                                 | Builds              | Icon | PBW                                |
 |-----------------------|------------------------------------------------------------|---------------------|------|------------------------------------|
 | `beam-up`             | ![](watchfaces/beam-up/screenshots/aplite.png)             | `A` `B` `C` `D`     | ✅    | [pbw](pbw/beam-up.pbw)             |
-| `brackets`            | ![](watchfaces/brackets/screenshots/basalt.png)            | `A` `B` `C` `D`     | ✅    | [pbw](pbw/brackets.pbw)            |
+| `brackets`            | ![](watchfaces/brackets/screenshots/basalt.png)            | `A` `B` `C` `D` `E` | ✅    | [pbw](pbw/brackets.pbw)            |
 | `cards`               | ![](watchfaces/cards/screenshots/diorite.png)              | `A` `B` `D`         |      | [pbw](pbw/cards.pbw)               |
 | `cmd-time-typed`      | ![](watchfaces/cmd-time-typed/screenshots/diorite.png)     | `A` `B` `C` `D` `E` | ✅    | [pbw](pbw/cmd-time-typed.pbw)      |
 | `cmd-time`            | ![](watchfaces/cmd-time/screenshots/diorite.png)           | `A` `B` `C` `D` `E` | ✅    | [pbw](pbw/cmd-time.pbw)            |
@@ -52,7 +52,7 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `block-world`    | ![](watchapps/block-world/screenshots/basalt.png)       | `B` `C` `E`           |      | [pbw](pbw/block-world.pbw)    |
 | `dashboard`      | ![](watchapps/dashboard/assets/screenshots/basalt1.png) | `A` `B` `C` `D`       | ✅    | [pbw](pbw/dashboard.pbw)      |
 | `muninn`         | ![](watchapps/muninn/screenshots/basalt.png)            | `A` `B` `D` `E` `F`   | ✅    | [pbw](pbw/muninn.pbw)         |
-| `news-headlines` | ![](watchapps/news-headlines/screenshots/basalt.png)    | `A` `B` `C` `D`       | ✅    | [pbw](pbw/news-headlines.pbw) |
+| `news-headlines` | ![](watchapps/news-headlines/screenshots/basalt.png)    | `A` `B` `C` `D` `E`   | ✅    | [pbw](pbw/news-headlines.pbw) |
 | `tube-status`    | ![](watchapps/tube-status/screenshots/basalt.png)       | `A` `B` `C` `D` `E`   | ✅    | [pbw](pbw/tube-status.pbw)    |
 | `pge-examples`   |                                                         | ❌ (needs pge package) |      |                               |
 
@@ -62,12 +62,13 @@ Some PBWs can be found in `/pbw` for sideloading.
 |---------------------------|--------|----------|-------------------------|
 | `pebble-isometric`        | ✅      | ✅        | `A` `B` `C` `D` `E` `F` |
 | `pebble-packet`           | ✅      | ✅        | `A` `B` `C` `D` `E`     |
-| `pebble-universal-fb`     | ✅      | ✅        | `A` `B` `C` `D` `E` `F` |
 | `pebble-pge`              | ✅      | ✅        | `A` `B` `C` `D` `E` `F` |
+| `pebble-scalable`         | ✅      | ✅        | `A` `B` `C` `D` `E` `F` |
+| `pebble-timeline-js`      | ✅      | ✅        | `A` `B` `C` `D` `E` `F` |
+| `pebble-universal-fb`     | ✅      | ✅        | `A` `B` `C` `D` `E` `F` |
 | `pebble-pge-simple`       |        |          |                         |
 | `pebble-simple-request`   |        |          |                         |
 | `pebble-timeline-js-node` |        |          |                         |
-| `pebble-timeline-js`      | ✅      | ✅        | `A` `B` `C` `D` `E` `F` |
 | `InverterLayerCompat`     | ✅      | ✅        | -                       |
 | `notif-layer`             | ✅      | ✅        | -                       |
 
