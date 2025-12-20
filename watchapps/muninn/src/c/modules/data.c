@@ -336,7 +336,7 @@ int data_calculate_days_remaining() {
 bool data_get_rate_is_elevated() {
   // Return true if the most recent value is much higher than usual
   const int avg = data_calculate_avg_discharge_rate();
-  const int last = 40; // UNDO ME s_sample_data.samples[0].result;
+  const int last = s_sample_data.samples[0].result;
 
   // Last value wasn't a significant one of discharge
   if (!util_is_valid(avg) || !util_is_valid(last)) return false;
