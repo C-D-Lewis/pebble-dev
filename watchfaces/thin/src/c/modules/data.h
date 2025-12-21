@@ -2,21 +2,14 @@
 
 #include <pebble.h>
 
-typedef enum {
-  DataKeyDate = 0,
-  DataKeyDay,
-  DataKeyBT,
-  DataKeyBattery,
-  DataKeySecondHand,
-  DataKeySteps,
-
-  DataKeyCount
-} DataKey;
-
 void data_init();
 
 void data_deinit();
 
-void data_set(int key, bool value);
+void data_set_enable(uint32_t key, bool b);
 
-bool data_get(int key);
+bool data_get_enable(uint32_t key);
+
+void data_set_color(uint32_t key, int color);
+
+GColor data_get_color(uint32_t key);

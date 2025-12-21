@@ -12,44 +12,85 @@ module.exports = [
         "defaultValue": "Features"
       },
       {
-        "type": "text",
-        "defaultValue": "Turn additional features on or off."
-      },
-      {
         "type": "toggle",
         "label": "Show weekday and month",
-        "messageKey": "DataKeyDate",
+        "messageKey": "EnableDate",
         "defaultValue": true
       },
       {
         "type": "toggle",
         "label": "Show day of the month",
-        "messageKey": "DataKeyDay",
+        "messageKey": "EnableDay",
         "defaultValue": true
       },
       {
         "type": "toggle",
         "label": "Show disconnected indicator",
-        "messageKey": "DataKeyBT",
+        "messageKey": "EnableBT",
         "defaultValue": true
       },
       {
         "type": "toggle",
         "label": "Show battery level (hour markers)",
-        "messageKey": "DataKeyBattery",
+        "messageKey": "EnableBattery",
         "defaultValue": true
       },
       {
         "type": "toggle",
         "label": "Show second hand (uses more power)",
-        "messageKey": "DataKeySecondHand",
+        "messageKey": "EnableSecondHand",
         "defaultValue": true
       },
       {
         "type": "toggle",
         "label": "Show step count",
-        "messageKey": "DataKeySteps",
+        "messageKey": "EnableSteps",
         "defaultValue": true
+      }
+    ]
+  },
+  {
+    "type": "section",
+    "items": [
+      {
+        "type": "heading",
+        "defaultValue": "Colors"
+      },
+      {
+        type: 'color',
+        label: 'Background',
+        messageKey: 'ColorBackground',
+        defaultValue: '000000'
+      },
+      {
+        type: 'color',
+        label: 'Hour/minutes hand',
+        messageKey: 'ColorHourMinutes',
+        defaultValue: 'AAAAAA'
+      },
+      {
+        type: 'color',
+        label: 'Seconds hand',
+        messageKey: 'ColorSeconds',
+        defaultValue: 'AA0000'
+      },
+      {
+        type: 'color',
+        label: 'Notches',
+        messageKey: 'ColorNotches',
+        defaultValue: 'FFFFFF'
+      },
+      {
+        type: 'color',
+        label: 'Month day',
+        messageKey: 'ColorMonthDay',
+        defaultValue: 'FFAA00'
+      },
+      {
+        type: 'color',
+        label: 'Date',
+        messageKey: 'ColorDate',
+        defaultValue: 'FFFFFF'
       }
     ]
   },

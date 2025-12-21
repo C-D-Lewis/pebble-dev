@@ -38,7 +38,7 @@ static void tick_handler(struct tm *tick_time, TimeUnits changed) {
   snprintf(s_day_buffer, sizeof(s_day_buffer), "%d", s_current_time.days);
   strftime(s_weekday_buffer, sizeof(s_weekday_buffer), "%a", tick_time);
   strftime(s_month_buffer, sizeof(s_month_buffer), "%b", tick_time);
-  
+
   int steps = health_get_step_count();
   static char s_steps_buffer[8];
   snprintf(s_steps_buffer, sizeof(s_steps_buffer), "%d", steps);
@@ -103,6 +103,9 @@ static void bg_update_proc(Layer *layer, GContext *ctx) {
   const int perc = state.charge_percent;
   const int batt_hours = (int)(12.0F * ((float)perc / 100.0F)) + 1;
 
+  GColor bg_color = data_get_color(MESSAGE_KEY_ColorBackground);
+  GColor notch_color = data_get_color(MESSAGE_KEY_ColorNotches);
+
   for (int h = 0; h < 12; h++) {
     for (int y = 0; y < THICKNESS; y++) {
       for (int x = 0; x < THICKNESS; x++) {
@@ -113,26 +116,16 @@ static void bg_update_proc(Layer *layer, GContext *ctx) {
           .y = (int16_t)(-cos_lookup(angle) * nom / TRIG_MAX_RATIO) + center.y,
         };
 
-        if (data_get(DataKeyBattery)) {
+        if (data_get_enable(MESSAGE_KEY_EnableBattery)) {
           if (h < batt_hours) {
-#ifdef PBL_COLOR
-            if (state.is_plugged) {
-              // Charging
-              graphics_context_set_stroke_color(ctx, GColorGreen);
-            } else {
-              // Discharging at this level
-              graphics_context_set_stroke_color(ctx, GColorWhite);
-            }
-#else
-            graphics_context_set_stroke_color(ctx, GColorWhite);
-#endif
+            graphics_context_set_stroke_color(ctx, notch_color);
           } else {
             // Empty segment
-            graphics_context_set_stroke_color(ctx, PBL_IF_COLOR_ELSE(GColorDarkGray, GColorBlack));
+            graphics_context_set_stroke_color(ctx, bg_color);
           }
         } else {
           // No battery indicator, show all
-          graphics_context_set_stroke_color(ctx, GColorWhite);
+          graphics_context_set_stroke_color(ctx, notch_color);
         }
         graphics_draw_line(
           ctx,
@@ -144,7 +137,7 @@ static void bg_update_proc(Layer *layer, GContext *ctx) {
   }
 
   // Make markers by cutting out the middle
-  graphics_context_set_fill_color(ctx, GColorBlack);
+  graphics_context_set_fill_color(ctx, bg_color);
 #ifdef PBL_ROUND
   graphics_fill_circle(ctx, center, (bounds.size.w / 2) - (2 * MARGIN));
 #else
@@ -171,7 +164,7 @@ static int hours_to_minutes(int hours_out_of_12) {
 
 static void draw_proc(Layer *layer, GContext *ctx) {
   GRect bounds = layer_get_bounds(layer);
-  GPoint center = grect_center_point(&bounds);  
+  GPoint center = grect_center_point(&bounds);
 
   SimpleTime mode_time = (s_animating) ? s_anim_time : s_current_time;
 
@@ -212,8 +205,14 @@ static void draw_proc(Layer *layer, GContext *ctx) {
     .y = (int16_t)(-cos_lookup(hour_angle) * (int32_t)len_hour / TRIG_MAX_RATIO) + center.y,
   };
 
+  GColor bg_color = data_get_color(MESSAGE_KEY_ColorBackground);
+  GColor hour_min_color = data_get_color(MESSAGE_KEY_ColorHourMinutes);
+  GColor second_color = data_get_color(MESSAGE_KEY_ColorSeconds);
+  GColor notch_color = data_get_color(MESSAGE_KEY_ColorNotches);
+  GColor day_month_color = data_get_color(MESSAGE_KEY_ColorMonthDay);
+
   // Draw hands
-  graphics_context_set_stroke_color(ctx, PBL_IF_COLOR_ELSE(GColorLightGray, GColorWhite));
+  graphics_context_set_stroke_color(ctx, hour_min_color);
   for (int y = 0; y < THICKNESS; y++) {
     for (int x = 0; x < THICKNESS; x++) {
       graphics_draw_line(
@@ -228,7 +227,7 @@ static void draw_proc(Layer *layer, GContext *ctx) {
       );
     }
   }
-  graphics_context_set_stroke_color(ctx, GColorWhite);
+  graphics_context_set_stroke_color(ctx, notch_color);
   for (int y = 0; y < THICKNESS; y++) {
     for (int x = 0; x < THICKNESS; x++) {
       graphics_draw_line(
@@ -245,14 +244,11 @@ static void draw_proc(Layer *layer, GContext *ctx) {
   }
 
   // Draw second hand
-  if (data_get(DataKeySecondHand)) {
+  if (data_get_enable(MESSAGE_KEY_EnableSecondHand)) {
     // Use loops
     for (int y = 0; y < THICKNESS - 1; y++) {
       for (int x = 0; x < THICKNESS - 1; x++) {
-        graphics_context_set_stroke_color(
-          ctx,
-          PBL_IF_COLOR_ELSE(GColorDarkCandyAppleRed, GColorWhite)
-        );
+        graphics_context_set_stroke_color(ctx, second_color);
         graphics_draw_line(
           ctx,
           GPoint(center.x + x, center.y + y),
@@ -260,10 +256,7 @@ static void draw_proc(Layer *layer, GContext *ctx) {
         );
 
         // Draw second hand tip
-        graphics_context_set_stroke_color(
-          ctx,
-          PBL_IF_COLOR_ELSE(GColorChromeYellow, GColorWhite)
-        );
+        graphics_context_set_stroke_color(ctx, day_month_color);
         graphics_draw_line(
           ctx,
           GPoint(second_hand_short.x + x, second_hand_short.y + y),
@@ -274,12 +267,12 @@ static void draw_proc(Layer *layer, GContext *ctx) {
   }
 
   // Center
-  graphics_context_set_fill_color(ctx, GColorWhite);
+  graphics_context_set_fill_color(ctx, notch_color);
   graphics_fill_circle(ctx, GPoint(center.x + 1, center.y + 1), 4);
 
   // Draw black if disconnected
-  if (data_get(DataKeyBT) && !s_is_connected) {
-    graphics_context_set_fill_color(ctx, GColorBlack);
+  if (data_get_enable(MESSAGE_KEY_EnableBT) && !s_is_connected) {
+    graphics_context_set_fill_color(ctx, bg_color);
     graphics_fill_circle(ctx, GPoint(center.x + 1, center.y + 1), 3);
   }
 }
@@ -298,29 +291,29 @@ static void window_load(Window *window) {
   const int y_offset = scalable_y(305);
   const int text_s = 100;
 
+  GColor day_month_color = data_get_color(MESSAGE_KEY_ColorMonthDay);
+  GColor notch_color = data_get_color(MESSAGE_KEY_ColorNotches);
+
   s_weekday_layer = text_layer_create(GRect(x_offset, y_offset + scalable_y(35), text_s, text_s));
   text_layer_set_font(s_weekday_layer, scalable_get_font(SFI_SmallBold));
-  text_layer_set_text_color(s_weekday_layer, GColorWhite);
+  text_layer_set_text_color(s_weekday_layer, day_month_color);
   text_layer_set_background_color(s_weekday_layer, GColorClear);
 
   s_day_in_month_layer = text_layer_create(
     GRect(x_offset, y_offset + scalable_y_pp(105, 120), text_s, text_s)
   );
   text_layer_set_font(s_day_in_month_layer, scalable_get_font(SFI_MediumBold));
-  text_layer_set_text_color(
-    s_day_in_month_layer,
-    PBL_IF_COLOR_ELSE(GColorChromeYellow, GColorWhite)
-  );
+  text_layer_set_text_color(s_day_in_month_layer, notch_color);
   text_layer_set_background_color(s_day_in_month_layer, GColorClear);
 
   s_month_layer = text_layer_create(GRect(x_offset, y_offset + scalable_y_pp(260, 250), text_s, text_s));
   text_layer_set_font(s_month_layer, scalable_get_font(SFI_SmallBold));
-  text_layer_set_text_color(s_month_layer, GColorWhite);
+  text_layer_set_text_color(s_month_layer, day_month_color);
   text_layer_set_background_color(s_month_layer, GColorClear);
 
   s_step_layer = text_layer_create(scalable_center_x(scalable_grect(0, 700, 1000, 300)));
   text_layer_set_font(s_step_layer, scalable_get_font(SFI_MediumBold));
-  text_layer_set_text_color(s_step_layer, GColorWhite);
+  text_layer_set_text_color(s_step_layer, day_month_color);
   text_layer_set_text_alignment(s_step_layer, GTextAlignmentCenter);
   text_layer_set_background_color(s_step_layer, GColorClear);
 
@@ -357,8 +350,10 @@ static void hands_update(Animation *anim, AnimationProgress dist_normalized) {
 /************************************ API *************************************/
 
 void main_window_push() {
+  GColor bg_color = data_get_color(MESSAGE_KEY_ColorBackground);
+
   s_main_window = window_create();
-  window_set_background_color(s_main_window, GColorBlack);
+  window_set_background_color(s_main_window, bg_color);
   window_set_window_handlers(s_main_window, (WindowHandlers) {
     .load = window_load,
     .unload = window_unload,
@@ -379,17 +374,17 @@ void main_window_reload_config() {
   struct tm *tm_now = localtime(&t);
   s_current_time.hours = tm_now->tm_hour;
   s_current_time.minutes = tm_now->tm_min;
-  s_current_time.seconds = tm_now->tm_sec;  
+  s_current_time.seconds = tm_now->tm_sec;
 
   tick_timer_service_unsubscribe();
-  if (data_get(DataKeySecondHand)) {
+  if (data_get_enable(MESSAGE_KEY_EnableSecondHand)) {
     tick_timer_service_subscribe(SECOND_UNIT, tick_handler);
   } else {
     tick_timer_service_subscribe(MINUTE_UNIT, tick_handler);
-  }  
+  }
 
   connection_service_unsubscribe();
-  if (data_get(DataKeyBT)) {
+  if (data_get_enable(MESSAGE_KEY_EnableBT)) {
     connection_service_subscribe((ConnectionHandlers) {
       .pebble_app_connection_handler = bt_handler
     });
@@ -397,7 +392,7 @@ void main_window_reload_config() {
   }
 
   battery_state_service_unsubscribe();
-  if (data_get(DataKeyBattery)) {
+  if (data_get_enable(MESSAGE_KEY_EnableBattery)) {
     battery_state_service_subscribe(batt_handler);
   }
 
@@ -406,14 +401,14 @@ void main_window_reload_config() {
   layer_remove_from_parent(text_layer_get_layer(s_weekday_layer));
   layer_remove_from_parent(text_layer_get_layer(s_month_layer));
   layer_remove_from_parent(text_layer_get_layer(s_step_layer));
-  if (data_get(DataKeyDay)) {
+  if (data_get_enable(MESSAGE_KEY_EnableDay)) {
     layer_add_child(window_layer, text_layer_get_layer(s_day_in_month_layer));
   }
-  if (data_get(DataKeyDate)) {
+  if (data_get_enable(MESSAGE_KEY_EnableDate)) {
     layer_add_child(window_layer, text_layer_get_layer(s_weekday_layer));
     layer_add_child(window_layer, text_layer_get_layer(s_month_layer));
   }
-  if (data_get(DataKeySteps) && health_is_health_available()) {
+  if (data_get_enable(MESSAGE_KEY_EnableSteps) && health_is_health_available()) {
     layer_add_child(window_layer, text_layer_get_layer(s_step_layer));
   }
 

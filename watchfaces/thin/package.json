@@ -23,14 +23,20 @@
     },
     "projectType": "native",
     "uuid": "09988afe-adbb-4941-a126-9b2c92aea311",
-    "messageKeys": {
-      "DataKeyBattery": 3,
-      "DataKeySecondHand": 4,
-      "DataKeyDate": 0,
-      "DataKeyDay": 1,
-      "DataKeyBT": 2,
-      "DataKeySteps": 5
-    },
+    "messageKeys": [
+      "EnableBattery",
+      "EnableSecondHand",
+      "EnableDate",
+      "EnableDay",
+      "EnableBT",
+      "EnableSteps",
+      "ColorBackground",
+      "ColorHourMinutes",
+      "ColorSeconds",
+      "ColorNotches",
+      "ColorMonthDay",
+      "ColorDate"
+    ],
     "enableMultiJS": true,
     "displayName": "Thin",
     "watchapp": {
