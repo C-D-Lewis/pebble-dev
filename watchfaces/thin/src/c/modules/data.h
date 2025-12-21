@@ -10,6 +10,6 @@ void data_set_enable(uint32_t key, bool b);
 
 bool data_get_enable(uint32_t key);
 
-void data_set_color(uint32_t key, int color);
+void data_set_color(uint32_t key, GColor color);
 
 GColor data_get_color(uint32_t key);

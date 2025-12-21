@@ -12,12 +12,12 @@ typedef struct {
   bool enable_second_hand;
   bool enable_steps;
 
-  int color_background;
-  int color_hour_minutes;
-  int color_seconds;
-  int color_notches;
-  int color_month_day;
-  int color_date;
+  GColor color_background;
+  GColor color_hour_minutes;
+  GColor color_seconds;
+  GColor color_notches;
+  GColor color_month_day;
+  GColor color_date;
 } AppConfig;
 
 // Cache for speed
@@ -27,6 +27,8 @@ static void save_all() {
   status_t result = persist_write_data(SK_AppConfig, &s_app_config, sizeof(AppConfig));
   if (result < 0) {
     APP_LOG(APP_LOG_LEVEL_ERROR, "Error writing app config: %d", (int)result);
+  } else {
+    APP_LOG(APP_LOG_LEVEL_INFO, "App config saved");
   }
 }
 
@@ -46,18 +48,20 @@ void data_init() {
     s_app_config.enable_second_hand = true;
     s_app_config.enable_steps = true;
 
-    s_app_config.color_background = GColorBlackARGB8;
-    s_app_config.color_hour_minutes = GColorLightGrayARGB8;
-    s_app_config.color_seconds = GColorDarkCandyAppleRedARGB8;
-    s_app_config.color_notches = GColorWhiteARGB8;
-    s_app_config.color_month_day = GColorChromeYellowARGB8;
-    s_app_config.color_date = GColorWhiteARGB8;
+    s_app_config.color_background = GColorBlack;
+    s_app_config.color_hour_minutes = PBL_IF_COLOR_ELSE(GColorLightGray, GColorWhite);
+    s_app_config.color_seconds = PBL_IF_COLOR_ELSE(GColorDarkCandyAppleRed, GColorWhite);
+    s_app_config.color_notches = GColorWhite;
+    s_app_config.color_month_day = PBL_IF_COLOR_ELSE(GColorChromeYellow, GColorWhite);
+    s_app_config.color_date = GColorWhite;
 
     save_all();
   } else {
     status_t result = persist_read_data(SK_AppConfig, &s_app_config, sizeof(AppConfig));
     if (result < 0) {
       APP_LOG(APP_LOG_LEVEL_ERROR, "Error reading app config: %d", (int)result);
+    } else {
+      APP_LOG(APP_LOG_LEVEL_INFO, "App config loaded");
     }
   }
 }
@@ -101,7 +105,7 @@ bool data_get_enable(uint32_t key) {
   return false;
 }
 
-void data_set_color(uint32_t key, int color) {
+void data_set_color(uint32_t key, GColor color) {
   if (key == MESSAGE_KEY_ColorBackground) {
     s_app_config.color_background = color;
   } else if (key == MESSAGE_KEY_ColorHourMinutes) {
@@ -119,17 +123,17 @@ void data_set_color(uint32_t key, int color) {
 
 GColor data_get_color(uint32_t key) {
   if (key == MESSAGE_KEY_ColorBackground) {
-    return GColorFromHEX(s_app_config.color_background);
+    return s_app_config.color_background;
   } else if (key == MESSAGE_KEY_ColorHourMinutes) {
-    return GColorFromHEX(s_app_config.color_hour_minutes);
+    return s_app_config.color_hour_minutes;
   } else if (key == MESSAGE_KEY_ColorSeconds) {
-    return GColorFromHEX(s_app_config.color_seconds);
+    return s_app_config.color_seconds;
   } else if (key == MESSAGE_KEY_ColorNotches) {
-    return GColorFromHEX(s_app_config.color_notches);
+    return s_app_config.color_notches;
   } else if (key == MESSAGE_KEY_ColorMonthDay) {
-    return GColorFromHEX(s_app_config.color_month_day);
+    return s_app_config.color_month_day;
   } else if (key == MESSAGE_KEY_ColorDate) {
-    return GColorFromHEX(s_app_config.color_date);
+    return s_app_config.color_date;
   }
 
   return GColorBlack;

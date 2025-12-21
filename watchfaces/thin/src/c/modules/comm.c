@@ -18,7 +18,7 @@ static void in_recv_handler(DictionaryIterator *iter, void *context) {
       key == MESSAGE_KEY_ColorSeconds || key == MESSAGE_KEY_ColorNotches || 
       key == MESSAGE_KEY_ColorMonthDay || key == MESSAGE_KEY_ColorDate
     ) {
-      data_set_color(key, (int)t->value->int32);
+      data_set_color(key, GColorFromHEX(t->value->int32));
     } else {
       APP_LOG(APP_LOG_LEVEL_WARNING, "Unknown config key received: %d", (int)key);
     }
