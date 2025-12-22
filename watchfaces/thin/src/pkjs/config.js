@@ -13,14 +13,8 @@ module.exports = [
       },
       {
         "type": "toggle",
-        "label": "Show weekday and month",
+        "label": "Show current date",
         "messageKey": "EnableDate",
-        "defaultValue": true
-      },
-      {
-        "type": "toggle",
-        "label": "Show day of the month",
-        "messageKey": "EnableDay",
         "defaultValue": true
       },
       {
@@ -82,7 +76,7 @@ module.exports = [
       },
       {
         type: 'color',
-        label: 'Month day',
+        label: 'Day of the month',
         messageKey: 'ColorMonthDay',
         defaultValue: 'FFAA00'
       },

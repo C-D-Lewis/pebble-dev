@@ -2,11 +2,10 @@
 
 #define SK_AppConfig 0
 
-#define SK_MIGRATION_1 100
+#define SK_MIGRATION_1 50
 
 typedef struct {
   bool enable_date;
-  bool enable_day;
   bool enable_bt;
   bool enable_battery;
   bool enable_second_hand;
@@ -42,7 +41,6 @@ void data_init() {
   if(!persist_exists(SK_AppConfig)) {
     // Set defaults
     s_app_config.enable_date = true;
-    s_app_config.enable_day = true;
     s_app_config.enable_bt = true;
     s_app_config.enable_battery = true;
     s_app_config.enable_second_hand = true;
@@ -74,8 +72,6 @@ void data_set_enable(uint32_t key, bool b) {
   // Can't use switch with MESSAGE_KEY_ constants directly
   if (key == MESSAGE_KEY_EnableDate) {
     s_app_config.enable_date = b;
-  } else if (key == MESSAGE_KEY_EnableDay) {
-    s_app_config.enable_day = b;
   } else if (key == MESSAGE_KEY_EnableBT) {
     s_app_config.enable_bt = b;
   } else if (key == MESSAGE_KEY_EnableBattery) {
@@ -90,8 +86,6 @@ void data_set_enable(uint32_t key, bool b) {
 bool data_get_enable(uint32_t key) {
   if (key == MESSAGE_KEY_EnableDate) {
     return s_app_config.enable_date;
-  } else if (key == MESSAGE_KEY_EnableDay) {
-    return s_app_config.enable_day;
   } else if (key == MESSAGE_KEY_EnableBT) {
     return s_app_config.enable_bt;
   } else if (key == MESSAGE_KEY_EnableBattery) {

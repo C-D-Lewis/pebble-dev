@@ -287,13 +287,12 @@ static void window_load(Window *window) {
   layer_set_update_proc(s_bg_layer, bg_update_proc);
   layer_add_child(window_layer, s_bg_layer);
 
-  const int x_offset = scalable_x(720);
+  const int x_offset = scalable_x(710);
   const int y_offset = scalable_y(305);
   const int text_s = 100;
 
   GColor month_day_color = data_get_color(MESSAGE_KEY_ColorMonthDay);
   GColor date_color = data_get_color(MESSAGE_KEY_ColorDate);
-  GColor notch_color = data_get_color(MESSAGE_KEY_ColorNotches);
 
   s_weekday_layer = text_layer_create(GRect(x_offset, y_offset + scalable_y(35), text_s, text_s));
   text_layer_set_font(s_weekday_layer, scalable_get_font(SFI_SmallBold));
@@ -301,7 +300,7 @@ static void window_load(Window *window) {
   text_layer_set_background_color(s_weekday_layer, GColorClear);
 
   s_day_in_month_layer = text_layer_create(
-    GRect(x_offset, y_offset + scalable_y_pp(105, 120), text_s, text_s)
+    GRect(x_offset + scalable_x(10), y_offset + scalable_y_pp(105, 120), text_s, text_s)
   );
   text_layer_set_font(s_day_in_month_layer, scalable_get_font(SFI_MediumBold));
   text_layer_set_text_color(s_day_in_month_layer, month_day_color);
@@ -397,15 +396,23 @@ void main_window_reload_config() {
     battery_state_service_subscribe(batt_handler);
   }
 
+  GColor bg_color = data_get_color(MESSAGE_KEY_ColorBackground);
+  GColor date_color = data_get_color(MESSAGE_KEY_ColorDate);
+  GColor month_day_color = data_get_color(MESSAGE_KEY_ColorMonthDay);
+
+  window_set_background_color(s_main_window, bg_color);
+  text_layer_set_text_color(s_weekday_layer, date_color);
+  text_layer_set_text_color(s_day_in_month_layer, month_day_color);
+  text_layer_set_text_color(s_month_layer, date_color);
+  text_layer_set_text_color(s_step_layer, date_color);
+
   Layer *window_layer = window_get_root_layer(s_main_window);
   layer_remove_from_parent(text_layer_get_layer(s_day_in_month_layer));
   layer_remove_from_parent(text_layer_get_layer(s_weekday_layer));
   layer_remove_from_parent(text_layer_get_layer(s_month_layer));
   layer_remove_from_parent(text_layer_get_layer(s_step_layer));
-  if (data_get_enable(MESSAGE_KEY_EnableDay)) {
-    layer_add_child(window_layer, text_layer_get_layer(s_day_in_month_layer));
-  }
   if (data_get_enable(MESSAGE_KEY_EnableDate)) {
+    layer_add_child(window_layer, text_layer_get_layer(s_day_in_month_layer));
     layer_add_child(window_layer, text_layer_get_layer(s_weekday_layer));
     layer_add_child(window_layer, text_layer_get_layer(s_month_layer));
   }

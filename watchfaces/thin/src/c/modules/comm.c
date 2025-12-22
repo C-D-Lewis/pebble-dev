@@ -8,9 +8,9 @@ static void in_recv_handler(DictionaryIterator *iter, void *context) {
   while (t) {
     uint32_t key = t->key;
     if (
-      key == MESSAGE_KEY_EnableDate || key == MESSAGE_KEY_EnableDay || 
-      key == MESSAGE_KEY_EnableBT || key == MESSAGE_KEY_EnableBattery || 
-      key == MESSAGE_KEY_EnableSecondHand || key == MESSAGE_KEY_EnableSteps
+      key == MESSAGE_KEY_EnableDate || key == MESSAGE_KEY_EnableBT ||
+      key == MESSAGE_KEY_EnableBattery || key == MESSAGE_KEY_EnableSecondHand ||
+      key == MESSAGE_KEY_EnableSteps
     ) {
       data_set_enable(key, t->value->int32 != 0);
     } else if (
