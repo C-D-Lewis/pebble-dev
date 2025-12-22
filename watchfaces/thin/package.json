@@ -3,7 +3,7 @@
   "author": "Chris Lewis",
   "private": true,
   "dependencies": {
-    "pebble-clay": "^1.0.4",
+    "@rebble/clay": "^1.0.6",
     "pebble-scalable": "^1.5.1"
   },
   "keywords": [
