@@ -63,27 +63,8 @@ from 2016) and what kind of anomalous behavior you encountered.
 
 ## TODO:
 
-- [x] Rolling window of N values for better average
-- [x] App UI (summary > menu > state view)
-- [x] Wakeup UI
-- [x] Bird blinking
-- [x] Disable confirmation (long press)
-- [x] UI polish
-- [x] Handle missing samples while off
-- [x] Settings? Custom alert?
-- [x] Real-world testing over several days
-- [x] Test power-off picks up correctly
-- [x] Test charging and resuming works
-- [x] Attempt to set AppGlance
-- [x] Pre-release: single app data structure
-- [x] Emery screen size support
-- [x] Some kind of color flair for color watches
-- [x] Show log entries for wakeups where charging was observed
-- [x] Push timeline pin for charging time prediction.
-- [x] Scalable layouts with library
-- [x] Elevated drain alert option
 - [ ] Display status of timeline pin insert request in settings window.
-- [ ] Extremely simple chart using log timestamps? requires more stored samples (CHECK DATA LOADS OKAY)
+- [ ] Extremely simple chart using log timestamps? 
 - [ ] Export/import data log to/from JS
 - [ ] Show more detailed data and charts on JS settings page?
 - [ ] Use `pebble-packet` when `pebble-events` is updated with `flint`

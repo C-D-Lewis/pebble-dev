@@ -10,13 +10,13 @@ void wakeup_schedule_next() {
   wakeup_unschedule();
 
   const time_t ts_now = time(NULL);
-  const struct tm *now = localtime(&ts_now);
 
 #if defined(WAKEUP_NEXT_MINUTE)
   // For faster testing of wakeups
   const time_t future = ts_now + 60;
 #else
   // Find next interval hour based on WAKEUP_MOD_H
+  const struct tm *now = localtime(&ts_now);
   const int hours_rem = WAKEUP_MOD_H - (now->tm_hour % WAKEUP_MOD_H);
 
   // Ensure it's exactly an interval of WAKEUP_MOD_H
@@ -75,7 +75,7 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
   const int last_sample_time = data_get_last_sample_time();
 
   // First ever sample - nothing to compare to
-  if (!util_is_valid(last_sample_time)) {
+  if (!util_is_not_status(last_sample_time)) {
     APP_LOG(APP_LOG_LEVEL_INFO, "First sample!");
 
     // Record state and wait for next time
@@ -161,6 +161,22 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
     return;
   }
 
+  // One day left - show peristent alert
+  const bool one_day_notified = data_get_one_day_notified();
+  const bool one_day_left = data_calculate_days_remaining() <= 1;
+  if (one_day_left && !one_day_notified) {
+    data_set_one_day_notified(true);
+
+    alert_window_push(
+      RESOURCE_ID_AWAKE,
+      "Muninn advises you may have one day remaining.",
+      true,
+      false
+    );
+    return;
+  }
+  if (!one_day_left && one_day_notified) data_set_one_day_notified(false);
+
   // Just a sample
   alert_window_push(
     RESOURCE_ID_WRITING,
@@ -172,7 +188,7 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
 
 bool wakeup_handle_missed() {
   const int wakeup_id = data_get_wakeup_id();
-  if (!util_is_valid(wakeup_id)) return false;
+  if (!util_is_not_status(wakeup_id)) return false;
 
   time_t wakeup_ts;
   const bool found = wakeup_query(wakeup_id, &wakeup_ts);

@@ -95,7 +95,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   for (int i = 0; i < count; i++) {
     const Sample *s = data_get_sample(i);
     const int value = s->charge_perc;
-    if (!util_is_valid(value)) continue;
+    if (!util_is_not_status(value)) continue;
 
     const int x = GRAPH_MARGIN + (i * x_gap);
     const int y = root_y + GRAPH_SIZE - ((value * GRAPH_SIZE) / 100);

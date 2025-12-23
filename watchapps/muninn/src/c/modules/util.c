@@ -80,11 +80,11 @@ void util_fmt_time_unit(time_t ts, char *buff, int size) {
 }
 
 char* util_get_status_string() {
-  const bool is_enabled = util_is_valid(data_get_wakeup_id());
+  const bool is_enabled = util_is_not_status(data_get_wakeup_id());
   if (!is_enabled) return "Not monitoring";
 
   // No readings at all yet
-  if (!util_is_valid(data_get_last_sample_time())) return "Awaiting sample...";
+  if (!util_is_not_status(data_get_last_sample_time())) return "Awaiting sample...";
 
   // Edge case here: no change or charging samples don't count
   // We can't produce a prediction AT ALL unless we have 'discharging' samples...
@@ -106,6 +106,6 @@ uint32_t util_get_battery_resource_id(int charge_percent) {
   return RESOURCE_ID_BATTERY_LOW;
 }
 
-bool util_is_valid(int v) {
+bool util_is_not_status(int v) {
   return v != STATUS_EMPTY && v != STATUS_CHARGED && v != STATUS_NO_CHANGE;
 }

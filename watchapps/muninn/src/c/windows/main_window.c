@@ -168,7 +168,7 @@ static void update_data() {
 
   time_t wakeup_ts;
   const int wakeup_id = data_get_wakeup_id();
-  const bool is_enabled = util_is_valid(wakeup_id);
+  const bool is_enabled = util_is_not_status(wakeup_id);
   const bool found = wakeup_query(wakeup_id, &wakeup_ts);
   if (is_enabled && !found) {
     data_set_error("Scheduled wakeup was not found");
@@ -206,7 +206,7 @@ static void update_data() {
 
     // Days remaining
     s_days_remaining = data_calculate_days_remaining();
-    if (!util_is_valid(s_days_remaining)) {
+    if (!util_is_not_status(s_days_remaining)) {
       text_layer_set_text(s_remaining_layer, "--");
     } else {
       // Handled in animation
@@ -217,7 +217,7 @@ static void update_data() {
 
     // Rate per day
     s_rate = data_calculate_avg_discharge_rate();
-    if (!util_is_valid(s_rate)) {
+    if (!util_is_not_status(s_rate)) {
       text_layer_set_text(s_rate_layer, "--");
     } else {
       // Handled in animation
@@ -309,7 +309,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
 ////////////////////////////////////////////// Clicks //////////////////////////////////////////////
 
 static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
-  const bool should_enable = !util_is_valid(data_get_wakeup_id());
+  const bool should_enable = !util_is_not_status(data_get_wakeup_id());
   if (should_enable) {
     s_blink_budget = 5;
     schedule_blink();

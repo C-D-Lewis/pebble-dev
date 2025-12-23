@@ -47,6 +47,8 @@ void data_reset_all() {
   s_app_data.ca_has_notified = false;
   s_app_data.push_timeline_pins = false;
   s_app_data.elevated_rate_alert = false;
+  s_app_data.pin_set_time = STATUS_EMPTY;
+  s_app_data.one_day_notified = false;
 
   // Init all fields in Samples struct
   for (int i = 0; i < NUM_SAMPLES; i++) {
@@ -75,16 +77,8 @@ static int result_from_gap(int gap) {
     return (gap * 4);
   }
 }
-#endif
 
-void data_init() {
-  // Before anything else, check if we should reset data
-  if (!persist_exists(SK_Migration_1)) {
-    data_reset_all();
-    persist_write_int(SK_Migration_1, 1);
-  }
-
-#if defined(USE_TEST_DATA)
+static void test_data_generator() {
   //
   // Test data scenarios
   //
@@ -115,7 +109,7 @@ void data_init() {
   ts_info->tm_sec = 5;
   const time_t base = mktime(ts_info);
 
-  // Load test values for this launch
+  // Set fixed test values for this launch
   // TODO: Use the array's newest value here?
   s_app_data.last_sample_time = base;
   s_app_data.last_charge_perc = 80;  // Agrees with emulator
@@ -125,6 +119,9 @@ void data_init() {
   s_app_data.custom_alert_level = AL_20;
   s_app_data.ca_has_notified = false;
   s_app_data.elevated_rate_alert = false;
+  s_app_data.push_timeline_pins = false;
+  s_app_data.pin_set_time = STATUS_EMPTY;
+  s_app_data.one_day_notified = false;
 
   for (int i = 0; i < NUM_SAMPLES; i++) {
     Sample *s = &s_samples[i];
@@ -139,7 +136,7 @@ void data_init() {
       s->time_diff = interval_s;
       s->result = result_from_gap(gap);
 
-      if (util_is_valid(s->result)) {
+      if (util_is_not_status(s->result)) {
         s->days_remaining = (s->charge_perc * interval_s) / (gap * SECONDS_PER_DAY);
         s->rate = s->result;
       }
@@ -156,13 +153,33 @@ void data_init() {
     s->charge_diff = gap;
     s->time_diff = interval_s;
     s->result = result_from_gap(gap);
-    if (util_is_valid(s->result)) {
+    if (util_is_not_status(s->result)) {
       s->days_remaining = (s->charge_perc * interval_s) / (gap * SECONDS_PER_DAY);
       s->rate = s->result;
     }
   }
 
   data_log_state();
+}
+#endif
+
+// Handle new fields with default values
+static void handle_new_fields() {
+  // Added pin_set_time to AppData
+  if (s_app_data.pin_set_time == 0) {
+    s_app_data.pin_set_time = STATUS_EMPTY;
+  }
+}
+
+void data_init() {
+  // Before anything else, check if we should reset data
+  if (!persist_exists(SK_Migration_1)) {
+    data_reset_all();
+    persist_write_int(SK_Migration_1, 1);
+  }
+
+#if defined(USE_TEST_DATA)
+  test_data_generator();
   return;
 #endif
 
@@ -190,6 +207,8 @@ void data_init() {
     }
   }
 
+  handle_new_fields();
+
   data_log_state();
 }
 
@@ -202,7 +221,7 @@ void data_deinit() {
 void data_log_state() {
 #if defined(LOG_STATE)
   time_t wakeup_ts = STATUS_EMPTY;
-  const bool is_enabled = util_is_valid(s_app_data.wakeup_id);
+  const bool is_enabled = util_is_not_status(s_app_data.wakeup_id);
   if (is_enabled) {
     wakeup_query(s_app_data.wakeup_id, &wakeup_ts);
   }
@@ -254,38 +273,13 @@ void data_push_sample(int charge_perc, int last_sample_time, int last_charge_per
   s->time_diff = time_diff;
   s->charge_diff = charge_diff;
   s->result = result;
-}
-
-// Old algo for comparison
-int data_calculate_avg_discharge_rate_v1() {
-  const int count = data_get_valid_samples_count();
-
-  // Not enough samples yet
-  if (count < MIN_SAMPLES) return STATUS_EMPTY;
-
-  int result_x2 = 0;
-  int weight_x2 = 0;
-  int seen = 0;
-
-  for (int i = 0; i < NUM_SAMPLES; i++) {
-    const Sample *s = &s_samples[i];
-    const int v = s->result;
-    // No discharge in this sample
-    if (!util_is_valid(v)) continue;
-
-    seen++;
-    if (seen <= 4) {
-      result_x2 += v * 2; // next three -> 2x weight
-      weight_x2 += 2;
-    } else {
-      result_x2 += v * 1; // rest -> 1x weight
-      weight_x2 += 1;
-    }
+  if (util_is_not_status(result)) {
+    s->days_remaining = data_calculate_days_remaining();
+    s->rate = data_calculate_avg_discharge_rate();
+  } else {
+    s->days_remaining = STATUS_EMPTY;
+    s->rate = STATUS_EMPTY;
   }
-
-  if (weight_x2 == 0) return STATUS_EMPTY;
-
-  return result_x2 / weight_x2;
 }
 
 /**
@@ -314,7 +308,7 @@ int data_calculate_avg_discharge_rate() {
     if (r == STATUS_NO_CHANGE) {
       r = 0;
     }
-    // Tricky - decision to ignore this time period for now (not discharging)
+    // Tricky - decision to ignore this time period for now (not discharging time)
     if (r == STATUS_CHARGED) continue;
 
     count++;
@@ -332,6 +326,9 @@ int data_calculate_avg_discharge_rate() {
   // We didn't count anything - empty log?
   if (weight_x2 == 0) return STATUS_EMPTY;
 
+  // If the majority samples are no-change, we may have a zero rate
+  if (result_x2 == 0) return 1;
+
   return result_x2 / weight_x2;
 }
 
@@ -341,10 +338,10 @@ int data_calculate_days_remaining() {
   const int charge_perc = state.charge_percent;
   const int rate = data_calculate_avg_discharge_rate();
 
-  // Given a 'valid' log entry is only one with a discharging change
-  if (!util_is_valid(rate)) return STATUS_EMPTY;
+  // Data not available yet
+  if (!util_is_not_status(rate)) return STATUS_EMPTY;
 
-  // We only ever charged in every non-empty log entry...
+  // Only ever charged, or rate is zero (return 1 above should prevent this)
   if (rate <= 0) return STATUS_EMPTY;
 
   return charge_perc / rate;
@@ -356,7 +353,7 @@ bool data_get_rate_is_elevated() {
   const int last = s_samples[0].result;
 
   // Last value wasn't a significant one of discharge
-  if (!util_is_valid(avg) || !util_is_valid(last)) return false;
+  if (!util_is_not_status(avg) || !util_is_not_status(last)) return false;
 
   return last >= avg * EVEVATED_RATE_MULT;
 }
@@ -380,6 +377,21 @@ void data_cycle_custom_alert_level() {
 
   // If changed to less than current, don't skip
   data_set_ca_has_notified(false);
+}
+
+void data_reset_log() {
+  for (int i = 0; i < NUM_SAMPLES; i++) {
+    Sample *s = &s_samples[i];
+    s->timestamp = STATUS_EMPTY;
+    s->charge_perc = STATUS_EMPTY;
+    s->last_sample_time = STATUS_EMPTY;
+    s->last_charge_perc = STATUS_EMPTY;
+    s->time_diff = STATUS_EMPTY;
+    s->charge_diff = STATUS_EMPTY;
+    s->result = STATUS_EMPTY;
+    s->days_remaining = STATUS_EMPTY;
+    s->rate = STATUS_EMPTY;
+  }
 }
 
 int data_get_last_sample_time() {
@@ -489,4 +501,20 @@ bool data_get_elevated_rate_alert() {
 
 void data_set_elevated_rate_alert(bool b) {
   s_app_data.elevated_rate_alert = b;
+}
+
+int data_get_pin_set_time() {
+  return s_app_data.pin_set_time;
+}
+
+void data_set_pin_set_time(int t) {
+  s_app_data.pin_set_time = t;
+}
+
+bool data_get_one_day_notified() {
+  return s_app_data.one_day_notified;
+}
+
+void data_set_one_day_notified(bool b) {
+  s_app_data.one_day_notified = b;
 }

@@ -18,7 +18,7 @@ void debug_window_update_data() {
   const int wakeup_id = data_get_wakeup_id();
   time_t wakeup_ts;
   const bool found = wakeup_query(wakeup_id, &wakeup_ts);
-  const bool is_enabled = util_is_valid(wakeup_id) && found;
+  const bool is_enabled = util_is_not_status(wakeup_id) && found;
 
   // AppState
   static char s_fmt_last_buff[16];

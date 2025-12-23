@@ -4,8 +4,18 @@ void out_failed_handler(DictionaryIterator *failed, AppMessageResult reason, voi
   APP_LOG(APP_LOG_LEVEL_ERROR, "Failed to send outbox");
 }
 
+void inbox_received_handler(DictionaryIterator *iter, void *context) {
+  // Check for days remaining and rate
+  Tuple *pin_set_t = dict_find(iter, MESSAGE_KEY_PIN_SET);
+  if (pin_set_t && pin_set_t->value->int32 == 1) {
+    data_set_pin_set_time(time(NULL));
+    APP_LOG(APP_LOG_LEVEL_INFO, "Pin set time updated");
+  }
+}
+
 void comm_init() {
   app_message_register_outbox_failed(out_failed_handler);
+  app_message_register_inbox_received(inbox_received_handler);
   app_message_open(512, 512);
 }
 
@@ -20,7 +30,7 @@ void comm_push_timeline_pins() {
   const int rate = data_calculate_avg_discharge_rate();
 #endif
 
-  if (!util_is_valid(days) || !util_is_valid(rate)) {
+  if (!util_is_not_status(days) || !util_is_not_status(rate)) {
     APP_LOG(APP_LOG_LEVEL_INFO, "Not enough data for pin prediction");
     return;
   }

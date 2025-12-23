@@ -35,15 +35,17 @@ typedef enum {
 
 // Persisted app data - be careful changing this!
 typedef struct {
-  int last_sample_time;
-  int last_charge_perc;
-  int wakeup_id;
-  bool seen_first_launch;
-  bool vibe_on_sample;
-  int custom_alert_level;
-  bool ca_has_notified;
-  bool push_timeline_pins;
-  bool elevated_rate_alert;
+  int last_sample_time;     // Last sample timestamp
+  int last_charge_perc;     // Last sample charge percentage
+  int wakeup_id;            // Current wakeup ID
+  bool seen_first_launch;   // Has the app been launched before?
+  bool vibe_on_sample;      // Vibrate on sample
+  int custom_alert_level;   // Custom alert level
+  bool ca_has_notified;     // Has notified for custom alert
+  bool push_timeline_pins;  // Push timeline pins
+  bool elevated_rate_alert; // Elevated rate alert
+  int pin_set_time;         // When timeline pin was last set
+  bool one_day_notified;    // One day remaining alert has notified
 
   // Singleton, adding new fields OK
 } AppData;
@@ -73,6 +75,7 @@ int data_calculate_avg_discharge_rate();
 int data_calculate_days_remaining();
 void data_cycle_custom_alert_level();
 bool data_get_rate_is_elevated();
+void data_reset_log();
 
 // Interface getters/setters
 int data_get_last_sample_time(void);
@@ -97,6 +100,10 @@ bool data_get_push_timeline_pins();
 void data_set_push_timeline_pins(bool b);
 bool data_get_elevated_rate_alert();
 void data_set_elevated_rate_alert(bool b);
+int data_get_pin_set_time();
+void data_set_pin_set_time(int t);
+bool data_get_one_day_notified();
+void data_set_one_day_notified(bool b);
 
 // Strings
 #define MSG_WELCOME "Welcome to Muninn!\n\nEstimates will appear after two samples are taken.\n\nPlease launch me if the watch is off and a sample is missed."

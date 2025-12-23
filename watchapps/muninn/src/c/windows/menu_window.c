@@ -75,6 +75,7 @@ static void menu_cell_draw(GContext *ctx, Layer *layer, char *title, char *desc)
 }
 
 static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_index, void *context) {
+  // Alert level detail
   const int alert_level = data_get_custom_alert_level();
   const bool alert_disabled = alert_level == AL_OFF;
   static char s_alert_buff[32];
@@ -168,10 +169,10 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
       data_cycle_custom_alert_level();
       break;
     case MI_PUSH_TIMELINE_PINS: {
-      const bool new_state = !data_get_push_timeline_pins();
-      data_set_push_timeline_pins(new_state);
+      const bool now_enabled = !data_get_push_timeline_pins();
+      data_set_push_timeline_pins(now_enabled);
 
-      if (new_state) comm_push_timeline_pins();
+      if (now_enabled) comm_push_timeline_pins();
     } break;
     case MI_ELEVATED_RATE_ALERT:
       data_set_elevated_rate_alert(!data_get_elevated_rate_alert());

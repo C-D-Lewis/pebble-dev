@@ -13,8 +13,9 @@
 #include "windows/alert_window.h"
 
 static void init() {
-  // Temporary
-  const bool notify_wipe = persist_exists(SK_AppData) && !persist_exists(SK_Migration_1);
+  // Temporary - to be removed a few versions after 1.12.0
+  const int old_appdata_key = 0;
+  const bool notify_wipe = persist_exists(old_appdata_key) && !persist_exists(SK_Migration_1);
 
   data_init();
   comm_init();

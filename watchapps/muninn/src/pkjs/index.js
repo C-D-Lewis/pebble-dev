@@ -11,17 +11,16 @@ function handlePushTimelinePin(dict) {
   var rate = dict.DISCHARGE_RATE;
 
   // Put the pin in the future at noon, or today late if no days remaining
-  var now = new Date();
-  var date = new Date(Date.now() + (days * SECONDS_PER_DAY * 1000));
-  var targetHour = (days == 0 && now.getHours() > 12) ? 23 : 12;
-  date.setHours(targetHour);
-  date.setMinutes(0);
-  date.setSeconds(0);
+  var target = new Date(Date.now() + (days * SECONDS_PER_DAY * 1000));
+  var targetHour = (days == 0 && new Date().getHours() > 12) ? 23 : 12;
+  target.setHours(targetHour);
+  target.setMinutes(0);
+  target.setSeconds(0);
 
   // Create the pin
   var pin = {
     id: PIN_ID_PREDICTION,
-    time: date.toISOString(),
+    time: target.toISOString(),
     layout: {
       type: 'genericPin',
       title: 'Time to charge!',
@@ -33,7 +32,14 @@ function handlePushTimelinePin(dict) {
 
   console.log('Inserting pin: ' + JSON.stringify(pin));
   timeline.insertUserPin(pin, function(responseText) { 
+    // Coreapp returns nothing here, we assume this callback means OK
     console.log('Result: ' + responseText);
+
+    Pebble.sendAppMessage({ PIN_SET: 1 }, function() {
+      console.log('Notified app of pin set');
+    }, function() {
+      console.log('Error notifying app of pin set');
+    });
   });
 }
 
