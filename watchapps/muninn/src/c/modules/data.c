@@ -2,7 +2,7 @@
 
 // Persisted
 static AppData s_app_data;
-static SampleData s_sample_data;
+static Sample s_samples[NUM_SAMPLES];
 
 // Not persisted
 static char s_error_buff[64];
@@ -19,11 +19,18 @@ static void save_all() {
     APP_LOG(APP_LOG_LEVEL_ERROR, "Error writing app data: %d", (int)result);
     data_set_error("Error writing app data to storage");
   }
+  if (result < (int)sizeof(AppData)) {
+    APP_LOG(APP_LOG_LEVEL_ERROR, "Warning: app data write truncated");
+  }
 
-  result = persist_write_data(SK_SampleData, &s_sample_data, sizeof(SampleData));
-  if (result < 0) {
-    APP_LOG(APP_LOG_LEVEL_ERROR, "Error writing sample data: %d", (int)result);
-    data_set_error("Error writing sample data to storage");
+  for (int i = 0; i < NUM_SAMPLES; i++) {
+    // Save each Sample using SK_SampleBase + i
+    const int key = SK_SampleBase + i;
+    result = persist_write_data(key, &s_samples[i], sizeof(Sample));
+    if (result < 0) {
+      APP_LOG(APP_LOG_LEVEL_ERROR, "Error writing sample data: %d", (int)result);
+      data_set_error("Error writing sample data to storage");
+    }
   }
 }
 
@@ -43,7 +50,7 @@ void data_reset_all() {
 
   // Init all fields in Samples struct
   for (int i = 0; i < NUM_SAMPLES; i++) {
-    Sample *s = &s_sample_data.samples[i];
+    Sample *s = &s_samples[i];
     s->timestamp = STATUS_EMPTY;
     s->charge_perc = STATUS_EMPTY;
     s->last_sample_time = STATUS_EMPTY;
@@ -51,13 +58,11 @@ void data_reset_all() {
     s->time_diff = STATUS_EMPTY;
     s->charge_diff = STATUS_EMPTY;
     s->result = STATUS_EMPTY;
+    s->days_remaining = STATUS_EMPTY;
+    s->rate = STATUS_EMPTY;
   }
 
   save_all();
-}
-
-static void do_migrations() {
-  // Future migrations go here
 }
 
 #if defined(USE_TEST_DATA)
@@ -73,29 +78,28 @@ static int result_from_gap(int gap) {
 #endif
 
 void data_init() {
+  // Before anything else, check if we should reset data
+  if (!persist_exists(SK_Migration_1)) {
+    data_reset_all();
+    persist_write_int(SK_Migration_1, 1);
+  }
+
 #if defined(USE_TEST_DATA)
   //
   // Test data scenarios
   //
   // 1 - Arbitrary scenario
-  // const int changes[NUM_SAMPLES] = {30, 30, 30, 30, 30, 30, 30, 30};
+  // const int changes[NUM_SAMPLES] = {30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30};
   //
   // 2 - Test case: Should show 10 days at 8% per day (from 80%)
-  // const int changes[NUM_SAMPLES] = {2, 2, 2, 2, 2, 2, 2, 2};
+  // const int changes[NUM_SAMPLES] = {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
   //
   // 3 - Test case: Should show 11 days at 7% (two other events are ignored)
   //     Note: includes the two special statuses
-  const int changes[NUM_SAMPLES] = {2, 2, 2, 2, -20, 2, 0, 2};
+  const int changes[NUM_SAMPLES] = {-20, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
   //
   // 4 - Test case: Should show 6 days at 12% per day (from 80%)
-  // const int changes[NUM_SAMPLES] = {3, 3, 3, 3, 3, 3, 3, 3};
-  //
-  // 5 - Test case: User submitted scenario for ~12% rate (not 40!)
-  //     Note: the code to set up fake scenarios won't show the correct overlapping periods
-  // const int changes[NUM_SAMPLES] = {0, 10, 0, 0, 10, 0, 10, 0};
-  //
-  // 6 - Test case: Last estimation was a significant uptick
-  // const int changes[NUM_SAMPLES] = {20, 10, 0, 0, 10, 0, 10, 0};
+  // const int changes[NUM_SAMPLES] = {3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
 
   int total_change = 0;
   for(int i = 0; i < NUM_SAMPLES; i++) {
@@ -123,7 +127,7 @@ void data_init() {
   s_app_data.elevated_rate_alert = false;
 
   for (int i = 0; i < NUM_SAMPLES; i++) {
-    Sample *s = &s_sample_data.samples[i];
+    Sample *s = &s_samples[i];
     const int gap = changes[i];
 
     if (i == 0) {
@@ -134,11 +138,16 @@ void data_init() {
       s->charge_diff = gap;
       s->time_diff = interval_s;
       s->result = result_from_gap(gap);
+
+      if (util_is_valid(s->result)) {
+        s->days_remaining = (s->charge_perc * interval_s) / (gap * SECONDS_PER_DAY);
+        s->rate = s->result;
+      }
       continue;
     }
 
     // Use the previous in the array which is more recent
-    Sample *newer_s = &s_sample_data.samples[i - 1];
+    Sample *newer_s = &s_samples[i - 1];
 
     s->timestamp = newer_s->last_sample_time;
     s->charge_perc = newer_s->last_charge_perc;
@@ -147,6 +156,10 @@ void data_init() {
     s->charge_diff = gap;
     s->time_diff = interval_s;
     s->result = result_from_gap(gap);
+    if (util_is_valid(s->result)) {
+      s->days_remaining = (s->charge_perc * interval_s) / (gap * SECONDS_PER_DAY);
+      s->rate = s->result;
+    }
   }
 
   data_log_state();
@@ -165,14 +178,16 @@ void data_init() {
       return;
     }
 
-    result = persist_read_data(SK_SampleData, &s_sample_data, sizeof(SampleData));
-    if (result < 0) {
-      APP_LOG(APP_LOG_LEVEL_ERROR, "Error reading sample data: %d", (int)result);
-      data_set_error("Error reading sample data from storage");
-      return;
+    // Load each sample using SK_SampleBase + i
+    for (int i = 0; i < NUM_SAMPLES; i++) {
+      const int key = SK_SampleBase + i;
+      result = persist_read_data(key, &s_samples[i], sizeof(Sample));
+      if (result < 0) {
+        APP_LOG(APP_LOG_LEVEL_ERROR, "Error reading sample data: %d", (int)result);
+        data_set_error("Error reading sample data from storage");
+        return;
+      }
     }
-
-    do_migrations();
   }
 
   data_log_state();
@@ -208,7 +223,7 @@ void data_log_state() {
 
   // Sample history
   for (int i = 0; i < NUM_SAMPLES; i++) {
-    Sample *s = &s_sample_data.samples[i];
+    Sample *s = &s_samples[i];
     APP_LOG(
       APP_LOG_LEVEL_INFO,
       "%d | t:%d -> %d (%d) | c:%d -> %d (%d) | ~%d",
@@ -228,10 +243,10 @@ void data_log_state() {
 void data_push_sample(int charge_perc, int last_sample_time, int last_charge_perc, int time_diff, int charge_diff, int result) {
   // Shift right previous samples
   for (int i = NUM_SAMPLES - 1; i > 0; i--) {
-    s_sample_data.samples[i] = s_sample_data.samples[i - 1];
+    s_samples[i] = s_samples[i - 1];
   }
 
-  Sample *s = &s_sample_data.samples[0];
+  Sample *s = &s_samples[0];
   s->timestamp = time(NULL);
   s->charge_perc = charge_perc;
   s->last_sample_time = last_sample_time;
@@ -243,7 +258,6 @@ void data_push_sample(int charge_perc, int last_sample_time, int last_charge_per
 
 // Old algo for comparison
 int data_calculate_avg_discharge_rate_v1() {
-  SampleData *data = data_get_sample_data();
   const int count = data_get_valid_samples_count();
 
   // Not enough samples yet
@@ -254,7 +268,8 @@ int data_calculate_avg_discharge_rate_v1() {
   int seen = 0;
 
   for (int i = 0; i < NUM_SAMPLES; i++) {
-    const int v = data->samples[i].result;
+    const Sample *s = &s_samples[i];
+    const int v = s->result;
     // No discharge in this sample
     if (!util_is_valid(v)) continue;
 
@@ -274,13 +289,12 @@ int data_calculate_avg_discharge_rate_v1() {
 }
 
 /**
- * This _should_ place twice as much emphasis on the most recent half of values,
+ * This _should_ place twice as much emphasis on the most recent four values,
  * so recent changes in watchface or activity are more quickly reflected.
  *
  * Important: count all time periods in the log, not just those with a drop!
  */
 int data_calculate_avg_discharge_rate() {
-  SampleData *data = data_get_sample_data();
   const int total = data_get_log_length();
 
   // Not enough samples yet
@@ -291,7 +305,8 @@ int data_calculate_avg_discharge_rate() {
   int count = 0;
 
   for (int i = 0; i < NUM_SAMPLES; i++) {
-    int r = data->samples[i].result;
+    const Sample *s = &s_samples[i];
+    int r = s->result;
 
     // Log ends here, we never skip a slot when adding to it
     if (r == STATUS_EMPTY) break;
@@ -303,11 +318,13 @@ int data_calculate_avg_discharge_rate() {
     if (r == STATUS_CHARGED) continue;
 
     count++;
+
+    // Weight the most recent 4 samples more heavily
     if (count <= 4) {
-      result_x2 += r * 2; // next three -> 2x weight
+      result_x2 += r * 2;
       weight_x2 += 2;
     } else {
-      result_x2 += r * 1; // rest -> 1x weight
+      result_x2 += r * 1;
       weight_x2 += 1;
     }
   }
@@ -336,7 +353,7 @@ int data_calculate_days_remaining() {
 bool data_get_rate_is_elevated() {
   // Return true if the most recent value is much higher than usual
   const int avg = data_calculate_avg_discharge_rate();
-  const int last = s_sample_data.samples[0].result;
+  const int last = s_samples[0].result;
 
   // Last value wasn't a significant one of discharge
   if (!util_is_valid(avg) || !util_is_valid(last)) return false;
@@ -389,8 +406,8 @@ void data_set_wakeup_id(int id) {
   s_app_data.wakeup_id = id;
 }
 
-SampleData* data_get_sample_data() {
-  return &s_sample_data;
+Sample* data_get_sample(int index) {
+  return &s_samples[index];
 }
 
 void data_set_error(char *err) {
@@ -430,7 +447,9 @@ int data_get_custom_alert_level() {
 int data_get_valid_samples_count() {
   int count = 0;
   for (int i = 0; i < NUM_SAMPLES; i++) {
-    if (util_is_valid(s_sample_data.samples[i].result)) {
+    // Count only discharging and no-change samples
+    const int r = s_samples[i].result;
+    if (r != STATUS_EMPTY && r != STATUS_CHARGED) {
       count++;
     }
   }
@@ -441,7 +460,7 @@ int data_get_log_length() {
   int count = 0;
   for (int i = 0; i < NUM_SAMPLES; i++) {
     // Count all, regardless of status unless they're truly empty
-    if (s_sample_data.samples[i].result != STATUS_EMPTY) {
+    if (s_samples[i].result != STATUS_EMPTY) {
       count++;
     }
   }

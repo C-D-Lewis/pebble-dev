@@ -13,11 +13,14 @@
 #include "windows/alert_window.h"
 
 static void init() {
+  // Temporary
+  const bool notify_wipe = persist_exists(SK_AppData) && !persist_exists(SK_Migration_1);
+
   data_init();
   comm_init();
   scalable_init();
 
-  if (launch_reason() == APP_LAUNCH_WAKEUP) {
+  if (launch_reason() == APP_LAUNCH_WAKEUP && !notify_wipe) {
     WakeupId id = 0;
     int32_t reason = 0;
     wakeup_get_launch_event(&id, &reason);
@@ -29,6 +32,15 @@ static void init() {
   const bool first_launch = !data_get_seen_first_launch();
 
   main_window_push();
+
+  if (notify_wipe) {
+    alert_window_push(
+      RESOURCE_ID_AWAKE,
+      "Data reset to allow some new features to work correctly.",
+      true,
+      false
+    );
+  }
 
   if (data_get_push_timeline_pins()) {
     // Try and push a pin

@@ -68,7 +68,6 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
 
   // Draw data points
   graphics_context_set_fill_color(ctx, GColorBlack);
-  const SampleData *data = data_get_sample_data();
   const int count = NUM_SAMPLES;
   const int x_gap = (GRAPH_SIZE + GRAPH_MARGIN) / count;
 
@@ -94,7 +93,8 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
 
   // Draw points - oldest is on the left
   for (int i = 0; i < count; i++) {
-    const int value = data->samples[count - 1 - i].charge_perc;
+    const Sample *s = data_get_sample(i);
+    const int value = s->charge_perc;
     if (!util_is_valid(value)) continue;
 
     const int x = GRAPH_MARGIN + (i * x_gap);
@@ -116,7 +116,8 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
 
     // Time labels on X axis
     if (i == 0 || i == count - 1) {
-      const time_t timestamp = data->samples[count -1 - i].timestamp;
+      const Sample *label_sample = data_get_sample(count -1 - i);
+      const time_t timestamp = label_sample->timestamp;
       struct tm *tm_point = localtime(&timestamp);
       static char s_time_buff[16];
       strftime(s_time_buff, sizeof(s_time_buff), "%H:%M", tm_point);

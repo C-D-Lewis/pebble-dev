@@ -16,12 +16,14 @@
 // NOTE: ADD ONLY - Changing keys will affect existing users!
 typedef enum {
   // App data key
-  SK_AppData = 0,
-  // Sample data key
-  SK_SampleData = 1,
+  SK_AppData = 1,
+  // Sample data key base - due to the 256B limit per-key we need to store separately
+  SK_SampleBase = 10,
+  // Wipe - adding new fields to Sample struct and expanding number of samples
+  SK_Migration_1 = 50,
 
   // Max storage value used
-  SK_Max = 25
+  SK_Max = 100
 } StorageKey;
 
 typedef enum {
@@ -42,30 +44,24 @@ typedef struct {
   bool ca_has_notified;
   bool push_timeline_pins;
   bool elevated_rate_alert;
+
+  // Singleton, adding new fields OK
 } AppData;
 
 // A full wakeup sample
 typedef struct {
-  // This sample
-  int timestamp;
-  int charge_perc;
+  int timestamp;        // This sample
+  int charge_perc;      //
+  int last_sample_time; // Previous values used in the calculation
+  int last_charge_perc; //
+  int time_diff;        // Comparison values
+  int charge_diff;      //
+  int result;           // Result - or special status!  
+  int days_remaining;   // Interesting for analysis
+  int rate;             //
 
-  // Previous values used in the calculation
-  int last_sample_time;
-  int last_charge_perc;
-
-  // Comparison values
-  int time_diff;
-  int charge_diff;
-
-  // Result - or special status!
-  int result;
+  // Saved per sample, adding new fields okay
 } Sample;
-
-// History of discharge rate values used for averaging
-typedef struct {
-  Sample samples[NUM_SAMPLES];
-} SampleData;
 
 // Methods
 void data_init();
@@ -85,7 +81,7 @@ int data_get_last_charge_perc(void);
 void data_set_last_charge_perc(int perc);
 int data_get_wakeup_id();
 void data_set_wakeup_id(int id);
-SampleData* data_get_sample_data();
+Sample* data_get_sample(int index);
 void data_set_error(char *err);
 char* data_get_error();
 void data_set_seen_first_launch();

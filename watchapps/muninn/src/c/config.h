@@ -2,11 +2,13 @@
 
 #include <pebble.h>
 
-// DO NOT CHANGE WITHOUT MIGRATION //
+/////////////////////////////////////
+// DO NOT CHANGE WITHOUT DUE CARE  //
+//                                 //
 // Hours between wakeups           //
 #define WAKEUP_MOD_H 6             //
 // Number of stored samples        //
-#define NUM_SAMPLES 8              //
+#define NUM_SAMPLES 16             //
 /////////////////////////////////////
 
 // MUST match package.json

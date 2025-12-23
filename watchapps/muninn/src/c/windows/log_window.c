@@ -167,8 +167,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
   }
 
   const int index = cell_index->row;
-  const SampleData *data = data_get_sample_data();
-  const Sample *s = &data->samples[index];
+  const Sample *s = data_get_sample(index);
 
   draw_result_and_datetime(ctx, bounds, s);
 
@@ -192,7 +191,9 @@ static void main_window_load(Window *window) {
   );
 
   s_header_layer = util_make_text_layer(header_rect, scalable_get_font(SFI_Medium));
-  text_layer_set_text(s_header_layer, "Data Log");
+  static char s_header_buff[32];
+  snprintf(s_header_buff, sizeof(s_header_buff), "Data Log (%d/%d)", data_get_log_length(), NUM_SAMPLES);
+  text_layer_set_text(s_header_layer, s_header_buff);
   text_layer_set_text_alignment(s_header_layer, GTextAlignmentCenter);
   layer_add_child(window_layer, text_layer_get_layer(s_header_layer));
 
