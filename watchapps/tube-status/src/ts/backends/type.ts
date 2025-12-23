@@ -46,7 +46,7 @@ export abstract class TransitBackend {
 
   abstract fetchLines(): Promise<LineStatus[] & { configMapping: number[] }>;
 
-  protected abstract mapSeverity(input: string | number): StatusSeverity;
+  protected abstract mapSeverity(...args: any[]): StatusSeverity;
 
   protected truncateReason(reason: string): string {
     if (reason.length > MAX_REASON_LENGTH) {
