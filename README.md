@@ -19,7 +19,7 @@ Some PBWs can be found in `/pbw` for sideloading.
 | Name                  | Screenshot                                                 | Builds                  | Icon | PBW                                |
 |-----------------------|------------------------------------------------------------|-------------------------|------|------------------------------------|
 | `beam-up`             | ![](watchfaces/beam-up/screenshots/aplite.png)             | `A` `B` `C` `D`         | ✅    | [pbw](pbw/beam-up.pbw)             |
-| `brackets`            | ![](watchfaces/brackets/screenshots/basalt.png)            | `A` `B` `C` `D` `E`     | ✅    | [pbw](pbw/brackets.pbw)            |
+| `brackets`            | ![](watchfaces/brackets/screenshots/diorite.png)            | `A` `B` `C` `D` `E`     | ✅    | [pbw](pbw/brackets.pbw)            |
 | `cards`               | ![](watchfaces/cards/screenshots/diorite.png)              | `A` `B` `D`             |      | [pbw](pbw/cards.pbw)               |
 | `cmd-time-typed`      | ![](watchfaces/cmd-time-typed/screenshots/diorite.png)     | `A` `B` `C` `D` `E`     | ✅    | [pbw](pbw/cmd-time-typed.pbw)      |
 | `cmd-time`            | ![](watchfaces/cmd-time/screenshots/diorite.png)           | `A` `B` `C` `D` `E`     | ✅    | [pbw](pbw/cmd-time.pbw)            |
@@ -111,6 +111,6 @@ should be used instead
 - [x] Merge all Split Horizon editions into config.
 - [x] Migrate all custom config to Clay.
 - [x] Verify correct tick unit used to save power.
+- [x] Rebuild and publish supported libraries with new SDK.
 - [ ] Menu icons for all current watchfaces and watchapps.
-- [ ] Rebuild and publish supported libraries with new SDK.
 - [ ] Upgrade more for Emery.
