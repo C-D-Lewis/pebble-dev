@@ -185,6 +185,9 @@ static void handle_new_fields() {
   if (s_app_data.pin_set_time == 0) {
     s_app_data.pin_set_time = STATUS_EMPTY;
   }
+  if (s_app_data.last_charge_time == 0) {
+    s_app_data.last_charge_time = STATUS_EMPTY;
+  }
 }
 
 void data_init() {
