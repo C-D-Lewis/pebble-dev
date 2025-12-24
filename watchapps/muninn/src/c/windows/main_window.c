@@ -475,7 +475,7 @@ static void window_load(Window *window) {
   layer_add_child(root_layer, text_layer_get_layer(s_row_1_subtitle_layer));
 
   // Row 2
-  row_x = scalable_x(10);
+  row_x = scalable_x(30);
   row_y = scalable_y_pp(665, 670);
   const int row_2_text_ico_off = scalable_x_pp(120, 120);
   const int row_2_text_y_off = scalable_y_pp(-35, -25);
@@ -495,7 +495,7 @@ static void window_load(Window *window) {
   );
   layer_add_child(root_layer, text_layer_get_layer(s_last_charge_layer));
 
-  row_x += scalable_x_pp(470, 480);
+  row_x += scalable_x_pp(460, 460);
 
   s_next_charge_bitmap = gbitmap_create_with_resource(RESOURCE_ID_NEXT_CHARGE);
   s_next_charge_bmp_layer = bitmap_layer_create(
@@ -528,15 +528,16 @@ static void window_load(Window *window) {
   );
   layer_add_child(root_layer, text_layer_get_layer(s_battery_layer));
 
-  row_x += scalable_x_pp(450, 460);
+  row_x += scalable_x_pp(430, 450);
 
   s_reading_bitmap = gbitmap_create_with_resource(RESOURCE_ID_READING);
   s_reading_bmp_layer = bitmap_layer_create(GRect(row_x, row_y, ICON_SIZE, ICON_SIZE));
   bitmap_layer_set_compositing_mode(s_reading_bmp_layer, GCompOpSet);
   bitmap_layer_set_bitmap(s_reading_bmp_layer, s_reading_bitmap);
   layer_add_child(root_layer, bitmap_layer_get_layer(s_reading_bmp_layer));
+  const int x_nudge = scalable_x_pp(20, 10);
   s_reading_layer = util_make_text_layer(
-    GRect(row_x + row_3_text_ico_off, row_y + row_3_text_y_off, DISPLAY_W, 100),
+    GRect(row_x + row_3_text_ico_off + x_nudge, row_y + row_3_text_y_off, DISPLAY_W, 100),
     scalable_get_font(SFI_Medium)
   );
   layer_add_child(root_layer, text_layer_get_layer(s_reading_layer));
