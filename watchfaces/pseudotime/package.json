@@ -1,8 +1,10 @@
 {
-  "version": "1.1.0",
+  "version": "1.2.0",
   "author": "Chris Lewis",
   "private": true,
-  "dependencies": {},
+  "dependencies": {
+    "pebble-scalable": "^1.5.1"
+  },
   "keywords": [
     "pebble-app"
   ],
@@ -27,7 +29,9 @@
       "aplite",
       "basalt",
       "chalk",
-      "diorite"
+      "diorite",
+      "emery",
+      "flint"
     ],
     "capabilities": []
   },

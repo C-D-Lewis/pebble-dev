@@ -1,13 +1,11 @@
 #include "main_window.h"
 
-#define WIDTH PBL_IF_ROUND_ELSE(180, 144)
-#define HEIGHT PBL_IF_ROUND_ELSE(180, 168)
-#define MARGIN PBL_IF_ROUND_ELSE(40, 20)
-#define BAR_WIDTH (WIDTH - (MARGIN * 2))
-#define BAR_HEIGHT 8
-#define BAR_SPACING 12
+#define MARGIN scalable_x(130)
+#define BAR_WIDTH (DISPLAY_W - (MARGIN * 2))
+#define BAR_HEIGHT scalable_y(50)
+#define BAR_SPACING scalable_y(70)
 #define BARS_TOTAL_HEIGHT ((BAR_HEIGHT * 3) + (BAR_SPACING * 2))
-#define BARS_Y_OFFSET ((HEIGHT - BARS_TOTAL_HEIGHT) / 2)
+#define BARS_Y_OFFSET ((DISPLAY_H - BARS_TOTAL_HEIGHT) / 2)
 
 // TODO: Dithered grey for monochrome displays
 #define BAR_COLOR_HOUR PBL_IF_COLOR_ELSE(GColorRed, GColorLightGray)
@@ -38,8 +36,6 @@ static void tick_handler(struct tm *tick_time, TimeUnits changed) {
  * Draw procedure for the bars layer.
  */
 static void bar_layer_update_proc(Layer *layer, GContext *ctx) {
-  GRect bounds = layer_get_bounds(layer);
-
   GRect bar_bounds = GRect(MARGIN, BARS_Y_OFFSET, BAR_WIDTH, BAR_HEIGHT);
 
   // Draw three bars for hours, minutes, and seconds
@@ -75,9 +71,19 @@ static void bar_layer_update_proc(Layer *layer, GContext *ctx) {
   graphics_context_set_fill_color(ctx, BAR_COLOR_HOUR);
   graphics_fill_rect(ctx, GRect(MARGIN, BARS_Y_OFFSET, hours_width, BAR_HEIGHT), 0, GCornerNone);
   graphics_context_set_fill_color(ctx, BAR_COLOR_MINUTE);
-  graphics_fill_rect(ctx, GRect(MARGIN, BARS_Y_OFFSET + BAR_HEIGHT + BAR_SPACING, minutes_width, BAR_HEIGHT), 0, GCornerNone);
+  graphics_fill_rect(
+    ctx,
+    GRect(MARGIN, BARS_Y_OFFSET + BAR_HEIGHT + BAR_SPACING, minutes_width, BAR_HEIGHT),
+    0,
+    GCornerNone
+  );
   graphics_context_set_fill_color(ctx, BAR_COLOR_SECOND);
-  graphics_fill_rect(ctx, GRect(MARGIN, BARS_Y_OFFSET + (BAR_HEIGHT + BAR_SPACING) * 2, seconds_width, BAR_HEIGHT), 0, GCornerNone);
+  graphics_fill_rect(
+    ctx,
+    GRect(MARGIN, BARS_Y_OFFSET + (BAR_HEIGHT + BAR_SPACING) * 2, seconds_width, BAR_HEIGHT),
+    0,
+    GCornerNone
+  );
 }
 
 /**

@@ -245,7 +245,7 @@ void data_log_state() {
     Sample *s = &s_samples[i];
     APP_LOG(
       APP_LOG_LEVEL_INFO,
-      "%d | t:%d -> %d (%d) | c:%d -> %d (%d) | ~%d",
+      "%d | t:%d -> %d (%d) | c:%d -> %d (%d) | ~%d | d:%d | r:%d",
       i,
       (int)s->last_sample_time,
       (int)s->timestamp,
@@ -253,7 +253,9 @@ void data_log_state() {
       (int)s->last_charge_perc,
       (int)s->charge_perc,
       (int)s->charge_diff,
-      (int)s->result
+      (int)s->result,
+      (int)s->days_remaining,
+      (int)s->rate
     );
   }
 #endif
