@@ -34,10 +34,7 @@ static void save_all() {
   }
 }
 
-void data_reset_all() {
-  delete_all_data();
-
-  // Write defaults - some will be init'd when tracking begins
+static void init_data_fields() {
   s_app_data.last_sample_time = STATUS_EMPTY;
   s_app_data.last_charge_perc = STATUS_EMPTY;
   s_app_data.wakeup_id = STATUS_EMPTY;
@@ -50,7 +47,6 @@ void data_reset_all() {
   s_app_data.pin_set_time = STATUS_EMPTY;
   s_app_data.one_day_notified = false;
 
-  // Init all fields in Samples struct
   for (int i = 0; i < NUM_SAMPLES; i++) {
     Sample *s = &s_samples[i];
     s->timestamp = STATUS_EMPTY;
@@ -63,6 +59,13 @@ void data_reset_all() {
     s->days_remaining = STATUS_EMPTY;
     s->rate = STATUS_EMPTY;
   }
+}
+
+void data_reset_all() {
+  delete_all_data();
+
+  // Write defaults - some will be init'd when tracking begins
+  init_data_fields();
 
   save_all();
 }
@@ -90,10 +93,20 @@ static void test_data_generator() {
   //
   // 3 - Test case: Should show 11 days at 7% (two other events are ignored)
   //     Note: includes the two special statuses
-  const int changes[NUM_SAMPLES] = {-20, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
+  // const int changes[NUM_SAMPLES] = {-20, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
   //
   // 4 - Test case: Should show 6 days at 12% per day (from 80%)
   // const int changes[NUM_SAMPLES] = {3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
+  //
+  // 5 - Test case: Should await 2 samples if both taken are 'no change'
+  // const int changes[NUM_SAMPLES] = {0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
+  //            or: Should allow one discharge and one 'no change'
+  // const int changes[NUM_SAMPLES] = {2, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
+  //            or: Should await 2 samples if charged and 'no change'
+  // const int changes[NUM_SAMPLES] = {0, -10, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
+  //
+  // 6 - Test case: Should show 1% when the majority of events are 'no change' (extreme battery life)
+  const int changes[NUM_SAMPLES] = {0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0};
 
   int total_change = 0;
   for(int i = 0; i < NUM_SAMPLES; i++) {
@@ -126,6 +139,7 @@ static void test_data_generator() {
   for (int i = 0; i < NUM_SAMPLES; i++) {
     Sample *s = &s_samples[i];
     const int gap = changes[i];
+    if (gap == STATUS_EMPTY) continue;
 
     if (i == 0) {
       s->timestamp = base;
@@ -179,6 +193,7 @@ void data_init() {
   }
 
 #if defined(USE_TEST_DATA)
+  init_data_fields();
   test_data_generator();
   return;
 #endif
@@ -291,7 +306,7 @@ void data_push_sample(int charge_perc, int last_sample_time, int last_charge_per
  * Important: count all time periods in the log, not just those with a drop!
  */
 int data_calculate_avg_discharge_rate() {
-  const int total = data_get_log_length();
+  const int total = data_get_valid_samples_count();
 
   // Not enough samples yet
   if (total < MIN_SAMPLES) return STATUS_EMPTY;
@@ -329,6 +344,7 @@ int data_calculate_avg_discharge_rate() {
   if (weight_x2 == 0) return STATUS_EMPTY;
 
   // If the majority samples are no-change, we may have a zero rate
+  // This case is a problem: 90% chagre becomes 90 days...
   if (result_x2 == 0) return 1;
 
   return result_x2 / weight_x2;
@@ -460,13 +476,21 @@ int data_get_custom_alert_level() {
 
 int data_get_valid_samples_count() {
   int count = 0;
+  bool discharged = false;
   for (int i = 0; i < NUM_SAMPLES; i++) {
     // Count only discharging and no-change samples
     const int r = s_samples[i].result;
     if (r != STATUS_EMPTY && r != STATUS_CHARGED) {
       count++;
     }
+    if (util_is_not_status(r)) {
+      discharged = true;
+    }
   }
+
+  // At least one must a be a full discharging sample
+  if (!discharged) return 0;
+
   return count;
 }
 

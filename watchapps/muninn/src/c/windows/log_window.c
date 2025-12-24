@@ -150,9 +150,8 @@ static uint16_t get_num_rows_callback(MenuLayer *menu_layer, uint16_t section_in
 
 static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_index, void *context) {
   const GRect bounds = layer_get_bounds(cell_layer);
-  const int count = data_get_valid_samples_count();
+  const int count = data_get_log_length();
 
-  // Menu guards against this, but cover the case anyway
   if (count == 0) {
     graphics_draw_text(
       ctx,

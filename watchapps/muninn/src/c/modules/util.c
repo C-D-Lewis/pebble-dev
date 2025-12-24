@@ -89,10 +89,8 @@ char* util_get_status_string() {
   // Edge case here: no change or charging samples don't count
   // We can't produce a prediction AT ALL unless we have 'discharging' samples...
   if (data_get_valid_samples_count() < MIN_SAMPLES) {
-    const int rem = MIN_SAMPLES - data_get_valid_samples_count();
-
     static char s_buff[32];
-    snprintf(s_buff, sizeof(s_buff), "Awaiting %d sample%s...", rem, rem > 1 ? "s" : "");
+    snprintf(s_buff, sizeof(s_buff), "Awaiting discharge...");
     return &s_buff[0];
   }
 
