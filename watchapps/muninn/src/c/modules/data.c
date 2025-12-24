@@ -46,6 +46,7 @@ static void init_data_fields() {
   s_app_data.elevated_rate_alert = false;
   s_app_data.pin_set_time = STATUS_EMPTY;
   s_app_data.one_day_notified = false;
+  s_app_data.last_charge_time = STATUS_EMPTY;
 
   for (int i = 0; i < NUM_SAMPLES; i++) {
     Sample *s = &s_samples[i];
@@ -93,7 +94,7 @@ static void test_data_generator() {
   //
   // 3 - Test case: Should show 11 days at 7% (two other events are ignored)
   //     Note: includes the two special statuses
-  // const int changes[NUM_SAMPLES] = {-20, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
+  const int changes[NUM_SAMPLES] = {-20, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
   //
   // 4 - Test case: Should show 6 days at 12% per day (from 80%)
   // const int changes[NUM_SAMPLES] = {3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
@@ -106,7 +107,7 @@ static void test_data_generator() {
   // const int changes[NUM_SAMPLES] = {0, -10, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
   //
   // 6 - Test case: Should show 1% when the majority of events are 'no change' (extreme battery life)
-  const int changes[NUM_SAMPLES] = {0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0};
+  // const int changes[NUM_SAMPLES] = {0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0};
 
   int total_change = 0;
   for(int i = 0; i < NUM_SAMPLES; i++) {
@@ -135,6 +136,7 @@ static void test_data_generator() {
   s_app_data.push_timeline_pins = false;
   s_app_data.pin_set_time = STATUS_EMPTY;
   s_app_data.one_day_notified = false;
+  s_app_data.last_charge_time = base - (8 * SECONDS_PER_DAY);
 
   for (int i = 0; i < NUM_SAMPLES; i++) {
     Sample *s = &s_samples[i];
@@ -412,6 +414,16 @@ void data_reset_log() {
   }
 }
 
+time_t data_get_next_charge_time() {
+  const time_t now = time(NULL);
+  const int days_remaining = data_calculate_days_remaining();
+  if (!util_is_not_status(days_remaining)) return STATUS_EMPTY;
+
+  return now + (days_remaining * SECONDS_PER_DAY);
+}
+
+///////////////////////////////////////// Getters / Setters ////////////////////////////////////////
+
 int data_get_last_sample_time() {
   return s_app_data.last_sample_time;
 }
@@ -543,4 +555,12 @@ bool data_get_one_day_notified() {
 
 void data_set_one_day_notified(bool b) {
   s_app_data.one_day_notified = b;
+}
+
+void data_set_last_charge_time(int ts) {
+  s_app_data.last_charge_time = ts;
+}
+
+int data_get_last_charge_time() {
+  return s_app_data.last_charge_time;
 }

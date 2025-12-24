@@ -2,31 +2,27 @@
 
 // Not scaled
 #if defined(PBL_PLATFORM_EMERY)
-  #define MASCOT_SIZE 66
-  #define EYE_RECT GRect(58, 10, 3, 3)
+  #define MASCOT_SIZE 30
+  #define EYE_RECT GRect(24, 11, 4, 4)
   #define DIV_W 2
-  #define ROW_1_SUBTITLE "   Days left       Est. %/day"
   #define BRAID_H 18
   #define ICON_SIZE 28
 #else
-  #define MASCOT_SIZE 48
-  #define EYE_RECT GRect(41, 7, 4, 4)
+  #define MASCOT_SIZE 24
+  #define EYE_RECT GRect(18, 7, 4, 4)
   #define DIV_W 1
-  #define ROW_1_SUBTITLE "    Days          Est. %/d"
   #define BRAID_H 14
   #define ICON_SIZE 24
 #endif
 
 #define ACTION_BAR_W scalable_x(70)
-#define BRAID_Y scalable_y_pp(420, 415)
+#define BRAID_Y scalable_y_pp(280, 275)
 #define HINT_W scalable_x(70)
 #define HINT_H scalable_y(200)
-#define ROW_DIV_Y scalable_y(810)
 
 static Window *s_window;
 static Layer *s_canvas_layer;
 static TextLayer
-  *s_status_label_layer,
   *s_status_value_layer,
   *s_desc_layer,
   *s_battery_layer,
@@ -34,20 +30,26 @@ static TextLayer
   *s_row_1_subtitle_layer,
   *s_remaining_layer,
   *s_rate_layer,
-  *s_hint_layer;
+  *s_hint_layer,
+  *s_last_charge_layer,
+  *s_next_charge_layer;
 static BitmapLayer
   *s_mascot_layer,
   *s_battery_bmp_layer,
   *s_reading_bmp_layer,
   *s_remaining_bmp_layer,
-  *s_rate_bmp_layer;
+  *s_rate_bmp_layer,
+  *s_last_charge_bmp_layer,
+  *s_next_charge_bmp_layer;
 static GBitmap
   *s_mascot_bitmap,
   *s_battery_bitmap,
   *s_reading_bitmap,
   *s_remaining_bitmap,
   *s_rate_bitmap,
-  *s_braid_bitmap;
+  *s_braid_bitmap,
+  *s_last_charge_bitmap,
+  *s_next_charge_bitmap;
 
 static AppTimer *s_blink_timer;
 static bool s_is_blinking, s_animating;
@@ -57,9 +59,9 @@ static int s_days_remaining, s_rate, s_anim_days, s_anim_rate;
 static void update_subtitle(int days) {
   static char s_subtitle_buff[48];
 #if defined(PBL_PLATFORM_EMERY)
-  const char *template = "   Day%s left       Est. %%/day";
+  const char *template = "   Day%s left        Est. %%/day";
 #else
-  const char *template = "    Day%s          Est. %%/d";
+  const char *template = "     Day%s          Est. %%/d";
 #endif
   snprintf(s_subtitle_buff, sizeof(s_subtitle_buff), template, days == 1 ? " " : "s");
   text_layer_set_text(s_row_1_subtitle_layer, s_subtitle_buff);
@@ -175,7 +177,7 @@ static void update_data() {
   }
 
   s_mascot_bitmap = gbitmap_create_with_resource(
-    is_enabled ? RESOURCE_ID_AWAKE : RESOURCE_ID_ASLEEP
+    is_enabled ? RESOURCE_ID_AWAKE_HEAD : RESOURCE_ID_ASLEEP_HEAD
   );
   bitmap_layer_set_bitmap(s_mascot_layer, s_mascot_bitmap);
   text_layer_set_text(s_status_value_layer, is_enabled ? "AWAKE" : "ASLEEP");
@@ -195,9 +197,11 @@ static void update_data() {
   text_layer_set_text(s_desc_layer, util_get_status_string());
 
   if (!is_enabled) {
+    // Anything that makes predictions should not be shown if not actively monitoring
     text_layer_set_text(s_reading_layer, "--:--");
     text_layer_set_text(s_remaining_layer, "--");
     text_layer_set_text(s_rate_layer, "--");
+    text_layer_set_text(s_next_charge_layer, "--");
 
     layer_set_hidden(text_layer_get_layer(s_hint_layer), false);
   } else {
@@ -206,10 +210,10 @@ static void update_data() {
 
     // Days remaining
     s_days_remaining = data_calculate_days_remaining();
-    if (!util_is_not_status(s_days_remaining)) {
+    if (util_is_not_status(s_days_remaining)) {
+      // Handled in animation
       text_layer_set_text(s_remaining_layer, "--");
     } else {
-      // Handled in animation
       text_layer_set_text(s_remaining_layer, "--");
     }
 
@@ -217,11 +221,36 @@ static void update_data() {
 
     // Rate per day
     s_rate = data_calculate_avg_discharge_rate();
-    if (!util_is_not_status(s_rate)) {
-      text_layer_set_text(s_rate_layer, "--");
-    } else {
+    if (util_is_not_status(s_rate)) {
       // Handled in animation
       text_layer_set_text(s_rate_layer, "--");
+    } else {
+      text_layer_set_text(s_rate_layer, "--");
+    }
+
+    // "Xd" last charge time
+    static char s_fmt_lc_buff[8];
+    const int last_charge_ts = data_get_last_charge_time();
+    if (util_is_not_status(last_charge_ts)) {
+      util_fmt_time_ago(
+        last_charge_ts,
+        &s_fmt_lc_buff[0],
+        sizeof(s_fmt_lc_buff)
+      );
+      text_layer_set_text(s_last_charge_layer, s_fmt_lc_buff);
+    } else {
+      text_layer_set_text(s_last_charge_layer, "--");
+    }
+
+    // "12 Dec" next charge time
+    static char s_nc_buff[16];
+    time_t next_charge_ts = data_get_next_charge_time();
+    if (util_is_not_status(next_charge_ts)) {
+      struct tm *nc_info = localtime(&next_charge_ts);
+      strftime(s_nc_buff, sizeof(s_nc_buff), "%d %b", nc_info);
+      text_layer_set_text(s_next_charge_layer, s_nc_buff);
+    } else {
+      text_layer_set_text(s_next_charge_layer, "--");
     }
 
     // Next reading
@@ -229,7 +258,6 @@ static void update_data() {
     util_fmt_time(wakeup_ts, &s_wakeup_buff[0], sizeof(s_wakeup_buff));
     text_layer_set_text(s_reading_layer, s_wakeup_buff);
   }
-
 
   if (data_calculate_avg_discharge_rate() != STATUS_EMPTY) {
     // If data to show, begin smooth animation
@@ -242,6 +270,45 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   // Divider braid
   const GRect braid_rect = GRect(0, BRAID_Y, DISPLAY_W, BRAID_H);
   graphics_draw_bitmap_in_rect(ctx, s_braid_bitmap, braid_rect);
+
+  // Status BG
+  graphics_context_set_fill_color(ctx, GColorBlack);
+  graphics_fill_rect(
+    ctx,
+    scalable_grect_pp(
+      GRect(0, 160, 930, 120),
+      GRect(0, 160, 930, 120)
+    ),
+    0,
+    GCornerNone
+  );
+
+  // Row dividers
+  graphics_context_set_stroke_color(ctx, GColorBlack);
+  graphics_context_set_stroke_width(ctx, DIV_W);
+  // Vertical
+  const int v_div_x = (DISPLAY_W / 2) - scalable_x(40);
+  const int v_div_y = scalable_y_pp(365, 355);
+  const int v_div_h = scalable_y_pp(465, 470);
+  graphics_draw_line(
+    ctx,
+    GPoint(v_div_x, v_div_y),
+    GPoint(v_div_x, v_div_y + v_div_h)
+  );
+  // Horizontal below row 1
+  const int row_2_div_y = scalable_y_pp(650, 630);
+  graphics_draw_line(
+    ctx,
+    GPoint(0, row_2_div_y),
+    GPoint(DISPLAY_W - (ACTION_BAR_W), row_2_div_y)
+  );
+  // Horizontal below row 2
+  const int row_3_div_y = scalable_y_pp(830, 835);
+  graphics_draw_line(
+    ctx,
+    GPoint(0, row_3_div_y),
+    GPoint(DISPLAY_W - ACTION_BAR_W, row_3_div_y)
+  );
 
   // Actions BG
   graphics_context_set_fill_color(ctx, PBL_IF_COLOR_ELSE(GColorDarkCandyAppleRed, GColorLightGray));
@@ -281,22 +348,6 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     ctx, GRect(hint_x, log_y, HINT_W, HINT_H),
     3,
     GCornersAll
-  );
-
-  // Row divider
-  graphics_context_set_stroke_color(ctx, GColorBlack);
-  graphics_context_set_stroke_width(ctx, DIV_W);
-  graphics_draw_line(
-    ctx,
-    GPoint(0, ROW_DIV_Y),
-    GPoint(DISPLAY_W - (ACTION_BAR_W), ROW_DIV_Y)
-  );
-  const int row_div_x = (DISPLAY_W / 2) - scalable_x(80);
-  const int row_div_h = scalable_y(320);
-  graphics_draw_line(
-    ctx,
-    GPoint(row_div_x, ROW_DIV_Y),
-    GPoint(row_div_x, ROW_DIV_Y - row_div_h)
   );
 
   // Blink Muninn's eye
@@ -353,48 +404,45 @@ static void window_load(Window *window) {
   s_braid_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BRAID);
 
   // Mascot
-  s_mascot_bitmap = gbitmap_create_with_resource(RESOURCE_ID_AWAKE);
+  s_mascot_bitmap = gbitmap_create_with_resource(RESOURCE_ID_AWAKE_HEAD);
   s_mascot_layer = bitmap_layer_create(
-    GRect(scalable_x(30), scalable_y(10), MASCOT_SIZE, MASCOT_SIZE)
+    GRect(scalable_x_pp(35, 45), scalable_y_pp(20, 25), MASCOT_SIZE, MASCOT_SIZE)
   );
   bitmap_layer_set_compositing_mode(s_mascot_layer, GCompOpSet);
   bitmap_layer_set_bitmap(s_mascot_layer, s_mascot_bitmap);
   layer_add_child(root_layer, bitmap_layer_get_layer(s_mascot_layer));
 
-  s_status_label_layer = util_make_text_layer(
-    scalable_grect(440, -10, 1000, 500),
-    scalable_get_font(SFI_Small)
-  );
-  text_layer_set_text(s_status_label_layer, "Muninn is");
-  layer_add_child(root_layer, text_layer_get_layer(s_status_label_layer));
+  s_canvas_layer = layer_create(bounds);
+  layer_set_update_proc(s_canvas_layer, canvas_update_proc);
+  layer_add_child(root_layer, s_canvas_layer);
 
   s_status_value_layer = util_make_text_layer(
     scalable_grect_pp(
-      GRect(430, 70, 1000, 500),
-      GRect(440, 110, 1000, 500)
+      GRect(0, -35, 1000, 200),
+      GRect(0, 5, 1000, 200)
     ),
     scalable_get_font(SFI_LargeBold)
   );
+  text_layer_set_text_alignment(s_status_value_layer, GTextAlignmentCenter);
   layer_add_child(root_layer, text_layer_get_layer(s_status_value_layer));
 
   s_desc_layer = util_make_text_layer(
     scalable_grect_pp(
-      GRect(0, 280, 930, 150),
-      GRect(0, 270, 930, 150)
+      GRect(0, 145, 930, 150),
+      GRect(0, 135, 930, 150)
     ),
     scalable_get_font(SFI_Small)
   );
   text_layer_set_text_alignment(s_desc_layer, GTextAlignmentCenter);
   text_layer_set_text_color(s_desc_layer, GColorWhite);
-  text_layer_set_background_color(s_desc_layer, GColorBlack);
   layer_add_child(root_layer, text_layer_get_layer(s_desc_layer));
 
-  // Top row
-  int row_x = scalable_x_pp(30, 40);
-  int row_y = scalable_y_pp(535, 550);
+  // Row 1
+  int row_x = scalable_x_pp(40, 50);
+  int row_y = scalable_y_pp(390, 385);
 
-  const int row_1_text_icon_offset = scalable_x_pp(190, 160);
-  const int row_1_text_y_offset = scalable_y_pp(-40, -20);
+  const int row_1_text_ico_off = scalable_x_pp(190, 160);
+  const int row_1_text_y_off = scalable_y_pp(-40, -20);
 
   s_remaining_bitmap = gbitmap_create_with_resource(RESOURCE_ID_REMAINING);
   s_remaining_bmp_layer = bitmap_layer_create(GRect(row_x, row_y, ICON_SIZE, ICON_SIZE));
@@ -402,12 +450,12 @@ static void window_load(Window *window) {
   bitmap_layer_set_bitmap(s_remaining_bmp_layer, s_remaining_bitmap);
   layer_add_child(root_layer, bitmap_layer_get_layer(s_remaining_bmp_layer));
   s_remaining_layer = util_make_text_layer(
-    GRect(row_x + row_1_text_icon_offset, row_y + row_1_text_y_offset, DISPLAY_W, 100),
+    GRect(row_x + row_1_text_ico_off, row_y + row_1_text_y_off, DISPLAY_W, 100),
     scalable_get_font(SFI_LargeBold)
   );
   layer_add_child(root_layer, text_layer_get_layer(s_remaining_layer));
 
-  row_x += scalable_x_pp(480, 480);
+  row_x += scalable_x_pp(485, 485);
 
   s_rate_bitmap = gbitmap_create_with_resource(RESOURCE_ID_RATE);
   s_rate_bmp_layer = bitmap_layer_create(GRect(row_x, row_y, ICON_SIZE, ICON_SIZE));
@@ -415,22 +463,59 @@ static void window_load(Window *window) {
   bitmap_layer_set_bitmap(s_rate_bmp_layer, s_rate_bitmap);
   layer_add_child(root_layer, bitmap_layer_get_layer(s_rate_bmp_layer));
   s_rate_layer = util_make_text_layer(
-    GRect(row_x + row_1_text_icon_offset, row_y + row_1_text_y_offset, DISPLAY_W, 100),
+    GRect(row_x + row_1_text_ico_off, row_y + row_1_text_y_off, DISPLAY_W, 100),
     scalable_get_font(SFI_LargeBold)
   );
   layer_add_child(root_layer, text_layer_get_layer(s_rate_layer));
 
   s_row_1_subtitle_layer = util_make_text_layer(
-    GRect(2, row_y + scalable_y_pp(120, 110), DISPLAY_W - ACTION_BAR_W, 40),
+    GRect(2, row_y + scalable_y_pp(115, 100), DISPLAY_W - ACTION_BAR_W, 40),
     scalable_get_font(SFI_Small)
   );
   layer_add_child(root_layer, text_layer_get_layer(s_row_1_subtitle_layer));
 
-  // Bottom row
+  // Row 2
   row_x = scalable_x(10);
-  row_y = scalable_y_pp(840, 850);
-  const int row_2_text_icon_offset = scalable_x_pp(160, 150);
-  const int row_2_text_y_offset = scalable_y_pp(-30, -20);
+  row_y = scalable_y_pp(665, 670);
+  const int row_2_text_ico_off = scalable_x_pp(120, 120);
+  const int row_2_text_y_off = scalable_y_pp(-35, -25);
+  
+  s_last_charge_bitmap = gbitmap_create_with_resource(RESOURCE_ID_LAST_CHARGE);
+  s_last_charge_bmp_layer = bitmap_layer_create(
+    GRect(row_x, row_y, ICON_SIZE, ICON_SIZE)
+  );
+  bitmap_layer_set_compositing_mode(s_last_charge_bmp_layer, GCompOpSet);
+  bitmap_layer_set_bitmap(s_last_charge_bmp_layer, s_last_charge_bitmap);
+  layer_add_child(root_layer, bitmap_layer_get_layer(s_last_charge_bmp_layer));
+
+  const int text_ico_nudge = scalable_x_pp(40, 30);
+  s_last_charge_layer = util_make_text_layer(
+    GRect(row_x + row_2_text_ico_off + text_ico_nudge, row_y + row_2_text_y_off, DISPLAY_W, 100),
+    scalable_get_font(SFI_Medium)
+  );
+  layer_add_child(root_layer, text_layer_get_layer(s_last_charge_layer));
+
+  row_x += scalable_x_pp(470, 480);
+
+  s_next_charge_bitmap = gbitmap_create_with_resource(RESOURCE_ID_NEXT_CHARGE);
+  s_next_charge_bmp_layer = bitmap_layer_create(
+    GRect(row_x, row_y, ICON_SIZE, ICON_SIZE)
+  );
+  bitmap_layer_set_compositing_mode(s_next_charge_bmp_layer, GCompOpSet);
+  bitmap_layer_set_bitmap(s_next_charge_bmp_layer, s_next_charge_bitmap);
+  layer_add_child(root_layer, bitmap_layer_get_layer(s_next_charge_bmp_layer));
+
+  s_next_charge_layer = util_make_text_layer(
+    GRect(row_x + row_2_text_ico_off, row_y + row_2_text_y_off, DISPLAY_W, 100),
+    scalable_get_font(SFI_Medium)
+  );
+  layer_add_child(root_layer, text_layer_get_layer(s_next_charge_layer));
+
+  // Row 3
+  row_x = scalable_x(10);
+  row_y = scalable_y_pp(845, 860);
+  const int row_3_text_ico_off = scalable_x_pp(160, 150);
+  const int row_3_text_y_off = scalable_y_pp(-30, -20);
 
   s_battery_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_HIGH);
   s_battery_bmp_layer = bitmap_layer_create(GRect(row_x, row_y, ICON_SIZE, ICON_SIZE));
@@ -438,7 +523,7 @@ static void window_load(Window *window) {
   bitmap_layer_set_bitmap(s_battery_bmp_layer, s_battery_bitmap);
   layer_add_child(root_layer, bitmap_layer_get_layer(s_battery_bmp_layer));
   s_battery_layer = util_make_text_layer(
-    GRect(row_x + row_2_text_icon_offset, row_y + row_2_text_y_offset, DISPLAY_W, 100),
+    GRect(row_x + row_3_text_ico_off, row_y + row_3_text_y_off, DISPLAY_W, 100),
     scalable_get_font(SFI_Medium)
   );
   layer_add_child(root_layer, text_layer_get_layer(s_battery_layer));
@@ -451,22 +536,17 @@ static void window_load(Window *window) {
   bitmap_layer_set_bitmap(s_reading_bmp_layer, s_reading_bitmap);
   layer_add_child(root_layer, bitmap_layer_get_layer(s_reading_bmp_layer));
   s_reading_layer = util_make_text_layer(
-    GRect(row_x + row_2_text_icon_offset, row_y + row_2_text_y_offset, DISPLAY_W, 100),
+    GRect(row_x + row_3_text_ico_off, row_y + row_3_text_y_off, DISPLAY_W, 100),
     scalable_get_font(SFI_Medium)
   );
   layer_add_child(root_layer, text_layer_get_layer(s_reading_layer));
-
-  // On top of almost everything
-  s_canvas_layer = layer_create(bounds);
-  layer_set_update_proc(s_canvas_layer, canvas_update_proc);
-  layer_add_child(root_layer, s_canvas_layer);
 
   // Hint for when Muninn is asleep (topmost)
   const GRect hint_rect = GRect(
     2,
     BRAID_Y + BRAID_H,
     DISPLAY_W - ACTION_BAR_W - 4,
-    (ROW_DIV_Y - BRAID_Y - BRAID_H)
+    (130 - BRAID_Y - BRAID_H)
   );
   s_hint_layer = util_make_text_layer(hint_rect, scalable_get_font(SFI_Medium));
   text_layer_set_background_color(s_hint_layer, GColorWhite);
@@ -478,7 +558,6 @@ static void window_load(Window *window) {
 }
 
 static void window_unload(Window *window) {
-  text_layer_destroy(s_status_label_layer);
   text_layer_destroy(s_status_value_layer);
   text_layer_destroy(s_desc_layer);
   text_layer_destroy(s_row_1_subtitle_layer);
@@ -487,6 +566,8 @@ static void window_unload(Window *window) {
   text_layer_destroy(s_remaining_layer);
   text_layer_destroy(s_rate_layer);
   text_layer_destroy(s_hint_layer);
+  text_layer_destroy(s_last_charge_layer);
+  text_layer_destroy(s_next_charge_layer);
 
   gbitmap_destroy(s_mascot_bitmap);
   gbitmap_destroy(s_braid_bitmap);
@@ -494,12 +575,16 @@ static void window_unload(Window *window) {
   gbitmap_destroy(s_reading_bitmap);
   gbitmap_destroy(s_remaining_bitmap);
   gbitmap_destroy(s_rate_bitmap);
+  gbitmap_destroy(s_last_charge_bitmap);
+  gbitmap_destroy(s_next_charge_bitmap);
 
   bitmap_layer_destroy(s_mascot_layer);
   bitmap_layer_destroy(s_battery_bmp_layer);
   bitmap_layer_destroy(s_reading_bmp_layer);
   bitmap_layer_destroy(s_remaining_bmp_layer);
   bitmap_layer_destroy(s_rate_bmp_layer);
+  bitmap_layer_destroy(s_last_charge_bmp_layer);
+  bitmap_layer_destroy(s_next_charge_bmp_layer);
 
   layer_destroy(s_canvas_layer);
 

@@ -85,6 +85,26 @@
           "file": "images/braid.png"
         },
         {
+          "type": "png",
+          "name": "AWAKE_HEAD",
+          "file": "images/awake-head.png"
+        },
+        {
+          "type": "png",
+          "name": "ASLEEP_HEAD",
+          "file": "images/asleep-head.png"
+        },
+        {
+          "type": "png",
+          "name": "LAST_CHARGE",
+          "file": "images/last-charge.png"
+        },
+        {
+          "type": "png",
+          "name": "NEXT_CHARGE",
+          "file": "images/next-charge.png"
+        },
+        {
           "type": "font",
           "name": "GOTCHA_GOTHIC_30",
           "file": "fonts/Gotcha-Gothic.ttf"

@@ -100,6 +100,7 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
         charge_diff,
         STATUS_CHARGED
       );
+      data_set_last_charge_time(ts_now);
     } else if (charge_diff == 0) {
       // No change since last sample - probably on charge or very short period
       data_push_sample(

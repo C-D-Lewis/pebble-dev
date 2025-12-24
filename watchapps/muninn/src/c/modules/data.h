@@ -46,6 +46,7 @@ typedef struct {
   bool elevated_rate_alert; // Elevated rate alert
   int pin_set_time;         // When timeline pin was last set
   bool one_day_notified;    // One day remaining alert has notified
+  int last_charge_time;     // Timestamp of last charge
 
   // Singleton, adding new fields OK
 } AppData;
@@ -76,6 +77,7 @@ int data_calculate_days_remaining();
 void data_cycle_custom_alert_level();
 bool data_get_rate_is_elevated();
 void data_reset_log();
+time_t data_get_next_charge_time();
 
 // Interface getters/setters
 int data_get_last_sample_time(void);
@@ -104,6 +106,8 @@ int data_get_pin_set_time();
 void data_set_pin_set_time(int t);
 bool data_get_one_day_notified();
 void data_set_one_day_notified(bool b);
+void data_set_last_charge_time(int ts);
+int data_get_last_charge_time();
 
 // Strings
 #define MSG_WELCOME "Welcome to Muninn!\n\nEstimates will appear after two samples are taken.\n\nPlease launch me if the watch is off and a sample is missed."
