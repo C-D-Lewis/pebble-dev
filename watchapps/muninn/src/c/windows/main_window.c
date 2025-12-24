@@ -488,7 +488,7 @@ static void window_load(Window *window) {
   bitmap_layer_set_bitmap(s_last_charge_bmp_layer, s_last_charge_bitmap);
   layer_add_child(root_layer, bitmap_layer_get_layer(s_last_charge_bmp_layer));
 
-  const int text_ico_nudge = scalable_x_pp(40, 30);
+  const int text_ico_nudge = scalable_x_pp(60, 40);
   s_last_charge_layer = util_make_text_layer(
     GRect(row_x + row_2_text_ico_off + text_ico_nudge, row_y + row_2_text_y_off, DISPLAY_W, 100),
     scalable_get_font(SFI_Medium)
@@ -542,16 +542,14 @@ static void window_load(Window *window) {
   layer_add_child(root_layer, text_layer_get_layer(s_reading_layer));
 
   // Hint for when Muninn is asleep (topmost)
-  const GRect hint_rect = GRect(
-    2,
-    BRAID_Y + BRAID_H,
-    DISPLAY_W - ACTION_BAR_W - 4,
-    (130 - BRAID_Y - BRAID_H)
+  const GRect hint_rect = scalable_grect_pp(
+    GRect(0, 360, 930, 470),
+    GRect(0, 355, 930, 475)
   );
   s_hint_layer = util_make_text_layer(hint_rect, scalable_get_font(SFI_Medium));
   text_layer_set_background_color(s_hint_layer, GColorWhite);
   text_layer_set_text_alignment(s_hint_layer, GTextAlignmentCenter);
-  text_layer_set_text(s_hint_layer, "Hold the Up button to wake Muninn.");
+  text_layer_set_text(s_hint_layer, "Hold the Up button  to wake Muninn.");
   layer_add_child(root_layer, text_layer_get_layer(s_hint_layer));
 
   update_data();
