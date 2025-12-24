@@ -30,11 +30,12 @@ void debug_window_update_data() {
   snprintf(
     s_values_buff,
     sizeof(s_values_buff),
-    "Scheduled: %s\nLast sample: %s\nNext sample: %s\nLast value: %d",
+    "Scheduled: %s\nLast sample: %s\nNext sample: %s\nLast value: %d\nAccuracy: %d%%",
     is_enabled ? "true": "false",
     &s_fmt_last_buff[0],
     &s_fmt_next_buff[0],
-    data_get_last_charge_perc()
+    data_get_last_charge_perc(),
+    data_calculate_accuracy()
   );
   text_layer_set_text(s_stats_layer, s_values_buff);
 }

@@ -425,6 +425,48 @@ time_t data_get_next_charge_time() {
   return now + (days_remaining * SECONDS_PER_DAY);
 }
 
+int data_calculate_accuracy() {
+  int newest_i = 0;
+  int oldest_i = -1;
+
+  // Find oldest valid sample
+  for (int i = 0; i < NUM_SAMPLES; i++) {
+    if (s_samples[i].result == STATUS_EMPTY) break;
+    oldest_i = i;
+  }
+  // Not enough samples
+  if (oldest_i <= newest_i) return STATUS_EMPTY;
+
+  int expected_acc = 0;
+  int actual_acc = 0;
+  for (int i = newest_i; i < oldest_i; i++) {
+    Sample *current = &s_samples[i];
+    Sample *older = &s_samples[i + 1];
+
+    if (current->result != STATUS_CHARGED && current->result != STATUS_NO_CHANGE) {
+      // Actual: Sum the diff in charge depletion
+      if (older->charge_perc > current->charge_perc) {
+        actual_acc += (older->charge_perc - current->charge_perc);
+      }
+
+      // Expected: Sum the total "percent-seconds" based on rate and time diff
+      if (util_is_not_status(current->rate)) {
+        expected_acc += current->rate * current->time_diff;
+      }
+    }
+  }
+
+  // Prevent divide by zero - actually nothing dropped
+  if (expected_acc <= 0 || actual_acc <= 0) return STATUS_EMPTY;
+
+  // Calculation: (Actual % / Expected %) * 100
+  // Multiply by SECONDS_PER_DAY because expected_acc is in "percent-seconds"
+  // Rate (%/day) * Time (seconds). This converts the ratio back to a pure percentage.
+  //
+  // Higher than 100% means the battery is draining faster than expected
+  return (int)((actual_acc * 100 * SECONDS_PER_DAY) / expected_acc);
+}
+
 ///////////////////////////////////////// Getters / Setters ////////////////////////////////////////
 
 int data_get_last_sample_time() {
