@@ -1,8 +1,10 @@
 {
-  "version": "1.1.0",
+  "version": "1.2.0",
   "author": "Chris Lewis",
   "private": true,
-  "dependencies": {},
+  "dependencies": {
+    "pebble-scalable": "^1.5.1"
+  },
   "keywords": [
     "pebble-app"
   ],
@@ -14,7 +16,13 @@
           "type": "font",
           "name": "TUNGSTEN_48",
           "file": "fonts/Tungsten-Bold.ttf",
-          "characterRegex" : "[0-9%]"
+          "characterRegex": "[0-9]"
+        },
+        {
+          "type": "font",
+          "name": "TUNGSTEN_64",
+          "file": "fonts/Tungsten-Bold.ttf",
+          "characterRegex": "[0-9]"
         }
       ]
     },
@@ -34,7 +42,9 @@
       "aplite",
       "basalt",
       "chalk",
-      "diorite"
+      "diorite",
+      "emery",
+      "flint"
     ],
     "capabilities": []
   },
