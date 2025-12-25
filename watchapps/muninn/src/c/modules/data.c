@@ -361,6 +361,9 @@ int data_calculate_days_remaining() {
   const int charge_perc = state.charge_percent;
   const int rate = data_calculate_avg_discharge_rate();
 
+  // If not enough data
+  if (data_get_valid_samples_count() < MIN_SAMPLES) return STATUS_EMPTY;
+
   // Data not available yet
   if (!util_is_not_status(rate)) return STATUS_EMPTY;
 

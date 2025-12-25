@@ -164,7 +164,8 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
 
   // One day left - show peristent alert
   const bool one_day_notified = data_get_one_day_notified();
-  const bool one_day_left = data_calculate_days_remaining() <= 1;
+  const int days_remaining = data_calculate_days_remaining();
+  const bool one_day_left = util_is_not_status(days_remaining) && days_remaining <= 1;
   if (one_day_left && !one_day_notified) {
     data_set_one_day_notified(true);
 
