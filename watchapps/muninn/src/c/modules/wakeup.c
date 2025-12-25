@@ -23,8 +23,7 @@ void wakeup_schedule_next() {
   struct tm tm_future = *now;
   tm_future.tm_hour += hours_rem;
   tm_future.tm_min = 0;
-  // Tiny extra offset in case weird things happen exactly on the hour
-  tm_future.tm_sec = 5;
+  tm_future.tm_sec = 0;
   const time_t future = mktime(&tm_future);
 #endif
 
