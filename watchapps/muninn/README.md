@@ -19,18 +19,21 @@ battery life and rate of discharge.
 Estimates will begin to appear after two of these readings have been taken.
 
 Features include:
-
 - Negligible battery impact.
 - Moving-average estimation of remaining battery life, weighted towards recent values.
-- Option to vibrate when a sample is taken.
-- Option to advise when battery charge is below a chosen threshold (50%/20%/10%).
-- Option to create a timeline pin at noon on the day the charge may run out.
-- Option to get alerted if the latest estimated rate is 2x average.
+- Display of last observed charge and predicted next charge date.
+- Notifies when there is about one day of charge remaining.
 - Attempt to set AppGlance to show estimate in the launcher menu.
 - View detailed logs of recent estimates.
 - View general battery tips and Muninn lore.
 - Ability to disable temporarily.
 - Completely delete and reset all app data.
+
+Options:
+- Vibrate when a sample is taken.
+- Advise when battery charge is below a chosen threshold (50%/20%/10%).
+- Set a timeline pin at noon the day charge may run out.
+- Be notified if the rate of drain is 2x average.
 
 Important notes:
 
@@ -63,7 +66,7 @@ from 2016) and what kind of anomalous behavior you encountered.
 
 ## TODO:
 
-- [ ] Display status of timeline pin insert request in settings window.
+- [ ] Self-evaluation of prediction accuracy over time
 - [ ] Extremely simple chart using log timestamps? 
 - [ ] Export/import data log to/from JS
 - [ ] Show more detailed data and charts on JS settings page?
