@@ -14,7 +14,7 @@
 // MUST match package.json
 #define VERSION "1.12.0"
 // Minimum samples before providing estimations
-#define MIN_SAMPLES 2
+#define MIN_SAMPLES 1
 // Maximum number of extra minutes if a collision
 #define EXTRA_MINUTES_MAX 10
 // Multipler for elevated rate alarm
@@ -44,5 +44,7 @@
 // #define TEST_TIMELINE_PIN true     //
 //                                    //
 // #define TEST_FORCE_SCALING true    //
+//                                    //
+// #define TEST_OVERESTIMATION true   //
 //                                    //
 ////////////////////////////////////////

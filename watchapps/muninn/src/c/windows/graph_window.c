@@ -107,6 +107,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   );
 
   // Draw points - oldest is on the left
+  int last_x = -1, last_y = -1;
   for (int i = 0; i < count; i++) {
     const Sample *s = data_get_sample(count - i - 1);
     const int value = s->charge_perc;
@@ -115,22 +116,27 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     const int x = GRAPH_MARGIN + (i * x_gap);
     const int y = root_y + GRAPH_SIZE - ((value * GRAPH_SIZE) / 100);
     
-    graphics_fill_circle(ctx, GPoint(x, y), 2);
+    // Draw line from previous point
+    if (last_x != -1) {
+      graphics_draw_line(ctx, GPoint(last_x, last_y), GPoint(x, y));
+    }
+    last_x = x;
+    last_y = y;
+    
+    graphics_fill_circle(ctx, GPoint(x, y), 1);
 
-    // Label every fourth point
-    if (i % 4 != 0) continue;
+    // Draw estimated value given rate at next oldest sample
+    if (i != count - 1) {
+      const Sample *prev_s = data_get_sample(count - i);
+      if (!util_is_not_status(prev_s->rate)) continue;
 
-    static char s_value_buff[4];
-    snprintf(s_value_buff, sizeof(s_value_buff), "%d", value);
-    graphics_draw_text(
-      ctx,
-      s_value_buff,
-      s_font_s,
-      GRect(x - 12, y - 17, 24, 14),
-      GTextOverflowModeTrailingEllipsis,
-      GTextAlignmentCenter,
-      NULL
-    );
+      const int time_diff = s->timestamp - prev_s->timestamp;
+      const int estimated_drop = (prev_s->rate * time_diff) / SECONDS_PER_DAY;
+      const int estimated_value = prev_s->charge_perc - estimated_drop;
+
+      const int est_y = root_y + GRAPH_SIZE - ((estimated_value * GRAPH_SIZE) / 100);
+      graphics_draw_circle(ctx, GPoint(x, est_y), 2);
+    }
   }
 }
 

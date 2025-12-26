@@ -169,9 +169,14 @@ static void test_data_generator() {
     s->charge_diff = gap;
     s->time_diff = interval_s;
     s->result = result_from_gap(gap);
+    // Make this deliberately incorrect for testing
     if (util_is_not_status(s->result)) {
-      s->days_remaining = (s->charge_perc * interval_s) / (gap * SECONDS_PER_DAY);
-      s->rate = s->result;
+      int result = s->result;
+#if defined(TEST_OVERESTIMATION)
+      result *= 2;
+#endif
+      s->days_remaining = ((s->charge_perc) * interval_s) / (gap * SECONDS_PER_DAY);
+      s->rate = result;
     }
   }
 
