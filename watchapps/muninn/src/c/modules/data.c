@@ -136,7 +136,7 @@ static void test_data_generator() {
   s_app_data.push_timeline_pins = false;
   s_app_data.pin_set_time = STATUS_EMPTY;
   s_app_data.one_day_notified = false;
-  s_app_data.last_charge_time = base - (8 * SECONDS_PER_DAY);
+  s_app_data.last_charge_time = base - (3 * SECONDS_PER_DAY);
 
   for (int i = 0; i < NUM_SAMPLES; i++) {
     Sample *s = &s_samples[i];

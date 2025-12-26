@@ -91,7 +91,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     ctx,
     "Oldest",
     s_font_s,
-    GRect(10, root_y + GRAPH_SIZE + 6, 50, 14),
+    GRect(10, root_y + GRAPH_SIZE + 3, 50, 14),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentLeft,
     NULL
@@ -100,19 +100,19 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     ctx,
     "Newest",
     s_font_s,
-    GRect(DISPLAY_W - 50, root_y + GRAPH_SIZE + 6, 50, 14),
+    GRect(DISPLAY_W - 50, root_y + GRAPH_SIZE + 3, 50, 14),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentRight,
     NULL
   );
 
   // Draw points - oldest is on the left
-  for (int i = count - 1; i >= 0; i--) {
-    const Sample *s = data_get_sample(i);
+  for (int i = 0; i < count; i++) {
+    const Sample *s = data_get_sample(count - i - 1);
     const int value = s->charge_perc;
     if (!util_is_not_status(value)) continue;
 
-    const int x = GRAPH_MARGIN + (GRAPH_SIZE - ((i - 1) * x_gap));
+    const int x = GRAPH_MARGIN + (i * x_gap);
     const int y = root_y + GRAPH_SIZE - ((value * GRAPH_SIZE) / 100);
     
     graphics_fill_circle(ctx, GPoint(x, y), 2);
