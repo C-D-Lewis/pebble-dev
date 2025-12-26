@@ -1,8 +1,9 @@
 #include "data.h"
 
-static LineData s_line_data[LineTypeMax];
+static LineConfig s_line_configs[MAX_LINES];
+static LineData s_line_data[MAX_LINES];
 static int s_progress = 0;
-static int s_progress_max = LineTypeMax;
+static int s_progress_max = MAX_LINES * 2; // Config and Status are sent separately
 
 void data_init() {
 }
@@ -10,93 +11,64 @@ void data_init() {
 void data_deinit() {
 }
 
-char* data_get_line_name(int type) {
-  switch(type) {
-    case LineTypeBakerloo:           return "Bakerloo";
-    case LineTypeCentral:            return "Central";
-    case LineTypeCircle:             return "Circle";
-    case LineTypeDistrict:           return "District";
-    case LineTypeDLR:                return "DLR";
-    case LineTypeElizabeth:          return "Elizabeth";
-    case LineTypeHammersmithAndCity: return "H'smith & City";
-    case LineTypeJubilee:            return "Jubilee";
-    case LineTypeLiberty:            return "Liberty";
-    case LineTypeLioness:            return "Lioness";
-    case LineTypeMetropolitan:       return "Metropolitan";
-    case LineTypeMildmay:            return "Mildmay";
-    case LineTypeNorthern:           return "Northern";
-    case LineTypePicadilly:          return "Picadilly";
-    case LineTypeSuffragette:        return "Suffragette";
-    case LineTypeVictoria:           return "Victoria";
-    case LineTypeWaterlooAndCity:    return "W'loo & City";
-    case LineTypeWeaver:             return "Weaver";
-    case LineTypeWindrush:           return "Windrush";
-    default:                         return "?";
+void data_set_line_config(int index, const char *name, uint32_t color, bool striped) {
+  if (index < 0 || index >= MAX_LINES) {
+    return;
   }
+
+  LineConfig *config = &s_line_configs[index];
+  config->configured = true;
+  snprintf(config->name, sizeof(config->name), "%s", name);
+  config->color = color;
+  config->striped = striped;
 }
 
-GColor data_get_line_color(int type) {
-#if defined(PBL_COLOR)
-  switch(type) {
-    case LineTypeBakerloo:           return GColorFromHEX(0xB36305);
-    case LineTypeCentral:            return GColorFromHEX(0xE32017);
-    case LineTypeCircle:             return GColorFromHEX(0xFFD300);
-    case LineTypeDistrict:           return GColorFromHEX(0x00782A);
-    case LineTypeDLR:                return GColorFromHEX(0x00AFAD);
-    case LineTypeElizabeth:          return GColorFromHEX(0x9364CD);
-    case LineTypeHammersmithAndCity: return GColorFromHEX(0xF3A9BB);
-    case LineTypeJubilee:            return GColorFromHEX(0xA0A5A9);
-    case LineTypeLiberty:            return GColorFromHEX(0x686868);
-    case LineTypeLioness:            return GColorFromHEX(0xFEAF3F);
-    case LineTypeMetropolitan:       return GColorFromHEX(0x9B0056);
-    case LineTypeMildmay:            return GColorCobaltBlue;
-    case LineTypeNorthern:           return GColorBlack;
-    case LineTypePicadilly:          return GColorFromHEX(0x003688);
-    case LineTypeSuffragette:        return GColorMayGreen;
-    case LineTypeWaterlooAndCity:    return GColorFromHEX(0x95CDBA);
-    case LineTypeWeaver:             return GColorFromHEX(0xA12860);
-    case LineTypeWindrush:           return GColorFromHEX(0xE32017);
-    case LineTypeVictoria:           return GColorFromHEX(0x0098D4);
-    default:                         return GColorWhite;
+char *data_get_line_name(int index) {
+  if (index < 0 || index >= MAX_LINES || !s_line_configs[index].configured) {
+    return "?";
   }
+  return s_line_configs[index].name;
+}
+
+GColor data_get_line_color(int index) {
+#if defined(PBL_COLOR)
+  if (index < 0 || index >= MAX_LINES || !s_line_configs[index].configured) {
+    return GColorWhite;
+  }
+  return GColorFromHEX(s_line_configs[index].color);
 #endif
   return GColorBlack;
 }
 
-LineData* data_get_line(int index) {
+LineData *data_get_line(int index) {
+  if (index < 0 || index >= MAX_LINES) {
+    return NULL;
+  }
   return &s_line_data[index];
 }
 
 GColor data_get_line_state_color(int index) {
-  char *state = data_get_line(index)->state;
-  
-  // Minor, Part
-  if (strstr(state, "inor") || strstr(state, "art")) {
+  if (index < 0 || index >= MAX_LINES) {
+    return GColorClear;
+  }
+
+  StatusSeverity severity = s_line_data[index].severity;
+
+  switch (severity) {
+  case StatusSeverityWarning:
     return PBL_IF_COLOR_ELSE(GColorChromeYellow, GColorDarkGray);
-  }
-
-  // Severe, Planned, Closed, Suspended
-  if (strstr(state, "evere") || strstr(state, "lanned") || strstr(state, "losed") || strstr(state, "uspended")) {
+  case StatusSeveritySevere:
     return PBL_IF_COLOR_ELSE(GColorRed, GColorDarkGray);
+  default:
+    return GColorClear;
   }
-
-  return GColorClear;
 }
 
-bool data_get_line_color_is_striped(int type) {
-  switch(type) {
-    case LineTypeDLR:
-    case LineTypeElizabeth:
-    case LineTypeLiberty:
-    case LineTypeLioness:
-    case LineTypeMildmay:
-    case LineTypeSuffragette:
-    case LineTypeWeaver:
-    case LineTypeWindrush:
-      return true;
-    default:
-      return false;
+bool data_get_line_color_is_striped(int index) {
+  if (index < 0 || index >= MAX_LINES || !s_line_configs[index].configured) {
+    return false;
   }
+  return s_line_configs[index].striped;
 }
 
 void data_set_progress(int progress) {
@@ -108,6 +80,9 @@ int data_get_progress() {
 }
 
 bool data_get_line_has_reason(int index) {
+  if (index < 0 || index >= MAX_LINES) {
+    return false;
+  }
   char *reason = data_get_line(index)->reason;
   return strlen(reason) != 0;
 }
@@ -122,8 +97,18 @@ int data_get_progress_max() {
 
 int data_get_lines_received() {
   int count = 0;
-  for (int i = 0; i < LineTypeMax; i++) {
+  for (int i = 0; i < MAX_LINES; i++) {
     if (strlen(s_line_data[i].state) != 0) {
+      count++;
+    }
+  }
+  return count;
+}
+
+int data_get_configured_line_count() {
+  int count = 0;
+  for (int i = 0; i < MAX_LINES; i++) {
+    if (s_line_configs[i].configured) {
       count++;
     }
   }

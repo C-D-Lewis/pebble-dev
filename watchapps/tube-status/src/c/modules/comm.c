@@ -9,25 +9,45 @@ void set_fast(bool fast) {
 static void inbox_received_handler(DictionaryIterator *iter, void *context) {
   // APP_LOG(APP_LOG_LEVEL_DEBUG, "Size: %d", packet_get_size(iter));
 
-  int index = 0;
-  if (packet_contains_key(iter, MESSAGE_KEY_LineIndex)) {
-    index = packet_get_integer(iter, MESSAGE_KEY_LineIndex);
+  // Handle incoming line configuration data
+  if (packet_contains_key(iter, MESSAGE_KEY_ConfigLineIndex)) {
+    int index = packet_get_integer(iter, MESSAGE_KEY_ConfigLineIndex);
+    char *name = packet_get_string(iter, MESSAGE_KEY_ConfigLineName);
+    uint32_t color = (uint32_t)packet_get_integer(iter, MESSAGE_KEY_ConfigLineColor);
+    bool striped = packet_get_integer(iter, MESSAGE_KEY_ConfigLineStriped) != 0;
+
+    data_set_line_config(index, name, color, striped);
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "Configured line %d: %s", index, name);
+    data_set_progress(data_get_progress() + 1);
+    splash_window_update();
+    return;
+  }
+
+  // Handle incoming line status data
+  if (packet_contains_key(iter, MESSAGE_KEY_LineStatusIndex)) {
+    int index = packet_get_integer(iter, MESSAGE_KEY_LineStatusIndex);
     // APP_LOG(APP_LOG_LEVEL_DEBUG, "Index: %d", index);
 
     LineData *line_data = data_get_line(index);
     line_data->index = index;
-    line_data->type = packet_get_integer(iter, MESSAGE_KEY_LineType);
 
     char *status = packet_get_string(iter, MESSAGE_KEY_LineStatus);
     snprintf(line_data->state, strlen(status) + 1 /* EOF */, "%s", status);
 
     char *reason = packet_get_string(iter, MESSAGE_KEY_LineReason);
     snprintf(line_data->reason, strlen(reason) + 1 /* EOF */, "%s", reason);
+
+    if (packet_contains_key(iter, MESSAGE_KEY_LineStatusSeverity)) {
+      line_data->severity = (StatusSeverity)packet_get_integer(iter, MESSAGE_KEY_LineStatusSeverity);
+    } else {
+      line_data->severity = StatusSeverityGood;
+    }
   }
 
-  data_set_progress(index);
+  // Update progress for any status or config message
+  data_set_progress(data_get_progress() + 1);
   if (packet_contains_key(iter, MESSAGE_KEY_FlagLineCount)) {
-    data_set_progress_max(packet_get_integer(iter, MESSAGE_KEY_FlagLineCount));
+    data_set_progress_max(packet_get_integer(iter, MESSAGE_KEY_FlagLineCount) * 2);
     splash_window_update();
   }
 

@@ -62,14 +62,14 @@ void draw_row_handler(GContext *ctx, const Layer *cell_layer, MenuIndex *cell_in
 
   // Line color
   int line_color_x = center.x - (STRIPE_WIDTH / 2);
-  graphics_context_set_fill_color(ctx, data_get_line_color(line_data->type));
+  graphics_context_set_fill_color(ctx, data_get_line_color(line_data->index));
   graphics_fill_rect(
     ctx,
     GRect(line_color_x, bounds.origin.y, STRIPE_WIDTH, bounds.size.h),
     GCornerNone,
     0
   );
-  if (data_get_line_color_is_striped(line_data->type)) {
+  if (data_get_line_color_is_striped(line_data->index)) {
     graphics_context_set_fill_color(ctx, GColorWhite);
     graphics_fill_rect(
       ctx,
@@ -95,7 +95,7 @@ void draw_row_handler(GContext *ctx, const Layer *cell_layer, MenuIndex *cell_in
   graphics_context_set_text_color(ctx, GColorBlack);
   graphics_draw_text(
     ctx,
-    data_get_line_name(line_data->type),
+    data_get_line_name(line_data->index),
     scalable_get_font(SFI_Medium),
     scalable_grect_pp(
       GRect(220, -40, 750, 200),
@@ -128,7 +128,7 @@ void draw_row_handler(GContext *ctx, const Layer *cell_layer, MenuIndex *cell_in
       GCornerNone,
       0
     );
-    
+
     // Arrow
     graphics_draw_text(
       ctx,
