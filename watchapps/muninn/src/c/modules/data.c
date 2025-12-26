@@ -87,14 +87,14 @@ static void test_data_generator() {
   // Test data scenarios
   //
   // 1 - Arbitrary scenario
-  // const int changes[NUM_SAMPLES] = {30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30};
+  const int changes[NUM_SAMPLES] = {2, 2, 3, 2, 1, 1, 4, 2, 1, 1, 1, 1, 1, 4, 1, 2};
   //
   // 2 - Test case: Should show 10 days at 8% per day (from 80%)
   // const int changes[NUM_SAMPLES] = {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
   //
   // 3 - Test case: Should show 11 days at 7% (two other events are ignored)
   //     Note: includes the two special statuses
-  const int changes[NUM_SAMPLES] = {-20, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
+  // const int changes[NUM_SAMPLES] = {-20, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
   //
   // 4 - Test case: Should show 6 days at 12% per day (from 80%)
   // const int changes[NUM_SAMPLES] = {3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3};

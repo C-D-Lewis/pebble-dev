@@ -3,13 +3,13 @@
 // Not scaled
 #if defined(PBL_PLATFORM_EMERY)
   #define MASCOT_SIZE 30
-  #define EYE_RECT GRect(24, 11, 4, 4)
+  #define EYE_RECT GRect(28, 11, 4, 4)
   #define DIV_W 2
   #define BRAID_H 18
   #define ICON_SIZE 28
 #else
   #define MASCOT_SIZE 24
-  #define EYE_RECT GRect(18, 7, 4, 4)
+  #define EYE_RECT GRect(20, 7, 4, 4)
   #define DIV_W 1
   #define BRAID_H 14
   #define ICON_SIZE 24
@@ -383,7 +383,7 @@ static void down_click_handler(ClickRecognizerRef recognizer, void *context) {
 }
 
 static void down_long_click_handler(ClickRecognizerRef recognizer, void *context) {
-  debug_window_push();
+  graph_window_push();
 }
 
 static void click_config_provider(void *context) {
@@ -406,7 +406,7 @@ static void window_load(Window *window) {
   // Mascot
   s_mascot_bitmap = gbitmap_create_with_resource(RESOURCE_ID_AWAKE_HEAD);
   s_mascot_layer = bitmap_layer_create(
-    GRect(scalable_x_pp(35, 45), scalable_y_pp(20, 25), MASCOT_SIZE, MASCOT_SIZE)
+    GRect(scalable_x_pp(40, 60), scalable_y_pp(20, 25), MASCOT_SIZE, MASCOT_SIZE)
   );
   bitmap_layer_set_compositing_mode(s_mascot_layer, GCompOpSet);
   bitmap_layer_set_bitmap(s_mascot_layer, s_mascot_bitmap);
