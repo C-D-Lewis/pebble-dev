@@ -9,29 +9,27 @@
 static Window *s_window;
 static ScrollLayer *s_scroll_layer;
 static TextLayer *s_text_layer;
-static BitmapLayer *s_image_layer;
 static Layer *s_braid_layer;
-static GBitmap *s_image_bitmap, *s_braid_bitmap;
+#if !defined(PBL_PLATFORM_APLITE)
+static BitmapLayer *s_image_layer;
+static GBitmap *s_image_bitmap;
+#endif
 
 static char *s_text_ptr;
 
 static void braid_update_proc(Layer *layer, GContext *ctx) {
   GRect bounds = layer_get_bounds(layer);
-  
-  graphics_draw_bitmap_in_rect(
-    ctx,
-    s_braid_bitmap,
-    GRect(0, 0, bounds.size.w, bounds.size.h)
-  );
+
+  GRect braid_rect = GRect(0, 0, bounds.size.w, bounds.size.h);
+  util_draw_braid(ctx, braid_rect);
 }
 
 static void window_load(Window *window) {
   Layer *root_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(root_layer);
 
-  s_image_bitmap = gbitmap_create_with_resource(RESOURCE_ID_MENU_ICON);
-  s_braid_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BRAID);
-
+#if !defined(PBL_PLATFORM_APLITE)
+  s_image_bitmap = bitmaps_create(RESOURCE_ID_AWAKE_HEAD);
   s_image_layer = bitmap_layer_create(
     scalable_grect_pp(
       GRect(0, 10, 1000, 150),
@@ -42,8 +40,13 @@ static void window_load(Window *window) {
   bitmap_layer_set_compositing_mode(s_image_layer, GCompOpSet);
   bitmap_layer_set_bitmap(s_image_layer, s_image_bitmap);
   layer_add_child(root_layer, bitmap_layer_get_layer(s_image_layer));
+#endif
 
+#if !defined(PBL_PLATFORM_APLITE)
   const int braid_y = scalable_y(170);
+#else
+  const int braid_y = 0;
+#endif
   s_braid_layer = layer_create(GRect(0, braid_y, DISPLAY_W, BRAID_H));
   layer_set_update_proc(s_braid_layer, braid_update_proc);
   layer_add_child(root_layer, s_braid_layer);
@@ -80,11 +83,10 @@ static void window_load(Window *window) {
 static void window_unload(Window *window) {
   scroll_layer_destroy(s_scroll_layer);
   text_layer_destroy(s_text_layer);
+#if !defined(PBL_PLATFORM_APLITE)
   bitmap_layer_destroy(s_image_layer);
+#endif
   layer_destroy(s_braid_layer);
-
-  gbitmap_destroy(s_image_bitmap);
-  gbitmap_destroy(s_braid_bitmap);
 
   window_destroy(s_window);
   s_window = NULL;

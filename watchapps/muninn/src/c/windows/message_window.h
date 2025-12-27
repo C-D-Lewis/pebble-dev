@@ -5,6 +5,7 @@
 #include "../config.h"
 
 #include "../modules/util.h"
+#include "../modules/bitmaps.h"
 #include "../modules/scalable.h"
 
 void message_window_push(char *text);

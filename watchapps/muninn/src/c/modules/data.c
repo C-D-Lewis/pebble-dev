@@ -9,7 +9,7 @@ static char s_error_buff[64];
 
 static void delete_all_data() {
   for (int i = 0; i < SK_Max; i += 1) {
-    if (!persist_exists(i)) continue;
+    // if (!persist_exists(i)) continue;
     persist_delete(i);
   }
   wakeup_cancel_all();
@@ -206,6 +206,7 @@ void data_init() {
 #if defined(USE_TEST_DATA)
   init_data_fields();
   test_data_generator();
+  data_log_state();
   return;
 #endif
 

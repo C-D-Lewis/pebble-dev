@@ -10,7 +10,6 @@
 #include "../modules/scalable.h"
 
 #include "message_window.h"
-#include "debug_window.h"
 #include "log_window.h"
 #include "graph_window.h"
 

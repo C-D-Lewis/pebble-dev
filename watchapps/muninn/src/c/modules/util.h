@@ -19,3 +19,5 @@ char* util_get_status_string();
 uint32_t util_get_battery_resource_id(int charge_percent);
 
 bool util_is_not_status(int v);
+
+void util_draw_braid(GContext *ctx, GRect rect);

@@ -16,7 +16,9 @@ void inbox_received_handler(DictionaryIterator *iter, void *context) {
 void comm_init() {
   app_message_register_outbox_failed(out_failed_handler);
   app_message_register_inbox_received(inbox_received_handler);
-  app_message_open(512, 512);
+
+  // Consider Aplite when adding to these
+  app_message_open(64, 64);
 }
 
 void comm_deinit() {}

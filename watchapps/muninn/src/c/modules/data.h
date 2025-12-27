@@ -22,7 +22,7 @@ typedef enum {
   // Wipe - adding new fields to Sample struct and expanding number of samples
   SK_Migration_1 = 50,
 
-  // Max storage value used - can clearing too many crash Aplite?
+  // Max storage value used
   SK_Max = 51
 } StorageKey;
 

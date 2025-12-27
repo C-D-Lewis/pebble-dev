@@ -107,3 +107,32 @@ uint32_t util_get_battery_resource_id(int charge_percent) {
 bool util_is_not_status(int v) {
   return v != STATUS_EMPTY && v != STATUS_CHARGED && v != STATUS_NO_CHANGE;
 }
+
+void util_draw_braid(GContext *ctx, GRect rect) {
+#if defined(PBL_PLATFORM_APLITE)
+  graphics_context_set_fill_color(ctx, GColorBlack);
+  graphics_fill_rect(ctx, rect, 0, GCornerNone);
+
+  // Draw braid without image on Aplite to save memory
+  const int size = 2;
+  const int start_x = size;
+  const int end_x = rect.size.w - size;
+  const int start_y = rect.origin.y + size;
+  const int end_y = rect.origin.y + rect.size.h - size;
+  for (int y = start_y; y < end_y; y += size) {
+    const bool offset = ((y - start_y) / size) % 2 == 1;
+    for (int x = start_x + (offset ? size : 0); x < end_x; x += (2 * size)) {
+      graphics_context_set_fill_color(ctx, GColorWhite);
+      graphics_fill_rect(
+        ctx,
+        GRect(x, y, size, size),
+        0,
+        GCornerNone
+      );
+    }
+  }
+#else
+  // Use bitmap
+  graphics_draw_bitmap_in_rect(ctx, bitmaps_create(RESOURCE_ID_BRAID), rect);
+#endif
+}

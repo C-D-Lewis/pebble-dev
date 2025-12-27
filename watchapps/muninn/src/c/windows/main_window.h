@@ -7,6 +7,7 @@
 #include "../modules/data.h"
 #include "../modules/wakeup.h"
 #include "../modules/util.h"
+#include "../modules/bitmaps.h"
 
 #include "menu_window.h"
 #include "graph_window.h"

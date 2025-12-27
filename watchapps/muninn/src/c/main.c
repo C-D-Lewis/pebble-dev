@@ -7,6 +7,7 @@
 #include "modules/wakeup.h"
 #include "modules/glance.h"
 #include "modules/scalable.h"
+#include "modules/bitmaps.h"
 
 #include "windows/main_window.h"
 #include "windows/message_window.h"
@@ -72,6 +73,7 @@ static void init() {
 
 static void deinit() {
   data_deinit();
+  bitmaps_destroy_all();
 
 #if PBL_API_EXISTS(app_glance_reload)
   app_glance_reload(glance_handler, NULL);

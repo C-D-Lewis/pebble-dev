@@ -11,27 +11,24 @@ static Window *s_window;
 static TextLayer *s_text_layer;
 static BitmapLayer *s_image_layer;
 static Layer *s_canvas_layer;
-static GBitmap *s_image_bitmap, *s_braid_bitmap;
+static GBitmap *s_image_bitmap;
 
 static uint32_t s_res_id;
 static char *s_message;
 
 static void canvas_update_proc(Layer *layer, GContext *ctx) {
-  graphics_draw_bitmap_in_rect(ctx, s_braid_bitmap, GRect(0, 0, DISPLAY_W, BRAID_H));
-  graphics_draw_bitmap_in_rect(
-    ctx,
-    s_braid_bitmap,
-    GRect(0, DISPLAY_H - BRAID_H, DISPLAY_W, BRAID_H)
-  );
+  GRect top_braid_rect = GRect(0, 0, DISPLAY_W, BRAID_H);
+  GRect bottom_braid_rect = GRect(0, DISPLAY_H - BRAID_H, DISPLAY_W, BRAID_H);
+
+  util_draw_braid(ctx, top_braid_rect);
+  util_draw_braid(ctx, bottom_braid_rect);
 }
 
 static void window_load(Window *window) {
   Layer *root_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(root_layer);
 
-  s_image_bitmap = gbitmap_create_with_resource(s_res_id);
-  s_braid_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BRAID);
-
+  s_image_bitmap = bitmaps_create(s_res_id);
   s_image_layer = bitmap_layer_create(scalable_grect(0, 130, 1000, 300));
   bitmap_layer_set_alignment(s_image_layer, GAlignCenter);
   bitmap_layer_set_compositing_mode(s_image_layer, GCompOpSet);
@@ -39,7 +36,7 @@ static void window_load(Window *window) {
   layer_add_child(root_layer, bitmap_layer_get_layer(s_image_layer));
 
   s_text_layer = util_make_text_layer(
-    scalable_grect(0, 430, 1000, 1000), 
+    scalable_grect(0, 430, 1000, 1000),
     scalable_get_font(SFI_Medium)
   );
   text_layer_set_text(s_text_layer, s_message);
@@ -55,9 +52,6 @@ static void window_unload(Window *window) {
   text_layer_destroy(s_text_layer);
   bitmap_layer_destroy(s_image_layer);
   layer_destroy(s_canvas_layer);
-
-  gbitmap_destroy(s_image_bitmap);
-  gbitmap_destroy(s_braid_bitmap);
 
   window_destroy(s_window);
   s_window = NULL;

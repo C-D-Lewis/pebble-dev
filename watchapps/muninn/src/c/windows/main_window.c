@@ -47,7 +47,6 @@ static GBitmap
   *s_reading_bitmap,
   *s_remaining_bitmap,
   *s_rate_bitmap,
-  *s_braid_bitmap,
   *s_last_charge_bitmap,
   *s_next_charge_bitmap;
 
@@ -136,6 +135,10 @@ static void blink_handler(void *context) {
 }
 
 static void schedule_blink() {
+#if defined(PBL_PLATFORM_APLITE)
+  return;
+#endif
+
   // Only blink a few times in case app is left open
   if (s_blink_budget == 0) {
     s_blink_timer = NULL;
@@ -160,11 +163,11 @@ static void cancel_blink() {
 
 static void update_data() {
   if (s_mascot_bitmap) {
-    gbitmap_destroy(s_mascot_bitmap);
+    bitmaps_destroy(s_mascot_bitmap);
     s_mascot_bitmap = NULL;
   }
   if (s_battery_bitmap) {
-    gbitmap_destroy(s_battery_bitmap);
+    bitmaps_destroy(s_battery_bitmap);
     s_battery_bitmap = NULL;
   }
 
@@ -176,10 +179,12 @@ static void update_data() {
     data_set_error("Scheduled wakeup was not found");
   }
 
-  s_mascot_bitmap = gbitmap_create_with_resource(
+#if !defined(PBL_PLATFORM_APLITE)
+  s_mascot_bitmap = bitmaps_create(
     is_enabled ? RESOURCE_ID_AWAKE_HEAD : RESOURCE_ID_ASLEEP_HEAD
   );
   bitmap_layer_set_bitmap(s_mascot_layer, s_mascot_bitmap);
+#endif
   text_layer_set_text(s_status_value_layer, is_enabled ? "AWAKE" : "ASLEEP");
 
   cancel_blink();
@@ -187,7 +192,7 @@ static void update_data() {
   // Battery now
   BatteryChargeState state = battery_state_service_peek();
   const int charge_percent = state.charge_percent;
-  s_battery_bitmap = gbitmap_create_with_resource(util_get_battery_resource_id(charge_percent));
+  s_battery_bitmap = bitmaps_create(util_get_battery_resource_id(charge_percent));
   bitmap_layer_set_bitmap(s_battery_bmp_layer, s_battery_bitmap);
   static char s_battery_buff[16];
   snprintf(s_battery_buff, sizeof(s_battery_buff), "%d%%", charge_percent);
@@ -268,8 +273,8 @@ static void update_data() {
 
 static void canvas_update_proc(Layer *layer, GContext *ctx) {
   // Divider braid
-  const GRect braid_rect = GRect(0, BRAID_Y, DISPLAY_W, BRAID_H);
-  graphics_draw_bitmap_in_rect(ctx, s_braid_bitmap, braid_rect);
+  const GRect braid_rect = GRect(0, BRAID_Y, DISPLAY_W - ACTION_BAR_W, BRAID_H);
+  util_draw_braid(ctx, braid_rect);
 
   // Status BG
   graphics_context_set_fill_color(ctx, GColorBlack);
@@ -401,15 +406,11 @@ static void window_load(Window *window) {
   Layer *root_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(root_layer);
 
-  s_braid_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BRAID);
-
-  // Mascot
-  s_mascot_bitmap = gbitmap_create_with_resource(RESOURCE_ID_AWAKE_HEAD);
+  // Mascot - bitmap set in update_data()
   s_mascot_layer = bitmap_layer_create(
     GRect(scalable_x_pp(40, 60), scalable_y_pp(20, 25), MASCOT_SIZE, MASCOT_SIZE)
   );
   bitmap_layer_set_compositing_mode(s_mascot_layer, GCompOpSet);
-  bitmap_layer_set_bitmap(s_mascot_layer, s_mascot_bitmap);
   layer_add_child(root_layer, bitmap_layer_get_layer(s_mascot_layer));
 
   s_canvas_layer = layer_create(bounds);
@@ -444,7 +445,7 @@ static void window_load(Window *window) {
   const int row_1_text_ico_off = scalable_x_pp(190, 160);
   const int row_1_text_y_off = scalable_y_pp(-40, -20);
 
-  s_remaining_bitmap = gbitmap_create_with_resource(RESOURCE_ID_REMAINING);
+  s_remaining_bitmap = bitmaps_create(RESOURCE_ID_REMAINING);
   s_remaining_bmp_layer = bitmap_layer_create(GRect(row_x, row_y, ICON_SIZE, ICON_SIZE));
   bitmap_layer_set_compositing_mode(s_remaining_bmp_layer, GCompOpSet);
   bitmap_layer_set_bitmap(s_remaining_bmp_layer, s_remaining_bitmap);
@@ -457,7 +458,7 @@ static void window_load(Window *window) {
 
   row_x += scalable_x_pp(485, 485);
 
-  s_rate_bitmap = gbitmap_create_with_resource(RESOURCE_ID_RATE);
+  s_rate_bitmap = bitmaps_create(RESOURCE_ID_RATE);
   s_rate_bmp_layer = bitmap_layer_create(GRect(row_x, row_y, ICON_SIZE, ICON_SIZE));
   bitmap_layer_set_compositing_mode(s_rate_bmp_layer, GCompOpSet);
   bitmap_layer_set_bitmap(s_rate_bmp_layer, s_rate_bitmap);
@@ -480,7 +481,7 @@ static void window_load(Window *window) {
   const int row_2_text_ico_off = scalable_x_pp(120, 120);
   const int row_2_text_y_off = scalable_y_pp(-35, -25);
   
-  s_last_charge_bitmap = gbitmap_create_with_resource(RESOURCE_ID_LAST_CHARGE);
+  s_last_charge_bitmap = bitmaps_create(RESOURCE_ID_LAST_CHARGE);
   s_last_charge_bmp_layer = bitmap_layer_create(
     GRect(row_x, row_y, ICON_SIZE, ICON_SIZE)
   );
@@ -497,7 +498,7 @@ static void window_load(Window *window) {
 
   row_x += scalable_x_pp(460, 460);
 
-  s_next_charge_bitmap = gbitmap_create_with_resource(RESOURCE_ID_NEXT_CHARGE);
+  s_next_charge_bitmap = bitmaps_create(RESOURCE_ID_NEXT_CHARGE);
   s_next_charge_bmp_layer = bitmap_layer_create(
     GRect(row_x, row_y, ICON_SIZE, ICON_SIZE)
   );
@@ -517,7 +518,7 @@ static void window_load(Window *window) {
   const int row_3_text_ico_off = scalable_x_pp(160, 150);
   const int row_3_text_y_off = scalable_y_pp(-30, -20);
 
-  s_battery_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_HIGH);
+  s_battery_bitmap = bitmaps_create(RESOURCE_ID_BATTERY_HIGH);
   s_battery_bmp_layer = bitmap_layer_create(GRect(row_x, row_y, ICON_SIZE, ICON_SIZE));
   bitmap_layer_set_compositing_mode(s_battery_bmp_layer, GCompOpSet);
   bitmap_layer_set_bitmap(s_battery_bmp_layer, s_battery_bitmap);
@@ -530,7 +531,7 @@ static void window_load(Window *window) {
 
   row_x += scalable_x_pp(430, 450);
 
-  s_reading_bitmap = gbitmap_create_with_resource(RESOURCE_ID_READING);
+  s_reading_bitmap = bitmaps_create(RESOURCE_ID_READING);
   s_reading_bmp_layer = bitmap_layer_create(GRect(row_x, row_y, ICON_SIZE, ICON_SIZE));
   bitmap_layer_set_compositing_mode(s_reading_bmp_layer, GCompOpSet);
   bitmap_layer_set_bitmap(s_reading_bmp_layer, s_reading_bitmap);
@@ -554,6 +555,8 @@ static void window_load(Window *window) {
   layer_add_child(root_layer, text_layer_get_layer(s_hint_layer));
 
   update_data();
+
+  APP_LOG(APP_LOG_LEVEL_INFO, "Heap free %d", heap_bytes_free());
 }
 
 static void window_unload(Window *window) {
@@ -567,15 +570,6 @@ static void window_unload(Window *window) {
   text_layer_destroy(s_hint_layer);
   text_layer_destroy(s_last_charge_layer);
   text_layer_destroy(s_next_charge_layer);
-
-  gbitmap_destroy(s_mascot_bitmap);
-  gbitmap_destroy(s_braid_bitmap);
-  gbitmap_destroy(s_battery_bitmap);
-  gbitmap_destroy(s_reading_bitmap);
-  gbitmap_destroy(s_remaining_bitmap);
-  gbitmap_destroy(s_rate_bitmap);
-  gbitmap_destroy(s_last_charge_bitmap);
-  gbitmap_destroy(s_next_charge_bitmap);
 
   bitmap_layer_destroy(s_mascot_layer);
   bitmap_layer_destroy(s_battery_bmp_layer);
