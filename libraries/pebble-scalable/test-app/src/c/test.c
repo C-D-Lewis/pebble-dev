@@ -52,7 +52,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     ctx,
     "This text should appear in the middle third on any platform or screen size",
     scalable_get_font(FontId_Small),
-    scalable_grect(0, 330, 1000, 330),
+    scalable_grect(0, 330, 1000, 500),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentCenter,
     NULL
@@ -83,6 +83,8 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     s_rate_bitmap,
     scalable_center_x(scalable_grect(0, 850, 150, 150))
   );
+
+  APP_LOG(APP_LOG_LEVEL_INFO, "W/H: %dx%d", PS_DISP_W, PS_DISP_H);
 }
 
 static void window_load(Window *window) {

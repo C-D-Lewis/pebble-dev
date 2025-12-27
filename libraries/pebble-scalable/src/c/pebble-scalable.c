@@ -1,13 +1,5 @@
 #include "pebble-scalable.h"
 
-#if defined(PBL_PLATFORM_EMERY)
-  #define PS_DISPLAY_W 200
-  #define PS_DISPLAY_H 228
-#else // aplite, basalt, diorite, flint
-  #define PS_DISPLAY_W 144
-  #define PS_DISPLAY_H 168
-#endif
-
 // Max font sets that can be stored
 #define PS_MAX_FONT_SETS 32
 // Max image ID sets that can be stored
@@ -41,11 +33,11 @@ static GFont* get_font_from_array(GFont **array) {
 ///////////////////////////////////////////// Geometry /////////////////////////////////////////////
 
 int scalable_x(int t_perc) {
-  return ((t_perc * PS_DISPLAY_W) + PS_HALF_RANGE) / 1000;
+  return ((t_perc * PS_DISP_W) + PS_HALF_RANGE) / 1000;
 }
 
 int scalable_y(int t_perc) {
-  return ((t_perc * PS_DISPLAY_H) + PS_HALF_RANGE) / 1000;
+  return ((t_perc * PS_DISP_H) + PS_HALF_RANGE) / 1000;
 }
 
 int scalable_x_pp(int original, int emery) {
@@ -88,12 +80,12 @@ GRect scalable_grect_pp(GRect original, GRect emery) {
 }
 
 GRect scalable_center_x(GRect r) {
-  r.origin.x = (PS_DISPLAY_W - r.size.w) / 2;
+  r.origin.x = (PS_DISP_W - r.size.w) / 2;
   return r;
 }
 
 GRect scalable_center_y(GRect r) {
-  r.origin.y = (PS_DISPLAY_H - r.size.h) / 2;
+  r.origin.y = (PS_DISP_H - r.size.h) / 2;
   return r;
 }
 

@@ -2,6 +2,19 @@
 
 #include <pebble.h>
 
+///////////////////////////////////////////// Constants ////////////////////////////////////////////
+
+#if defined(PBL_PLATFORM_EMERY)
+  #define PS_DISP_W 200
+  #define PS_DISP_H 228
+#elif defined(PBL_PLATFORM_CHALK)
+  #define PS_DISP_W 180
+  #define PS_DISP_H 180
+#else // aplite, basalt, diorite, flint
+  #define PS_DISP_W 144
+  #define PS_DISP_H 168
+#endif
+
 ///////////////////////////////////////////// Geometry /////////////////////////////////////////////
 
 /**

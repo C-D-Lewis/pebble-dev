@@ -62,6 +62,11 @@ const int x = scalable_x_pp(110, 120);
 const int y = scalable_y_pp(450, 480);
 ```
 
+The library also exports constants:
+
+* `PS_DISP_W` - current display width.
+* `PS_DISP_H` - current display height.
+
 ## Centering
 
 A GRect can be centered in either the X or Y axis, or both:
