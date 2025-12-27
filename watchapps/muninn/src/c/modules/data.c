@@ -179,8 +179,6 @@ static void test_data_generator() {
       s->rate = result;
     }
   }
-
-  data_log_state();
 }
 #endif
 

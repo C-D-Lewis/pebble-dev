@@ -106,36 +106,39 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     NULL
   );
 
-  // Draw points - oldest is on the left
+  // Draw lines - oldest is on the left
   int last_x = -1, last_y = -1;
+  // Draw points from oldest to newest
   for (int i = 0; i < count; i++) {
-    const Sample *s = data_get_sample(count - i - 1);
-    const int value = s->charge_perc;
-    if (!util_is_not_status(value)) continue;
+    // Moving from oldest to newest
+    const int idx = count - i - 1;
+    const Sample *s = data_get_sample(idx);
+    if (!s || !util_is_not_status(s->charge_perc)) continue;
 
     const int x = GRAPH_MARGIN + (i * x_gap);
-    const int y = root_y + GRAPH_SIZE - ((value * GRAPH_SIZE) / 100);
+    const int y = root_y + GRAPH_SIZE - ((s->charge_perc * GRAPH_SIZE) / 100);
     
-    // Draw line from previous point
+    // Draw the line to this point
     if (last_x != -1) {
       graphics_draw_line(ctx, GPoint(last_x, last_y), GPoint(x, y));
     }
+    graphics_fill_circle(ctx, GPoint(x, y), 1);
     last_x = x;
     last_y = y;
-    
-    graphics_fill_circle(ctx, GPoint(x, y), 1);
 
-    // Draw estimated value given rate at next oldest sample
-    if (i != count - 1) {
-      const Sample *prev_s = data_get_sample(count - i);
-      if (!util_is_not_status(prev_s->rate)) continue;
-
-      const int time_diff = s->timestamp - prev_s->timestamp;
-      const int estimated_drop = (prev_s->rate * time_diff) / SECONDS_PER_DAY;
-      const int estimated_value = prev_s->charge_perc - estimated_drop;
-
-      const int est_y = root_y + GRAPH_SIZE - ((estimated_value * GRAPH_SIZE) / 100);
-      graphics_draw_circle(ctx, GPoint(x, est_y), 2);
+    // The sample to the left is idx + 1
+    if (idx + 1 < count) {
+      const Sample *left_s = data_get_sample(idx + 1);
+      
+      if (left_s && util_is_not_status(left_s->rate)) {
+        const int time_diff = s->timestamp - left_s->timestamp;
+        const int est_drop = (left_s->rate * time_diff) / SECONDS_PER_DAY; 
+        const int est_val = left_s->charge_perc - est_drop;
+        const int est_y = root_y + GRAPH_SIZE - ((est_val * GRAPH_SIZE) / 100);
+        
+        // Draw prediction circle
+        graphics_draw_circle(ctx, GPoint(x, est_y), 3);
+      }
     }
   }
 }
