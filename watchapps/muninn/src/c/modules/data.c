@@ -8,7 +8,10 @@ static Sample s_samples[NUM_SAMPLES];
 static char s_error_buff[64];
 
 static void delete_all_data() {
-  for (int i = 0; i < SK_Max; i += 1) persist_delete(i);
+  for (int i = 0; i < SK_Max; i += 1) {
+    if (!persist_exists(i)) continue;
+    persist_delete(i);
+  }
   wakeup_cancel_all();
   APP_LOG(APP_LOG_LEVEL_INFO, "!!! RESET ALL DATA !!!");
 }
