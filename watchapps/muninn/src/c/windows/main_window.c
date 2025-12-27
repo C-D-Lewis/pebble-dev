@@ -135,10 +135,7 @@ static void blink_handler(void *context) {
 }
 
 static void schedule_blink() {
-#if defined(PBL_PLATFORM_APLITE)
-  return;
-#endif
-
+#if !defined(PBL_PLATFORM_APLITE)
   // Only blink a few times in case app is left open
   if (s_blink_budget == 0) {
     s_blink_timer = NULL;
@@ -147,6 +144,7 @@ static void schedule_blink() {
 
   s_blink_budget--;
   s_blink_timer = app_timer_register(700 + (rand() % 3000), blink_handler, NULL);
+#endif
 }
 
 static void cancel_blink() {

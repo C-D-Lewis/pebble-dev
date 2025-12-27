@@ -109,7 +109,9 @@ bool util_is_not_status(int v) {
 }
 
 void util_draw_braid(GContext *ctx, GRect rect) {
-#if defined(PBL_PLATFORM_APLITE)
+#if !defined(PBL_PLATFORM_APLITE)
+  graphics_draw_bitmap_in_rect(ctx, bitmaps_create(RESOURCE_ID_BRAID), rect);
+#else
   graphics_context_set_fill_color(ctx, GColorBlack);
   graphics_fill_rect(ctx, rect, 0, GCornerNone);
 
@@ -131,8 +133,5 @@ void util_draw_braid(GContext *ctx, GRect rect) {
       );
     }
   }
-#else
-  // Use bitmap
-  graphics_draw_bitmap_in_rect(ctx, bitmaps_create(RESOURCE_ID_BRAID), rect);
 #endif
 }
