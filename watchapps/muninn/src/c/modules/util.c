@@ -90,7 +90,7 @@ char* util_get_status_string() {
   // We can't produce a prediction AT ALL unless we have 'discharging' samples...
   if (data_get_valid_samples_count() < MIN_SAMPLES) {
     static char s_buff[32];
-    snprintf(s_buff, sizeof(s_buff), "Awaiting discharge...");
+    snprintf(s_buff, sizeof(s_buff), "Awaiting discharges...");
     return &s_buff[0];
   }
 
