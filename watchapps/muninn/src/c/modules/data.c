@@ -471,12 +471,11 @@ int data_calculate_accuracy() {
   // Prevent divide by zero - actually nothing dropped
   if (expected_acc <= 0 || actual_acc <= 0) return STATUS_EMPTY;
 
-  // Calculation: (Actual % / Expected %) * 100
-  // Multiply by SECONDS_PER_DAY because expected_acc is in "percent-seconds"
-  // Rate (%/day) * Time (seconds). This converts the ratio back to a pure percentage.
-  //
-  // Higher than 100% means the battery is draining faster than expected
-  return (int)((actual_acc * 100 * SECONDS_PER_DAY) / expected_acc);
+  // Convert expected_acc (percent-seconds) to raw percentage points
+  int expected_total_perc = expected_acc / SECONDS_PER_DAY;
+
+  // Return the difference in battery gauge units
+  return actual_acc - expected_total_perc;
 }
 
 int data_calculate_days_remaining_accuracy() {
@@ -535,11 +534,7 @@ int data_calculate_days_remaining_accuracy() {
   if (expected_days <= 0) return STATUS_EMPTY;
 
   // Return diff of days - positive means more days remaining than expected
-  // return actual_days - expected_days; ?
-
-  // A positive value means the estimate was more days than estimated
-  // A negative value means the estimate was fewer days than estimated
-  return (actual_days * 100) / expected_days;
+  return actual_days - expected_days;
 }
 
 ///////////////////////////////////////// Getters / Setters ////////////////////////////////////////

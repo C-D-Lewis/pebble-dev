@@ -175,7 +175,7 @@ static void main_window_load(Window *window) {
   snprintf(
     s_desc_buff,
     sizeof(s_desc_buff),
-    "Acc R: %d%% DR: %d%%",
+    "Acc R: %d%% DR: %dd",
     data_calculate_accuracy(),
     data_calculate_days_remaining_accuracy()
   );
