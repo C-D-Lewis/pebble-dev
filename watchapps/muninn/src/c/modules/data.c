@@ -5,7 +5,7 @@ static AppData s_app_data;
 static Sample s_samples[NUM_SAMPLES];
 
 // Not persisted
-static char s_error_buff[64];
+static char s_error_buff[32];
 
 static void delete_all_data() {
   for (int i = 0; i < SK_Max; i += 1) {
@@ -156,7 +156,8 @@ static void test_data_generator() {
       s->result = result_from_gap(gap);
 
       if (util_is_not_status(s->result)) {
-        s->days_remaining = (s->charge_perc * interval_s) / (gap * SECONDS_PER_DAY);
+        // TODO: Generator should use accumulated average rate, not one sample's
+        s->days_remaining = s->charge_perc / s->result;
         s->rate = s->result;
       }
       continue;
@@ -178,7 +179,7 @@ static void test_data_generator() {
 #if defined(TEST_OVERESTIMATION)
       result *= 2;
 #endif
-      s->days_remaining = ((s->charge_perc) * interval_s) / (gap * SECONDS_PER_DAY);
+      s->days_remaining = s->charge_perc / result;
       s->rate = result;
     }
   }
@@ -475,6 +476,69 @@ int data_calculate_accuracy() {
   //
   // Higher than 100% means the battery is draining faster than expected
   return (int)((actual_acc * 100 * SECONDS_PER_DAY) / expected_acc);
+}
+
+int data_calculate_days_remaining_accuracy() {
+  // If there is at least a whole day of continuous discharge samples, compare the
+  // days_remaining estimate at the start and end of that period.
+  int start_i = -1;
+  int end_i = -1;
+  int time_acc = 0;
+  bool discharged = false;
+
+  for (int i = 0; i < NUM_SAMPLES; i++) {
+    Sample *s = &s_samples[i];
+    // Log ends here / no data
+    if (s->result == STATUS_EMPTY) break;
+
+    // Only consider discharging or 'no change' samples
+    if (s->result != STATUS_CHARGED) {
+      if (start_i == -1) {
+        start_i = i;
+      }
+      end_i = i;
+      time_acc += s->time_diff;
+
+      // Must be at least one discharging sample in the period
+      if (util_is_not_status(s->result)) {
+        discharged = true;
+      }
+    } else {
+      // Reset if we hit a non-discharging sample
+      start_i = -1;
+      end_i = -1;
+      time_acc = 0;
+      discharged = false;
+    }
+  }
+
+  // No valid full day or more period found including some discharge
+  if (
+    start_i == -1 || end_i == -1 ||
+    start_i == end_i ||
+    time_acc < SECONDS_PER_DAY ||
+    !discharged) {
+    return STATUS_EMPTY;
+  }
+
+  Sample *start_s = &s_samples[start_i];
+  Sample *end_s = &s_samples[end_i];
+
+  // Somehow invalid days_remaining values?
+  if (!util_is_not_status(start_s->days_remaining) || !util_is_not_status(end_s->days_remaining)) {
+    return STATUS_EMPTY;
+  }
+
+  const int expected_days = start_s->days_remaining - (time_acc / SECONDS_PER_DAY);
+  const int actual_days = end_s->days_remaining;
+  if (expected_days <= 0) return STATUS_EMPTY;
+
+  // Return diff of days - positive means more days remaining than expected
+  // return actual_days - expected_days; ?
+
+  // A positive value means the estimate was more days than estimated
+  // A negative value means the estimate was fewer days than estimated
+  return (actual_days * 100) / expected_days;
 }
 
 ///////////////////////////////////////// Getters / Setters ////////////////////////////////////////

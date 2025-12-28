@@ -29,7 +29,7 @@ static void window_load(Window *window) {
   GRect bounds = layer_get_bounds(root_layer);
 
 #if !defined(PBL_PLATFORM_APLITE)
-  s_image_bitmap = bitmaps_create(RESOURCE_ID_AWAKE_HEAD);
+  s_image_bitmap = bitmaps_get(RESOURCE_ID_AWAKE_HEAD);
   s_image_layer = bitmap_layer_create(
     scalable_grect_pp(
       GRect(0, 10, 1000, 150),

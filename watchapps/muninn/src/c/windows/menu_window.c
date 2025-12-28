@@ -78,7 +78,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
   // Alert level detail
   const int alert_level = data_get_custom_alert_level();
   const bool alert_disabled = alert_level == AL_OFF;
-  static char s_alert_buff[32];
+  static char s_alert_buff[28];
   if (!alert_disabled) {
     snprintf(s_alert_buff, sizeof(s_alert_buff), "Notifying near %d%%", alert_level);
   }

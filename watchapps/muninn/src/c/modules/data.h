@@ -79,6 +79,7 @@ bool data_get_rate_is_elevated();
 void data_reset_log();
 time_t data_get_next_charge_time();
 int data_calculate_accuracy();
+int data_calculate_days_remaining_accuracy();
 
 // Interface getters/setters
 int data_get_last_sample_time(void);

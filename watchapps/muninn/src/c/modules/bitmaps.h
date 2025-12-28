@@ -2,7 +2,7 @@
 
 #include <pebble.h>
 
-GBitmap* bitmaps_create(uint32_t res_id);
+GBitmap* bitmaps_get(uint32_t res_id);
 
 void bitmaps_destroy(GBitmap *ptr);
 

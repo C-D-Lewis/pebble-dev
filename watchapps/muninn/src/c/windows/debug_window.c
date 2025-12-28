@@ -21,12 +21,12 @@ void debug_window_update_data() {
   const bool is_enabled = util_is_not_status(wakeup_id) && found;
 
   // AppState
-  static char s_fmt_last_buff[16];
+  static char s_fmt_last_buff[8];
   util_fmt_time(data_get_last_sample_time(), &s_fmt_last_buff[0], sizeof(s_fmt_last_buff));
-  static char s_fmt_next_buff[16];
+  static char s_fmt_next_buff[8];
   util_fmt_time(wakeup_ts, &s_fmt_next_buff[0], sizeof(s_fmt_next_buff));
 
-  static char s_values_buff[128];
+  static char s_values_buff[100];
   snprintf(
     s_values_buff,
     sizeof(s_values_buff),

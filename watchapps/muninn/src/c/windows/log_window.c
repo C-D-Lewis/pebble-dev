@@ -41,7 +41,7 @@ static void draw_changes(GContext *ctx, const GRect bounds, const Sample *s) {
   );
 
   // Charge diff
-  static char s_lcp_buff[32];
+  static char s_lcp_buff[16];
   snprintf(s_lcp_buff, sizeof(s_lcp_buff), "%d%% -> %d%%", s->last_charge_perc, s->charge_perc);
   graphics_draw_text(
     ctx,
@@ -98,7 +98,7 @@ static void draw_result_and_datetime(GContext *ctx, const GRect bounds, const Sa
   const struct tm *ts_info = localtime(&ts_time);
   strftime(s_datetime_buff, sizeof(s_datetime_buff), "%d %b", ts_info);
 
-  static char s_result_buff[32];
+  static char s_result_buff[16];
   if (s->result == STATUS_NO_CHANGE) {
     snprintf(s_result_buff, sizeof(s_result_buff), "No change");
   } else if (s->result == STATUS_CHARGED) {

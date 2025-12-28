@@ -89,9 +89,7 @@ char* util_get_status_string() {
   // Edge case here: no change or charging samples don't count
   // We can't produce a prediction AT ALL unless we have 'discharging' samples...
   if (data_get_valid_samples_count() < MIN_SAMPLES) {
-    static char s_buff[32];
-    snprintf(s_buff, sizeof(s_buff), "Awaiting discharges...");
-    return &s_buff[0];
+    return "Awaiting discharges...";
   }
 
   // Ongoing readings
@@ -110,7 +108,7 @@ bool util_is_not_status(int v) {
 
 void util_draw_braid(GContext *ctx, GRect rect) {
 #if !defined(PBL_PLATFORM_APLITE)
-  graphics_draw_bitmap_in_rect(ctx, bitmaps_create(RESOURCE_ID_BRAID), rect);
+  graphics_draw_bitmap_in_rect(ctx, bitmaps_get(RESOURCE_ID_BRAID), rect);
 #else
   graphics_context_set_fill_color(ctx, GColorBlack);
   graphics_fill_rect(ctx, rect, 0, GCornerNone);

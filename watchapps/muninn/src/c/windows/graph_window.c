@@ -5,12 +5,12 @@
 #if defined(PBL_PLATFORM_EMERY)
   #define TITLE_HEIGHT 28
   #define GRAPH_MARGIN 28
-  #define DESC_Y 20
+  #define DESC_Y 26
   #define ZERO_OFFSET 18
 #else
   #define TITLE_HEIGHT 22
   #define GRAPH_MARGIN 24
-  #define DESC_Y 14
+  #define DESC_Y 16
   #define ZERO_OFFSET 17
 #endif
 
@@ -106,8 +106,8 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     NULL
   );
 
-  // Draw lines - oldest is on the left
   int last_x = -1, last_y = -1;
+
   // Draw points from oldest to newest
   for (int i = 0; i < count; i++) {
     // Moving from oldest to newest
@@ -117,18 +117,20 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
 
     const int x = GRAPH_MARGIN + (i * x_gap);
     const int y = root_y + GRAPH_SIZE - ((s->charge_perc * GRAPH_SIZE) / 100);
-    
-    // Draw the line to this point
-    if (last_x != -1) {
-      graphics_draw_line(ctx, GPoint(last_x, last_y), GPoint(x, y));
-    }
-    graphics_fill_circle(ctx, GPoint(x, y), 1);
-    last_x = x;
-    last_y = y;
 
-    // The sample to the left is idx + 1
+    // Draw this point
+    graphics_fill_circle(ctx, GPoint(x, y), 1);
+
     if (idx + 1 < count) {
+      // The next oldest sample is idx + 1
       const Sample *left_s = data_get_sample(idx + 1);
+
+      // Draw the line to this point IF the previous one had a days_remaining
+      if (last_x != -1 && left_s && util_is_not_status(left_s->days_remaining)) {
+        graphics_draw_line(ctx, GPoint(last_x, last_y), GPoint(x, y));
+      }
+      last_x = x;
+      last_y = y;
       
       if (left_s && util_is_not_status(left_s->rate)) {
         const int time_diff = s->timestamp - left_s->timestamp;
@@ -139,6 +141,21 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
         // Draw prediction circle
         graphics_draw_circle(ctx, GPoint(x, est_y), 3);
       }
+    }
+
+    // Draw days_remaining cross for this sample
+    if (util_is_not_status(s->days_remaining)) {
+      const int dr_y = root_y + GRAPH_SIZE - ((s->days_remaining * 100) / GRAPH_SIZE);
+      graphics_draw_line(
+        ctx,
+        GPoint(x - 4, dr_y - 4),
+        GPoint(x + 4, dr_y + 4)
+      );
+      graphics_draw_line(
+        ctx,
+        GPoint(x - 4, dr_y + 4),
+        GPoint(x + 4, dr_y - 4)
+      );
     }
   }
 }
@@ -162,8 +179,14 @@ static void main_window_load(Window *window) {
   layer_add_child(root_layer, s_canvas_layer);
 
   s_desc_layer = util_make_text_layer(GRect(4, DESC_Y, bounds.size.w - 8, 100), s_font_s);
-  static char s_desc_buff[32];
-  snprintf(s_desc_buff, sizeof(s_desc_buff), "Accuracy: %d%%", data_calculate_accuracy());
+  static char s_desc_buff[48];
+  snprintf(
+    s_desc_buff,
+    sizeof(s_desc_buff),
+    "Accuracy: %d%%\nDR accuracy: %d%%",
+    data_calculate_accuracy(),
+    data_calculate_days_remaining_accuracy()
+  );
   text_layer_set_text(s_desc_layer, s_desc_buff);
   text_layer_set_overflow_mode(s_desc_layer, GTextOverflowModeWordWrap);
   layer_add_child(root_layer, text_layer_get_layer(s_desc_layer));

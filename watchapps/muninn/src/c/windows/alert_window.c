@@ -28,7 +28,7 @@ static void window_load(Window *window) {
   Layer *root_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(root_layer);
 
-  s_image_bitmap = bitmaps_create(s_res_id);
+  s_image_bitmap = bitmaps_get(s_res_id);
   s_image_layer = bitmap_layer_create(scalable_grect(0, 130, 1000, 300));
   bitmap_layer_set_alignment(s_image_layer, GAlignCenter);
   bitmap_layer_set_compositing_mode(s_image_layer, GCompOpSet);

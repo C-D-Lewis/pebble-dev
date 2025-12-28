@@ -34,7 +34,6 @@ static TextLayer
   *s_last_charge_layer,
   *s_next_charge_layer;
 static BitmapLayer
-  *s_mascot_layer,
   *s_battery_bmp_layer,
   *s_reading_bmp_layer,
   *s_remaining_bmp_layer,
@@ -42,13 +41,16 @@ static BitmapLayer
   *s_last_charge_bmp_layer,
   *s_next_charge_bmp_layer;
 static GBitmap
-  *s_mascot_bitmap,
   *s_battery_bitmap,
   *s_reading_bitmap,
   *s_remaining_bitmap,
   *s_rate_bitmap,
   *s_last_charge_bitmap,
   *s_next_charge_bitmap;
+#if !defined(PBL_PLATFORM_APLITE)
+static GBitmap *s_mascot_bitmap;
+static BitmapLayer *s_mascot_layer;
+#endif
 
 static AppTimer *s_blink_timer;
 static bool s_is_blinking, s_animating;
@@ -56,7 +58,7 @@ static int s_blink_budget;
 static int s_days_remaining, s_rate, s_anim_days, s_anim_rate;
 
 static void update_subtitle(int days) {
-  static char s_subtitle_buff[48];
+  static char s_subtitle_buff[40];
 #if defined(PBL_PLATFORM_EMERY)
   const char *template = "   Day%s left        Est. %%/day";
 #else
@@ -102,7 +104,7 @@ static void anim_update(Animation *anim, AnimationProgress dist_normalized) {
   s_anim_rate = anim_percentage(dist_normalized, s_rate);
 
   // Update text layers
-  static char s_remaining_buff[16];
+  static char s_remaining_buff[8];
   snprintf(
     s_remaining_buff,
     sizeof(s_remaining_buff),
@@ -111,7 +113,7 @@ static void anim_update(Animation *anim, AnimationProgress dist_normalized) {
   );
   text_layer_set_text(s_remaining_layer, s_remaining_buff);
 
-  static char s_rate_buff[16];
+  static char s_rate_buff[8];
   snprintf(s_rate_buff, sizeof(s_rate_buff), s_anim_rate < 10 ? "0%d" : "%d", s_anim_rate);
   text_layer_set_text(s_rate_layer, s_rate_buff);
 }
@@ -160,10 +162,12 @@ static void cancel_blink() {
 ///////////////////////////////////////////// Handlers /////////////////////////////////////////////
 
 static void update_data() {
+#if !defined(PBL_PLATFORM_APLITE)
   if (s_mascot_bitmap) {
     bitmaps_destroy(s_mascot_bitmap);
     s_mascot_bitmap = NULL;
   }
+#endif
   if (s_battery_bitmap) {
     bitmaps_destroy(s_battery_bitmap);
     s_battery_bitmap = NULL;
@@ -178,7 +182,7 @@ static void update_data() {
   }
 
 #if !defined(PBL_PLATFORM_APLITE)
-  s_mascot_bitmap = bitmaps_create(
+  s_mascot_bitmap = bitmaps_get(
     is_enabled ? RESOURCE_ID_AWAKE_HEAD : RESOURCE_ID_ASLEEP_HEAD
   );
   bitmap_layer_set_bitmap(s_mascot_layer, s_mascot_bitmap);
@@ -190,9 +194,9 @@ static void update_data() {
   // Battery now
   BatteryChargeState state = battery_state_service_peek();
   const int charge_percent = state.charge_percent;
-  s_battery_bitmap = bitmaps_create(util_get_battery_resource_id(charge_percent));
+  s_battery_bitmap = bitmaps_get(util_get_battery_resource_id(charge_percent));
   bitmap_layer_set_bitmap(s_battery_bmp_layer, s_battery_bitmap);
-  static char s_battery_buff[16];
+  static char s_battery_buff[8];
   snprintf(s_battery_buff, sizeof(s_battery_buff), "%d%%", charge_percent);
   text_layer_set_text(s_battery_layer, s_battery_buff);
 
@@ -246,7 +250,7 @@ static void update_data() {
     }
 
     // "12 Dec" next charge time
-    static char s_nc_buff[16];
+    static char s_nc_buff[8];
     time_t next_charge_ts = data_get_next_charge_time();
     if (util_is_not_status(next_charge_ts)) {
       struct tm *nc_info = localtime(&next_charge_ts);
@@ -404,12 +408,14 @@ static void window_load(Window *window) {
   Layer *root_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(root_layer);
 
+#if !defined(PBL_PLATFORM_APLITE)
   // Mascot - bitmap set in update_data()
   s_mascot_layer = bitmap_layer_create(
     GRect(scalable_x_pp(40, 60), scalable_y_pp(20, 25), MASCOT_SIZE, MASCOT_SIZE)
   );
   bitmap_layer_set_compositing_mode(s_mascot_layer, GCompOpSet);
   layer_add_child(root_layer, bitmap_layer_get_layer(s_mascot_layer));
+#endif
 
   s_canvas_layer = layer_create(bounds);
   layer_set_update_proc(s_canvas_layer, canvas_update_proc);
@@ -443,7 +449,7 @@ static void window_load(Window *window) {
   const int row_1_text_ico_off = scalable_x_pp(190, 160);
   const int row_1_text_y_off = scalable_y_pp(-40, -20);
 
-  s_remaining_bitmap = bitmaps_create(RESOURCE_ID_REMAINING);
+  s_remaining_bitmap = bitmaps_get(RESOURCE_ID_REMAINING);
   s_remaining_bmp_layer = bitmap_layer_create(GRect(row_x, row_y, ICON_SIZE, ICON_SIZE));
   bitmap_layer_set_compositing_mode(s_remaining_bmp_layer, GCompOpSet);
   bitmap_layer_set_bitmap(s_remaining_bmp_layer, s_remaining_bitmap);
@@ -456,7 +462,7 @@ static void window_load(Window *window) {
 
   row_x += scalable_x_pp(485, 485);
 
-  s_rate_bitmap = bitmaps_create(RESOURCE_ID_RATE);
+  s_rate_bitmap = bitmaps_get(RESOURCE_ID_RATE);
   s_rate_bmp_layer = bitmap_layer_create(GRect(row_x, row_y, ICON_SIZE, ICON_SIZE));
   bitmap_layer_set_compositing_mode(s_rate_bmp_layer, GCompOpSet);
   bitmap_layer_set_bitmap(s_rate_bmp_layer, s_rate_bitmap);
@@ -479,7 +485,7 @@ static void window_load(Window *window) {
   const int row_2_text_ico_off = scalable_x_pp(120, 120);
   const int row_2_text_y_off = scalable_y_pp(-35, -25);
   
-  s_last_charge_bitmap = bitmaps_create(RESOURCE_ID_LAST_CHARGE);
+  s_last_charge_bitmap = bitmaps_get(RESOURCE_ID_LAST_CHARGE);
   s_last_charge_bmp_layer = bitmap_layer_create(
     GRect(row_x, row_y, ICON_SIZE, ICON_SIZE)
   );
@@ -496,7 +502,7 @@ static void window_load(Window *window) {
 
   row_x += scalable_x_pp(460, 460);
 
-  s_next_charge_bitmap = bitmaps_create(RESOURCE_ID_NEXT_CHARGE);
+  s_next_charge_bitmap = bitmaps_get(RESOURCE_ID_NEXT_CHARGE);
   s_next_charge_bmp_layer = bitmap_layer_create(
     GRect(row_x, row_y, ICON_SIZE, ICON_SIZE)
   );
@@ -516,10 +522,8 @@ static void window_load(Window *window) {
   const int row_3_text_ico_off = scalable_x_pp(160, 150);
   const int row_3_text_y_off = scalable_y_pp(-30, -20);
 
-  s_battery_bitmap = bitmaps_create(RESOURCE_ID_BATTERY_HIGH);
   s_battery_bmp_layer = bitmap_layer_create(GRect(row_x, row_y, ICON_SIZE, ICON_SIZE));
   bitmap_layer_set_compositing_mode(s_battery_bmp_layer, GCompOpSet);
-  bitmap_layer_set_bitmap(s_battery_bmp_layer, s_battery_bitmap);
   layer_add_child(root_layer, bitmap_layer_get_layer(s_battery_bmp_layer));
   s_battery_layer = util_make_text_layer(
     GRect(row_x + row_3_text_ico_off, row_y + row_3_text_y_off, DISPLAY_W, 100),
@@ -529,7 +533,7 @@ static void window_load(Window *window) {
 
   row_x += scalable_x_pp(430, 450);
 
-  s_reading_bitmap = bitmaps_create(RESOURCE_ID_READING);
+  s_reading_bitmap = bitmaps_get(RESOURCE_ID_READING);
   s_reading_bmp_layer = bitmap_layer_create(GRect(row_x, row_y, ICON_SIZE, ICON_SIZE));
   bitmap_layer_set_compositing_mode(s_reading_bmp_layer, GCompOpSet);
   bitmap_layer_set_bitmap(s_reading_bmp_layer, s_reading_bitmap);
@@ -569,7 +573,9 @@ static void window_unload(Window *window) {
   text_layer_destroy(s_last_charge_layer);
   text_layer_destroy(s_next_charge_layer);
 
+#if !defined(PBL_PLATFORM_APLITE)
   bitmap_layer_destroy(s_mascot_layer);
+#endif
   bitmap_layer_destroy(s_battery_bmp_layer);
   bitmap_layer_destroy(s_reading_bmp_layer);
   bitmap_layer_destroy(s_remaining_bmp_layer);
