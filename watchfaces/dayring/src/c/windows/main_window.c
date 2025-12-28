@@ -5,7 +5,7 @@
 #define ARC_RADIUS scalable_x(380)
 #define ARC_WIDTH scalable_x(80)
 #define ARC_COLOR_DAY PBL_IF_COLOR_ELSE(GColorYellow, GColorWhite)
-#define ARC_COLOR_NIGHT PBL_IF_COLOR_ELSE(GColorDukeBlue, GColorWhite)
+#define ARC_COLOR_NIGHT PBL_IF_COLOR_ELSE(GColorBlue, GColorWhite)
 #define ARC_BG_COLOR PBL_IF_COLOR_ELSE(GColorDarkGray, GColorBlack)
 #define ARC_X ((DISPLAY_W - (ARC_RADIUS * 2)) / 2)
 #define ARC_Y ((DISPLAY_H - (ARC_RADIUS * 2)) / 2)
