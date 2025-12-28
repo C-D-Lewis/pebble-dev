@@ -90,7 +90,7 @@ static void test_data_generator() {
   // Test data scenarios
   //
   // 1 - Arbitrary scenario
-  const int changes[NUM_SAMPLES] = {2, 2, 3, 2, 1, 1, 4, 2, 1, 1, 1, 1, 1, 4, 1, 2};
+  const int changes[NUM_SAMPLES] = {2, 2, 1, 2, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1};
   //
   // 2 - Test case: Should show 10 days at 8% per day (from 80%)
   // const int changes[NUM_SAMPLES] = {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
@@ -269,11 +269,12 @@ void data_log_state() {
   );
 
   // Sample history
+  APP_LOG(APP_LOG_LEVEL_INFO, "i,lst,ts,td,lcp,cp,cd,r,dr,rt");
   for (int i = 0; i < NUM_SAMPLES; i++) {
     Sample *s = &s_samples[i];
     APP_LOG(
       APP_LOG_LEVEL_INFO,
-      "%d | t:%d -> %d (%d) | c:%d -> %d (%d) | ~%d | d:%d | r:%d",
+      "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",
       i,
       (int)s->last_sample_time,
       (int)s->timestamp,
@@ -492,7 +493,7 @@ int data_calculate_days_remaining_accuracy() {
     if (s->result == STATUS_EMPTY) break;
 
     // Only consider discharging or 'no change' samples
-    if (s->result != STATUS_CHARGED) {
+    if (util_is_not_charging(s->result)) {
       if (start_i == -1) {
         start_i = i;
       }

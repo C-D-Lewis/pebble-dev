@@ -2,7 +2,7 @@
   "name": "muninn",
   "author": "Chris Lewis",
   "version": "1.15.0",
-  "_note": "Also update config.h",
+  "_note": "Also update config.h & check Aplite!",
   "private": true,
   "keywords": [
     "pebble-app"

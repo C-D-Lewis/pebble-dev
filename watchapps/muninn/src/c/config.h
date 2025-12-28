@@ -18,7 +18,7 @@
 // Maximum number of extra minutes if a collision
 #define EXTRA_MINUTES_MAX 10
 // Multipler for elevated rate alarm
-#define EVEVATED_RATE_MULT 2
+#define EVEVATED_RATE_MULT 3
 
 // Platform-dependant values
 #if defined(PBL_PLATFORM_EMERY)

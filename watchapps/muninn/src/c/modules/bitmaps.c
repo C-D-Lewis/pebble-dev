@@ -6,7 +6,7 @@ GBitmap *s_arr[MAX_BITMAPS];
 uint32_t s_res_ids[MAX_BITMAPS];
 
 GBitmap* bitmaps_get(uint32_t res_id) {
-  APP_LOG(APP_LOG_LEVEL_INFO, "Loading bitmap: %d (heap %d)", (int)res_id, heap_bytes_free());
+  // APP_LOG(APP_LOG_LEVEL_INFO, "Loading bitmap: %d (heap %d)", (int)res_id, heap_bytes_free());
 
   // Use cache if already loaded
   for (int i = 0; i < MAX_BITMAPS; i++) {

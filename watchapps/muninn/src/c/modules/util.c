@@ -106,6 +106,11 @@ bool util_is_not_status(int v) {
   return v != STATUS_EMPTY && v != STATUS_CHARGED && v != STATUS_NO_CHANGE;
 }
 
+bool util_is_not_charging(int v) {
+  // Allow result and STATUS_NO_CHANGE
+  return util_is_not_status(v) || v == STATUS_NO_CHANGE;
+}
+
 void util_draw_braid(GContext *ctx, GRect rect) {
 #if !defined(PBL_PLATFORM_APLITE)
   graphics_draw_bitmap_in_rect(ctx, bitmaps_get(RESOURCE_ID_BRAID), rect);
