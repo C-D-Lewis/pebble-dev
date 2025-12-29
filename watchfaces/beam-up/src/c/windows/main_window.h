@@ -1,12 +1,13 @@
 #pragma once
 
 #include <pebble.h>
+#include <pebble-universal-fb/pebble-universal-fb.h>
 
 #include "../config.h"
 
 #include "../modules/data.h"
+#include "../modules/scalable.h"
 
-#include "../lib/universal_fb/universal_fb.h"
 
 void main_window_push();
 

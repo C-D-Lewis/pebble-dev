@@ -17,7 +17,7 @@ static void write_defaults() {
 
 void data_init() {
   // Nuke previus version settings
-  if(!persist_exists(V_3_1)) {
+  if (!persist_exists(V_3_1)) {
     persist_write_bool(V_3_1, true);
 
     for(int i = 0; i < DataNumBoolKeys; i++) {
@@ -51,7 +51,7 @@ bool data_get_boolean_setting(int data_key) {
 }
 
 void data_set_boolean_setting(int data_key, bool value) {
-  if(data_key < DataNumBoolKeys) {
+  if (data_key < DataNumBoolKeys) {
     s_bool_settings[data_key] = value;
   }
 }

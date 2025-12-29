@@ -4,12 +4,13 @@
 
 #include "modules/data.h"
 #include "modules/comm.h"
+#include "modules/scalable.h"
 
 static void init() {
   data_init();
+  scalable_init();
 
-  const uint32_t buffer_size = 256;
-  comm_init(buffer_size, buffer_size);
+  comm_init(128, 128);
   setlocale(LC_ALL, "");
 
   main_window_push();

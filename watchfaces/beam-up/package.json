@@ -1,10 +1,7 @@
 {
-  "version": "3.7.0",
+  "version": "3.8.0",
   "author": "Chris Lewis",
   "private": true,
-  "dependencies": {
-    "pebble-clay": "^1.0.4"
-  },
   "keywords": [
     "pebble-app"
   ],
@@ -15,14 +12,12 @@
         {
           "type": "font",
           "name": "FONT_IMAGINE_48",
-          "file": "fonts/imagine.ttf",
-          "compatibility": "2.7"
+          "file": "fonts/imagine.ttf"
         },
         {
           "type": "font",
           "name": "FONT_IMAGINE_24",
-          "file": "fonts/imagine.ttf",
-          "compatibility": "2.7"
+          "file": "fonts/imagine.ttf"
         },
         {
           "menuIcon": true,
@@ -65,11 +60,18 @@
       "aplite",
       "basalt",
       "chalk",
-      "diorite"
+      "diorite",
+      "emery",
+      "flint"
     ],
     "capabilities": [
       "configurable"
     ]
   },
-  "name": "beam-up"
+  "name": "beam-up",
+  "dependencies": {
+    "@rebble/clay": "^1.0.6",
+    "pebble-scalable": "^1.6.0",
+    "pebble-universal-fb": "^1.9.0"
+  }
 }
