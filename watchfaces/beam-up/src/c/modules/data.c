@@ -4,15 +4,23 @@
 static GColor s_foreground, s_background;
 static bool s_bool_settings[DataNumBoolKeys];
 
+static void save_all() {
+  for(int i = 0; i < DataNumBoolKeys; i++) persist_write_bool(i, s_bool_settings[i]);
+
+  persist_write_int(DataKeyForegroundColor, s_foreground.argb);
+  persist_write_int(DataKeyBackgroundColor, s_background.argb);
+}
+
 static void write_defaults() {
   s_bool_settings[DataKeyDate] = false;
   s_bool_settings[DataKeyAnimations] = true;
   s_bool_settings[DataKeyBTIndicator] = true;
   s_bool_settings[DataKeyHourlyVibration] = false;
   s_bool_settings[DataKeySleep] = false;
+
   s_foreground = GColorWhite;
   s_background = GColorBlack;
-  data_deinit();
+  save_all();
 }
 
 void data_init() {
@@ -20,48 +28,47 @@ void data_init() {
   if (!persist_exists(V_3_1)) {
     persist_write_bool(V_3_1, true);
 
-    for(int i = 0; i < DataNumBoolKeys; i++) {
-      persist_delete(i);
-    }
+    for(int i = 0; i < DataNumBoolKeys; i++) persist_delete(i);
     persist_delete(DataKeyForegroundColor);
     persist_delete(DataKeyBackgroundColor);
 
     write_defaults();
-  } else {
-    // Read settings
-    for(int i = 0; i < DataNumBoolKeys; i++) {
-      s_bool_settings[i] = persist_read_bool(i);
-    }
-    s_foreground = (GColor){ .argb = persist_read_int(DataKeyForegroundColor) };
-    s_background = (GColor){ .argb = persist_read_int(DataKeyBackgroundColor) };
+    return;
   }
+  
+  // Read settings
+  for(int i = 0; i < DataNumBoolKeys; i++) {
+    s_bool_settings[i] = persist_read_bool(i);
+  }
+  s_foreground = (GColor){ .argb = persist_read_int(DataKeyForegroundColor) };
+  s_background = (GColor){ .argb = persist_read_int(DataKeyBackgroundColor) };
 }
 
 void data_deinit() {
-  // Store current values
-  for(int i = 0; i < DataNumBoolKeys; i++) {
-    persist_write_bool(i, s_bool_settings[i]);
-  }
-  persist_write_int(DataKeyForegroundColor, s_foreground.argb);
-  persist_write_int(DataKeyBackgroundColor, s_background.argb);
+  save_all();
 }
 
-bool data_get_boolean_setting(int data_key) {
-  return (data_key < DataNumBoolKeys && persist_exists(data_key)) ? s_bool_settings[data_key] : false;
+bool data_get_boolean_setting(int key) {
+  return (key < DataNumBoolKeys && persist_exists(key)) ? s_bool_settings[key] : false;
 }
 
-void data_set_boolean_setting(int data_key, bool value) {
-  if (data_key < DataNumBoolKeys) {
-    s_bool_settings[data_key] = value;
+void data_set_boolean_setting(int key, bool value) {
+  if (key < DataNumBoolKeys) {
+    s_bool_settings[key] = value;
   }
 }
 
 GColor data_get_foreground_color() {
+  // TODO: Clay supports 2-color palette on B/W platforms
 #if defined(PBL_COLOR)
   return s_foreground;
 #else
   return GColorWhite;
 #endif
+}
+
+void data_set_foreground_color(GColor color) {
+  s_foreground = color;
 }
 
 GColor data_get_background_color() {
@@ -70,10 +77,6 @@ GColor data_get_background_color() {
 #else
   return GColorBlack;
 #endif
-}
-
-void data_set_foreground_color(GColor color) {
-  s_foreground = color;
 }
 
 void data_set_background_color(GColor color) {

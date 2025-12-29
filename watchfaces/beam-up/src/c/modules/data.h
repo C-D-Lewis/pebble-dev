@@ -19,7 +19,6 @@ typedef enum {
 
 // When settings need nuking
 typedef enum {
-  V_3_0 = 100,
   V_3_1 = 101
 } VersionKeys;
 

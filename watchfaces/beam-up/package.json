@@ -11,12 +11,17 @@
       "media": [
         {
           "type": "font",
+          "name": "FONT_IMAGINE_24",
+          "file": "fonts/imagine.ttf"
+        },
+        {
+          "type": "font",
           "name": "FONT_IMAGINE_48",
           "file": "fonts/imagine.ttf"
         },
         {
           "type": "font",
-          "name": "FONT_IMAGINE_24",
+          "name": "FONT_IMAGINE_64",
           "file": "fonts/imagine.ttf"
         },
         {
