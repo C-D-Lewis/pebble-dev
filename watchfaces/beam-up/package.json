@@ -13,25 +13,25 @@
           "type": "font",
           "name": "FONT_IMAGINE_24",
           "file": "fonts/imagine.ttf",
-          "characterRegex": "[0-9montuewdhfrisa]"
+          "characterRegex": "[0-9montuewdhfrisaMONTUEWDHFRISA :]"
         },
         {
           "type": "font",
           "name": "FONT_IMAGINE_34",
           "file": "fonts/imagine.ttf",
-          "characterRegex": "[0-9montuewdhfrisa]"
+          "characterRegex": "[0-9montuewdhfrisaMONTUEWDHFRISA :]"
         },
         {
           "type": "font",
           "name": "FONT_IMAGINE_48",
           "file": "fonts/imagine.ttf",
-          "characterRegex": "[0-9montuewdhfrisa]"
+          "characterRegex": "[0-9montuewdhfrisaMONTUEWDHFRISA :]"
         },
         {
           "type": "font",
           "name": "FONT_IMAGINE_65",
           "file": "fonts/imagine.ttf",
-          "characterRegex": "[0-9montuewdhfrisa]"
+          "characterRegex": "[0-9montuewdhfrisaMONTUEWDHFRISA :]"
         },
         {
           "menuIcon": true,
