@@ -2,6 +2,8 @@
 
 #include <pebble.h>
 
+#include "../config.h"
+
 // TODO: Migrate messageKeys
 typedef enum {
   // Features

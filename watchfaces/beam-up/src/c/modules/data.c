@@ -42,6 +42,17 @@ void data_init() {
   }
   s_foreground = (GColor){ .argb = persist_read_int(DataKeyForegroundColor) };
   s_background = (GColor){ .argb = persist_read_int(DataKeyBackgroundColor) };
+
+  if (TEST_NO_ANIMATIONS) {
+    s_bool_settings[DataKeyAnimations] = false;
+  }
+  if (TEST_ALL_OPTIONS_ON) {
+    s_bool_settings[DataKeyDate] = true;
+    s_bool_settings[DataKeyAnimations] = true;
+    s_bool_settings[DataKeyBTIndicator] = true;
+    s_bool_settings[DataKeyHourlyVibration] = true;
+    s_bool_settings[DataKeySleep] = true;
+  }
 }
 
 void data_deinit() {

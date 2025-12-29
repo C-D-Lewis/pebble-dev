@@ -3,22 +3,22 @@
 
 #define NUM_CHARS 5
 
+// Here be dragons and if another larger round display comes out my head will explode
 #define DIGIT_Y scalable_y_pp(315, 325)
 #define SECONDS_Y_OFFSET scalable_y(625)
 #define SECONDS_HEIGHT scalable_y(30)
-#define BEAM_X scalable_x(97)
-#define BEAM_W scalable_x(208)
+#define BEAM_W PBL_IF_ROUND_ELSE(scalable_x(165), scalable_x_pp(208, 205))
 #define BEAM_H scalable_y(601)
-#define DIGIT_SIZE GSize(scalable_x(347), scalable_y(357))
-
+#define DIGIT_W scalable_x(250)
+#define DIGIT_H scalable_y(357)
 // Necessary to center
-#define HOURS_TENS_X  PBL_IF_ROUND_ELSE(scalable_x(28),  scalable_x(-90))
-#define HOURS_UNITS_X PBL_IF_ROUND_ELSE(scalable_x(217), scalable_x(146))
-#define MINS_TENS_X   PBL_IF_ROUND_ELSE(scalable_x(450), scalable_x(438))
-#define MINS_UNITS_X  PBL_IF_ROUND_ELSE(scalable_x(639), scalable_x(674))
-#define DIGIT_NUDGE_X scalable_x_pp(0, -20);
-#define DIGIT_NUDGE_Y scalable_x_pp(0, 10);
-use these!
+#define HOURS_TENS_X  PBL_IF_ROUND_ELSE(scalable_x(80),  scalable_x(20))
+#define HOURS_UNITS_X PBL_IF_ROUND_ELSE(scalable_x(265), scalable_x(250))
+#define MINS_TENS_X   PBL_IF_ROUND_ELSE(scalable_x(545), scalable_x(555))
+#define MINS_UNITS_X  PBL_IF_ROUND_ELSE(scalable_x(735), scalable_x(784))
+// Extra nudge for text
+#define D_N_X PBL_IF_ROUND_ELSE(scalable_x(-55), scalable_x_pp(0, -10))
+#define D_N_Y PBL_IF_ROUND_ELSE(scalable_y(15), scalable_y_pp(0, -15))
 
 static Window *s_window;
 static TextLayer *s_digits[NUM_CHARS], *s_date_layer;
@@ -54,7 +54,7 @@ static void show_digit_values() {
   for(int i = 0; i < NUM_CHARS; i++) {
     if (i != 2) {
       s_chars[i][0] = s_time_buff[i];
-      text_layer_set_text(s_digits[i], DEBUG ? "0" : s_chars[i]);
+      text_layer_set_text(s_digits[i], TEST_ALL_ZEROS ? "0" : s_chars[i]);
     } else {
       text_layer_set_text(s_digits[i], ":");
     }
@@ -138,73 +138,73 @@ static void animate_beams(struct tm *tick_time) {
       Layer *layer_ptr;
 
       // Animate stuff back into place
-      if ((s_states[0] != s_states_prev[0]) || DEBUG) {
+      if ((s_states[0] != s_states_prev[0]) || TEST_ALWAYS_BEAM) {
         layer_ptr = text_layer_get_layer(s_digits[0]);
         anims[0] = animate_layer(
           layer_ptr,
           layer_get_frame(layer_ptr),
-          GRect(HOURS_TENS_X, DIGIT_Y, DIGIT_SIZE.w, DIGIT_SIZE.h),
+          GRect(HOURS_TENS_X + D_N_X, DIGIT_Y + D_N_Y, DIGIT_W, DIGIT_H),
           200,
           100
         );
         anims[1] = animate_layer(
           s_beams[0],
           layer_get_frame(s_beams[0]),
-          GRect(HOURS_TENS_X + BEAM_X, 0, BEAM_W, 0),
+          GRect(HOURS_TENS_X, 0, BEAM_W, 0),
           400,
           500
         );
         s_states_prev[0] = s_states[0];
       }
-      if ((s_states[1] != s_states_prev[1]) || DEBUG) {
+      if ((s_states[1] != s_states_prev[1]) || TEST_ALWAYS_BEAM) {
         layer_ptr = text_layer_get_layer(s_digits[1]);
         anims[2] = animate_layer(
           layer_ptr,
           layer_get_frame(layer_ptr),
-          GRect(HOURS_UNITS_X, DIGIT_Y, DIGIT_SIZE.w, DIGIT_SIZE.h),
+          GRect(HOURS_UNITS_X + D_N_X, DIGIT_Y + D_N_Y, DIGIT_W, DIGIT_H),
           200,
           100
         );
         anims[3] = animate_layer(
           s_beams[1],
           layer_get_frame(s_beams[1]),
-          GRect(HOURS_UNITS_X + BEAM_X, 0, BEAM_W, 0),
+          GRect(HOURS_UNITS_X, 0, BEAM_W, 0),
           400,
           500
         );
         s_states_prev[1] = s_states[1];
       }
-      if ((s_states[2] != s_states_prev[2]) || DEBUG) {
+      if ((s_states[2] != s_states_prev[2]) || TEST_ALWAYS_BEAM) {
         layer_ptr = text_layer_get_layer(s_digits[3]);
         anims[4] = animate_layer(
           layer_ptr,
           layer_get_frame(layer_ptr),
-          GRect(MINS_TENS_X, DIGIT_Y, DIGIT_SIZE.w, DIGIT_SIZE.h),
+          GRect(MINS_TENS_X + D_N_X, DIGIT_Y + D_N_Y, DIGIT_W, DIGIT_H),
           200,
           100
         );
         anims[5] = animate_layer(
           s_beams[2],
           layer_get_frame(s_beams[2]),
-          GRect(MINS_TENS_X + BEAM_X, 0, BEAM_W, 0),
+          GRect(MINS_TENS_X, 0, BEAM_W, 0),
           400,
           500
         );
         s_states_prev[2] = s_states[2];
       }
-      if ((s_states[3] != s_states_prev[3]) || DEBUG) {
+      if ((s_states[3] != s_states_prev[3]) || TEST_ALWAYS_BEAM) {
         layer_ptr = text_layer_get_layer(s_digits[4]);
         anims[6] = animate_layer(
           layer_ptr,
           layer_get_frame(layer_ptr),
-          GRect(MINS_UNITS_X, DIGIT_Y, DIGIT_SIZE.w, DIGIT_SIZE.h),
+          GRect(MINS_UNITS_X + D_N_X, DIGIT_Y + D_N_Y, DIGIT_W, DIGIT_H),
           200,
           100
         );
         anims[7] = animate_layer(
           s_beams[3],
           layer_get_frame(s_beams[3]),
-          GRect(MINS_UNITS_X + BEAM_X, 0, BEAM_W, 0),
+          GRect(MINS_UNITS_X, 0, BEAM_W, 0),
           400,
           500
         );
@@ -228,25 +228,25 @@ static void animate_beams(struct tm *tick_time) {
     case 2:
       layer_set_frame(
         text_layer_get_layer(s_digits[0]),
-        GRect(HOURS_TENS_X, DIGIT_Y, DIGIT_SIZE.w, DIGIT_SIZE.h)
+        GRect(HOURS_TENS_X + D_N_X, DIGIT_Y + D_N_Y, DIGIT_W, DIGIT_H)
       );
       layer_set_frame(
         text_layer_get_layer(s_digits[1]),
-        GRect(HOURS_UNITS_X, DIGIT_Y, DIGIT_SIZE.w, DIGIT_SIZE.h)
+        GRect(HOURS_UNITS_X + D_N_X, DIGIT_Y + D_N_Y, DIGIT_W, DIGIT_H)
       );
       layer_set_frame(
         text_layer_get_layer(s_digits[3]),
-        GRect(MINS_TENS_X, DIGIT_Y, DIGIT_SIZE.w, DIGIT_SIZE.h)
+        GRect(MINS_TENS_X + D_N_X, DIGIT_Y + D_N_Y, DIGIT_W, DIGIT_H)
       );
       layer_set_frame(
         text_layer_get_layer(s_digits[4]),
-        GRect(MINS_UNITS_X, DIGIT_Y, DIGIT_SIZE.w, DIGIT_SIZE.h)
+        GRect(MINS_UNITS_X + D_N_X, DIGIT_Y + D_N_Y, DIGIT_W, DIGIT_H)
       );
 
-      layer_set_frame(s_beams[0], GRect(HOURS_TENS_X + BEAM_X, 0, BEAM_W, 0));
-      layer_set_frame(s_beams[1], GRect(HOURS_UNITS_X + BEAM_X, 0, BEAM_W, 0));
-      layer_set_frame(s_beams[2], GRect(MINS_TENS_X + BEAM_X, 0, BEAM_W, 0));
-      layer_set_frame(s_beams[3], GRect(MINS_UNITS_X + BEAM_X, 0, BEAM_W, 0));
+      layer_set_frame(s_beams[0], GRect(HOURS_TENS_X, 0, BEAM_W, 0));
+      layer_set_frame(s_beams[1], GRect(HOURS_UNITS_X, 0, BEAM_W, 0));
+      layer_set_frame(s_beams[2], GRect(MINS_TENS_X, 0, BEAM_W, 0));
+      layer_set_frame(s_beams[3], GRect(MINS_UNITS_X, 0, BEAM_W, 0));
 
       layer_set_frame(s_seconds_bar, GRect(0, SECONDS_Y_OFFSET, 0, SECONDS_HEIGHT));
       break;
@@ -312,73 +312,73 @@ static void animate_beams(struct tm *tick_time) {
       Layer *layer_ptr;
 
       // Schedule animations of digits and beams together
-      if ((s_states[0] != s_states_prev[0]) || DEBUG) {
+      if ((s_states[0] != s_states_prev[0]) || TEST_ALWAYS_BEAM) {
         layer_ptr = text_layer_get_layer(s_digits[0]);
         anims[0] = animate_layer(
           layer_ptr,
           layer_get_frame(layer_ptr),
-          GRect(HOURS_TENS_X, -DIGIT_Y, DIGIT_SIZE.w, DIGIT_SIZE.h),
+          GRect(HOURS_TENS_X + D_N_X, -DIGIT_Y, DIGIT_W, DIGIT_H),
           200,
           700
         );
         anims[1] = animate_layer(
           s_beams[0],
           layer_get_frame(s_beams[0]),
-          GRect(HOURS_TENS_X + BEAM_X, 0, BEAM_W, BEAM_H),
+          GRect(HOURS_TENS_X, 0, BEAM_W, BEAM_H),
           400,
           0
         );
       }
 
-      if ((s_states[1] != s_states_prev[1]) || DEBUG) {
+      if ((s_states[1] != s_states_prev[1]) || TEST_ALWAYS_BEAM) {
         layer_ptr = text_layer_get_layer(s_digits[1]);
         anims[2] = animate_layer(
           layer_ptr,
           layer_get_frame(layer_ptr),
-          GRect(HOURS_UNITS_X, -DIGIT_Y, DIGIT_SIZE.w, DIGIT_SIZE.h),
+          GRect(HOURS_UNITS_X + D_N_X, -DIGIT_Y, DIGIT_W, DIGIT_H),
           200,
           700
         );
         anims[3] = animate_layer(
           s_beams[1],
           layer_get_frame(s_beams[1]),
-          GRect(HOURS_UNITS_X + BEAM_X, 0, BEAM_W, BEAM_H),
+          GRect(HOURS_UNITS_X, 0, BEAM_W, BEAM_H),
           400,
           0
         );
       }
 
-      if ((s_states[2] != s_states_prev[2]) || DEBUG) {
+      if ((s_states[2] != s_states_prev[2]) || TEST_ALWAYS_BEAM) {
         layer_ptr = text_layer_get_layer(s_digits[3]);
         anims[4] = animate_layer(
           layer_ptr,
           layer_get_frame(layer_ptr),
-          GRect(MINS_TENS_X, -DIGIT_Y, DIGIT_SIZE.w, DIGIT_SIZE.h),
+          GRect(MINS_TENS_X + D_N_X, -DIGIT_Y, DIGIT_W, DIGIT_H),
           200,
           700
         );
         anims[5] = animate_layer(
           s_beams[2],
           layer_get_frame(s_beams[2]),
-          GRect(MINS_TENS_X + BEAM_X, 0, BEAM_W, BEAM_H),
+          GRect(MINS_TENS_X, 0, BEAM_W, BEAM_H),
           400,
           0
         );
       }
 
-      if ((s_states[3] != s_states_prev[3]) || DEBUG) {
+      if ((s_states[3] != s_states_prev[3]) || TEST_ALWAYS_BEAM) {
         layer_ptr = text_layer_get_layer(s_digits[4]);
         anims[6] = animate_layer(
           layer_ptr,
           layer_get_frame(layer_ptr),
-          GRect(MINS_UNITS_X, -DIGIT_Y, DIGIT_SIZE.w, DIGIT_SIZE.h),
+          GRect(MINS_UNITS_X + D_N_X, -DIGIT_Y, DIGIT_W, DIGIT_H),
           200,
           700
         );
         anims[7] = animate_layer(
           s_beams[3],
           layer_get_frame(s_beams[3]),
-          GRect(MINS_UNITS_X + BEAM_X, 0, BEAM_W, BEAM_H),
+          GRect(MINS_UNITS_X, 0, BEAM_W, BEAM_H),
           400,
           0
         );
@@ -442,12 +442,22 @@ static void window_load(Window *window) {
   Layer *window_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(window_layer);
 
-  const int colon_x = HOURS_UNITS_X + 9;
-  s_digits[0] = text_layer_create(GRect(HOURS_TENS_X, DIGIT_Y, DIGIT_SIZE.w, DIGIT_SIZE.h));
-  s_digits[1] = text_layer_create(GRect(HOURS_UNITS_X, DIGIT_Y, DIGIT_SIZE.w, DIGIT_SIZE.h));
-  s_digits[2] = text_layer_create(GRect(colon_x, DIGIT_Y, DIGIT_SIZE.w, DIGIT_SIZE.h));
-  s_digits[3] = text_layer_create(GRect(MINS_TENS_X, DIGIT_Y, DIGIT_SIZE.w, DIGIT_SIZE.h));
-  s_digits[4] = text_layer_create(GRect(MINS_UNITS_X, DIGIT_Y, DIGIT_SIZE.w, DIGIT_SIZE.h));
+  s_digits[0] = text_layer_create(
+    GRect(HOURS_TENS_X + D_N_X, DIGIT_Y + D_N_Y, DIGIT_W, DIGIT_H)
+  );
+  s_digits[1] = text_layer_create(
+    GRect(HOURS_UNITS_X + D_N_X, DIGIT_Y + D_N_Y, DIGIT_W, DIGIT_H)
+  );
+  const int colon_x = HOURS_UNITS_X + scalable_x(65);
+  s_digits[2] = text_layer_create(
+    GRect(colon_x + D_N_X, DIGIT_Y + D_N_Y, DIGIT_W, DIGIT_H)
+  );
+  s_digits[3] = text_layer_create(
+    GRect(MINS_TENS_X + D_N_X, DIGIT_Y + D_N_Y, DIGIT_W, DIGIT_H)
+  );
+  s_digits[4] = text_layer_create(
+    GRect(MINS_UNITS_X + D_N_X, DIGIT_Y + D_N_Y, DIGIT_W, DIGIT_H)
+  );
 
   for(int i = 0; i < NUM_CHARS; i++) {
     text_layer_set_background_color(s_digits[i], GColorClear);
@@ -456,19 +466,17 @@ static void window_load(Window *window) {
     layer_add_child(window_layer, text_layer_get_layer(s_digits[i]));
   }
 
-  s_beams[0] = layer_create(GRect(HOURS_TENS_X + BEAM_X, 0, BEAM_W, 0));
-  s_beams[1] = layer_create(GRect(HOURS_UNITS_X + BEAM_X, 0, BEAM_W, 0));
-  s_beams[2] = layer_create(GRect(MINS_TENS_X + BEAM_X, 0, BEAM_W, 0));
-  s_beams[3] = layer_create(GRect(MINS_UNITS_X + BEAM_X, 0, BEAM_W, 0));
+  const int init_beam_h = TEST_NO_ANIMATIONS ? BEAM_H : 0;
+  s_beams[0] = layer_create(GRect(HOURS_TENS_X, 0, BEAM_W, init_beam_h));
+  s_beams[1] = layer_create(GRect(HOURS_UNITS_X, 0, BEAM_W, init_beam_h));
+  s_beams[2] = layer_create(GRect(MINS_TENS_X, 0, BEAM_W, init_beam_h));
+  s_beams[3] = layer_create(GRect(MINS_UNITS_X, 0, BEAM_W, init_beam_h));
 
   s_inv_layer = layer_create(GRect(bounds.origin.x, bounds.origin.y, bounds.size.w, BEAM_H));
   layer_set_update_proc(s_inv_layer, inv_update_proc);
   layer_add_child(window_layer, s_inv_layer);
 
-  const int date_x = PBL_IF_ROUND_ELSE(0, scalable_x(313));
-  s_date_layer = text_layer_create(
-    GRect(date_x, SECONDS_Y_OFFSET, bounds.size.w - date_x, scalable_y(179))
-  );
+  s_date_layer = text_layer_create(GRect(1, SECONDS_Y_OFFSET, bounds.size.w - 1, 300));
   text_layer_set_background_color(s_date_layer, GColorClear);
   text_layer_set_text_alignment(
     s_date_layer,
