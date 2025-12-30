@@ -4,11 +4,11 @@
 #define NUM_CHARS 5
 
 // Here be dragons and if another larger round display comes out my head will explode
-#define DIGIT_Y scalable_y_pp(315, 325)
-#define SECONDS_Y_OFFSET scalable_y(625)
+#define DIGIT_Y scalable_y_pp(300, 300)
+#define SECONDS_Y_OFFSET scalable_y_pp(605, 600)
 #define SECONDS_HEIGHT scalable_y(30)
 #define BEAM_W PBL_IF_ROUND_ELSE(scalable_x(165), scalable_x_pp(208, 205))
-#define BEAM_H scalable_y(601)
+#define BEAM_H ((2 * DIGIT_Y) - scalable_y_pp(10, 20))
 #define DIGIT_W scalable_x(250)
 #define DIGIT_H scalable_y(357)
 // Necessary to center
