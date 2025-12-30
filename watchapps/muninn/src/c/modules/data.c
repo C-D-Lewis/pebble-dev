@@ -521,20 +521,30 @@ int data_calculate_days_remaining_accuracy() {
     return STATUS_EMPTY;
   }
 
-  Sample *start_s = &s_samples[start_i];
-  Sample *end_s = &s_samples[end_i];
+  Sample *newest_s = &s_samples[start_i];
+  Sample *oldest_s = &s_samples[end_i];
 
   // Somehow invalid days_remaining values?
-  if (!util_is_not_status(start_s->days_remaining) || !util_is_not_status(end_s->days_remaining)) {
-    return STATUS_EMPTY;
-  }
+  if (
+    !util_is_not_status(newest_s->days_remaining) ||
+    !util_is_not_status(oldest_s->days_remaining)
+  ) return STATUS_EMPTY;
 
-  const int expected_days = start_s->days_remaining - (time_acc / SECONDS_PER_DAY);
-  const int actual_days = end_s->days_remaining;
-  if (expected_days <= 0) return STATUS_EMPTY;
+  // Physical time elapsed
+  const int actual_elapsed = time_acc / SECONDS_PER_DAY;
+  // Change in battery estimate
+  const int estimated_elapsed = oldest_s->days_remaining - newest_s->days_remaining;
 
-  // Return diff of days - positive means more days remaining than expected
-  return actual_days - expected_days;
+  if (actual_elapsed <= 0) return STATUS_EMPTY;
+
+  APP_LOG(
+    APP_LOG_LEVEL_INFO,
+    "ActualElapsed:%d EstElapsed:%d",
+    actual_elapsed,
+    estimated_elapsed
+  );
+
+  return actual_elapsed - estimated_elapsed;
 }
 
 ///////////////////////////////////////// Getters / Setters ////////////////////////////////////////
