@@ -14,8 +14,10 @@ static void inbox_received_handler(DictionaryIterator *inbox, void *context) {
 }
 
 void comm_init() {
+  packet_init();
+
   app_message_register_inbox_received(inbox_received_handler);
   app_message_open(128, 128);
 }
 
-void comm_deinit() { }
+void comm_deinit() {}

@@ -5,7 +5,7 @@ static bool s_show_minutes, s_bt_alert;
 
 void data_init() {
   const int persist_key_first_time = 54786;
-  if(!persist_exists(persist_key_first_time)) {
+  if (!persist_exists(persist_key_first_time)) {
     persist_write_bool(persist_key_first_time, false);
 
     // Set defaults
@@ -22,7 +22,7 @@ void data_init() {
   }
 
   const int persist_key_v_1_3 = 432987;
-  if(!persist_exists(persist_key_v_1_3)) {
+  if (!persist_exists(persist_key_v_1_3)) {
     persist_write_bool(persist_key_v_1_3, false);
 
     data_set_feature(FeatureKeyShowMinutes, true);

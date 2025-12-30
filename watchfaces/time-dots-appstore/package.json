@@ -1,6 +1,6 @@
 {
   "name": "time-dots",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "author": "Chris Lewis",
   "private": true,
   "keywords": [
@@ -32,14 +32,17 @@
       "aplite",
       "basalt",
       "chalk",
-      "diorite"
+      "diorite",
+      "emery",
+      "flint"
     ],
     "capabilities": [
       "configurable"
     ]
   },
   "dependencies": {
-    "pebble-clay": "^1.0.3",
-    "pebble-packet": "^1.3.2"
+    "@rebble/clay": "^1.0.3",
+    "pebble-packet": "^1.5.0",
+    "pebble-scalable": "^1.6.0"
   }
 }
