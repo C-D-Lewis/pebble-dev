@@ -1,6 +1,5 @@
 #include <pebble.h>
 #include <pebble-packet/pebble-packet.h>
-#include <pebble-events/pebble-events.h>
 
 static Window *s_window;
 static TextLayer *s_text_layer;
@@ -57,13 +56,14 @@ static void inbox_dropped_handler(AppMessageResult reason, void *context) {
 }
 
 static void init(void) {
-  // MUST USE pebble-events
-  events_app_message_request_inbox_size(512);
-  events_app_message_request_outbox_size(512);
-  events_app_message_open();
+  packet_init();
 
-  // MUST do this AFTER opening app message
-  events_app_message_register_inbox_received(inbox_received_handler, NULL);
+  app_message_register_inbox_dropped(inbox_dropped_handler);
+  app_message_register_inbox_received(inbox_received_handler);
+  const AppMessageResult r = app_message_open(256, 256);
+  if (r != APP_MSG_OK) {
+    APP_LOG(APP_LOG_LEVEL_ERROR, "Failed to open AppMessage: %s", packet_result_to_string(r));
+  }
 
   s_window = window_create();
   window_set_click_config_provider(s_window, click_config_provider);

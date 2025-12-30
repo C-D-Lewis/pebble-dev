@@ -2,14 +2,24 @@
 
 #include <pebble.h>
 
-// Callback when a send failed, but not when attempting the send.
+// Callback when a send failed or timed out.
 typedef void(PacketFailedCallback)(void);
+
+// Initialize the library. Must be called before app_message_open().
+void packet_init();
 
 // Begin a new packet. Must be called before putting anything in it.
 // Returns:
 //   bool - true if the packet was successfully initialised, false otherwise.
 //          Check app logs to see any error reason.
 bool packet_begin();
+
+// Get the readable version of an AppMessageResult.
+// Parameters:
+//   result - The result to translate.
+// Returns:
+//   char* - The readable string.
+char* packet_result_to_string(AppMessageResult result);
 
 // Put an integer into the packet.
 // Parameters:

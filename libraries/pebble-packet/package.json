@@ -1,7 +1,7 @@
 {
   "name": "pebble-packet",
   "author": "Chris Lewis",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "files": [
     "dist.zip"
   ],
@@ -9,7 +9,6 @@
     "pebble-package"
   ],
   "dependencies": {
-    "pebble-events": "^1.2.0"
   },
   "pebble": {
     "projectType": "package",
@@ -19,7 +18,8 @@
       "basalt",
       "chalk",
       "diorite",
-      "emery"
+      "emery",
+      "flint"
     ],
     "resources": {
       "media": []

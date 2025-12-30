@@ -7,8 +7,10 @@
   ],
   "private": true,
   "dependencies": {
-    "pebble-events": "^1.2.0",
     "pebble-packet": ".."
+  },
+  "scripts": {
+    "rebuild": "cd ../ && pebble clean && pebble build && cd - && pebble clean && pebble build && pebble install --emulator"
   },
   "pebble": {
     "displayName": "test",
@@ -19,7 +21,9 @@
       "aplite",
       "basalt",
       "chalk",
-      "diorite"
+      "diorite",
+      "emery",
+      "flint"
     ],
     "watchapp": {
       "watchface": false
