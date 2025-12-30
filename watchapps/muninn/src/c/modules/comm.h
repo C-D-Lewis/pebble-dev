@@ -2,6 +2,8 @@
 
 #include <pebble.h>
 
+#include <pebble-packet/pebble-packet.h>
+
 #include "data.h"
 
 void comm_init();
