@@ -35,7 +35,6 @@ static TextLayer
   *s_next_charge_layer;
 static BitmapLayer
   *s_battery_bmp_layer,
-  *s_reading_bmp_layer,
   *s_remaining_bmp_layer,
   *s_rate_bmp_layer,
   *s_last_charge_bmp_layer,
@@ -49,7 +48,7 @@ static GBitmap
   *s_next_charge_bitmap;
 #if !defined(PBL_PLATFORM_APLITE)
 static GBitmap *s_mascot_bitmap;
-static BitmapLayer *s_mascot_layer;
+static BitmapLayer *s_mascot_layer, *s_reading_bmp_layer;
 #endif
 
 static AppTimer *s_blink_timer;
@@ -362,6 +361,30 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     graphics_context_set_fill_color(ctx, GColorBlack);
     graphics_fill_rect(ctx, EYE_RECT, 0, GCornerNone);
   }
+
+#if defined(PBL_PLATFORM_APLITE)
+  // Draw clock instead of bitmap for 'next sample'
+  graphics_context_set_stroke_color(ctx, GColorBlack);
+  graphics_context_set_stroke_width(ctx, 2);
+
+  const int icon_x = scalable_x(430) + 3;
+  const int icon_y = scalable_y(845);
+  const int center_x = icon_x + (ICON_SIZE / 2);
+  const int center_y = icon_y + (ICON_SIZE / 2);
+  graphics_draw_circle(
+    ctx,
+    GPoint(
+      center_x,
+      center_y
+    ),
+    (ICON_SIZE / 2) - 4
+  );
+
+  // Draw hands
+  graphics_context_set_stroke_width(ctx, 1);
+  graphics_draw_line(ctx, GPoint(center_x, center_y), GPoint(center_x, center_y - 5));
+  graphics_draw_line(ctx, GPoint(center_x, center_y), GPoint(center_x + 5, center_y));
+#endif
 }
 
 ////////////////////////////////////////////// Clicks //////////////////////////////////////////////
@@ -449,7 +472,13 @@ static void window_load(Window *window) {
   const int row_1_text_ico_off = scalable_x_pp(190, 160);
   const int row_1_text_y_off = scalable_y_pp(-40, -20);
 
+#if !defined(PBL_PLATFORM_APLITE)
   s_remaining_bitmap = bitmaps_get(RESOURCE_ID_REMAINING);
+#else
+  // Re-use same bitmap as for current level
+  BatteryChargeState state = battery_state_service_peek();
+  s_remaining_bitmap = bitmaps_get(util_get_battery_resource_id(state.charge_percent));
+#endif
   s_remaining_bmp_layer = bitmap_layer_create(GRect(row_x, row_y, ICON_SIZE, ICON_SIZE));
   bitmap_layer_set_compositing_mode(s_remaining_bmp_layer, GCompOpSet);
   bitmap_layer_set_bitmap(s_remaining_bmp_layer, s_remaining_bitmap);
@@ -533,11 +562,13 @@ static void window_load(Window *window) {
 
   row_x += scalable_x_pp(430, 450);
 
+#if !defined(PBL_PLATFORM_APLITE)
   s_reading_bitmap = bitmaps_get(RESOURCE_ID_READING);
   s_reading_bmp_layer = bitmap_layer_create(GRect(row_x, row_y, ICON_SIZE, ICON_SIZE));
   bitmap_layer_set_compositing_mode(s_reading_bmp_layer, GCompOpSet);
   bitmap_layer_set_bitmap(s_reading_bmp_layer, s_reading_bitmap);
   layer_add_child(root_layer, bitmap_layer_get_layer(s_reading_bmp_layer));
+#endif
   const int x_nudge = scalable_x_pp(20, 10);
   s_reading_layer = util_make_text_layer(
     GRect(row_x + row_3_text_ico_off + x_nudge, row_y + row_3_text_y_off, DISPLAY_W, 100),
@@ -575,9 +606,9 @@ static void window_unload(Window *window) {
 
 #if !defined(PBL_PLATFORM_APLITE)
   bitmap_layer_destroy(s_mascot_layer);
+  bitmap_layer_destroy(s_reading_bmp_layer);
 #endif
   bitmap_layer_destroy(s_battery_bmp_layer);
-  bitmap_layer_destroy(s_reading_bmp_layer);
   bitmap_layer_destroy(s_remaining_bmp_layer);
   bitmap_layer_destroy(s_rate_bmp_layer);
   bitmap_layer_destroy(s_last_charge_bmp_layer);

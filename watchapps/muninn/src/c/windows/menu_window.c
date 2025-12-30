@@ -14,7 +14,6 @@ typedef enum {
   MI_PUSH_TIMELINE_PINS,
   MI_ELEVATED_RATE_ALERT,
   MI_BATTERY_TIPS,
-  MI_ABOUT,
   MI_DELETE_ALL_DATA,
   MI_VERSION,
   MI_MAX,
@@ -78,7 +77,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
   // Alert level detail
   const int alert_level = data_get_custom_alert_level();
   const bool alert_disabled = alert_level == AL_OFF;
-  static char s_alert_buff[28];
+  static char s_alert_buff[24];
   if (!alert_disabled) {
     snprintf(s_alert_buff, sizeof(s_alert_buff), "Notifying near %d%%", alert_level);
   }
@@ -118,9 +117,6 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
       break;
     case MI_BATTERY_TIPS:
       menu_cell_draw(ctx, cell_layer, "Battery tips", NULL);
-      break;
-    case MI_ABOUT:
-      menu_cell_draw(ctx, cell_layer, "About", NULL);
       break;
     case MI_DELETE_ALL_DATA:
       menu_cell_draw(
@@ -179,9 +175,6 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
       break;
     case MI_BATTERY_TIPS:
       message_window_push(MSG_TIPS);
-      break;
-    case MI_ABOUT:
-      message_window_push(MSG_ABOUT);
       break;
     case MI_DELETE_ALL_DATA:
       if (s_reset_confirm) {

@@ -2,7 +2,9 @@
 
 #include <pebble.h>
 
+#if !defined(PBL_PLATFORM_APLITE)
 #include <pebble-packet/pebble-packet.h>
+#endif
 
 #include "data.h"
 

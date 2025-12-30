@@ -25,7 +25,7 @@ static void draw_changes(GContext *ctx, const GRect bounds, const Sample *s) {
   static char s_fmt_ts_buff[8];
   util_fmt_time(s->last_sample_time, &s_fmt_lst_buff[0], sizeof(s_fmt_lst_buff));
   util_fmt_time(adj_ts, &s_fmt_ts_buff[0], sizeof(s_fmt_ts_buff));
-  static char s_lst_buff[32];
+  static char s_lst_buff[16];
   snprintf(s_lst_buff, sizeof(s_lst_buff), "%s -> %s", s_fmt_lst_buff, s_fmt_ts_buff);
   graphics_draw_text(
     ctx,
@@ -190,7 +190,7 @@ static void main_window_load(Window *window) {
   );
 
   s_header_layer = util_make_text_layer(header_rect, scalable_get_font(SFI_Medium));
-  static char s_header_buff[32];
+  static char s_header_buff[17];
   snprintf(s_header_buff, sizeof(s_header_buff), "Data Log (%d/%d)", data_get_log_length(), NUM_SAMPLES);
   text_layer_set_text(s_header_layer, s_header_buff);
   text_layer_set_text_alignment(s_header_layer, GTextAlignmentCenter);
