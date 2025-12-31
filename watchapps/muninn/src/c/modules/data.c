@@ -454,19 +454,33 @@ int data_calculate_accuracy() {
 
   int expected_acc = 0;
   int actual_acc = 0;
+
+  // Pre-fill last_valid_rate in case the first rate isn't useful
+  int last_valid_rate = 0;
+  for (int i = newest_i; i <= oldest_i; i++) {
+    if (util_is_not_status(s_samples[i].rate)) {
+      last_valid_rate = s_samples[i].rate;
+      break;
+    }
+  }
+
   for (int i = newest_i; i < oldest_i; i++) {
     Sample *current = &s_samples[i];
     Sample *older = &s_samples[i + 1];
 
-    if (current->result != STATUS_CHARGED && current->result != STATUS_NO_CHANGE) {
-      // Actual: Sum the diff in charge depletion
-      if (older->charge_perc > current->charge_perc) {
+    if (util_is_not_charging(current->result)) {
+      // Accumulate actual change
+      if (older->charge_perc >= current->charge_perc) {
         actual_acc += (older->charge_perc - current->charge_perc);
       }
 
-      // Expected: Sum the total "percent-seconds" based on rate and time diff
+      // If current rate is valid, use it and update fallback
       if (util_is_not_status(current->rate)) {
+        last_valid_rate = current->rate;
         expected_acc += current->rate * current->time_diff;
+      } else if (last_valid_rate > 0) {
+        // If current rate is invalid, use the last known good rate
+        expected_acc += last_valid_rate * current->time_diff;
       }
     }
   }

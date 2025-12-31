@@ -2,7 +2,7 @@
 
 #define GRAPH_MARGIN scalable_x(100)
 #define GRAPH_W scalable_x(900)
-#define GRAPH_H scalable_y(500)
+#define GRAPH_H scalable_y(550)
 #define AXIS_S scalable_x(10)
 #define NOTCH_S scalable_x(35)
 
@@ -74,6 +74,8 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   const bool flip = count - s_selection < (count / 2);
   int prev_x = -1, prev_y = -1;
 
+  graphics_context_set_stroke_width(ctx, 1);
+
   // Draw points from oldest to newest
   for (int i = 0; i < count; i++) {
     const int idx = count - i - 1;
@@ -108,24 +110,26 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
 
     if (idx + 1 < count) {
       // The next oldest sample is idx + 1
-      const Sample *left_s = data_get_sample(idx + 1);
+      const Sample *prev_s = data_get_sample(idx + 1);
 
-      // Draw the line to this point IF the previous one had a days_remaining
-      if (prev_x != -1 && left_s && util_is_not_status(left_s->days_remaining)) {
+      // Draw the line to this point
+      if (prev_x != -1 && prev_s && util_is_not_status(prev_s->charge_perc)) {
         graphics_draw_line(ctx, GPoint(prev_x, prev_y), GPoint(x, y));
       }
       prev_x = x;
       prev_y = y;
 
       // Draw prediction based on previous rate
-      if (left_s && util_is_not_status(left_s->rate)) {
-        const int time_diff = s->timestamp - left_s->timestamp;
-        const int est_drop = (left_s->rate * time_diff) / SECONDS_PER_DAY;
-        const int est_val = left_s->charge_perc - est_drop;
+      if (prev_s && util_is_not_status(prev_s->rate)) {
+        const int time_diff = s->timestamp - prev_s->timestamp;
+        const int est_drop = (prev_s->rate * time_diff) / SECONDS_PER_DAY;
+        const int est_val = prev_s->charge_perc - est_drop;
         const int est_y = root_y + GRAPH_H - (((est_val - low_v) * GRAPH_H) / y_range);
 
-        // Draw prediction circle
-        graphics_draw_circle(ctx, GPoint(x, est_y), 2 * POINT_S);
+        if (est_y != y) {
+          // Draw prediction circle
+          graphics_draw_circle(ctx, GPoint(x, est_y), POINT_S);
+        }
       }
     }
   }
@@ -232,12 +236,14 @@ static void main_window_load(Window *window) {
     GRect(scalable_x(20), scalable_y(860), bounds.size.w, 100),
     scalable_get_font(SFI_Small)
   );
+  const int acc = data_calculate_accuracy();
   static char s_desc_buff[48];
   snprintf(
     s_desc_buff,
     sizeof(s_desc_buff),
-    "Drained %d%% vs expected",
-    data_calculate_accuracy()
+    "%d%% %s than trend",
+    acc,
+    acc >= 0 ? "more" : "less"
   );
   text_layer_set_text(s_desc_layer, s_desc_buff);
   text_layer_set_overflow_mode(s_desc_layer, GTextOverflowModeWordWrap);
