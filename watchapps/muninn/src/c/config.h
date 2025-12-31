@@ -20,18 +20,9 @@
 // Multipler for elevated rate alarm
 #define EVEVATED_RATE_MULT 3
 
-// Platform-dependant values
-#if defined(PBL_PLATFORM_EMERY)
-  #define DISPLAY_W 200
-  #define DISPLAY_H 228
-#else
-  #define DISPLAY_W 144
-  #define DISPLAY_H 168
-#endif
-
 ///////////// Testing area /////////////
 //                                    //
-// #define USE_TEST_DATA true         //
+#define USE_TEST_DATA true         //
 //                                    //
 // #define SAVE_TEST_DATA true        //
 //                                    //

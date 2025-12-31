@@ -17,8 +17,8 @@ static uint32_t s_res_id;
 static char *s_message;
 
 static void canvas_update_proc(Layer *layer, GContext *ctx) {
-  GRect top_braid_rect = GRect(0, 0, DISPLAY_W, BRAID_H);
-  GRect bottom_braid_rect = GRect(0, DISPLAY_H - BRAID_H, DISPLAY_W, BRAID_H);
+  GRect top_braid_rect = GRect(0, 0, PS_DISP_W, BRAID_H);
+  GRect bottom_braid_rect = GRect(0, PS_DISP_H - BRAID_H, PS_DISP_W, BRAID_H);
 
   util_draw_braid(ctx, top_braid_rect);
   util_draw_braid(ctx, bottom_braid_rect);

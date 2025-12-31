@@ -51,7 +51,7 @@ static void window_load(Window *window) {
   layer_add_child(root_layer, status_bar_layer_get_layer(s_status_bar));
 
   s_stats_layer = util_make_text_layer(
-    GRect(5, STATUS_BAR_LAYER_HEIGHT, DISPLAY_W - 10, 168),
+    GRect(5, STATUS_BAR_LAYER_HEIGHT, PS_DISP_W - 10, PS_DISP_H),
     font
   );
   layer_add_child(root_layer, text_layer_get_layer(s_stats_layer));

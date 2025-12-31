@@ -41,19 +41,18 @@ static BitmapLayer
   *s_next_charge_bmp_layer;
 static GBitmap
   *s_battery_bitmap,
-  *s_reading_bitmap,
   *s_remaining_bitmap,
   *s_rate_bitmap,
   *s_last_charge_bitmap,
   *s_next_charge_bitmap;
 #if !defined(PBL_PLATFORM_APLITE)
-static GBitmap *s_mascot_bitmap;
+static GBitmap *s_mascot_bitmap, *s_reading_bitmap;
 static BitmapLayer *s_mascot_layer, *s_reading_bmp_layer;
+static int s_blink_budget;
 #endif
 
 static AppTimer *s_blink_timer;
 static bool s_is_blinking, s_animating;
-static int s_blink_budget;
 static int s_days_remaining, s_rate, s_anim_days, s_anim_rate;
 
 static void update_subtitle(int days) {
@@ -119,6 +118,7 @@ static void anim_update(Animation *anim, AnimationProgress dist_normalized) {
 
 ///////////////////////////////////////////// Blinking /////////////////////////////////////////////
 
+#if !defined(PBL_PLATFORM_APLITE)
 static void schedule_blink();
 
 static void unblink_handler(void *context) {
@@ -136,7 +136,6 @@ static void blink_handler(void *context) {
 }
 
 static void schedule_blink() {
-#if !defined(PBL_PLATFORM_APLITE)
   // Only blink a few times in case app is left open
   if (s_blink_budget == 0) {
     s_blink_timer = NULL;
@@ -145,7 +144,6 @@ static void schedule_blink() {
 
   s_blink_budget--;
   s_blink_timer = app_timer_register(700 + (rand() % 3000), blink_handler, NULL);
-#endif
 }
 
 static void cancel_blink() {
@@ -157,6 +155,7 @@ static void cancel_blink() {
   s_is_blinking = false;
   layer_mark_dirty(s_canvas_layer);
 }
+#endif
 
 ///////////////////////////////////////////// Handlers /////////////////////////////////////////////
 
@@ -188,7 +187,9 @@ static void update_data() {
 #endif
   text_layer_set_text(s_status_value_layer, is_enabled ? "AWAKE" : "ASLEEP");
 
+#if !defined(PBL_PLATFORM_APLITE)
   cancel_blink();
+#endif
 
   // Battery now
   BatteryChargeState state = battery_state_service_peek();
@@ -212,7 +213,9 @@ static void update_data() {
     layer_set_hidden(text_layer_get_layer(s_hint_layer), false);
   } else {
     layer_set_hidden(text_layer_get_layer(s_hint_layer), true);
+#if !defined(PBL_PLATFORM_APLITE)
     schedule_blink();
+#endif
 
     // Days remaining
     s_days_remaining = data_calculate_days_remaining();
@@ -274,7 +277,7 @@ static void update_data() {
 
 static void canvas_update_proc(Layer *layer, GContext *ctx) {
   // Divider braid
-  const GRect braid_rect = GRect(0, BRAID_Y, DISPLAY_W - ACTION_BAR_W, BRAID_H);
+  const GRect braid_rect = GRect(0, BRAID_Y, PS_DISP_W - ACTION_BAR_W, BRAID_H);
   util_draw_braid(ctx, braid_rect);
 
   // Status BG
@@ -293,7 +296,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   graphics_context_set_stroke_color(ctx, GColorBlack);
   graphics_context_set_stroke_width(ctx, DIV_W);
   // Vertical
-  const int v_div_x = (DISPLAY_W / 2) - scalable_x(40);
+  const int v_div_x = (PS_DISP_W / 2) - scalable_x(40);
   const int v_div_y = scalable_y_pp(365, 355);
   const int v_div_h = scalable_y_pp(465, 470);
   graphics_draw_line(
@@ -306,25 +309,25 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   graphics_draw_line(
     ctx,
     GPoint(0, row_2_div_y),
-    GPoint(DISPLAY_W - (ACTION_BAR_W), row_2_div_y)
+    GPoint(PS_DISP_W - (ACTION_BAR_W), row_2_div_y)
   );
   // Horizontal below row 2
   const int row_3_div_y = scalable_y_pp(830, 835);
   graphics_draw_line(
     ctx,
     GPoint(0, row_3_div_y),
-    GPoint(DISPLAY_W - ACTION_BAR_W, row_3_div_y)
+    GPoint(PS_DISP_W - ACTION_BAR_W, row_3_div_y)
   );
 
   // Actions BG
   graphics_context_set_fill_color(ctx, PBL_IF_COLOR_ELSE(GColorDarkCandyAppleRed, GColorLightGray));
-  GRect actions_rect = GRect(DISPLAY_W - ACTION_BAR_W, 0, ACTION_BAR_W, DISPLAY_H);
+  GRect actions_rect = GRect(PS_DISP_W - ACTION_BAR_W, 0, ACTION_BAR_W, PS_DISP_H);
   graphics_fill_rect(ctx, actions_rect, 0, GCornerNone);
 
-  const int hint_x = DISPLAY_W - (HINT_W / 2);
+  const int hint_x = PS_DISP_W - (HINT_W / 2);
 
   // Enable hint
-  const int enable_y = DISPLAY_H / 6 - (HINT_H / 2);
+  const int enable_y = PS_DISP_H / 6 - (HINT_H / 2);
   graphics_context_set_fill_color(ctx, GColorBlack);
   graphics_fill_rect(
     ctx, GRect(hint_x, enable_y, HINT_W, HINT_H),
@@ -339,7 +342,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   graphics_fill_circle(ctx, select_center, scalable_x(20));
 
   // Menu hint
-  const int menu_y = (DISPLAY_H / 2) - (HINT_H / 2);
+  const int menu_y = (PS_DISP_H / 2) - (HINT_H / 2);
   graphics_context_set_fill_color(ctx, GColorBlack);
   graphics_fill_rect(
     ctx, GRect(hint_x, menu_y, HINT_W, HINT_H),
@@ -348,7 +351,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   );
 
   // Log hint
-  const int log_y = ((5 * DISPLAY_H) / 6) - (HINT_H / 2);
+  const int log_y = ((5 * PS_DISP_H) / 6) - (HINT_H / 2);
   graphics_context_set_fill_color(ctx, GColorBlack);
   graphics_fill_rect(
     ctx, GRect(hint_x, log_y, HINT_W, HINT_H),
@@ -392,8 +395,10 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
 static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
   const bool should_enable = !util_is_not_status(data_get_wakeup_id());
   if (should_enable) {
+#if !defined(PBL_PLATFORM_APLITE)
     s_blink_budget = 5;
     schedule_blink();
+#endif
 
     wakeup_schedule_next();
   } else {
@@ -484,7 +489,7 @@ static void window_load(Window *window) {
   bitmap_layer_set_bitmap(s_remaining_bmp_layer, s_remaining_bitmap);
   layer_add_child(root_layer, bitmap_layer_get_layer(s_remaining_bmp_layer));
   s_remaining_layer = util_make_text_layer(
-    GRect(row_x + row_1_text_ico_off, row_y + row_1_text_y_off, DISPLAY_W, 100),
+    GRect(row_x + row_1_text_ico_off, row_y + row_1_text_y_off, PS_DISP_W, 100),
     scalable_get_font(SFI_LargeBold)
   );
   layer_add_child(root_layer, text_layer_get_layer(s_remaining_layer));
@@ -497,13 +502,13 @@ static void window_load(Window *window) {
   bitmap_layer_set_bitmap(s_rate_bmp_layer, s_rate_bitmap);
   layer_add_child(root_layer, bitmap_layer_get_layer(s_rate_bmp_layer));
   s_rate_layer = util_make_text_layer(
-    GRect(row_x + row_1_text_ico_off, row_y + row_1_text_y_off, DISPLAY_W, 100),
+    GRect(row_x + row_1_text_ico_off, row_y + row_1_text_y_off, PS_DISP_W, 100),
     scalable_get_font(SFI_LargeBold)
   );
   layer_add_child(root_layer, text_layer_get_layer(s_rate_layer));
 
   s_row_1_subtitle_layer = util_make_text_layer(
-    GRect(2, row_y + scalable_y_pp(115, 100), DISPLAY_W - ACTION_BAR_W, 40),
+    GRect(2, row_y + scalable_y_pp(115, 100), PS_DISP_W - ACTION_BAR_W, 40),
     scalable_get_font(SFI_Small)
   );
   layer_add_child(root_layer, text_layer_get_layer(s_row_1_subtitle_layer));
@@ -524,7 +529,7 @@ static void window_load(Window *window) {
 
   const int text_ico_nudge = scalable_x_pp(60, 40);
   s_last_charge_layer = util_make_text_layer(
-    GRect(row_x + row_2_text_ico_off + text_ico_nudge, row_y + row_2_text_y_off, DISPLAY_W, 100),
+    GRect(row_x + row_2_text_ico_off + text_ico_nudge, row_y + row_2_text_y_off, PS_DISP_W, 100),
     scalable_get_font(SFI_Medium)
   );
   layer_add_child(root_layer, text_layer_get_layer(s_last_charge_layer));
@@ -540,7 +545,7 @@ static void window_load(Window *window) {
   layer_add_child(root_layer, bitmap_layer_get_layer(s_next_charge_bmp_layer));
 
   s_next_charge_layer = util_make_text_layer(
-    GRect(row_x + row_2_text_ico_off, row_y + row_2_text_y_off, DISPLAY_W, 100),
+    GRect(row_x + row_2_text_ico_off, row_y + row_2_text_y_off, PS_DISP_W, 100),
     scalable_get_font(SFI_Medium)
   );
   layer_add_child(root_layer, text_layer_get_layer(s_next_charge_layer));
@@ -555,7 +560,7 @@ static void window_load(Window *window) {
   bitmap_layer_set_compositing_mode(s_battery_bmp_layer, GCompOpSet);
   layer_add_child(root_layer, bitmap_layer_get_layer(s_battery_bmp_layer));
   s_battery_layer = util_make_text_layer(
-    GRect(row_x + row_3_text_ico_off, row_y + row_3_text_y_off, DISPLAY_W, 100),
+    GRect(row_x + row_3_text_ico_off, row_y + row_3_text_y_off, PS_DISP_W, 100),
     scalable_get_font(SFI_Medium)
   );
   layer_add_child(root_layer, text_layer_get_layer(s_battery_layer));
@@ -571,7 +576,7 @@ static void window_load(Window *window) {
 #endif
   const int x_nudge = scalable_x_pp(20, 10);
   s_reading_layer = util_make_text_layer(
-    GRect(row_x + row_3_text_ico_off + x_nudge, row_y + row_3_text_y_off, DISPLAY_W, 100),
+    GRect(row_x + row_3_text_ico_off + x_nudge, row_y + row_3_text_y_off, PS_DISP_W, 100),
     scalable_get_font(SFI_Medium)
   );
   layer_add_child(root_layer, text_layer_get_layer(s_reading_layer));
@@ -629,7 +634,9 @@ void main_window_push() {
     });
     window_set_click_config_provider(s_window, click_config_provider);
 
+#if !defined(PBL_PLATFORM_APLITE)
     s_blink_budget = 5;
+#endif
   }
 
   window_stack_push(s_window, true);

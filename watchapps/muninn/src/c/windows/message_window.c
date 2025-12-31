@@ -47,7 +47,7 @@ static void window_load(Window *window) {
 #else
   const int braid_y = 0;
 #endif
-  s_braid_layer = layer_create(GRect(0, braid_y, DISPLAY_W, BRAID_H));
+  s_braid_layer = layer_create(GRect(0, braid_y, PS_DISP_W, BRAID_H));
   layer_set_update_proc(s_braid_layer, braid_update_proc);
   layer_add_child(root_layer, s_braid_layer);
 

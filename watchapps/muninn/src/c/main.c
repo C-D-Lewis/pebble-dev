@@ -35,7 +35,7 @@ static void init() {
   const bool first_launch = !data_get_seen_first_launch();
 
   main_window_push();
-  // graph_window_push();
+  graph_window_push();
 
   if (notify_wipe) {
     alert_window_push(
