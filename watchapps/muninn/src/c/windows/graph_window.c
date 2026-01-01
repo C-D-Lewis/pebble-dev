@@ -19,6 +19,11 @@ static Layer *s_canvas_layer;
 
 static int s_selection = 0;
 
+static char* get_exp_sign(int acc) {
+  if (acc == 0) return "=";
+  return acc > 0 ? ">" : "<";
+}
+
 static void canvas_update_proc(Layer *layer, GContext *ctx) {
   graphics_context_set_fill_color(ctx, GColorBlack);
   graphics_context_set_text_color(ctx, GColorBlack);
@@ -233,7 +238,7 @@ static void main_window_load(Window *window) {
   layer_add_child(root_layer, s_canvas_layer);
 
   s_desc_layer = util_make_text_layer(
-    GRect(scalable_x(20), scalable_y(860), bounds.size.w, 100),
+    GRect(scalable_x(50), scalable_y(860), bounds.size.w, 100),
     scalable_get_font(SFI_Small)
   );
   const int acc = data_calculate_accuracy();
@@ -241,9 +246,14 @@ static void main_window_load(Window *window) {
   snprintf(
     s_desc_buff,
     sizeof(s_desc_buff),
-    "%d%% %s than trend",
+#if defined(PBL_PLATFORM_EMERY)
+    "Trend: %s%d%% (%s expected)",
+#else
+    "Trend: %s%d%% (%s expctd.)",
+#endif
+    acc >= 0 ? "+" : "",
     acc,
-    acc >= 0 ? "more" : "less"
+    get_exp_sign(acc)
   );
   text_layer_set_text(s_desc_layer, s_desc_buff);
   text_layer_set_overflow_mode(s_desc_layer, GTextOverflowModeWordWrap);

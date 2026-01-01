@@ -90,7 +90,7 @@ static void test_data_generator() {
   // Test data scenarios
   //
   // 1 - Arbitrary scenario
-  // const int changes[NUM_SAMPLES] = {2, 2, 1, 2, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1};
+  // const int changes[NUM_SAMPLES] = {2, 2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
   //
   // 2 - Test case: Should show 10 days at 8% per day (from 80%)
   // const int changes[NUM_SAMPLES] = {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
@@ -108,6 +108,8 @@ static void test_data_generator() {
   // const int changes[NUM_SAMPLES] = {2, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
   //            or: Should await 2 samples if charged and 'no change'
   // const int changes[NUM_SAMPLES] = {0, -10, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
+  //            or: Should await 1 sample
+  // const int changes[NUM_SAMPLES] = {2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
   //
   // 6 - Test case: Should show 1% when the majority of events are 'no change' (extreme battery life)
   // const int changes[NUM_SAMPLES] = {0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0};

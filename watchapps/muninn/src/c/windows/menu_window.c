@@ -2,6 +2,7 @@
 
 #define ROW_HEIGHT_SMALL scalable_y(220)
 #define ROW_HEIGHT_LARGE scalable_y(300)
+#define MIN_SAMPLES_FOR_GRAPH 4
 
 static Window *s_window;
 static MenuLayer *s_menu_layer;
@@ -13,11 +14,16 @@ typedef enum {
   MI_CUSTOM_ALERT_LEVEL,
   MI_PUSH_TIMELINE_PINS,
   MI_ELEVATED_RATE_ALERT,
+  MI_GRAPH,
   MI_BATTERY_TIPS,
   MI_DELETE_ALL_DATA,
   MI_VERSION,
   MI_MAX,
 } MenuItems;
+
+static bool graph_is_available() {
+  return data_get_log_length() >= MIN_SAMPLES_FOR_GRAPH;
+}
 
 static uint16_t get_num_rows_callback(MenuLayer *menu_layer, uint16_t section_index, void *context) {
   return MI_MAX;
@@ -82,6 +88,11 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
     snprintf(s_alert_buff, sizeof(s_alert_buff), "Notifying near %d%%", alert_level);
   }
 
+  // Graph availability after 4 samples
+  const bool graph_valid = graph_is_available();
+  static char s_graph_buff[22];
+  snprintf(s_graph_buff, sizeof(s_graph_buff), "Need min. %d samples", MIN_SAMPLES_FOR_GRAPH);
+
   switch(cell_index->row) {
     case MI_VIBE_ON_SAMPLE:
       menu_cell_draw(
@@ -113,6 +124,14 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
         cell_layer,
         "High drain alert",
         data_get_elevated_rate_alert() ? "Enabled" : "Disabled"
+      );
+      break;
+    case MI_GRAPH:
+      menu_cell_draw(
+        ctx,
+        cell_layer,
+        "Log graph",
+        graph_valid ? NULL : s_graph_buff
       );
       break;
     case MI_BATTERY_TIPS:
@@ -149,6 +168,8 @@ static int16_t get_cell_height_callback(struct MenuLayer *menu_layer, MenuIndex 
     case MI_ELEVATED_RATE_ALERT:
     case MI_VERSION:
       return ROW_HEIGHT_LARGE;
+    case MI_GRAPH:
+      return graph_is_available() ? ROW_HEIGHT_SMALL : ROW_HEIGHT_LARGE;
     case MI_DELETE_ALL_DATA:
       return s_reset_confirm ? ROW_HEIGHT_LARGE : ROW_HEIGHT_SMALL;
     default:
@@ -173,6 +194,13 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
     case MI_ELEVATED_RATE_ALERT:
       data_set_elevated_rate_alert(!data_get_elevated_rate_alert());
       break;
+    case MI_GRAPH: {
+      if (graph_is_available()) {
+        graph_window_push();
+      } else {
+        vibes_long_pulse();
+      }
+    } break;
     case MI_BATTERY_TIPS:
       message_window_push(MSG_TIPS);
       break;

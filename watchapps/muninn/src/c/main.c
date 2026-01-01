@@ -12,7 +12,6 @@
 #include "windows/main_window.h"
 #include "windows/message_window.h"
 #include "windows/alert_window.h"
-#include "windows/graph_window.h"
 
 static void init() {
   // Temporary - to be removed a few versions after 1.12.0
@@ -35,7 +34,6 @@ static void init() {
   const bool first_launch = !data_get_seen_first_launch();
 
   main_window_push();
-  graph_window_push();
 
   if (notify_wipe) {
     alert_window_push(
