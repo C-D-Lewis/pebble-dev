@@ -1,5 +1,4 @@
-#include <pebble.h>
-#include "../modules/data.h"
+#include "main_window.h"
 
 #define DATE_COLOR PBL_IF_COLOR_ELSE(GColorLightGray, GColorWhite)
 
@@ -46,25 +45,25 @@ static void window_load(Window *window) {
   bitmap_layer_set_bitmap(s_bg_layer, s_bg_bitmap);
   layer_add_child(window_layer, bitmap_layer_get_layer(s_bg_layer));
 
-  s_wday_layer = text_layer_create(GRect(0, 20, bounds.size.w, 40));
+  s_wday_layer = text_layer_create(scalable_grect(0, 120, 1000, 400));
   text_layer_set_text_color(s_wday_layer, DATE_COLOR);
   text_layer_set_background_color(s_wday_layer, GColorClear);
   text_layer_set_text_alignment(s_wday_layer, GTextAlignmentCenter);
-  text_layer_set_font(s_wday_layer, fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD));
+  text_layer_set_font(s_wday_layer, scalable_get_font(SFI_MediumBold));
   layer_add_child(window_layer, text_layer_get_layer(s_wday_layer));
 
-  s_time_layer = text_layer_create(GRect(0, 47, bounds.size.w, 60));
+  s_time_layer = text_layer_create(scalable_grect(0, 280, 1000, 400));
   text_layer_set_text_color(s_time_layer, GColorWhite);
   text_layer_set_background_color(s_time_layer, GColorClear);
   text_layer_set_text_alignment(s_time_layer, GTextAlignmentCenter);
-  text_layer_set_font(s_time_layer, fonts_get_system_font(FONT_KEY_BITHAM_34_MEDIUM_NUMBERS));
+  text_layer_set_font(s_time_layer, scalable_get_font(SFI_Large));
   layer_add_child(window_layer, text_layer_get_layer(s_time_layer));
 
-  s_day_layer = text_layer_create(GRect(10, 85, 124, 60));
+  s_day_layer = text_layer_create(scalable_grect(0, 530, 1000, 400));
   text_layer_set_text_color(s_day_layer, DATE_COLOR);
   text_layer_set_background_color(s_day_layer, GColorClear);
   text_layer_set_text_alignment(s_day_layer, GTextAlignmentCenter);
-  text_layer_set_font(s_day_layer, fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD));
+  text_layer_set_font(s_day_layer, scalable_get_font(SFI_MediumBold));
   layer_add_child(window_layer, text_layer_get_layer(s_day_layer));
 }
 
@@ -89,7 +88,6 @@ void main_window_push() {
       .unload = window_unload,
     });
   }
-
   window_stack_push(s_window, true);
 
   tick_timer_service_subscribe(MINUTE_UNIT, tick_handler);

@@ -1,8 +1,10 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "author": "Chris Lewis",
   "private": true,
-  "dependencies": {},
+  "dependencies": {
+    "pebble-scalable": "^1.6.0"
+  },
   "keywords": [
     "pebble-app"
   ],
@@ -14,6 +16,30 @@
           "type": "bitmap",
           "name": "BACKGROUND",
           "file": "images/background.png"
+        },
+        {
+          "type": "font",
+          "name": "FONT_FUTURA_24",
+          "file": "fonts/FuturaCondensed.ttf",
+          "characterRegex": "[0-9A-Za-z :]"
+        },
+        {
+          "type": "font",
+          "name": "FONT_FUTURA_28",
+          "file": "fonts/FuturaCondensed.ttf",
+          "characterRegex": "[0-9A-Za-z :]"
+        },
+        {
+          "type": "font",
+          "name": "FONT_FUTURA_36",
+          "file": "fonts/FuturaCondensed.ttf",
+          "characterRegex": "[0-9A-Za-z :]"
+        },
+        {
+          "type": "font",
+          "name": "FONT_FUTURA_48",
+          "file": "fonts/FuturaCondensed.ttf",
+          "characterRegex": "[0-9A-Za-z :]"
         }
       ]
     },
@@ -32,7 +58,9 @@
     "targetPlatforms": [
       "aplite",
       "basalt",
-      "diorite"
+      "diorite",
+      "emery",
+      "flint"
     ],
     "capabilities": []
   },
