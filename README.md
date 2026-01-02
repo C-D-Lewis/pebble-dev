@@ -33,7 +33,7 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `index`               | ![](watchfaces/index/screenshots/aplite.png)               | `A` `B` `C` `D`         |      | [pbw](pbw/index.pbw)               |
 | `isotime-appstore`    | ![](watchfaces/isotime-appstore/screenshots/yellow.png)    | `A` `B` `C` `D` `E`     | ✅    | [pbw](pbw/isotime.pbw)             |
 | `kitty-watchface`     | ![](watchfaces/kitty-watchface/screenshots/aplite.png)     | `A` `B` `D`             |      | [pbw](pbw/kitty-watchface.pbw)     |
-| `morndas`             | ![](watchfaces/morndas/screenshots/basalt.png)             | `A` `B` `D`             |      | [pbw](pbw/morndas.pbw)             |
+| `morndas`             | ![](watchfaces/morndas/screenshots/basalt.png)             | `A` `B` `D` `E` `F`            |      | [pbw](pbw/morndas.pbw)             |
 | `past-present-future` | ![](watchfaces/past-present-future/screenshots/aplite.png) | `A` `B` `D`             |      | [pbw](pbw/past-present-future.pbw) |
 | `potential-divider`   | ![](watchfaces/potential-divider/screenshots/aplite.png)   | `A` `B` `D`             | ✅    | [pbw](pbw/potential-divider.pbw)   |
 | `pseudotime`          | ![](watchfaces/pseudotime/screenshots/basalt.png)          | `A` `B` `C` `D` `E` `F` |      | [pbw](pbw/pseudotime.pbw)          |
