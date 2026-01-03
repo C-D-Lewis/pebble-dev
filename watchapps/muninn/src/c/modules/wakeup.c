@@ -36,19 +36,23 @@ void wakeup_schedule_next() {
 
   // Failed for some reason
   if (id < 0) {
-    if (id == E_RANGE) {
-      // Try again in the future if a collision with another app
-      int extra_mins = 1;
-      while (id < 0 && extra_mins <= EXTRA_MINUTES_MAX) {
-        APP_LOG(APP_LOG_LEVEL_INFO, "E_RANGE, trying again with +%dm", extra_mins);
-        id = wakeup_schedule(future + (extra_mins * 60), 0, true);
-        extra_mins++;
-      }
-    } else {
-      APP_LOG(APP_LOG_LEVEL_ERROR, "Failed to schedule wakeup: %d", id);
-      data_set_error("Failed to schedule wakeup");
-      return;
+    // Try again in the future if a collision with another app
+    int extra_mins = 1;
+    while (id < 0 && extra_mins <= EXTRA_MINUTES_MAX) {
+      APP_LOG(APP_LOG_LEVEL_INFO, "E_RANGE, trying again with +%dm", extra_mins);
+      id = wakeup_schedule(future + (extra_mins * 60), 0, true);
+      extra_mins++;
     }
+  }
+
+  // If still failed
+  if (id < 0) {
+    APP_LOG(APP_LOG_LEVEL_ERROR, "Failed to schedule wakeup!");
+
+    static char err_buff[64];
+    snprintf(err_buff, sizeof(err_buff), "Failed to schedule wakeup: %d", id);
+    data_set_error(err_buff);
+    return;
   }
 
   data_set_wakeup_id(id);

@@ -5,7 +5,7 @@ static AppData s_app_data;
 static Sample s_samples[NUM_SAMPLES];
 
 // Not persisted
-static char s_error_buff[32];
+static char s_error_buff[64];
 
 static void delete_all_data() {
   for (int i = 0; i < SK_Max; i += 1) {
