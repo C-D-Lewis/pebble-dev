@@ -12,13 +12,15 @@
 /////////////////////////////////////
 
 // MUST match package.json
-#define VERSION "1.16.0"
+#define VERSION "1.17.0"
 // Minimum samples before providing estimations
 #define MIN_SAMPLES 2
 // Maximum number of extra minutes if a collision
 #define EXTRA_MINUTES_MAX 10
 // Multipler for elevated rate alarm
 #define EVEVATED_RATE_MULT 3
+// Minimum negative charge_diff to count as charging
+#define MIN_CHARGE_AMOUNT 10
 
 ///////////// Testing area /////////////
 //                                    //

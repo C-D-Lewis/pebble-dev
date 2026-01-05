@@ -77,6 +77,8 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
   const int charge_percent = state.charge_percent;
   const int last_sample_time = data_get_last_sample_time();
 
+  int result = STATUS_EMPTY;
+
   // First ever sample - nothing to compare to
   if (!util_is_not_status(last_sample_time)) {
     APP_LOG(APP_LOG_LEVEL_INFO, "First sample!");
@@ -86,51 +88,44 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
     data_set_last_sample_time(ts_now);
   } else {
     const int time_diff_s = ts_now - last_sample_time;
-    const int charge_diff = last_charge_perc - charge_percent;
-    APP_LOG(APP_LOG_LEVEL_INFO, "Time diff: %d, Charge diff: %d", time_diff_s, charge_diff);
+    const int discharge_perc = last_charge_perc - charge_percent;
+    APP_LOG(APP_LOG_LEVEL_INFO, "Time diff: %d, Charge diff: %d", time_diff_s, discharge_perc);
 
-    // Turns out, in all cases below we note both of these anyway
-    data_set_last_charge_perc(charge_percent);
-    data_set_last_sample_time(ts_now);
+    const bool battery_bumped = discharge_perc < 0 && discharge_perc > -MIN_CHARGE_AMOUNT;
+    if (!battery_bumped) {
+      // If a significant event, note the new conditions
+      data_set_last_charge_perc(charge_percent);
+      data_set_last_sample_time(ts_now);
+    }
 
-    if (charge_diff < 0) {
-      // Recently charged
-      data_push_sample(
-        charge_percent,
-        last_sample_time,
-        last_charge_perc,
-        time_diff_s,
-        charge_diff,
-        STATUS_CHARGED
-      );
-      data_set_last_charge_time(ts_now);
-    } else if (charge_diff == 0) {
-      // No change since last sample - probably on charge or very short period
-      data_push_sample(
-        charge_percent,
-        last_sample_time,
-        last_charge_perc,
-        time_diff_s,
-        charge_diff,
-        STATUS_NO_CHANGE
-      );
+    if (discharge_perc < 0) {
+      // Can't combine with the 'if' above due to the 'else' otherwise being taken
+      if (!battery_bumped) {
+        // Recently charged by user a significant amount
+        result = STATUS_CHARGED;
+        data_set_last_charge_time(ts_now);
+      }
+    } else if (discharge_perc == 0) {
+      // No change since last sample - probably on full-charge or very low drain
+      result = STATUS_NO_CHANGE;
     } else {
       // Calculate new daily discharge rate estimate!
-      const int estimate = (charge_diff * SECONDS_PER_DAY) / time_diff_s;
+      result = (discharge_perc * SECONDS_PER_DAY) / time_diff_s;
+      APP_LOG(APP_LOG_LEVEL_INFO, "estimate: %d", result);
+    }
 
+    if (result != STATUS_EMPTY) {
       data_push_sample(
         charge_percent,
         last_sample_time,
         last_charge_perc,
         time_diff_s,
-        charge_diff,
-        estimate
+        discharge_perc,
+        result
       );
-      APP_LOG(APP_LOG_LEVEL_INFO, "estimate: %d", estimate);
     }
   }
 
-  data_log_state();
   wakeup_schedule_next();
 
   // Should we advise battery is low?
@@ -182,13 +177,22 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
   }
   if (!one_day_left && one_day_notified) data_set_one_day_notified(false);
 
-  // Just a sample
-  alert_window_push(
-    RESOURCE_ID_WRITING,
-    "Muninn is taking a note...",
-    data_get_vibe_on_sample(),
-    true
-  );
+  if (result != STATUS_EMPTY) {
+    // Tell the user if a sample was taken
+    alert_window_push(
+      RESOURCE_ID_WRITING,
+      "Muninn is taking a note...",
+      data_get_vibe_on_sample(),
+      true
+    );
+  } else {
+    alert_window_push(
+      RESOURCE_ID_WRITING,
+      "Muninn chose to wait some more.",
+      data_get_vibe_on_sample(),
+      true
+    );
+  }
 }
 
 bool wakeup_handle_missed() {
