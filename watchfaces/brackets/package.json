@@ -1,7 +1,7 @@
 {
   "name": "brackets",
   "author": "Chris Lewis",
-  "version": "2.5.0",
+  "version": "2.6.0",
   "private": true,
   "keywords": [
     "pebble-app"
@@ -33,13 +33,13 @@
           "type": "font",
           "name": "SHARE_24",
           "file": "fonts/Share-TechMono.ttf",
-          "characterRegex": "[0-9A-Z :%.]"
+          "characterRegex": "[-0-9A-Z :%.]"
         },
         {
           "type": "font",
           "name": "SHARE_36",
           "file": "fonts/Share-TechMono.ttf",
-          "characterRegex": "[0-9A-Z :%.]"
+          "characterRegex": "[-0-9A-Z :%.]"
         },
         {
           "type": "bitmap",
