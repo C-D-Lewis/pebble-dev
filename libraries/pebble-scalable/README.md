@@ -161,4 +161,6 @@ graphics_draw_bitmap_in_rect(
 
 - [x] Support per-platform (per shape) values
 - [x] Solution for picking bitmaps (to work with their scalable GRects)
-- [ ] Chalk? It's so different layouts might not be at all similar...
+- [ ] Find solution to 'ever expanding args' problem for new platforms
+- [ ] Chalk support
+- [ ] Gabbro support

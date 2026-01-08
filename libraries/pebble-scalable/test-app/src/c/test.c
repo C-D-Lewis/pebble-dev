@@ -16,9 +16,15 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   graphics_context_set_fill_color(ctx, GColorBlack);
 
   // Half width, 2% height, specific position just off the top text
+  // Y is specific to emery in this case
   graphics_fill_rect(
     ctx,
-    GRect(0, scalable_y_pp(60, 65), scalable_x(500), scalable_y(20)),
+    GRect(
+      0,
+      scalable_y((SV){.o = 60, .e = 65}),
+      scalable_x((SV){.o = 500}),
+      scalable_y((SV){.o = 20})
+    ),
     0,
     GCornerNone
   );
@@ -26,19 +32,34 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   // Half height, 2% width, specific position
   graphics_fill_rect(
     ctx,
-    GRect(10, 0, scalable_x(20), scalable_y(500)),
+    GRect(
+      10,
+      0,
+      scalable_x((SV){.o = 20}),
+      scalable_y((SV){.o = 500})
+    ),
     0,
     GCornerNone
   );
 
   // 12% size and position
-  graphics_fill_rect(ctx, scalable_grect(120, 120, 120, 120), 0, GCornerNone);
+  graphics_fill_rect(
+    ctx,
+    GRect(
+      scalable_x((SV){.o = 12}),
+      scalable_y((SV){.o = 12}),
+      scalable_x((SV){.o = 12}),
+      scalable_y((SV){.o = 12}),
+    ),
+    0,
+    GCornerNone
+  );
 
   // Further inside only on Emery
   graphics_context_set_fill_color(ctx, GColorWhite);
   graphics_fill_rect(
     ctx,
-    scalable_grect_pp(
+    scalable_grect(
       GRect(110, 110, 10, 10),
       GRect(130, 130, 10, 10)
     ),

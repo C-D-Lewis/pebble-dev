@@ -1,82 +1,29 @@
 #include "pebble-scalable.h"
 
-// Max font sets that can be stored
-#define PS_MAX_FONT_SETS 32
-// Max image ID sets that can be stored
-#define PS_MAX_GBITMAP_IDS 32
-// Number of distinct screen shapes
-#define PS_DISTINCT_SHAPES 2
-// All other screen shape (aplite, basalt, diorite, flint etc.) slot
-#define PS_DS_REGULAR 0
-// Emery distinct screen shape slot
-#define PS_DS_EMERY 1
-// Half the scale input in thousandths
-#define PS_HALF_RANGE 500
-
-static GFont *s_fonts_ptrs[PS_MAX_FONT_SETS][PS_DISTINCT_SHAPES];
-
-static GFont* get_font_if_set(GFont *ptr) {
-  if (ptr == NULL) {
-    APP_LOG(APP_LOG_LEVEL_ERROR, "pebble-scalable: tried to get font that was not yet set");
-  }
-  return ptr;
-}
-
-static GFont* get_font_from_array(GFont **array) {
-#if defined(PBL_PLATFORM_EMERY)
-  return array[PS_DS_EMERY];
-#else // aplite, basalt, diorite, flint
-  return array[PS_DS_REGULAR];
-#endif
-}
-
 ///////////////////////////////////////////// Geometry /////////////////////////////////////////////
 
-int scalable_x(int t_perc) {
-  return ((t_perc * PS_DISP_W) + PS_HALF_RANGE) / 1000;
-}
-
-int scalable_y(int t_perc) {
-  return ((t_perc * PS_DISP_H) + PS_HALF_RANGE) / 1000;
-}
-
-int scalable_x_pp(int original, int emery) {
-#if defined(PBL_PLATFORM_EMERY)
-  return scalable_x(emery);
-#else // aplite, basalt, diorite, flint
-  return scalable_x(original);
+// A simple helper to pick the right member based on the build platform
+#if defined(PBL_PLATFORM_CHALK)
+  #define _GET_SV(s) ((s).c ? (s).c : (s).o)
+#elif defined(PBL_PLATFORM_EMERY)
+  #define _GET_SV(s) ((s).e ? (s).e : (s).o)
+#else
+  #define _GET_SV(s) ((s).o)
 #endif
+
+// Half the scale input in thousandths
+#define _T_PERC_HALF_RANGE 500
+
+static int scale(int t_perc, int dimension) {
+  return ((t_perc * dimension) + _T_PERC_HALF_RANGE) / 1000;
 }
 
-int scalable_y_pp(int original, int emery) {
-#if defined(PBL_PLATFORM_EMERY)
-  return scalable_y(emery);
-#else // aplite, basalt, diorite, flint
-  return scalable_y(original);
-#endif
+int scalable_x(SV values) {
+  return scale(_GET_SV(values), PS_DISP_W);
 }
 
-GRect scalable_grect(int x_t_perc, int y_t_perc, int w_t_perc, int h_t_perc) {
-  return GRect(
-    scalable_x(x_t_perc),
-    scalable_y(y_t_perc),
-    scalable_x(w_t_perc),
-    scalable_y(h_t_perc)
-  );
-}
-
-GRect scalable_grect_pp(GRect original, GRect emery) {
-#if defined(PBL_PLATFORM_EMERY)
-  const GRect val = emery;
-#else // aplite, basalt, diorite, flint
-  const GRect val = original;
-#endif
-  return GRect(
-    scalable_x(val.origin.x),
-    scalable_y(val.origin.y),
-    scalable_x(val.size.w),
-    scalable_y(val.size.h)
-  );
+int scalable_y(SV values) {
+  return scale(_GET_SV(values), PS_DISP_H);
 }
 
 GRect scalable_center_x(GRect r) {
@@ -95,16 +42,35 @@ GRect scalable_center(GRect r) {
 
 /////////////////////////////////////////////// Fonts //////////////////////////////////////////////
 
-void scalable_set_fonts(int id, GFont *original, GFont *emery) {
-  if (id >= PS_MAX_FONT_SETS) {
-    APP_LOG(APP_LOG_LEVEL_ERROR, "pebble-scalable: font id must be <%d", PS_MAX_FONT_SETS);
+// Max font sets that can be stored
+#define _MAX_FONT_SETS 16
+
+// Macro to pick the pointer based on the build target
+#if defined(PBL_PLATFORM_CHALK)
+  #define GET_SF(s) ((s).c ? (s).c : (s).o)
+#elif defined(PBL_PLATFORM_EMERY)
+  #define GET_SF(s) ((s).e ? (s).e : (s).o)
+#else
+  #define GET_SF(s) ((s).o)
+#endif
+
+static GFont s_fonts_ptrs[_MAX_FONT_SETS];
+
+void scalable_set_fonts(int size_id, SF fonts) {
+  if (size_id >= _MAX_FONT_SETS) {
+    APP_LOG(APP_LOG_LEVEL_ERROR, "ps: font id %d exceeds max", size_id);
     return;
   }
 
-  s_fonts_ptrs[id][PS_DS_REGULAR] = original;
-  s_fonts_ptrs[id][PS_DS_EMERY] = emery;
+  // Pick the correct pointer now and store only that one
+  s_fonts_ptrs[size_id] = GET_SF(fonts);
 }
 
-GFont scalable_get_font(int id) {
-  return *(get_font_if_set(get_font_from_array(s_fonts_ptrs[id])));
+GFont scalable_get_font(int size_id) {
+  if (size_id >= _MAX_FONT_SETS || s_fonts_ptrs[size_id] == NULL) {
+    APP_LOG(APP_LOG_LEVEL_ERROR, "ps: font %d not set", size_id);
+    return NULL; 
+  }
+
+  return s_fonts_ptrs[size_id];
 }
