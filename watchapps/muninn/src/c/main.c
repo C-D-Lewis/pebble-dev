@@ -11,7 +11,6 @@
 
 #include "windows/main_window.h"
 #include "windows/message_window.h"
-#include "windows/alert_window.h"
 
 static void init() {
   // Temporary - to be removed a few versions after 1.12.0
@@ -36,12 +35,7 @@ static void init() {
   main_window_push();
 
   if (notify_wipe) {
-    alert_window_push(
-      RESOURCE_ID_AWAKE,
-      "Data reset to allow some new features to work correctly.",
-      true,
-      false
-    );
+    message_window_push("Data reset to allow some new features to work correctly.", true, false);
   }
 
   if (data_get_push_timeline_pins()) {
@@ -54,17 +48,12 @@ static void init() {
 
   if (missed) {
 #if !defined(USE_TEST_DATA)
-    alert_window_push(
-      RESOURCE_ID_ASLEEP,
-      "Muninn missed a sample, but will continue.",
-      true,
-      false
-    );
+    message_window_push("Muninn missed a sample, but will continue.", true, false);
 #endif
   }
 
   if (first_launch) {
-    message_window_push(MSG_WELCOME);
+    message_window_push(MSG_WELCOME, false, false);
     data_set_seen_first_launch();
   }
 }

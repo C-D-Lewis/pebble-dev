@@ -4,7 +4,7 @@
 
 #include "../modules/data.h"
 
-#include "../windows/alert_window.h"
+#include "../windows/message_window.h"
 
 void wakeup_schedule_next();
 

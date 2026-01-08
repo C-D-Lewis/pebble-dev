@@ -33,7 +33,7 @@ static void window_load(Window *window) {
   s_image_layer = bitmap_layer_create(
     scalable_grect_pp(
       GRect(0, 10, 1000, 150),
-      GRect(0, 20, 1000, 150)
+      GRect(0, 10, 1000, 150)
     )
   );
   bitmap_layer_set_alignment(s_image_layer, GAlignCenter);
@@ -43,7 +43,7 @@ static void window_load(Window *window) {
 #endif
 
 #if !defined(PBL_PLATFORM_APLITE)
-  const int braid_y = scalable_y(170);
+  const int braid_y = scalable_y(150);
 #else
   const int braid_y = 0;
 #endif
@@ -52,7 +52,7 @@ static void window_load(Window *window) {
   layer_add_child(root_layer, s_braid_layer);
 
   // Code from devsite to try and fit text inside a TextLayer inside a ScrollLayer
-  GRect shrinking_rect = GRect(5, 0, bounds.size.w - 10, 2000);
+  GRect shrinking_rect = GRect(2, 0, bounds.size.w - 4, 2000);
   GSize text_size = graphics_text_layout_get_content_size(
     s_text_ptr,
     scalable_get_font(SFI_Medium), 
@@ -62,8 +62,8 @@ static void window_load(Window *window) {
   );
   text_size.h += 10;
   GRect text_bounds = bounds;
-  text_bounds.origin.x += 5;
-  text_bounds.size.w -= 10;
+  text_bounds.origin.x += 2;
+  text_bounds.size.w -= 4;
   text_bounds.size.h = text_size.h;
 
   s_text_layer = util_make_text_layer(text_bounds, scalable_get_font(SFI_Medium));
@@ -92,7 +92,11 @@ static void window_unload(Window *window) {
   s_window = NULL;
 }
 
-void message_window_push(char *text) {
+static void timer_callback(void *data) {
+  window_stack_pop_all(true);
+}
+
+void message_window_push(char *text, bool do_vibe, bool do_dismiss) {
   s_text_ptr = text;
 
   if (!s_window) {
@@ -104,4 +108,7 @@ void message_window_push(char *text) {
   }
 
   window_stack_push(s_window, true);
+
+  if (do_dismiss) app_timer_register(3000, timer_callback, NULL);
+  if (do_vibe) vibes_short_pulse();
 }

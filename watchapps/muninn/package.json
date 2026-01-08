@@ -29,78 +29,63 @@
     "resources": {
       "media": [
         {
-          "type": "png",
+          "type": "bitmap",
           "name": "MENU_ICON",
           "file": "images/menu_icon.png",
           "menuIcon": true
         },
         {
-          "type": "png",
-          "name": "AWAKE",
-          "file": "images/awake.png"
-        },
-        {
-          "type": "png",
-          "name": "ASLEEP",
-          "file": "images/asleep.png"
-        },
-        {
-          "type": "png",
-          "name": "WRITING",
-          "file": "images/writing.png"
-        },
-        {
-          "type": "png",
+          "type": "bitmap",
           "name": "BATTERY_LOW",
           "file": "images/battery-low.png"
         },
         {
-          "type": "png",
+          "type": "bitmap",
           "name": "BATTERY_MEDIUM",
           "file": "images/battery-medium.png"
         },
         {
-          "type": "png",
+          "type": "bitmap",
           "name": "BATTERY_HIGH",
           "file": "images/battery-high.png"
         },
         {
-          "type": "png",
+          "type": "bitmap",
           "name": "READING",
           "file": "images/reading.png"
         },
         {
-          "type": "png",
+          "type": "bitmap",
           "name": "REMAINING",
           "file": "images/remaining.png"
         },
         {
-          "type": "png",
+          "type": "bitmap",
           "name": "RATE",
           "file": "images/rate.png"
         },
         {
-          "type": "png",
+          "type": "bitmap",
           "name": "BRAID",
           "file": "images/braid.png"
         },
         {
-          "type": "png",
+          "type": "bitmap",
           "name": "AWAKE_HEAD",
           "file": "images/awake-head.png"
         },
         {
-          "type": "png",
+          "type": "bitmap",
           "name": "ASLEEP_HEAD",
           "file": "images/asleep-head.png"
         },
         {
-          "type": "png",
+          "type": "bitmap",
           "name": "LAST_CHARGE",
           "file": "images/last-charge.png"
         },
         {
-          "type": "png",
+          "type": "bitmap",
           "name": "NEXT_CHARGE",
           "file": "images/next-charge.png"
         },

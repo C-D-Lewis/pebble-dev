@@ -31,7 +31,7 @@ void glance_handler(AppGlanceReloadSession *session, size_t limit, void *context
   };
   const AppGlanceResult result = app_glance_add_slice(session, slice);
   if (result != APP_GLANCE_RESULT_SUCCESS) {
-    APP_LOG(APP_LOG_LEVEL_ERROR, "AppGlance Error: %d", result);
+    APP_LOG(APP_LOG_LEVEL_ERROR, "Glance e %d", result);
   }
 }
 #endif

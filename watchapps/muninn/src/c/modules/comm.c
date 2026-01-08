@@ -1,7 +1,7 @@
 #include "comm.h"
 
 void out_failed_handler(DictionaryIterator *failed, AppMessageResult reason, void *context) {
-  APP_LOG(APP_LOG_LEVEL_ERROR, "Failed to send outbox");
+  APP_LOG(APP_LOG_LEVEL_ERROR, "Outbox fail");
 }
 
 void inbox_received_handler(DictionaryIterator *iter, void *context) {
@@ -14,9 +14,9 @@ void inbox_received_handler(DictionaryIterator *iter, void *context) {
 #endif
   if (code == 1) {
     data_set_pin_set_time(time(NULL));
-    APP_LOG(APP_LOG_LEVEL_INFO, "Pin set time updated");
+  // APP_LOG(APP_LOG_LEVEL_INFO, "Pin set time updated");
   } else {
-    APP_LOG(APP_LOG_LEVEL_ERROR, "Unexpected result: %d", code);
+    APP_LOG(APP_LOG_LEVEL_ERROR, "?? %d", code);
   }
 }
 
@@ -43,7 +43,7 @@ void comm_push_timeline_pins() {
 #endif
 
   if (!util_is_not_status(days) || !util_is_not_status(rate)) {
-    APP_LOG(APP_LOG_LEVEL_INFO, "Not enough data for pin prediction");
+  // APP_LOG(APP_LOG_LEVEL_INFO, "Not enough data for pin prediction");
     return;
   }
 

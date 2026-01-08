@@ -33,14 +33,11 @@ static TextLayer
   *s_hint_layer,
   *s_last_charge_layer,
   *s_next_charge_layer;
-#if !defined(PBL_PLATFORM_APLITE)
+
 static GBitmap *s_mascot_bitmap;
-static BitmapLayer *s_mascot_layer;
 static AppTimer *s_blink_timer;
 static int s_blink_budget;
-#endif
-
-static bool s_is_blinking, s_animating;
+static bool s_is_blinking, s_animating, s_is_enabled;
 static int s_days_remaining, s_rate, s_anim_days, s_anim_rate;
 
 static void update_subtitle(int days) {
@@ -106,7 +103,6 @@ static void anim_update(Animation *anim, AnimationProgress dist_normalized) {
 
 ///////////////////////////////////////////// Blinking /////////////////////////////////////////////
 
-#if !defined(PBL_PLATFORM_APLITE)
 static void schedule_blink();
 
 static void unblink_handler(void *context) {
@@ -143,37 +139,22 @@ static void cancel_blink() {
   s_is_blinking = false;
   layer_mark_dirty(s_canvas_layer);
 }
-#endif
 
 ///////////////////////////////////////////// Handlers /////////////////////////////////////////////
 
 static void update_data() {
-#if !defined(PBL_PLATFORM_APLITE)
-  if (s_mascot_bitmap) {
-    bitmaps_destroy(s_mascot_bitmap);
-    s_mascot_bitmap = NULL;
-  }
-#endif
-
   time_t wakeup_ts;
   const int wakeup_id = data_get_wakeup_id();
-  const bool is_enabled = util_is_not_status(wakeup_id);
+  const bool wakeup_id_set = util_is_not_status(wakeup_id);
   const bool found = wakeup_query(wakeup_id, &wakeup_ts);
-  if (is_enabled && !found) {
+  s_is_enabled = wakeup_id_set && found;
+  if (wakeup_id_set && !found) {
     data_set_error("Scheduled wakeup was not found");
   }
 
-#if !defined(PBL_PLATFORM_APLITE)
-  s_mascot_bitmap = bitmaps_get(
-    is_enabled ? RESOURCE_ID_AWAKE_HEAD : RESOURCE_ID_ASLEEP_HEAD
-  );
-  bitmap_layer_set_bitmap(s_mascot_layer, s_mascot_bitmap);
-#endif
-  text_layer_set_text(s_status_layer, is_enabled ? "AWAKE" : "ASLEEP");
+  text_layer_set_text(s_status_layer, s_is_enabled ? "AWAKE" : "ASLEEP");
 
-#if !defined(PBL_PLATFORM_APLITE)
   cancel_blink();
-#endif
 
   // Battery now
   BatteryChargeState state = battery_state_service_peek();
@@ -184,9 +165,9 @@ static void update_data() {
   // Current status
   text_layer_set_text(s_desc_layer, util_get_status_string());
 
-  if (!is_enabled) {
+  if (!s_is_enabled) {
     // Anything that makes predictions should not be shown if not actively monitoring
-    text_layer_set_text(s_reading_layer, "--:--");
+    text_layer_set_text(s_reading_layer, " --:--");
     text_layer_set_text(s_remaining_layer, "--");
     text_layer_set_text(s_rate_layer, "--");
     text_layer_set_text(s_next_charge_layer, "--");
@@ -194,9 +175,7 @@ static void update_data() {
     layer_set_hidden(text_layer_get_layer(s_hint_layer), false);
   } else {
     layer_set_hidden(text_layer_get_layer(s_hint_layer), true);
-#if !defined(PBL_PLATFORM_APLITE)
     schedule_blink();
-#endif
 
     // Days remaining
     s_days_remaining = data_calculate_days_remaining();
@@ -299,7 +278,6 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     GPoint(0, row_3_div_y),
     GPoint(PS_DISP_W - ACTION_BAR_W, row_3_div_y)
   );
-
   // Actions BG
   graphics_context_set_fill_color(ctx, PBL_IF_COLOR_ELSE(GColorDarkCandyAppleRed, GColorLightGray));
   GRect actions_rect = GRect(PS_DISP_W - ACTION_BAR_W, 0, ACTION_BAR_W, PS_DISP_H);
@@ -340,6 +318,20 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     GCornersAll
   );
 
+  // Mascot
+  if (s_mascot_bitmap != NULL) {
+    bitmaps_destroy(s_mascot_bitmap);
+    s_mascot_bitmap = NULL;
+  }
+  s_mascot_bitmap = bitmaps_get(
+    s_is_enabled ? RESOURCE_ID_AWAKE_HEAD : RESOURCE_ID_ASLEEP_HEAD
+  );
+  graphics_draw_bitmap_in_rect(
+    ctx,
+    s_mascot_bitmap,
+    GRect(scalable_x_pp(40, 60), scalable_y_pp(20, 25), MASCOT_SIZE, MASCOT_SIZE)
+  );
+
   // Blink Muninn's eye
   if (s_is_blinking) {
     graphics_context_set_fill_color(ctx, GColorBlack);
@@ -349,22 +341,11 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   BatteryChargeState state = battery_state_service_peek();
   GBitmap *batt_state_ptr = bitmaps_get(util_get_battery_resource_id(state.charge_percent));
 
-  // Save memory for Aplite, draw icons that don't change without a BitmapLayer
-#if defined(PBL_PLATFORM_APLITE)
-  // Use same as for battery gauge
-  graphics_draw_bitmap_in_rect(
-    ctx,
-    batt_state_ptr,
-    GRect(scalable_x(40), scalable_y(390), ICON_SIZE, ICON_SIZE)
-  );
-#else
-  // Use dedicated image
   graphics_draw_bitmap_in_rect(
     ctx,
     bitmaps_get(RESOURCE_ID_REMAINING),
     GRect(scalable_x(40), scalable_y_pp(390, 385), ICON_SIZE, ICON_SIZE)
   );
-#endif
   graphics_draw_bitmap_in_rect(
     ctx,
     bitmaps_get(RESOURCE_ID_RATE),
@@ -387,36 +368,11 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     batt_state_ptr,
     GRect(scalable_x(10), scalable_y_pp(845, 860), ICON_SIZE, ICON_SIZE)
   );
-
-#if defined(PBL_PLATFORM_APLITE)
-  // Draw clock instead of bitmap for 'next sample'
-  graphics_context_set_stroke_color(ctx, GColorBlack);
-  graphics_context_set_stroke_width(ctx, 1);
-
-  const int icon_x = scalable_x(430) + 3;
-  const int icon_y = scalable_y(845);
-  const int center_x = icon_x + (ICON_SIZE / 2);
-  const int center_y = icon_y + (ICON_SIZE / 2);
-  graphics_draw_circle(
-    ctx,
-    GPoint(
-      center_x,
-      center_y
-    ),
-    (ICON_SIZE / 2) - 4
-  );
-
-  // Draw hands
-  graphics_context_set_stroke_width(ctx, 1);
-  graphics_draw_line(ctx, GPoint(center_x, center_y), GPoint(center_x, center_y - 5));
-  graphics_draw_line(ctx, GPoint(center_x, center_y), GPoint(center_x + 5, center_y));
-#else
   graphics_draw_bitmap_in_rect(
     ctx,
     bitmaps_get(RESOURCE_ID_READING),
     GRect(scalable_x_pp(435, 455), scalable_y_pp(850, 860), ICON_SIZE, ICON_SIZE)
   );
-#endif
 }
 
 ////////////////////////////////////////////// Clicks //////////////////////////////////////////////
@@ -424,10 +380,8 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
 static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
   const bool should_enable = !util_is_not_status(data_get_wakeup_id());
   if (should_enable) {
-#if !defined(PBL_PLATFORM_APLITE)
     s_blink_budget = 5;
     schedule_blink();
-#endif
 
     wakeup_schedule_next();
   } else {
@@ -465,15 +419,6 @@ static void window_load(Window *window) {
   Layer *root_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(root_layer);
 
-#if !defined(PBL_PLATFORM_APLITE)
-  // Mascot - bitmap set in update_data()
-  s_mascot_layer = bitmap_layer_create(
-    GRect(scalable_x_pp(40, 60), scalable_y_pp(20, 25), MASCOT_SIZE, MASCOT_SIZE)
-  );
-  bitmap_layer_set_compositing_mode(s_mascot_layer, GCompOpSet);
-  layer_add_child(root_layer, bitmap_layer_get_layer(s_mascot_layer));
-#endif
-
   s_canvas_layer = layer_create(bounds);
   layer_set_update_proc(s_canvas_layer, canvas_update_proc);
   layer_add_child(root_layer, s_canvas_layer);
@@ -500,15 +445,13 @@ static void window_load(Window *window) {
   layer_add_child(root_layer, text_layer_get_layer(s_desc_layer));
 
   // Row 1
-  // TODO after moving images to canvas, these can probably be adjusted on all 3 rows
   int row_x = scalable_x_pp(40, 50);
   int row_y = scalable_y_pp(390, 385);
-
-  const int row_1_text_ico_off = scalable_x_pp(190, 160);
-  const int row_1_text_y_off = scalable_y_pp(-40, -20);
+  int text_ico_off = scalable_x_pp(190, 160);
+  int text_y_off = scalable_y_pp(-40, -20);
 
   s_remaining_layer = util_make_text_layer(
-    GRect(row_x + row_1_text_ico_off, row_y + row_1_text_y_off, PS_DISP_W, 100),
+    GRect(row_x + text_ico_off, row_y + text_y_off, PS_DISP_W, 100),
     scalable_get_font(SFI_LargeBold)
   );
   layer_add_child(root_layer, text_layer_get_layer(s_remaining_layer));
@@ -516,7 +459,7 @@ static void window_load(Window *window) {
   row_x += scalable_x_pp(485, 485);
 
   s_rate_layer = util_make_text_layer(
-    GRect(row_x + row_1_text_ico_off, row_y + row_1_text_y_off, PS_DISP_W, 100),
+    GRect(row_x + text_ico_off, row_y + text_y_off, PS_DISP_W, 100),
     scalable_get_font(SFI_LargeBold)
   );
   layer_add_child(root_layer, text_layer_get_layer(s_rate_layer));
@@ -530,12 +473,12 @@ static void window_load(Window *window) {
   // Row 2
   row_x = scalable_x(30);
   row_y = scalable_y_pp(665, 670);
-  const int row_2_text_ico_off = scalable_x_pp(120, 120);
-  const int row_2_text_y_off = scalable_y_pp(-35, -25);
+  text_ico_off = scalable_x_pp(120, 120);
+  text_y_off = scalable_y_pp(-35, -25);
   
   const int text_ico_nudge = scalable_x_pp(60, 40);
   s_last_charge_layer = util_make_text_layer(
-    GRect(row_x + row_2_text_ico_off + text_ico_nudge, row_y + row_2_text_y_off, PS_DISP_W, 100),
+    GRect(row_x + text_ico_off + text_ico_nudge, row_y + text_y_off, PS_DISP_W, 100),
     scalable_get_font(SFI_Medium)
   );
   layer_add_child(root_layer, text_layer_get_layer(s_last_charge_layer));
@@ -543,7 +486,7 @@ static void window_load(Window *window) {
   row_x += scalable_x_pp(460, 460);
 
   s_next_charge_layer = util_make_text_layer(
-    GRect(row_x + row_2_text_ico_off, row_y + row_2_text_y_off, PS_DISP_W, 100),
+    GRect(row_x + text_ico_off, row_y + text_y_off, PS_DISP_W, 100),
     scalable_get_font(SFI_Medium)
   );
   layer_add_child(root_layer, text_layer_get_layer(s_next_charge_layer));
@@ -551,11 +494,11 @@ static void window_load(Window *window) {
   // Row 3
   row_x = scalable_x(10);
   row_y = scalable_y_pp(845, 860);
-  const int row_3_text_ico_off = scalable_x_pp(160, 150);
-  const int row_3_text_y_off = scalable_y_pp(-30, -20);
+  text_ico_off = scalable_x_pp(160, 150);
+  text_y_off = scalable_y_pp(-30, -20);
 
   s_battery_layer = util_make_text_layer(
-    GRect(row_x + row_3_text_ico_off, row_y + row_3_text_y_off, PS_DISP_W, 100),
+    GRect(row_x + text_ico_off, row_y + text_y_off, PS_DISP_W, 100),
     scalable_get_font(SFI_Medium)
   );
   layer_add_child(root_layer, text_layer_get_layer(s_battery_layer));
@@ -564,7 +507,7 @@ static void window_load(Window *window) {
 
   const int x_nudge = scalable_x_pp(20, 10);
   s_reading_layer = util_make_text_layer(
-    GRect(row_x + row_3_text_ico_off + x_nudge, row_y + row_3_text_y_off, PS_DISP_W, 100),
+    GRect(row_x + text_ico_off + x_nudge, row_y + text_y_off, PS_DISP_W, 100),
     scalable_get_font(SFI_Medium)
   );
   layer_add_child(root_layer, text_layer_get_layer(s_reading_layer));
@@ -582,7 +525,7 @@ static void window_load(Window *window) {
 
   update_data();
 
-  APP_LOG(APP_LOG_LEVEL_INFO, "Heap free %d", heap_bytes_free());
+  APP_LOG(APP_LOG_LEVEL_INFO, "Heap %d", heap_bytes_free());
 }
 
 static void window_unload(Window *window) {
@@ -597,10 +540,6 @@ static void window_unload(Window *window) {
   text_layer_destroy(s_last_charge_layer);
   text_layer_destroy(s_next_charge_layer);
 
-#if !defined(PBL_PLATFORM_APLITE)
-  bitmap_layer_destroy(s_mascot_layer);
-#endif
-
   layer_destroy(s_canvas_layer);
 
   window_destroy(s_window);
@@ -612,13 +551,11 @@ void main_window_push() {
     s_window = window_create();
     window_set_window_handlers(s_window, (WindowHandlers) {
       .load = window_load,
-      .unload = window_unload,
+      .unload = window_unload
     });
     window_set_click_config_provider(s_window, click_config_provider);
 
-#if !defined(PBL_PLATFORM_APLITE)
     s_blink_budget = 5;
-#endif
   }
 
   window_stack_push(s_window, true);

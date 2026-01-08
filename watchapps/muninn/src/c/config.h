@@ -2,14 +2,14 @@
 
 #include <pebble.h>
 
-/////////////////////////////////////
-// DO NOT CHANGE WITHOUT DUE CARE  //
-//                                 //
-// Hours between wakeups           //
-#define WAKEUP_MOD_H 6             //
-// Number of stored samples        //
-#define NUM_SAMPLES 16             //
-/////////////////////////////////////
+///////////////////////////////////////////
+// DO NOT CHANGE WITHOUT DUE CARE        //
+//                                       //
+// Hours between wakeups (check strings) //
+#define WAKEUP_MOD_H 6                   //
+// Number of stored samples              //
+#define NUM_SAMPLES 16                   //
+///////////////////////////////////////////
 
 // MUST match package.json
 #define VERSION "1.17.0"
@@ -22,22 +22,22 @@
 // Minimum negative charge_diff to count as charging
 #define MIN_CHARGE_AMOUNT 10
 
-///////////// Testing area /////////////
-//                                    //
-// #define USE_TEST_DATA true         //
-//                                    //
-// #define SAVE_TEST_DATA true        //
-//                                    //
-#define LOG_STATE true             //
-//                                    //
-// #define WAKEUP_NEXT_MINUTE true    //
-//                                    //
-// #define TEST_COLLISION true        //
-//                                    //
-// #define TEST_TIMELINE_PIN true     //
-//                                    //
-// #define TEST_FORCE_SCALING true    //
-//                                    //
-// #define TEST_OVERESTIMATION true   //
-//                                    //
-////////////////////////////////////////
+///////////// Testing area ////////////////
+//                                       //
+// #define USE_TEST_DATA true            //
+//                                       //
+// #define SAVE_TEST_DATA true           //
+//                                       //
+// #define LOG_STATE true                //
+//                                       //
+// #define WAKEUP_NEXT_MINUTE true       //
+//                                       //
+// #define TEST_COLLISION true           //
+//                                       //
+// #define TEST_TIMELINE_PIN true        //
+//                                       //
+// #define TEST_FORCE_SCALING true       //
+//                                       //
+// #define TEST_OVERESTIMATION true      //
+//                                       //
+///////////////////////////////////////////

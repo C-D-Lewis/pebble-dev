@@ -10,14 +10,16 @@ static MenuLayer *s_menu_layer;
 static bool s_reset_confirm;
 
 typedef enum {
-  MI_VIBE_ON_SAMPLE = 0,
+  MI_GRAPH = 0,
+  MI_BATTERY_TIPS,
+  MI_INFORMATION,
+  MI_VIBE_ON_SAMPLE,
   MI_CUSTOM_ALERT_LEVEL,
   MI_PUSH_TIMELINE_PINS,
   MI_ELEVATED_RATE_ALERT,
-  MI_GRAPH,
-  MI_BATTERY_TIPS,
   MI_DELETE_ALL_DATA,
   MI_VERSION,
+
   MI_MAX,
 } MenuItems;
 
@@ -91,9 +93,23 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
   // Graph availability after 4 samples
   const bool graph_valid = graph_is_available();
   static char s_graph_buff[22];
-  snprintf(s_graph_buff, sizeof(s_graph_buff), "Need min. %d samples", MIN_SAMPLES_FOR_GRAPH);
+  snprintf(s_graph_buff, sizeof(s_graph_buff), "Awaiting %d samples...", MIN_SAMPLES_FOR_GRAPH);
 
   switch(cell_index->row) {
+    case MI_GRAPH:
+      menu_cell_draw(
+        ctx,
+        cell_layer,
+        "Log graph",
+        graph_valid ? NULL : s_graph_buff
+      );
+      break;
+    case MI_BATTERY_TIPS:
+      menu_cell_draw(ctx, cell_layer, "Battery tips", NULL);
+      break;
+    case MI_INFORMATION:
+      menu_cell_draw(ctx, cell_layer, "Information", NULL);
+      break;
     case MI_VIBE_ON_SAMPLE:
       menu_cell_draw(
         ctx,
@@ -125,17 +141,6 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
         "High drain alert",
         data_get_elevated_rate_alert() ? "Enabled" : "Disabled"
       );
-      break;
-    case MI_GRAPH:
-      menu_cell_draw(
-        ctx,
-        cell_layer,
-        "Log graph",
-        graph_valid ? NULL : s_graph_buff
-      );
-      break;
-    case MI_BATTERY_TIPS:
-      menu_cell_draw(ctx, cell_layer, "Battery tips", NULL);
       break;
     case MI_DELETE_ALL_DATA:
       menu_cell_draw(
@@ -179,6 +184,19 @@ static int16_t get_cell_height_callback(struct MenuLayer *menu_layer, MenuIndex 
 
 static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) {
   switch(cell_index->row) {
+    case MI_GRAPH: {
+      if (graph_is_available()) {
+        graph_window_push();
+      } else {
+        vibes_double_pulse();
+      }
+    } break;
+    case MI_BATTERY_TIPS:
+      message_window_push(MSG_TIPS, false, false);
+      break;
+    case MI_INFORMATION:
+      message_window_push(MSG_INFORMATION, false, false);
+      break;
     case MI_VIBE_ON_SAMPLE:
       data_set_vibe_on_sample(!data_get_vibe_on_sample());
       break;
@@ -193,16 +211,6 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
     } break;
     case MI_ELEVATED_RATE_ALERT:
       data_set_elevated_rate_alert(!data_get_elevated_rate_alert());
-      break;
-    case MI_GRAPH: {
-      if (graph_is_available()) {
-        graph_window_push();
-      } else {
-        vibes_long_pulse();
-      }
-    } break;
-    case MI_BATTERY_TIPS:
-      message_window_push(MSG_TIPS);
       break;
     case MI_DELETE_ALL_DATA:
       if (s_reset_confirm) {

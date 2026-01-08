@@ -13,17 +13,17 @@ static void delete_all_data() {
     persist_delete(i);
   }
   wakeup_cancel_all();
-  APP_LOG(APP_LOG_LEVEL_INFO, "!!! RESET ALL DATA !!!");
+// APP_LOG(APP_LOG_LEVEL_INFO, "!!! RESET ALL DATA !!!");
 }
 
 static void save_all() {
   status_t result = persist_write_data(SK_AppData, &s_app_data, sizeof(AppData));
   if (result < 0) {
-    APP_LOG(APP_LOG_LEVEL_ERROR, "Error writing app data: %d", (int)result);
-    data_set_error("Error writing app data to storage");
+    APP_LOG(APP_LOG_LEVEL_ERROR, "data write fail %d", (int)result);
+    data_set_error("Error writing app data");
   }
   if (result < (int)sizeof(AppData)) {
-    APP_LOG(APP_LOG_LEVEL_ERROR, "Warning: app data write truncated");
+    APP_LOG(APP_LOG_LEVEL_ERROR, "data write trunc");
   }
 
   for (int i = 0; i < NUM_SAMPLES; i++) {
@@ -31,8 +31,8 @@ static void save_all() {
     const int key = SK_SampleBase + i;
     result = persist_write_data(key, &s_samples[i], sizeof(Sample));
     if (result < 0) {
-      APP_LOG(APP_LOG_LEVEL_ERROR, "Error writing sample data: %d", (int)result);
-      data_set_error("Error writing sample data to storage");
+      APP_LOG(APP_LOG_LEVEL_ERROR, "sample write fail %d", (int)result);
+      data_set_error("Error writing sample data");
     }
   }
 }
@@ -223,8 +223,8 @@ void data_init() {
     // Load current data
     status_t result = persist_read_data(SK_AppData, &s_app_data, sizeof(AppData));
     if (result < 0) {
-      APP_LOG(APP_LOG_LEVEL_ERROR, "Error reading app data: %d", (int)result);
-      data_set_error("Error reading app data from storage");
+      APP_LOG(APP_LOG_LEVEL_ERROR, "app read fail %d", (int)result);
+      data_set_error("Error reading app data");
       return;
     }
 
@@ -233,8 +233,8 @@ void data_init() {
       const int key = SK_SampleBase + i;
       result = persist_read_data(key, &s_samples[i], sizeof(Sample));
       if (result < 0) {
-        APP_LOG(APP_LOG_LEVEL_ERROR, "Error reading sample data: %d", (int)result);
-        data_set_error("Error reading sample data from storage");
+        APP_LOG(APP_LOG_LEVEL_ERROR, "sample read fail %d", (int)result);
+        data_set_error("Error reading sample data");
         return;
       }
     }
@@ -274,7 +274,7 @@ void data_log_state() {
   );
 
   // Sample history
-  APP_LOG(APP_LOG_LEVEL_INFO, "i,lst,ts,td,lcp,cp,cd,r,dr,rt");
+// APP_LOG(APP_LOG_LEVEL_INFO, "i,lst,ts,td,lcp,cp,cd,r,dr,rt");
   for (int i = 0; i < NUM_SAMPLES; i++) {
     Sample *s = &s_samples[i];
     APP_LOG(
@@ -598,8 +598,7 @@ Sample* data_get_sample(int index) {
 
 void data_set_error(char *err) {
   snprintf(s_error_buff, sizeof(s_error_buff), "Error: %s", err);
-  alert_window_push(
-    RESOURCE_ID_ASLEEP,
+  message_window_push(
     data_get_error(),
     true,
     false

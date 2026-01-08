@@ -27,7 +27,7 @@ void wakeup_schedule_next() {
   const time_t future = mktime(&tm_future);
 #endif
 
-  APP_LOG(APP_LOG_LEVEL_INFO, "future %d", (int)future);
+// APP_LOG(APP_LOG_LEVEL_INFO, "future %d", (int)future);
   int id = wakeup_schedule(future, 0, true);
 #if defined(TEST_COLLISION)
   // To test collision rescheduling
@@ -39,7 +39,7 @@ void wakeup_schedule_next() {
     // Try again in the future if a collision with another app
     int extra_mins = 1;
     while (id < 0 && extra_mins <= EXTRA_MINUTES_MAX) {
-      APP_LOG(APP_LOG_LEVEL_INFO, "E_RANGE, trying again with +%dm", extra_mins);
+    // APP_LOG(APP_LOG_LEVEL_INFO, "E_RANGE, trying again with +%dm", extra_mins);
       id = wakeup_schedule(future + (extra_mins * 60), 0, true);
       extra_mins++;
     }
@@ -47,7 +47,7 @@ void wakeup_schedule_next() {
 
   // If still failed
   if (id < 0) {
-    APP_LOG(APP_LOG_LEVEL_ERROR, "Failed to schedule wakeup!");
+    APP_LOG(APP_LOG_LEVEL_ERROR, "schedule fail");
 
     static char err_buff[64];
     snprintf(err_buff, sizeof(err_buff), "Failed to schedule wakeup: %d", id);
@@ -56,7 +56,7 @@ void wakeup_schedule_next() {
   }
 
   data_set_wakeup_id(id);
-  APP_LOG(APP_LOG_LEVEL_INFO, "Scheduled wakeup: %d", id);
+// APP_LOG(APP_LOG_LEVEL_INFO, "Scheduled wakeup: %d", id);
 }
 
 void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
@@ -81,7 +81,7 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
 
   // First ever sample - nothing to compare to
   if (!util_is_not_status(last_sample_time)) {
-    APP_LOG(APP_LOG_LEVEL_INFO, "First sample!");
+  // APP_LOG(APP_LOG_LEVEL_INFO, "First sample!");
 
     // Record state and wait for next time
     data_set_last_charge_perc(charge_percent);
@@ -89,7 +89,7 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
   } else {
     const int time_diff_s = ts_now - last_sample_time;
     const int discharge_perc = last_charge_perc - charge_percent;
-    APP_LOG(APP_LOG_LEVEL_INFO, "Time diff: %d, Charge diff: %d", time_diff_s, discharge_perc);
+  // APP_LOG(APP_LOG_LEVEL_INFO, "Time diff: %d, Charge diff: %d", time_diff_s, discharge_perc);
 
     const bool battery_bumped = discharge_perc < 0 && discharge_perc > -MIN_CHARGE_AMOUNT;
     if (!battery_bumped) {
@@ -111,7 +111,7 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
     } else {
       // Calculate new daily discharge rate estimate!
       result = (discharge_perc * SECONDS_PER_DAY) / time_diff_s;
-      APP_LOG(APP_LOG_LEVEL_INFO, "estimate: %d", result);
+    // APP_LOG(APP_LOG_LEVEL_INFO, "estimate: %d", result);
     }
 
     if (result != STATUS_EMPTY) {
@@ -138,12 +138,7 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
     data_set_ca_has_notified(true);
 
     vibes_double_pulse();
-    alert_window_push(
-      RESOURCE_ID_AWAKE,
-      "Muninn advises the battery is below your chosen threshold.",
-      true,
-      false
-    );
+    message_window_push("Muninn advises the battery is below your chosen threshold.", true, false);
     return;
   }
   if (!is_low && ca_has_notified) data_set_ca_has_notified(false);
@@ -151,12 +146,7 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
   // Rate is unusually high
   if (data_get_rate_is_elevated() && data_get_elevated_rate_alert()) {
     vibes_double_pulse();
-    alert_window_push(
-      RESOURCE_ID_AWAKE,
-      "Muninn advises the battery is draining faster than usual.",
-      true,
-      false
-    );
+    message_window_push("Muninn advises the battery is draining faster than usual.", true, false);
     return;
   }
 
@@ -167,31 +157,16 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
   if (one_day_left && !one_day_notified) {
     data_set_one_day_notified(true);
 
-    alert_window_push(
-      RESOURCE_ID_AWAKE,
-      "Muninn advises you may have one day remaining.",
-      true,
-      false
-    );
+    message_window_push("Muninn advises you may have one day remaining.", true, false);
     return;
   }
   if (!one_day_left && one_day_notified) data_set_one_day_notified(false);
 
   if (result != STATUS_EMPTY) {
     // Tell the user if a sample was taken
-    alert_window_push(
-      RESOURCE_ID_WRITING,
-      "Muninn is taking a note...",
-      data_get_vibe_on_sample(),
-      true
-    );
+    message_window_push("Muninn is taking a note...", data_get_vibe_on_sample(), true);
   } else {
-    alert_window_push(
-      RESOURCE_ID_WRITING,
-      "Muninn chose to wait some more.",
-      data_get_vibe_on_sample(),
-      true
-    );
+    message_window_push("Muninn chose to wait some more.", data_get_vibe_on_sample(), true);
   }
 }
 
