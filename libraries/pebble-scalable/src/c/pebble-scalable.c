@@ -18,26 +18,43 @@ static int scale(int t_perc, int dimension) {
   return ((t_perc * dimension) + _T_PERC_HALF_RANGE) / 1000;
 }
 
-int scalable_x(SV values) {
+int scl_x(int t_perc) {
+  return scale(t_perc, PS_DISP_W);
+}
+
+int scl_y(int t_perc) {
+  return scale(t_perc, PS_DISP_H);
+}
+
+int _scl_x_pp_impl(SV values) {
   return scale(_GET_SV(values), PS_DISP_W);
 }
 
-int scalable_y(SV values) {
+int _scl_y_pp_impl(SV values) {
   return scale(_GET_SV(values), PS_DISP_H);
 }
 
-GRect scalable_center_x(GRect r) {
+GRect scl_grect(int x_t_perc, int y_t_perc, int w_t_perc, int h_t_perc) {
+  return GRect(
+    scale(x_t_perc, PS_DISP_W),
+    scale(y_t_perc, PS_DISP_H),
+    scale(w_t_perc, PS_DISP_W),
+    scale(h_t_perc, PS_DISP_H)
+  );
+}
+
+GRect scl_center_x(GRect r) {
   r.origin.x = (PS_DISP_W - r.size.w) / 2;
   return r;
 }
 
-GRect scalable_center_y(GRect r) {
+GRect scl_center_y(GRect r) {
   r.origin.y = (PS_DISP_H - r.size.h) / 2;
   return r;
 }
 
-GRect scalable_center(GRect r) {
-  return scalable_center_x(scalable_center_y(r));
+GRect scl_center(GRect r) {
+  return scl_center_x(scl_center_y(r));
 }
 
 /////////////////////////////////////////////// Fonts //////////////////////////////////////////////
@@ -56,7 +73,7 @@ GRect scalable_center(GRect r) {
 
 static GFont s_fonts_ptrs[_MAX_FONT_SETS];
 
-void scalable_set_fonts(int size_id, SF fonts) {
+void _scl_set_fonts_impl(int size_id, SF fonts) {
   if (size_id >= _MAX_FONT_SETS) {
     APP_LOG(APP_LOG_LEVEL_ERROR, "ps: font id %d exceeds max", size_id);
     return;
@@ -66,7 +83,7 @@ void scalable_set_fonts(int size_id, SF fonts) {
   s_fonts_ptrs[size_id] = GET_SF(fonts);
 }
 
-GFont scalable_get_font(int size_id) {
+GFont scl_get_font(int size_id) {
   if (size_id >= _MAX_FONT_SETS || s_fonts_ptrs[size_id] == NULL) {
     APP_LOG(APP_LOG_LEVEL_ERROR, "ps: font %d not set", size_id);
     return NULL; 

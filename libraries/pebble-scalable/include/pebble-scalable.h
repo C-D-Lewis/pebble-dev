@@ -29,29 +29,52 @@ typedef struct {
 } SV; // "scalable values"
 
 /**
- * Get an X coordinate as a thousandth of the screen width.
+ * Get an X coordinate as a thousandth of the screen width, same on all platforms.
  */
-int scalable_x(SV values);
+int scl_x(int t_perc);
 
 /**
- * Get a Y coordinate as a thousandth of the screen height.
+ * Get a Y coordinate as a thousandth of the screen height, same on all platforms.
  */
-int scalable_y(SV values);
+int scl_y(int t_perc);
+
+/**
+ * As scl_x, but with platform-specific values.
+ */
+int scl_x_pp(SV values);
+
+/**
+ * As scl_y, but with platform-specific values.
+ */
+int scl_y_pp(SV values);
+
+// This combination allows specifying values per-platform without the struct cast!
+int _scl_x_pp_impl(SV values);
+#define scl_x_pp(...) _scl_x_pp_impl((SV)__VA_ARGS__)
+int _scl_y_pp_impl(SV values);
+#define scl_y_pp(...) _scl_y_pp_impl((SV)__VA_ARGS__)
+
+/**
+ * Get a scaled GRect with values as thousandths of screen dimensions, same on all platforms.
+ *
+ * For per-platform values, construct a GRect using scl_x_pp and scl_y_pp as needed.
+ */
+GRect scl_grect(int x_t_perc, int y_t_perc, int w_t_perc, int h_t_perc);
 
 /**
  * Center a GRect in the X axis based on its size.
  */
-GRect scalable_center_x(GRect r);
+GRect scl_center_x(GRect r);
 
 /**
  * Center a GRect in the Y axis based on its size.
  */
-GRect scalable_center_y(GRect r);
+GRect scl_center_y(GRect r);
 
 /**
  * Center a GRect in both axes.
  */
-GRect scalable_center(GRect r);
+GRect scl_center(GRect r);
 
 ////////////////////////////////////////////// Fonts ///////////////////////////////////////////////
 
@@ -73,12 +96,14 @@ typedef struct {
  *
  * Keys can be 0 - 15 in value.
  */
-void scalable_set_fonts(int size_id, SF fonts);
+void _scl_set_fonts_impl(int size_id, SF fonts);
+
+#define scl_set_fonts(id, ...) _scl_set_fonts_impl(id, (SF)__VA_ARGS__)
 
 /**
  * Get a font for the current platform by size ID, if previously set.
  */
-GFont scalable_get_font(int size_id);
+GFont scl_get_font(int size_id);
 
 ////////////////////////////////////////////// Images //////////////////////////////////////////////
 
