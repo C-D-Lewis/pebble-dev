@@ -104,8 +104,6 @@ bool data_get_push_timeline_pins();
 void data_set_push_timeline_pins(bool b);
 bool data_get_elevated_rate_alert();
 void data_set_elevated_rate_alert(bool b);
-int data_get_pin_set_time();
-void data_set_pin_set_time(int t);
 bool data_get_one_day_notified();
 void data_set_one_day_notified(bool b);
 void data_set_last_charge_time(int ts);

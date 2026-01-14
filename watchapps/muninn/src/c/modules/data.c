@@ -684,14 +684,6 @@ void data_set_elevated_rate_alert(bool b) {
   s_app_data.elevated_rate_alert = b;
 }
 
-int data_get_pin_set_time() {
-  return s_app_data.pin_set_time;
-}
-
-void data_set_pin_set_time(int t) {
-  s_app_data.pin_set_time = t;
-}
-
 bool data_get_one_day_notified() {
   return s_app_data.one_day_notified;
 }

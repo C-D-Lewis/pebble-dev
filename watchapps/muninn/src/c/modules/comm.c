@@ -1,23 +1,11 @@
 #include "comm.h"
 
 void out_failed_handler(DictionaryIterator *failed, AppMessageResult reason, void *context) {
-  APP_LOG(APP_LOG_LEVEL_ERROR, "Outbox fail");
+  APP_LOG(APP_LOG_LEVEL_ERROR, "Out fail");
 }
 
 void inbox_received_handler(DictionaryIterator *iter, void *context) {
-  // Check for days remaining and rate
-#if !defined(PBL_PLATFORM_APLITE)
-  const int code = packet_get_integer(iter, MESSAGE_KEY_PIN_SET);
-#else
-  Tuple *pin_set_t = dict_find(iter, MESSAGE_KEY_PIN_SET);
-  const int code = pin_set_t->value->int32;
-#endif
-  if (code == 1) {
-    data_set_pin_set_time(time(NULL));
-  // APP_LOG(APP_LOG_LEVEL_INFO, "Pin set time updated");
-  } else {
-    APP_LOG(APP_LOG_LEVEL_ERROR, "?? %d", code);
-  }
+  // Unused
 }
 
 void comm_init() {
@@ -28,7 +16,7 @@ void comm_init() {
   app_message_register_outbox_failed(out_failed_handler);
   app_message_register_inbox_received(inbox_received_handler);
   // Consider Aplite when adding to these
-  app_message_open(32, 32);
+  app_message_open(32, 128);
 }
 
 void comm_deinit() {}
@@ -50,6 +38,7 @@ void comm_push_timeline_pins() {
   // This seems silly but here we are
 #if !defined(PBL_PLATFORM_APLITE)
   if (packet_begin()) {
+    packet_put_integer(MESSAGE_KEY_PUSH_PIN, 1);
     packet_put_integer(MESSAGE_KEY_DAYS_REMAINING, days);
     packet_put_integer(MESSAGE_KEY_DISCHARGE_RATE, rate);
     packet_send(NULL);
@@ -65,4 +54,8 @@ void comm_push_timeline_pins() {
   
   app_message_outbox_send();
 #endif
+}
+
+void data_push_sync_data(int index) {
+  // Send this sample - timestamp is the unique ordered key
 }

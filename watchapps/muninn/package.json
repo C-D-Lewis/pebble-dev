@@ -97,9 +97,10 @@
       ]
     },
     "messageKeys": [
+      "PUSH_PIN",
       "DAYS_REMAINING",
       "DISCHARGE_RATE",
-      "PIN_SET"
+      "SYNC"
     ]
   },
   "dependencies": {

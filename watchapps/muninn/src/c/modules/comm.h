@@ -13,3 +13,5 @@ void comm_init();
 void comm_deinit();
 
 void comm_push_timeline_pins();
+
+void comm_push_sync_data(int index);
