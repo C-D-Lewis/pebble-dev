@@ -18,6 +18,47 @@ static TextLayer *s_header_layer, *s_desc_layer;
 static Layer *s_canvas_layer;
 
 static int s_selection = 0;
+static int s_anim_count = 0;
+static bool s_animating = false;
+
+//////////////////////////////////////////// Animations ////////////////////////////////////////////
+
+static int anim_percentage(AnimationProgress dist_normalized, int max) {
+  return (max * dist_normalized) / ANIMATION_NORMALIZED_MAX;
+}
+
+static void animation_started(Animation *anim, void *context) {
+  s_animating = true;
+}
+
+static void animation_stopped(Animation *anim, bool stopped, void *context) {
+  s_animating = false;
+}
+
+static void animate(int duration, int delay, AnimationImplementation *implementation, bool handlers) {
+  Animation *anim = animation_create();
+  if (anim) {
+    animation_set_duration(anim, duration);
+    animation_set_delay(anim, delay);
+    animation_set_curve(anim, AnimationCurveEaseOut);
+    animation_set_implementation(anim, implementation);
+    if (handlers) {
+      animation_set_handlers(anim, (AnimationHandlers) {
+        .started = animation_started,
+        .stopped = animation_stopped
+      }, NULL);
+    }
+    animation_schedule(anim);
+  }
+}
+
+static void anim_update(Animation *anim, AnimationProgress dist_normalized) {
+  s_anim_count = anim_percentage(dist_normalized, data_get_log_length());
+
+  layer_mark_dirty(s_canvas_layer);
+}
+
+////////////////////////////////////////////// Layout //////////////////////////////////////////////
 
 static char* get_exp_sign(int acc) {
   if (acc == 0) return "=";
@@ -28,7 +69,9 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   graphics_context_set_fill_color(ctx, GColorBlack);
   graphics_context_set_text_color(ctx, GColorBlack);
 
-  const int count = data_get_log_length();
+  const int count = s_animating ? s_anim_count : data_get_log_length();
+  if (count < 1) return;
+
   const int x_gap = GRAPH_W / count;
   const int root_y = scalable_y(160);
   const int max_x = GRAPH_MARGIN + ((count - 1) * x_gap);
@@ -280,4 +323,7 @@ void graph_window_push() {
   }
 
   window_stack_push(s_window, true);
+
+  static AnimationImplementation anim_implementation = { .update = anim_update };
+  animate(1200, 0, &anim_implementation, true);
 }

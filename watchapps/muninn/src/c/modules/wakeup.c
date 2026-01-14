@@ -137,7 +137,7 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
   if (data_get_valid_samples_count() > MIN_SAMPLES && is_low && !ca_has_notified) {
     data_set_ca_has_notified(true);
 
-    vibes_double_pulse();
+    if (!quiet_time_is_active()) vibes_double_pulse();
     message_window_push("Muninn advises the battery is below your chosen threshold.", true, false);
     return;
   }
@@ -145,7 +145,7 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
 
   // Rate is unusually high
   if (data_get_rate_is_elevated() && data_get_elevated_rate_alert()) {
-    vibes_double_pulse();
+    if (!quiet_time_is_active()) vibes_double_pulse();
     message_window_push("Muninn advises the battery is draining faster than usual.", true, false);
     return;
   }

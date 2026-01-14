@@ -110,5 +110,5 @@ void message_window_push(char *text, bool do_vibe, bool do_dismiss) {
   window_stack_push(s_window, true);
 
   if (do_dismiss) app_timer_register(3000, timer_callback, NULL);
-  if (do_vibe) vibes_short_pulse();
+  if (do_vibe && !quiet_time_is_active()) vibes_short_pulse();
 }

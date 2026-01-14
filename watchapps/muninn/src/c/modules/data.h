@@ -114,4 +114,4 @@ int data_get_last_charge_time();
 // Strings
 #define MSG_WELCOME "Welcome to Muninn!\n\nEstimates will appear after two samples are taken.\n\nPlease launch me if the watch is off and a sample is missed."
 #define MSG_TIPS "Use a watchface that updates every minute.\n\nFilter notifications from very noisy apps.\n\nDisable the motion activated backlight."
-#define MSG_INFORMATION "Samples are taken every 6 hours.\n\nThe main screen shows:\n- Estimate data if available.\n- Last detected & next predicted charge.\n- Current battery level and next sample time.\n\nIf off when a wakeup is missed, the app must be launched again."
+#define MSG_INFORMATION "Samples are taken every 6 hours.\n\nThe main screen shows:\n- Estimate data if available.\n- Last detected & next predicted charge.\n- Current battery level and next sample time.\n\nThe graph shows each reading, with an outlined circle for predicted levels.\n\nIf off when a wakeup is missed, the app must be launched again."
