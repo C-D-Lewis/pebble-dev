@@ -2,7 +2,7 @@
 
 #include <pebble.h>
 
-#include <pebble-events/pebble-events.h>
+#include <pebble-packet/pebble-packet.h>
 
 #include "data.h"
 

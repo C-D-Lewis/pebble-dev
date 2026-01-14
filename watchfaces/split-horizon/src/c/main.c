@@ -4,8 +4,10 @@
 
 #include "modules/data.h"
 #include "modules/comm.h"
+#include "modules/scalable.h"
 
 static void init() {
+  scalable_init();
   data_init();
   comm_init();
 

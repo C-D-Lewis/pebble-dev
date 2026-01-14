@@ -1,10 +1,11 @@
 {
-  "version": "1.2.0",
+  "version": "1.3.0",
   "author": "Chris Lewis",
   "private": true,
   "dependencies": {
-    "pebble-clay": "^1.0.4",
-    "pebble-packet": "^1.3.2"
+    "@rebble/clay": "^1.0.6",
+    "pebble-packet": "^1.5.0",
+    "pebble-scalable": "^2.0.0"
   },
   "keywords": [
     "pebble-app"
@@ -15,7 +16,7 @@
       "media": [
         {
           "type": "font",
-          "name": "FONT_IMAGINE_43",
+          "name": "FONT_IMAGINE_20",
           "file": "fonts/imagine.ttf"
         },
         {
@@ -25,7 +26,22 @@
         },
         {
           "type": "font",
-          "name": "FONT_IMAGINE_20",
+          "name": "FONT_IMAGINE_43",
+          "file": "fonts/imagine.ttf"
+        },
+        {
+          "type": "font",
+          "name": "FONT_IMAGINE_27",
+          "file": "fonts/imagine.ttf"
+        },
+        {
+          "type": "font",
+          "name": "FONT_IMAGINE_33",
+          "file": "fonts/imagine.ttf"
+        },
+        {
+          "type": "font",
+          "name": "FONT_IMAGINE_58",
           "file": "fonts/imagine.ttf"
         },
         {
@@ -53,7 +69,9 @@
     "targetPlatforms": [
       "aplite",
       "basalt",
-      "diorite"
+      "diorite",
+      "emery",
+      "flint"
     ],
     "capabilities": [
       "configurable"
