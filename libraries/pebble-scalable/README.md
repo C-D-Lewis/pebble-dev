@@ -5,6 +5,7 @@ sizes by defining their dimensions only once in an app.
 
 - [Setting up](#setting-up)
 - [Layout](#layout)
+- [Constants](#constants)
 - [Centering](#centering)
 - [Fonts](#fonts)
 - [Images](#images)
@@ -60,10 +61,9 @@ This is done with members of a struct for each distinct platform shape:
 > breaking existing code!
 
 ```c
-// Larger only on Emery (x/y: 10%, w/h per platform)
+// Larger only on Emery
 const GRect emery = GRect(
-  scl_x(100),
-  scl_y(100),
+  0, 0,
   scl_x_pp({.o = 200, .e = 250}),
   scl_y_pp({.o = 200, .e = 250})
 );
@@ -72,6 +72,8 @@ const GRect emery = GRect(
 const int x = scl_x_pp({.o = 110, .e = 120});
 const int y = scl_y_pp({.o = 450, .e = 480});
 ```
+
+## Constants
 
 The library also exports constants for all platforms:
 

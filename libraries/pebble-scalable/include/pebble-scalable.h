@@ -41,16 +41,12 @@ int scl_y(int t_perc);
 /**
  * As scl_x, but with platform-specific values.
  */
-int scl_x_pp(SV values);
+int _scl_x_pp_impl(SV values);
+#define scl_x_pp(...) _scl_x_pp_impl((SV)__VA_ARGS__)
 
 /**
  * As scl_y, but with platform-specific values.
  */
-int scl_y_pp(SV values);
-
-// This combination allows specifying values per-platform without the struct cast!
-int _scl_x_pp_impl(SV values);
-#define scl_x_pp(...) _scl_x_pp_impl((SV)__VA_ARGS__)
 int _scl_y_pp_impl(SV values);
 #define scl_y_pp(...) _scl_y_pp_impl((SV)__VA_ARGS__)
 
@@ -97,7 +93,6 @@ typedef struct {
  * Keys can be 0 - 15 in value.
  */
 void _scl_set_fonts_impl(int size_id, SF fonts);
-
 #define scl_set_fonts(id, ...) _scl_set_fonts_impl(id, (SF)__VA_ARGS__)
 
 /**
