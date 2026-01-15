@@ -14,7 +14,9 @@ static void init() {
   main_window_push();
 }
 
-static void deinit() { }
+static void deinit() {
+  data_deinit();
+}
 
 int main() {
   init();

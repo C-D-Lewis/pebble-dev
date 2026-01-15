@@ -1,8 +1,10 @@
-var Clay = require('pebble-clay');
+var Clay = require('@rebble/clay');
 var clayConfig = require('./config');
 var clay = new Clay(clayConfig);
 
-const API_URL = 'https://api.open-meteo.com/v1/forecast';
+var API_URL = 'https://api.open-meteo.com/v1/forecast';
+
+var WEATHER_LEN = 8;
 
 function request(url, type, callback) {
   var xhr = new XMLHttpRequest();
@@ -93,7 +95,7 @@ function getWeather(pos) {
     var code = json.current.weather_code;
 
     var str = getWeatherStrFromCode(code);
-    var gap = 8 - (tempStr.length + str.length);
+    var gap = WEATHER_LEN - (tempStr.length + str.length);
     var weatherStr = tempStr + stringRepeat(' ', gap) + str;
 
     Pebble.sendAppMessage({
@@ -101,17 +103,17 @@ function getWeather(pos) {
     }, function() {
       console.log('Sent weather to Pebble');
     }, console.log);
-  }); 
+  });
 }
 
 function getLocation() {
-  window.navigator.geolocation.getCurrentPosition(
+  navigator.geolocation.getCurrentPosition(
     getWeather,
     function (err) {
+      console.log('Failed to get current location:');
       console.log(err);
-      Pebble.sendAppMessage({'KEY_REQUEST_TEMPERATURE': 'ERR'});
     },
-    {'timeout': 15000, 'maximumAge': 60000}
+    { timeout: 15000, maximumAge: 60000 }
   );
 }
 

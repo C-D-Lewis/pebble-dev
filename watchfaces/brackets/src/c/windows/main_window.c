@@ -111,23 +111,24 @@ static void tick_handler(struct tm *tick_time, TimeUnits changed) {
 static TextLayer* make_text_layer(GRect frame) {
   TextLayer *this = text_layer_create(frame);
   text_layer_set_background_color(this, GColorClear);
-  text_layer_set_font(this, scalable_get_font(SFI_Medium));
+  text_layer_set_font(this, scl_get_font(SFI_Medium));
   return this;
 }
 
 static bool any_complication_enabled() {
-  return data_get_boolean(MESSAGE_KEY_BatteryAndBluetooth) || data_get_boolean(MESSAGE_KEY_WeatherStatus);
+  return data_get_boolean(MESSAGE_KEY_BatteryAndBluetooth) ||
+    data_get_boolean(MESSAGE_KEY_WeatherStatus);
 }
 
 static void draw_brackets(GContext *ctx, GRect bounds, int scl_y) {
-  GRect rect = scalable_grect(0, scl_y, 940, 270);
-  const int bracket_w = scalable_x(30);
-  const int bracket_x_inset = scalable_x(70);
+  GRect rect = scl_grect(0, scl_y, 940, 270);
+  const int bracket_w = scl_x(30);
+  const int bracket_x_inset = scl_x(70);
 
-  graphics_context_set_fill_color(ctx, GColorBlack);
+  graphics_context_set_fill_color(ctx, data_get_color(MESSAGE_KEY_ColorBrackets));
   graphics_fill_rect(ctx, rect, GCornerNone, 0);
 
-  graphics_context_set_fill_color(ctx, GColorWhite);
+  graphics_context_set_fill_color(ctx, data_get_color(MESSAGE_KEY_ColorBackground));
   graphics_fill_rect(
     ctx,
     grect_inset(rect, GEdgeInsets(bracket_w)),
@@ -153,8 +154,8 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
 }
 
 static GPoint get_root_point() {
-  const int root_x = PBL_IF_ROUND_ELSE(scalable_x(150), scalable_x(25));
-  const int root_y = any_complication_enabled() ? scalable_y(190) : scalable_y(360);
+  const int root_x = PBL_IF_ROUND_ELSE(scl_x(150), scl_x(25));
+  const int root_y = any_complication_enabled() ? scl_y(190) : scl_y(360);
   return GPoint(root_x, root_y);
 }
 
@@ -163,20 +164,20 @@ static void layout() {
   GRect bounds = layer_get_bounds(root_layer);
 
   const GPoint root = get_root_point();
-  int y = PBL_IF_ROUND_ELSE(scalable_y(200), root.y);
+  int y = PBL_IF_ROUND_ELSE(scl_y(200), root.y);
 
   layer_set_frame(s_canvas_layer, GRect(root.x, root.y, DISPLAY_W, DISPLAY_H));
 
-  const int text_x = PBL_IF_ROUND_ELSE(scalable_x(260), scalable_x_pp(140, 113));
-  y -= scalable_y_pp(40, 50);
+  const int text_x = PBL_IF_ROUND_ELSE(scl_x(260), scl_x_pp({.o = 140, .e = 113}));
+  y -= scl_y_pp({.o = 40, .e = 50});
   GRect frame = grect_inset(bounds, GEdgeInsets(y, 0, 0, text_x));
   layer_set_frame(text_layer_get_layer(s_date_layer), frame);
 
-  y += scalable_y_pp(165, 162);
+  y += scl_y_pp({.o = 165, .e =  162});
   frame = grect_inset(bounds, GEdgeInsets(y, 0, 0, text_x));
   layer_set_frame(text_layer_get_layer(s_time_layer), frame);
 
-  y += scalable_y_pp(195, 200);
+  y += scl_y_pp({.o = 195, .e =  200});
 
   if (data_get_boolean(MESSAGE_KEY_BatteryAndBluetooth)) {
     frame = grect_inset(bounds, GEdgeInsets(y, 0, 0, text_x));
@@ -184,7 +185,7 @@ static void layout() {
   }
 
   if (data_get_boolean(MESSAGE_KEY_WeatherStatus)) {
-    y += scalable_y_pp(165, 163);
+    y += scl_y_pp({.o = 165, .e =  163});
     frame = grect_inset(bounds, GEdgeInsets(y, 0, 0, text_x));
     layer_set_frame(text_layer_get_layer(s_weather_layer), frame);
   }
@@ -272,8 +273,19 @@ void main_window_reload() {
     text_layer_set_text(s_weather_layer, data_get_weather_string());
   }
 
+  // Time
   tick_timer_service_unsubscribe();
-  tick_timer_service_subscribe(data_get_boolean(MESSAGE_KEY_SecondTick) ? SECOND_UNIT : MINUTE_UNIT, tick_handler);
+  tick_timer_service_subscribe(
+    data_get_boolean(MESSAGE_KEY_SecondTick) ? SECOND_UNIT : MINUTE_UNIT,
+    tick_handler
+  );
+
+  // Colors
+  window_set_background_color(s_window, data_get_color(MESSAGE_KEY_ColorBackground));
+  text_layer_set_text_color(s_time_layer, data_get_color(MESSAGE_KEY_ColorDateTime));
+  text_layer_set_text_color(s_date_layer, data_get_color(MESSAGE_KEY_ColorDateTime));
+  text_layer_set_text_color(s_batt_and_bt_layer, data_get_color(MESSAGE_KEY_ColorComplications));
+  text_layer_set_text_color(s_weather_layer, data_get_color(MESSAGE_KEY_ColorComplications));
 }
 
 /** Reload only data from JS, not all subscriptions */

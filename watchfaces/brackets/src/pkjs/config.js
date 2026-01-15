@@ -12,10 +12,6 @@ module.exports = [
         "defaultValue": "Options"
       },
       {
-        "type": "text",
-        "defaultValue": "Some values require closing and re-opening the watchface."
-      },
-      {
         "type": "toggle",
         "messageKey": "BatteryAndBluetooth",
         "label": "Show Battery & BT Status",
@@ -32,6 +28,39 @@ module.exports = [
         "messageKey": "WeatherStatus",
         "label": "Show Local Weather",
         "defaultValue": true
+      }
+    ]
+  },
+  {
+    "type": "section",
+    "items": [
+      {
+        "type": "heading",
+        "defaultValue": "Colors"
+      },
+      {
+        type: 'color',
+        label: 'Background',
+        messageKey: 'ColorBackground',
+        defaultValue: 'FFFFFF'
+      },
+      {
+        type: 'color',
+        label: 'Brackets',
+        messageKey: 'ColorBrackets',
+        defaultValue: '000000'
+      },
+      {
+        type: 'color',
+        label: 'Date and Time',
+        messageKey: 'ColorDateTime',
+        defaultValue: '000000'
+      },
+      {
+        type: 'color',
+        label: 'Complications',
+        messageKey: 'ColorComplications',
+        defaultValue: '000000'
       }
     ]
   },
