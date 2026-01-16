@@ -142,3 +142,109 @@ void util_draw_braid(GContext *ctx, GRect rect) {
   }
 #endif
 }
+
+// Like menu_cell_basic_draw but with larger subtitle
+void util_menu_cell_draw(GContext *ctx, Layer *layer, char *title, char *desc) {
+  // TODO: Can we use ContentSize here without layout issues?
+  //       It may conflict with pebble-scalable font system
+  //
+  // Somehow removing this consumes 200B more memory!?
+  PreferredContentSize content_size = preferred_content_size();
+  // APP_LOG(APP_LOG_LEVEL_INFO, "content_size: %d", (int)content_size);
+
+#if !defined(TEST_FORCE_SCALING)
+  // Medium or smaller (rare?), use regular rendering
+  if (content_size <= PreferredContentSizeMedium) {
+    menu_cell_basic_draw(ctx, layer, title, desc, NULL);
+    return;
+  }
+#endif
+
+  // Else, use larger one
+  GRect title_rect = GRect(
+    scl_x(30),
+    scl_y_pp({.o = -30, .e = -10}),
+    PS_DISP_W,
+    100
+  );
+  if (desc == NULL) {
+    title_rect.origin.y += scl_y(30);
+  }
+
+  graphics_draw_text(
+    ctx,
+    title,
+    scl_get_font(SFI_MediumBold),
+    title_rect,
+    GTextOverflowModeTrailingEllipsis,
+    GTextAlignmentLeft,
+    NULL
+  );
+
+  if (desc != NULL) {
+    graphics_draw_text(
+      ctx,
+      desc,
+      scl_get_font(SFI_Medium),
+      GRect(
+        scl_x(30),
+        scl_y_pp({.o = 110, .e = 130}),
+        PS_DISP_W,
+        100
+      ),
+      GTextOverflowModeTrailingEllipsis,
+      GTextAlignmentLeft,
+      NULL
+    );
+  }
+}
+
+#if !defined(PBL_PLATFORM_APLITE)
+static Animation *s_animation;
+static bool s_animating; // For now, we can assume only one is every active
+
+void util_stop_animation() {
+  if (s_animation) {
+    animation_unschedule(s_animation);
+    animation_destroy(s_animation);
+    s_animation = NULL;
+  }
+}
+
+int util_anim_percentage(AnimationProgress dist_normalized, int max) {
+  return (max * dist_normalized) / ANIMATION_NORMALIZED_MAX;
+}
+
+static void animation_started(Animation *anim, void *context) {
+  s_animating = true;
+}
+
+static void animation_stopped(Animation *anim, bool stopped, void *context) {
+  s_animating = false;
+
+  util_stop_animation();
+}
+
+void util_animate(int duration, int delay, AnimationImplementation *implementation, bool handlers) {
+  util_stop_animation();
+
+  s_animation = animation_create();
+  if (s_animation) {
+    animation_set_duration(s_animation, duration);
+    animation_set_delay(s_animation, delay);
+    animation_set_curve(s_animation, AnimationCurveEaseOut);
+    animation_set_implementation(s_animation, implementation);
+    if (handlers) {
+      animation_set_handlers(s_animation, (AnimationHandlers) {
+        .started = animation_started,
+        .stopped = animation_stopped
+      }, NULL);
+    }
+    animation_schedule(s_animation);
+  }
+}
+
+bool util_is_animating() {
+  return s_animating;
+}
+#endif

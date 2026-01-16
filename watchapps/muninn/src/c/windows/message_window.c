@@ -30,12 +30,7 @@ static void window_load(Window *window) {
 
 #if !defined(PBL_PLATFORM_APLITE)
   s_image_bitmap = bitmaps_get(RESOURCE_ID_AWAKE_HEAD);
-  s_image_layer = bitmap_layer_create(
-    scalable_grect_pp(
-      GRect(0, 10, 1000, 150),
-      GRect(0, 10, 1000, 150)
-    )
-  );
+  s_image_layer = bitmap_layer_create(scl_grect(0, 10, 1000, 150));
   bitmap_layer_set_alignment(s_image_layer, GAlignCenter);
   bitmap_layer_set_compositing_mode(s_image_layer, GCompOpSet);
   bitmap_layer_set_bitmap(s_image_layer, s_image_bitmap);
@@ -43,7 +38,7 @@ static void window_load(Window *window) {
 #endif
 
 #if !defined(PBL_PLATFORM_APLITE)
-  const int braid_y = scalable_y(150);
+  const int braid_y = scl_y(150);
 #else
   const int braid_y = 0;
 #endif
@@ -55,7 +50,7 @@ static void window_load(Window *window) {
   GRect shrinking_rect = GRect(2, 0, bounds.size.w - 4, 2000);
   GSize text_size = graphics_text_layout_get_content_size(
     s_text_ptr,
-    scalable_get_font(SFI_Medium), 
+    scl_get_font(SFI_Medium), 
     shrinking_rect,
     GTextOverflowModeWordWrap,
     GTextAlignmentLeft
@@ -66,7 +61,7 @@ static void window_load(Window *window) {
   text_bounds.size.w -= 4;
   text_bounds.size.h = text_size.h;
 
-  s_text_layer = util_make_text_layer(text_bounds, scalable_get_font(SFI_Medium));
+  s_text_layer = util_make_text_layer(text_bounds, scl_get_font(SFI_Medium));
   text_layer_set_text_alignment(s_text_layer, GTextAlignmentLeft);
   text_layer_set_text(s_text_layer, s_text_ptr);
   

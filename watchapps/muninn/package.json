@@ -1,7 +1,7 @@
 {
   "name": "muninn",
   "author": "Chris Lewis",
-  "version": "1.18.0",
+  "version": "1.19.0",
   "_note": "Also update config.h & check Aplite!",
   "private": true,
   "keywords": [
@@ -105,7 +105,7 @@
   },
   "dependencies": {
     "pebble-packet": "^1.5.0",
-    "pebble-scalable": "^1.6.0",
+    "pebble-scalable": "^2.0.0",
     "pebble-timeline-js": "^2.1.1"
   }
 }

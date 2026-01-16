@@ -2,6 +2,8 @@
 
 #include <pebble.h>
 
+#include "modules/scalable.h"
+
 ///////////////////////////////////////////
 // DO NOT CHANGE WITHOUT DUE CARE        //
 //                                       //
@@ -12,7 +14,7 @@
 ///////////////////////////////////////////
 
 // MUST match package.json
-#define VERSION "1.18.0"
+#define VERSION "1.19.0"
 // Minimum samples before providing estimations
 #define MIN_SAMPLES 2
 // Maximum number of extra minutes if a collision
@@ -21,6 +23,10 @@
 #define EVEVATED_RATE_MULT 3
 // Minimum negative charge_diff to count as charging
 #define MIN_CHARGE_AMOUNT 10
+// MenuLayer single row height
+#define ROW_HEIGHT_SMALL scl_y(220)
+// MenuLayer two row height
+#define ROW_HEIGHT_LARGE scl_y(300)
 
 ///////////// Testing area ////////////////
 //                                       //

@@ -15,10 +15,10 @@
   #define ICON_SIZE 24
 #endif
 
-#define ACTION_BAR_W scalable_x(70)
-#define BRAID_Y scalable_y_pp(280, 275)
-#define HINT_W scalable_x(70)
-#define HINT_H scalable_y(200)
+#define ACTION_BAR_W scl_x(70)
+#define BRAID_Y scl_y_pp({.o = 280, .e = 275})
+#define HINT_W scl_x(70)
+#define HINT_H scl_y(200)
 
 static Window *s_window;
 static Layer *s_canvas_layer;
@@ -34,10 +34,10 @@ static TextLayer
   *s_last_charge_layer,
   *s_next_charge_layer;
 
-static GBitmap *s_mascot_bitmap;
+static GBitmap *s_mascot_bitmap, *s_batt_bitmap;
 static AppTimer *s_blink_timer;
 static int s_blink_budget;
-static bool s_is_blinking, s_animating, s_is_enabled;
+static bool s_is_blinking, s_is_enabled;
 static int s_days_remaining, s_rate, s_anim_days, s_anim_rate;
 
 static void update_subtitle(int days) {
@@ -53,53 +53,33 @@ static void update_subtitle(int days) {
 
 //////////////////////////////////////////// Animations ////////////////////////////////////////////
 
-static int anim_percentage(AnimationProgress dist_normalized, int max) {
-  return (max * dist_normalized) / ANIMATION_NORMALIZED_MAX;
-}
-
-static void animation_started(Animation *anim, void *context) {
-  s_animating = true;
-}
-
-static void animation_stopped(Animation *anim, bool stopped, void *context) {
-  s_animating = false;
-}
-
-static void animate(int duration, int delay, AnimationImplementation *implementation, bool handlers) {
-  Animation *anim = animation_create();
-  if (anim) {
-    animation_set_duration(anim, duration);
-    animation_set_delay(anim, delay);
-    animation_set_curve(anim, AnimationCurveEaseInOut);
-    animation_set_implementation(anim, implementation);
-    if (handlers) {
-      animation_set_handlers(anim, (AnimationHandlers) {
-        .started = animation_started,
-        .stopped = animation_stopped
-      }, NULL);
-    }
-    animation_schedule(anim);
-  }
-}
-
-static void anim_update(Animation *anim, AnimationProgress dist_normalized) {
-  s_anim_days = anim_percentage(dist_normalized, s_days_remaining);
-  s_anim_rate = anim_percentage(dist_normalized, s_rate);
+static void update_anim_text() {
+#if !defined(PBL_PLATFORM_APLITE)
+  const bool animating = util_is_animating();
+#else
+  const bool animating = false;
+#endif
+  const int days = animating ? s_anim_days : s_days_remaining;
+  const int rate = animating ? s_anim_rate : s_rate;
 
   // Update text layers
   static char s_remaining_buff[8];
-  snprintf(
-    s_remaining_buff,
-    sizeof(s_remaining_buff),
-    s_anim_days < 10 ? "0%d" : "%d",
-    s_anim_days
-  );
+  snprintf(s_remaining_buff, sizeof(s_remaining_buff), days < 10 ? "0%d" : "%d", days);
   text_layer_set_text(s_remaining_layer, s_remaining_buff);
 
   static char s_rate_buff[8];
-  snprintf(s_rate_buff, sizeof(s_rate_buff), s_anim_rate < 10 ? "0%d" : "%d", s_anim_rate);
+  snprintf(s_rate_buff, sizeof(s_rate_buff), rate < 10 ? "0%d" : "%d", rate);
   text_layer_set_text(s_rate_layer, s_rate_buff);
 }
+
+#if !defined(PBL_PLATFORM_APLITE)
+static void anim_update(Animation *anim, AnimationProgress dist_normalized) {
+  s_anim_days = util_anim_percentage(dist_normalized, s_days_remaining);
+  s_anim_rate = util_anim_percentage(dist_normalized, s_rate);
+
+  update_anim_text();
+}
+#endif
 
 ///////////////////////////////////////////// Blinking /////////////////////////////////////////////
 
@@ -180,8 +160,13 @@ static void update_data() {
     // Days remaining
     s_days_remaining = data_calculate_days_remaining();
     if (util_is_not_status(s_days_remaining)) {
+#if !defined(PBL_PLATFORM_APLITE)
       // Handled in animation
       text_layer_set_text(s_remaining_layer, "--");
+#else
+      // Set statically
+      update_anim_text();
+#endif
     } else {
       text_layer_set_text(s_remaining_layer, "--");
     }
@@ -191,8 +176,11 @@ static void update_data() {
     // Rate per day
     s_rate = data_calculate_avg_discharge_rate();
     if (util_is_not_status(s_rate)) {
-      // Handled in animation
+#if !defined(PBL_PLATFORM_APLITE)
       text_layer_set_text(s_rate_layer, "--");
+#else
+      update_anim_text();
+#endif
     } else {
       text_layer_set_text(s_rate_layer, "--");
     }
@@ -228,11 +216,13 @@ static void update_data() {
     text_layer_set_text(s_reading_layer, s_wakeup_buff);
   }
 
+#if !defined(PBL_PLATFORM_APLITE)
   if (data_calculate_avg_discharge_rate() != STATUS_EMPTY) {
     // If data to show, begin smooth animation
     static AnimationImplementation anim_implementation = { .update = anim_update };
-    animate(1000, 100, &anim_implementation, true);
+    util_animate(1000, 100, &anim_implementation, true);
   }
+#endif
 }
 
 static void canvas_update_proc(Layer *layer, GContext *ctx) {
@@ -242,37 +232,29 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
 
   // Status BG
   graphics_context_set_fill_color(ctx, GColorBlack);
-  graphics_fill_rect(
-    ctx,
-    scalable_grect_pp(
-      GRect(0, 160, 930, 120),
-      GRect(0, 160, 930, 120)
-    ),
-    0,
-    GCornerNone
-  );
+  graphics_fill_rect(ctx, scl_grect(0, 160, 930, 120), 0, GCornerNone);
 
   // Row dividers
   graphics_context_set_stroke_color(ctx, GColorBlack);
   graphics_context_set_stroke_width(ctx, DIV_W);
   // Vertical
-  const int v_div_x = (PS_DISP_W / 2) - scalable_x(40);
-  const int v_div_y = scalable_y_pp(365, 355);
-  const int v_div_h = scalable_y_pp(465, 470);
+  const int v_div_x = (PS_DISP_W / 2) - scl_x(40);
+  const int v_div_y = scl_y_pp({.o = 365, .e = 355});
+  const int v_div_h = scl_y_pp({.o = 465, .e = 470});
   graphics_draw_line(
     ctx,
     GPoint(v_div_x, v_div_y),
     GPoint(v_div_x, v_div_y + v_div_h)
   );
   // Horizontal below row 1
-  const int row_2_div_y = scalable_y_pp(650, 630);
+  const int row_2_div_y = scl_y_pp({.o = 650, .e = 630});
   graphics_draw_line(
     ctx,
     GPoint(0, row_2_div_y),
     GPoint(PS_DISP_W - (ACTION_BAR_W), row_2_div_y)
   );
   // Horizontal below row 2
-  const int row_3_div_y = scalable_y_pp(830, 835);
+  const int row_3_div_y = scl_y_pp({.o = 830, .e = 835});
   graphics_draw_line(
     ctx,
     GPoint(0, row_3_div_y),
@@ -298,7 +280,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     .x = hint_x + (HINT_W / 2),
     .y = enable_y + (HINT_H / 2)
   };
-  graphics_fill_circle(ctx, select_center, scalable_x(20));
+  graphics_fill_circle(ctx, select_center, scl_x(20));
 
   // Menu hint
   const int menu_y = (PS_DISP_H / 2) - (HINT_H / 2);
@@ -320,7 +302,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
 
   // Mascot
   if (s_mascot_bitmap != NULL) {
-    bitmaps_destroy(s_mascot_bitmap);
+    bitmaps_destroy_ptr(s_mascot_bitmap);
     s_mascot_bitmap = NULL;
   }
   s_mascot_bitmap = bitmaps_get(
@@ -329,7 +311,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   graphics_draw_bitmap_in_rect(
     ctx,
     s_mascot_bitmap,
-    GRect(scalable_x_pp(40, 60), scalable_y_pp(20, 25), MASCOT_SIZE, MASCOT_SIZE)
+    GRect(scl_x_pp({.o = 40, .e = 60}), scl_y_pp({.o = 20, .e = 25}), MASCOT_SIZE, MASCOT_SIZE)
   );
 
   // Blink Muninn's eye
@@ -339,40 +321,73 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   }
 
   BatteryChargeState state = battery_state_service_peek();
-  GBitmap *batt_state_ptr = bitmaps_get(util_get_battery_resource_id(state.charge_percent));
+  if (s_batt_bitmap != NULL) {
+    bitmaps_destroy_ptr(s_batt_bitmap);
+    s_batt_bitmap = NULL;
+  }
+  s_batt_bitmap = bitmaps_get(util_get_battery_resource_id(state.charge_percent));
 
+  // Save memory for Aplite, draw icons that don't change without a BitmapLayer
+#if defined(PBL_PLATFORM_APLITE)
+  // Use same as for battery gauge
+  graphics_draw_bitmap_in_rect(
+    ctx,
+    s_batt_bitmap,
+    GRect(scl_x(40), scl_y(390), ICON_SIZE, ICON_SIZE)
+  );
+#else
+  // Use dedicated image
   graphics_draw_bitmap_in_rect(
     ctx,
     bitmaps_get(RESOURCE_ID_REMAINING),
-    GRect(scalable_x(40), scalable_y_pp(390, 385), ICON_SIZE, ICON_SIZE)
-  );
+    GRect(scl_x(40), scl_y_pp({.o = 390, .e = 385}), ICON_SIZE, ICON_SIZE)
+   );
+#endif
   graphics_draw_bitmap_in_rect(
     ctx,
     bitmaps_get(RESOURCE_ID_RATE),
-    GRect(scalable_x(530), scalable_y_pp(390, 385), ICON_SIZE, ICON_SIZE)
+    GRect(scl_x(530), scl_y_pp({.o = 390, .e = 385}), ICON_SIZE, ICON_SIZE)
   );
 
   graphics_draw_bitmap_in_rect(
     ctx,
     bitmaps_get(RESOURCE_ID_LAST_CHARGE),
-    GRect(scalable_x(30), scalable_y_pp(665, 670), ICON_SIZE, ICON_SIZE)
+    GRect(scl_x(30), scl_y_pp({.o = 665, .e = 670}), ICON_SIZE, ICON_SIZE)
   );
   graphics_draw_bitmap_in_rect(
     ctx,
     bitmaps_get(RESOURCE_ID_NEXT_CHARGE),
-    GRect(scalable_x(490), scalable_y_pp(665, 670), ICON_SIZE, ICON_SIZE)
+    GRect(scl_x(490), scl_y_pp({.o = 665, .e = 670}), ICON_SIZE, ICON_SIZE)
   );
 
   graphics_draw_bitmap_in_rect(
     ctx,
-    batt_state_ptr,
-    GRect(scalable_x(10), scalable_y_pp(845, 860), ICON_SIZE, ICON_SIZE)
+    s_batt_bitmap,
+    GRect(scl_x(10), scl_y_pp({.o = 845, .e = 860}), ICON_SIZE, ICON_SIZE)
   );
+
+#if defined(PBL_PLATFORM_APLITE)
+  // Draw clock instead of bitmap for 'next sample'
+  graphics_context_set_stroke_color(ctx, GColorBlack);
+  graphics_context_set_stroke_width(ctx, 1);
+
+  const int icon_x = scl_x(430) + 3;
+  const int icon_y = scl_y(845);
+  const int center_x = icon_x + (ICON_SIZE / 2);
+  const int center_y = icon_y + (ICON_SIZE / 2);
+  graphics_draw_circle(ctx, GPoint(center_x, center_y), (ICON_SIZE / 2) - 4);
+
+  // Draw hands
+  graphics_context_set_stroke_width(ctx, 1);
+  graphics_draw_line(ctx, GPoint(center_x, center_y), GPoint(center_x, center_y - 5));
+  graphics_draw_line(ctx, GPoint(center_x, center_y), GPoint(center_x + 5, center_y));
+#else
   graphics_draw_bitmap_in_rect(
     ctx,
     bitmaps_get(RESOURCE_ID_READING),
-    GRect(scalable_x_pp(435, 455), scalable_y_pp(850, 860), ICON_SIZE, ICON_SIZE)
-  );
+    GRect(scl_x_pp({.o = 435, .e = 455}), scl_y_pp({.o = 850, .e = 860}), ICON_SIZE, ICON_SIZE)
+   );
+#endif
 }
 
 ////////////////////////////////////////////// Clicks //////////////////////////////////////////////
@@ -424,103 +439,99 @@ static void window_load(Window *window) {
   layer_add_child(root_layer, s_canvas_layer);
 
   s_status_layer = util_make_text_layer(
-    scalable_grect_pp(
-      GRect(0, -35, 1000, 200),
-      GRect(0, 5, 1000, 200)
-    ),
-    scalable_get_font(SFI_LargeBold)
+    GRect(0, scl_y_pp({.o = -35, .e = 5}), PS_DISP_W, 100),
+    scl_get_font(SFI_LargeBold)
   );
   text_layer_set_text_alignment(s_status_layer, GTextAlignmentCenter);
   layer_add_child(root_layer, text_layer_get_layer(s_status_layer));
 
   s_desc_layer = util_make_text_layer(
-    scalable_grect_pp(
-      GRect(0, 145, 930, 150),
-      GRect(0, 135, 930, 150)
-    ),
-    scalable_get_font(SFI_Small)
+    GRect(0, scl_y_pp({.o = 145, .e = 135}), scl_x(930), scl_y(150)),
+    scl_get_font(SFI_Small)
   );
   text_layer_set_text_alignment(s_desc_layer, GTextAlignmentCenter);
   text_layer_set_text_color(s_desc_layer, GColorWhite);
   layer_add_child(root_layer, text_layer_get_layer(s_desc_layer));
 
   // Row 1
-  int row_x = scalable_x_pp(40, 50);
-  int row_y = scalable_y_pp(390, 385);
-  int text_ico_off = scalable_x_pp(190, 160);
-  int text_y_off = scalable_y_pp(-40, -20);
+  int row_x = scl_x_pp({.o = 40, .e = 50});
+  int row_y = scl_y_pp({.o = 390, .e = 385});
+  int text_ico_off = scl_x_pp({.o = 190, .e = 160});
+  int text_y_off = scl_y_pp({.o = -40, .e = -20});
 
   s_remaining_layer = util_make_text_layer(
     GRect(row_x + text_ico_off, row_y + text_y_off, PS_DISP_W, 100),
-    scalable_get_font(SFI_LargeBold)
+    scl_get_font(SFI_LargeBold)
   );
   layer_add_child(root_layer, text_layer_get_layer(s_remaining_layer));
 
-  row_x += scalable_x_pp(485, 485);
+  row_x += scl_x_pp({.o = 485, .e = 485});
 
   s_rate_layer = util_make_text_layer(
     GRect(row_x + text_ico_off, row_y + text_y_off, PS_DISP_W, 100),
-    scalable_get_font(SFI_LargeBold)
+    scl_get_font(SFI_LargeBold)
   );
   layer_add_child(root_layer, text_layer_get_layer(s_rate_layer));
 
   s_row_1_subtitle_layer = util_make_text_layer(
-    GRect(2, row_y + scalable_y_pp(115, 100), PS_DISP_W - ACTION_BAR_W, 40),
-    scalable_get_font(SFI_Small)
+    GRect(2, row_y + scl_y_pp({.o = 115, .e = 100}), PS_DISP_W - ACTION_BAR_W, 40),
+    scl_get_font(SFI_Small)
   );
   layer_add_child(root_layer, text_layer_get_layer(s_row_1_subtitle_layer));
 
   // Row 2
-  row_x = scalable_x(30);
-  row_y = scalable_y_pp(665, 670);
-  text_ico_off = scalable_x_pp(120, 120);
-  text_y_off = scalable_y_pp(-35, -25);
+  row_x = scl_x(30);
+  row_y = scl_y_pp({.o = 665, .e = 670});
+  text_ico_off = scl_x_pp({.o = 120, .e = 120});
+  text_y_off = scl_y_pp({.o = -35, .e = -25});
   
-  const int text_ico_nudge = scalable_x_pp(60, 40);
+  const int text_ico_nudge = scl_x_pp({.o = 60, .e = 40});
   s_last_charge_layer = util_make_text_layer(
     GRect(row_x + text_ico_off + text_ico_nudge, row_y + text_y_off, PS_DISP_W, 100),
-    scalable_get_font(SFI_Medium)
+    scl_get_font(SFI_Medium)
   );
   layer_add_child(root_layer, text_layer_get_layer(s_last_charge_layer));
 
-  row_x += scalable_x_pp(460, 460);
+  row_x += scl_x_pp({.o = 460, .e = 460});
 
   s_next_charge_layer = util_make_text_layer(
     GRect(row_x + text_ico_off, row_y + text_y_off, PS_DISP_W, 100),
-    scalable_get_font(SFI_Medium)
+    scl_get_font(SFI_Medium)
   );
   layer_add_child(root_layer, text_layer_get_layer(s_next_charge_layer));
 
   // Row 3
-  row_x = scalable_x(10);
-  row_y = scalable_y_pp(845, 860);
-  text_ico_off = scalable_x_pp(160, 150);
-  text_y_off = scalable_y_pp(-30, -20);
+  row_x = scl_x(10);
+  row_y = scl_y_pp({.o = 845, .e = 860});
+  text_ico_off = scl_x_pp({.o = 160, .e = 150});
+  text_y_off = scl_y_pp({.o = -30, .e = -20});
 
   s_battery_layer = util_make_text_layer(
     GRect(row_x + text_ico_off, row_y + text_y_off, PS_DISP_W, 100),
-    scalable_get_font(SFI_Medium)
+    scl_get_font(SFI_Medium)
   );
   layer_add_child(root_layer, text_layer_get_layer(s_battery_layer));
 
-  row_x += scalable_x_pp(430, 450);
+  row_x += scl_x_pp({.o = 430, .e = 450});
 
-  const int x_nudge = scalable_x_pp(20, 10);
+  const int x_nudge = scl_x_pp({.o = 20, .e = 10});
   s_reading_layer = util_make_text_layer(
     GRect(row_x + text_ico_off + x_nudge, row_y + text_y_off, PS_DISP_W, 100),
-    scalable_get_font(SFI_Medium)
+    scl_get_font(SFI_Medium)
   );
   layer_add_child(root_layer, text_layer_get_layer(s_reading_layer));
 
   // Hint for when Muninn is asleep (topmost)
-  const GRect hint_rect = scalable_grect_pp(
-    GRect(0, 360, 930, 470),
-    GRect(0, 355, 930, 475)
+  const GRect hint_rect = GRect(
+    0,
+    scl_y_pp({.o = 360, .e = 355}),
+    scl_x(930),
+    scl_y_pp({.o = 470, .e = 475})
   );
-  s_hint_layer = util_make_text_layer(hint_rect, scalable_get_font(SFI_Medium));
+  s_hint_layer = util_make_text_layer(hint_rect, scl_get_font(SFI_Medium));
   text_layer_set_background_color(s_hint_layer, GColorWhite);
   text_layer_set_text_alignment(s_hint_layer, GTextAlignmentCenter);
-  text_layer_set_text(s_hint_layer, "Hold the Up button  to wake Muninn.");
+  text_layer_set_text(s_hint_layer, "Hold the Up button\nto wake Muninn.");
   layer_add_child(root_layer, text_layer_get_layer(s_hint_layer));
 
   update_data();
@@ -546,12 +557,31 @@ static void window_unload(Window *window) {
   s_window = NULL;
 }
 
+static void window_disappear(Window *window) {
+#if !defined(PBL_PLATFORM_APLITE)
+  util_stop_animation();
+#endif
+
+  // Remove images that will loaded in canvas update proc
+  bitmaps_destroy_ptr(s_mascot_bitmap);
+  s_mascot_bitmap = NULL;
+  bitmaps_destroy_ptr(s_batt_bitmap);
+  s_batt_bitmap = NULL;
+
+  bitmaps_destroy_id(RESOURCE_ID_RATE);
+  bitmaps_destroy_id(RESOURCE_ID_LAST_CHARGE);
+  bitmaps_destroy_id(RESOURCE_ID_NEXT_CHARGE);
+
+  // APP_LOG(APP_LOG_LEVEL_INFO, "d %d", heap_bytes_free());
+}
+
 void main_window_push() {
   if (!s_window) {
     s_window = window_create();
     window_set_window_handlers(s_window, (WindowHandlers) {
       .load = window_load,
-      .unload = window_unload
+      .unload = window_unload,
+      .disappear = window_disappear,
     });
     window_set_click_config_provider(s_window, click_config_provider);
 

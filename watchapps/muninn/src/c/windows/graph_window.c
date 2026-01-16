@@ -1,10 +1,10 @@
 #include "log_window.h"
 
-#define GRAPH_MARGIN scalable_x(100)
-#define GRAPH_W scalable_x(900)
-#define GRAPH_H scalable_y(550)
-#define AXIS_S scalable_x(10)
-#define NOTCH_S scalable_x(35)
+#define GRAPH_MARGIN scl_x(100)
+#define GRAPH_W scl_x(900)
+#define GRAPH_H scl_y(550)
+#define AXIS_S scl_x(10)
+#define NOTCH_S scl_x(35)
 
 // Not scaled
 #if defined(PBL_PLATFORM_EMERY)
@@ -18,45 +18,19 @@ static TextLayer *s_header_layer, *s_desc_layer;
 static Layer *s_canvas_layer;
 
 static int s_selection = 0;
+#if !defined(PBL_PLATFORM_APLITE)
 static int s_anim_count = 0;
-static bool s_animating = false;
+#endif
 
 //////////////////////////////////////////// Animations ////////////////////////////////////////////
 
-static int anim_percentage(AnimationProgress dist_normalized, int max) {
-  return (max * dist_normalized) / ANIMATION_NORMALIZED_MAX;
-}
-
-static void animation_started(Animation *anim, void *context) {
-  s_animating = true;
-}
-
-static void animation_stopped(Animation *anim, bool stopped, void *context) {
-  s_animating = false;
-}
-
-static void animate(int duration, int delay, AnimationImplementation *implementation, bool handlers) {
-  Animation *anim = animation_create();
-  if (anim) {
-    animation_set_duration(anim, duration);
-    animation_set_delay(anim, delay);
-    animation_set_curve(anim, AnimationCurveEaseOut);
-    animation_set_implementation(anim, implementation);
-    if (handlers) {
-      animation_set_handlers(anim, (AnimationHandlers) {
-        .started = animation_started,
-        .stopped = animation_stopped
-      }, NULL);
-    }
-    animation_schedule(anim);
-  }
-}
-
+#if !defined(PBL_PLATFORM_APLITE)
 static void anim_update(Animation *anim, AnimationProgress dist_normalized) {
-  s_anim_count = anim_percentage(dist_normalized, data_get_log_length());
+  s_anim_count = util_anim_percentage(dist_normalized, data_get_log_length());
 
   layer_mark_dirty(s_canvas_layer);
 }
+#endif
 
 ////////////////////////////////////////////// Layout //////////////////////////////////////////////
 
@@ -69,11 +43,15 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   graphics_context_set_fill_color(ctx, GColorBlack);
   graphics_context_set_text_color(ctx, GColorBlack);
 
-  const int count = s_animating ? s_anim_count : data_get_log_length();
+#if !defined(PBL_PLATFORM_APLITE)
+  const int count = util_is_animating() ? s_anim_count : data_get_log_length();
+#else
+  const int count = data_get_log_length();
+#endif
   if (count < 1) return;
 
   const int x_gap = GRAPH_W / count;
-  const int root_y = scalable_y(160);
+  const int root_y = scl_y(160);
   const int max_x = GRAPH_MARGIN + ((count - 1) * x_gap);
 
   // Find Y ranges, rounded to nearest 10
@@ -183,10 +161,10 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   }
 
   // Box around date
-  const int box_h = scalable_y(100);
-  const int date_box_y = root_y + GRAPH_H + scalable_y(60);
-  const GRect box_rect = scalable_center_x(
-    GRect(0, date_box_y, scalable_x_pp(630, 580), box_h)
+  const int box_h = scl_y(100);
+  const int date_box_y = root_y + GRAPH_H + scl_y(60);
+  const GRect box_rect = scl_center_x(
+    GRect(0, date_box_y, scl_x_pp({.o = 630, .e = 580}), box_h)
   );
   graphics_context_set_stroke_color(ctx, GColorBlack);
   graphics_draw_rect(ctx, box_rect);
@@ -196,15 +174,15 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   if (sel_s && util_is_not_status(sel_s->timestamp)) {
     time_t ts = sel_s->timestamp;
 
-    static char s_date_buff[32];
+    static char s_date_buff[18];
     struct tm *time_info = localtime(&ts);
     strftime(s_date_buff, sizeof(s_date_buff), "%d %b - %H:%M", time_info);
 
     graphics_draw_text(
       ctx,
       s_date_buff,
-      scalable_get_font(SFI_Small),
-      GRect(0, date_box_y - scalable_y_pp(25, 25), PS_DISP_W, 300),
+      scl_get_font(SFI_Small),
+      GRect(0, date_box_y - scl_y(25), PS_DISP_W, 300),
       GTextOverflowModeTrailingEllipsis,
       GTextAlignmentCenter,
       NULL
@@ -214,7 +192,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   // Draw sample's value in box, on either side
   if (sel_s && util_is_not_status(sel_s->charge_perc)) {
     const int sel_y = root_y + GRAPH_H - (((sel_s->charge_perc - low_v) * GRAPH_H) / y_range);
-    const int box_w = scalable_x(210);
+    const int box_w = scl_x(210);
     const int box_x = flip ? PS_DISP_W - box_w : 0;
     const int box_y = sel_y - (box_h / 2);
     const GRect box_rect = GRect(box_x, box_y, box_w, box_h);
@@ -235,8 +213,8 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     graphics_draw_text(
       ctx,
       s_value_buff,
-      scalable_get_font(SFI_Small),
-      GRect(box_x, box_y - scalable_y(25), box_w, box_h),
+      scl_get_font(SFI_Small),
+      GRect(box_x, box_y - scl_y(25), box_w, box_h),
       GTextOverflowModeTrailingEllipsis,
       GTextAlignmentCenter,
       NULL
@@ -267,8 +245,8 @@ static void main_window_load(Window *window) {
   GRect bounds = layer_get_bounds(root_layer);
 
   s_header_layer = util_make_text_layer(
-    GRect(0, scalable_y_pp(-50, -30), bounds.size.w, 100),
-    scalable_get_font(SFI_Medium)
+    GRect(0, scl_y_pp({.o = -50, .e = -30}), bounds.size.w, 100),
+    scl_get_font(SFI_Medium)
   );
   text_layer_set_text(s_header_layer, "Log Graph");
   text_layer_set_text_alignment(s_header_layer, GTextAlignmentCenter);
@@ -281,8 +259,8 @@ static void main_window_load(Window *window) {
   layer_add_child(root_layer, s_canvas_layer);
 
   s_desc_layer = util_make_text_layer(
-    GRect(scalable_x(50), scalable_y(860), bounds.size.w, 100),
-    scalable_get_font(SFI_Small)
+    GRect(scl_x(50), scl_y(860), bounds.size.w, 100),
+    scl_get_font(SFI_Small)
   );
   const int acc = data_calculate_accuracy();
   static char s_desc_buff[48];
@@ -312,18 +290,28 @@ static void window_unload(Window *window) {
   s_window = NULL;
 }
 
+
+static void window_disappear(Window *window) {
+#if !defined(PBL_PLATFORM_APLITE)
+  util_stop_animation();
+#endif
+}
+
 void graph_window_push() {
   if (!s_window) {
     s_window = window_create();
     window_set_window_handlers(s_window, (WindowHandlers) {
       .load = main_window_load,
-      .unload = window_unload
+      .unload = window_unload,
+      .disappear = window_disappear
     });
     window_set_click_config_provider(s_window, click_config_provider);
   }
 
   window_stack_push(s_window, true);
 
+#if !defined(PBL_PLATFORM_APLITE)
   static AnimationImplementation anim_implementation = { .update = anim_update };
-  animate(1200, 0, &anim_implementation, true);
+  util_animate(1200, 0, &anim_implementation, true);
+#endif
 }

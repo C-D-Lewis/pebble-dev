@@ -1,9 +1,8 @@
 #include "log_window.h"
 
-#define ROW_HEIGHT scalable_y(410)
-#define ROW_HEIGHT_SMALL scalable_y(240)
-#define DIV_Y scalable_y(125)
-#define MENU_INSET scalable_y(135)
+#define ROW_HEIGHT scl_y(410)
+#define DIV_Y scl_y(125)
+#define MENU_INSET scl_y(135)
 
 // Extra precision needed
 #if defined(PBL_PLATFORM_EMERY)
@@ -30,11 +29,8 @@ static void draw_changes(GContext *ctx, const GRect bounds, const Sample *s) {
   graphics_draw_text(
     ctx,
     s_lst_buff,
-    scalable_get_font(SFI_Medium),
-    scalable_grect_pp(
-      GRect(20, 100, 1000, 280),
-      GRect(20, 110, 1000, 280)
-    ),
+    scl_get_font(SFI_Medium),
+    GRect(scl_x(20), scl_y_pp({.o = 100, .e = 110}), PS_DISP_W, 100),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentLeft,
     NULL
@@ -46,11 +42,8 @@ static void draw_changes(GContext *ctx, const GRect bounds, const Sample *s) {
   graphics_draw_text(
     ctx,
     s_lcp_buff,
-    scalable_get_font(SFI_Medium),
-    scalable_grect_pp(
-      GRect(20, 210, 1000, 280),
-      GRect(20, 220, 1000, 280)
-    ),
+    scl_get_font(SFI_Medium),
+    GRect(scl_x(20), scl_y_pp({.o = 210, .e = 220}), PS_DISP_W, 100),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentLeft,
     NULL
@@ -62,11 +55,8 @@ static void draw_changes(GContext *ctx, const GRect bounds, const Sample *s) {
   graphics_draw_text(
     ctx,
     s_ts_diff_buff,
-    scalable_get_font(SFI_Medium),
-    scalable_grect_pp(
-      GRect(0, 100, 980, 280),
-      GRect(0, 110, 980, 280)
-    ),
+    scl_get_font(SFI_Medium),
+    GRect(0, scl_y_pp({.o = 100, .e = 110}), scl_x(980), 100),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentRight,
     NULL
@@ -77,11 +67,8 @@ static void draw_changes(GContext *ctx, const GRect bounds, const Sample *s) {
   graphics_draw_text(
     ctx,
     s_perc_diff_buff,
-    scalable_get_font(SFI_Medium),
-    scalable_grect_pp(
-      GRect(0, 210, 980, 280),
-      GRect(0, 220, 980, 280)
-    ),
+    scl_get_font(SFI_Medium),
+    GRect(0, scl_y_pp({.o = 210, .e = 220}), scl_x(980), 100),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentRight,
     NULL
@@ -115,11 +102,8 @@ static void draw_result_and_datetime(GContext *ctx, const GRect bounds, const Sa
   graphics_draw_text(
     ctx,
     s_datetime_buff,
-    scalable_get_font(SFI_Medium),
-    scalable_grect_pp(
-      GRect(20, -50, 1000, 280),
-      GRect(20, -30, 1000, 280)
-    ),
+    scl_get_font(SFI_Medium),
+    GRect(scl_x(20), scl_y_pp({.o = -50, .e = -30}), PS_DISP_W, 100),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentLeft,
     NULL
@@ -127,11 +111,8 @@ static void draw_result_and_datetime(GContext *ctx, const GRect bounds, const Sa
   graphics_draw_text(
     ctx,
     s_result_buff,
-    scalable_get_font(SFI_Medium),
-    scalable_grect_pp(
-      GRect(0, -50, 980, 280),
-      GRect(0, -30, 980, 280)
-    ),
+    scl_get_font(SFI_Medium),
+    GRect(0, scl_y_pp({.o = -50, .e = -30}), scl_x(980), 100),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentRight,
     NULL
@@ -156,8 +137,8 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
     graphics_draw_text(
       ctx,
       "No samples yet",
-      scalable_get_font(SFI_Medium),
-      scalable_grect(0, 20, 1000, 280),
+      scl_get_font(SFI_Medium),
+      scl_grect(0, 20, 1000, 280),
       GTextOverflowModeTrailingEllipsis,
       GTextAlignmentCenter,
       NULL
@@ -184,14 +165,17 @@ static void main_window_load(Window *window) {
   Layer *window_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(window_layer);
 
-  const GRect header_rect = scalable_grect_pp(
-    GRect(0, -40, 1000, 300),
-    GRect(0, -20, 1000, 300)
-  );
+  const GRect header_rect = GRect(0, scl_y_pp({.o = -40, .e = -20}), PS_DISP_W, 100);
 
-  s_header_layer = util_make_text_layer(header_rect, scalable_get_font(SFI_Medium));
+  s_header_layer = util_make_text_layer(header_rect, scl_get_font(SFI_Medium));
   static char s_header_buff[17];
-  snprintf(s_header_buff, sizeof(s_header_buff), "History (%d/%d)", data_get_log_length(), NUM_SAMPLES);
+  snprintf(
+    s_header_buff,
+    sizeof(s_header_buff),
+    "History (%d/%d)",
+    data_get_log_length(),
+    NUM_SAMPLES
+  );
   text_layer_set_text(s_header_layer, s_header_buff);
   text_layer_set_text_alignment(s_header_layer, GTextAlignmentCenter);
   layer_add_child(window_layer, text_layer_get_layer(s_header_layer));

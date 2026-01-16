@@ -10,7 +10,5 @@
 #include "../modules/scalable.h"
 
 #include "message_window.h"
-#include "graph_window.h"
-#include "settings_window.h"
 
-void menu_window_push();
+void settings_window_push();

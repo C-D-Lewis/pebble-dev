@@ -153,18 +153,20 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
   // One day left - show peristent alert
   const bool one_day_notified = data_get_one_day_notified();
   const int days_remaining = data_calculate_days_remaining();
+  const bool one_day_alert = data_get_one_day_alert();
   const bool one_day_left = util_is_not_status(days_remaining) && days_remaining <= 1;
-  if (one_day_left && !one_day_notified) {
+  if (one_day_alert && one_day_left && !one_day_notified) {
     data_set_one_day_notified(true);
 
-    message_window_push("Muninn advises you may have one day remaining.", true, false);
+    message_window_push("Muninn advises you have one day remaining.", true, false);
     return;
   }
   if (!one_day_left && one_day_notified) data_set_one_day_notified(false);
 
+  // Main display on wakeup
   if (result != STATUS_EMPTY) {
     // Tell the user if a sample was taken
-    message_window_push("Muninn is taking a note...", data_get_vibe_on_sample(), true);
+    message_window_push("Muninn is taking a note.", data_get_vibe_on_sample(), true);
   } else {
     message_window_push("Muninn chose to wait some more.", data_get_vibe_on_sample(), true);
   }
@@ -179,13 +181,13 @@ bool wakeup_handle_missed() {
 
   // Doesn't exist or is too long ago, reschedule it
   if (!found || (time(NULL) - wakeup_ts) > (WAKEUP_MOD_H * SECONDS_PER_HOUR)) {
-    APP_LOG(
-      APP_LOG_LEVEL_INFO,
-      "Missed wakeup detected: %d %d %d",
-      wakeup_id,
-      found ? 1 : 0,
-      (int)wakeup_ts
-    );
+    // APP_LOG(
+    //   APP_LOG_LEVEL_INFO,
+    //   "Missed w: %d %d %d",
+    //   wakeup_id,
+    //   found ? 1 : 0,
+    //   (int)wakeup_ts
+    // );
     wakeup_schedule_next();
     return true;
   }

@@ -44,11 +44,12 @@ typedef struct {
   bool ca_has_notified;     // Has notified for custom alert
   bool push_timeline_pins;  // Push timeline pins
   bool elevated_rate_alert; // Elevated rate alert
-  int pin_set_time;         // When timeline pin was last set
+  int _unused_pin_set_time; 
   bool one_day_notified;    // One day remaining alert has notified
   int last_charge_time;     // Timestamp of last charge
+  bool one_day_alert;       // Show 'one day remaining' alert
 
-  // Singleton, adding new fields OK
+  // Singleton, adding new fields OK, removing from middle is NOT OK
 } AppData;
 
 // A full wakeup sample
@@ -108,6 +109,8 @@ bool data_get_one_day_notified();
 void data_set_one_day_notified(bool b);
 void data_set_last_charge_time(int ts);
 int data_get_last_charge_time();
+bool data_get_one_day_alert();
+void data_set_one_day_alert(bool b);
 
 // Strings
 #define MSG_WELCOME "Welcome to Muninn!\n\nEstimates will appear after two samples are taken.\n\nPlease launch me if the watch is off and a sample is missed."

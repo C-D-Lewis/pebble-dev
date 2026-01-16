@@ -47,9 +47,9 @@ static void init_data_fields() {
   s_app_data.ca_has_notified = false;
   s_app_data.push_timeline_pins = false;
   s_app_data.elevated_rate_alert = false;
-  s_app_data.pin_set_time = STATUS_EMPTY;
   s_app_data.one_day_notified = false;
   s_app_data.last_charge_time = STATUS_EMPTY;
+  s_app_data.one_day_alert = false;
 
   for (int i = 0; i < NUM_SAMPLES; i++) {
     Sample *s = &s_samples[i];
@@ -142,9 +142,9 @@ static void test_data_generator() {
   s_app_data.ca_has_notified = false;
   s_app_data.elevated_rate_alert = false;
   s_app_data.push_timeline_pins = false;
-  s_app_data.pin_set_time = STATUS_EMPTY;
   s_app_data.one_day_notified = false;
   s_app_data.last_charge_time = base - (3 * SECONDS_PER_DAY);
+  s_app_data.one_day_alert = false;
 
   for (int i = 0; i < NUM_SAMPLES; i++) {
     Sample *s = &s_samples[i];
@@ -193,10 +193,6 @@ static void test_data_generator() {
 
 // Handle new fields with default values
 static void handle_new_fields() {
-  // Added pin_set_time to AppData
-  if (s_app_data.pin_set_time == 0) {
-    s_app_data.pin_set_time = STATUS_EMPTY;
-  }
   if (s_app_data.last_charge_time == 0) {
     s_app_data.last_charge_time = STATUS_EMPTY;
   }
@@ -556,12 +552,12 @@ int data_calculate_days_remaining_accuracy() {
 
   if (actual_elapsed <= 0) return STATUS_EMPTY;
 
-  APP_LOG(
-    APP_LOG_LEVEL_INFO,
-    "ActualElapsed:%d EstElapsed:%d",
-    actual_elapsed,
-    estimated_elapsed
-  );
+  // APP_LOG(
+  //   APP_LOG_LEVEL_INFO,
+  //   "ActualElapsed:%d EstElapsed:%d",
+  //   actual_elapsed,
+  //   estimated_elapsed
+  // );
 
   return actual_elapsed - estimated_elapsed;
 }
@@ -698,4 +694,12 @@ void data_set_last_charge_time(int ts) {
 
 int data_get_last_charge_time() {
   return s_app_data.last_charge_time;
+}
+
+bool data_get_one_day_alert() {
+  return s_app_data.one_day_alert;
+}
+
+void data_set_one_day_alert(bool b) {
+  s_app_data.one_day_alert = b;
 }
