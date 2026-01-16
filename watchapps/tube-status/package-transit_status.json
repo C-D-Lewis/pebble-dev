@@ -1,0 +1,7 @@
+{
+  "name": "transit-status",
+  "pebble": {
+    "uuid": "19704840-b25d-487c-9f6f-e4ea0d6a832c",
+    "displayName": "Transit Status"
+  }
+}

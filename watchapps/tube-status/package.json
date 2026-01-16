@@ -37,6 +37,8 @@
     "projectType": "native",
     "uuid": "5120531c-9d73-4852-b26d-3d3cee90d92a",
     "messageKeys": [
+      "FlagJSReady",
+      "RequestTransitSystem",
       "LineStatusIndex",
       "LineStatus",
       "LineReason",
@@ -49,7 +51,7 @@
       "LineStatusSeverity"
     ],
     "enableMultiJS": true,
-    "displayName": "Transit Status",
+    "displayName": "Tube Status",
     "watchapp": {
       "onlyShownOnCommunication": false,
       "hiddenApp": false,

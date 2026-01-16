@@ -3,14 +3,47 @@
 #
 # Feel free to customize this to your needs.
 #
+import json
 import os.path
 
 top = '.'
 out = 'build'
 
+def variant_setup(ctx):
+    variant = ctx.options.variant
+    if variant == 'transit_status' and not os.path.exists('package.json.bak'):
+        ctx.env.append_value('DEFINES', ['APP_VARIANT_TRANSIT_STATUS'])
+
+        ctx.exec_command('cp package.json package.json.bak')
+
+        with open('package.json', 'r') as f:
+            base = json.load(f)
+        with open('package-transit_status.json', 'r') as f:
+            override = json.load(f)
+
+        for key, value in override.items():
+            if isinstance(value, dict) and key in base and isinstance(base[key], dict):
+                base[key].update(value)
+            else:
+                base[key] = value
+
+        with open('package.json', 'w') as f:
+            json.dump(base, f, indent=2)
+
+        ctx.exec_command('npm install')
+    else:
+        ctx.env.append_value('DEFINES', ['APP_VARIANT_TUBE_STATUS'])
+
+def variant_reset(ctx):
+    variant = ctx.options.variant
+    if variant == 'transit_status' and os.path.exists('package.json.bak'):
+        ctx.exec_command('mv package.json.bak package.json')
+        ctx.exec_command('npm install')
 
 def options(ctx):
     ctx.load('pebble_sdk')
+    ctx.add_option('--variant', action='store', default='default',
+                   help='Build variant: default or transit_status')
 
 
 def configure(ctx):
@@ -20,37 +53,46 @@ def configure(ctx):
     change after calling ctx.load('pebble_sdk') and make sure to set the correct environment first.
     Universal configuration: add your change prior to calling ctx.load('pebble_sdk').
     """
-    ctx.load('pebble_sdk')
+    try:
+        variant_setup(ctx)
+        ctx.load('pebble_sdk')
+    finally:
+        variant_reset(ctx)
 
 
 def build(ctx):
-    ctx.exec_command('npm run build')
+    try:
+        variant_setup(ctx)
+        
+        ctx.exec_command('npm run build')
 
-    ctx.load('pebble_sdk')
+        ctx.load('pebble_sdk')
 
-    build_worker = os.path.exists('worker_src')
-    binaries = []
+        build_worker = os.path.exists('worker_src')
+        binaries = []
 
-    cached_env = ctx.env
-    for platform in ctx.env.TARGET_PLATFORMS:
-        ctx.env = ctx.all_envs[platform]
-        ctx.set_group(ctx.env.PLATFORM_NAME)
-        app_elf = '{}/pebble-app.elf'.format(ctx.env.BUILD_DIR)
-        ctx.pbl_build(source=ctx.path.ant_glob('src/c/**/*.c'), target=app_elf, bin_type='app')
+        cached_env = ctx.env
+        for platform in ctx.env.TARGET_PLATFORMS:
+            ctx.env = ctx.all_envs[platform]
+            ctx.set_group(ctx.env.PLATFORM_NAME)
+            app_elf = '{}/pebble-app.elf'.format(ctx.env.BUILD_DIR)
+            ctx.pbl_build(source=ctx.path.ant_glob('src/c/**/*.c'), target=app_elf, bin_type='app')
 
-        if build_worker:
-            worker_elf = '{}/pebble-worker.elf'.format(ctx.env.BUILD_DIR)
-            binaries.append({'platform': platform, 'app_elf': app_elf, 'worker_elf': worker_elf})
-            ctx.pbl_build(source=ctx.path.ant_glob('worker_src/c/**/*.c'),
-                          target=worker_elf,
-                          bin_type='worker')
-        else:
-            binaries.append({'platform': platform, 'app_elf': app_elf})
-    ctx.env = cached_env
+            if build_worker:
+                worker_elf = '{}/pebble-worker.elf'.format(ctx.env.BUILD_DIR)
+                binaries.append({'platform': platform, 'app_elf': app_elf, 'worker_elf': worker_elf})
+                ctx.pbl_build(source=ctx.path.ant_glob('worker_src/c/**/*.c'),
+                            target=worker_elf,
+                            bin_type='worker')
+            else:
+                binaries.append({'platform': platform, 'app_elf': app_elf})
+        ctx.env = cached_env
 
-    ctx.set_group('bundle')
-    ctx.pbl_bundle(binaries=binaries,
-                   js=ctx.path.ant_glob(['src/ts-build/**/*.js',
-                                         'src/pkjs/**/*.json',
-                                         'src/common/**/*.js']),
-                   js_entry_file='src/ts-build/index.js')
+        ctx.set_group('bundle')
+        ctx.pbl_bundle(binaries=binaries,
+                    js=ctx.path.ant_glob(['src/ts-build/**/*.js',
+                                            'src/pkjs/**/*.json',
+                                            'src/common/**/*.js']),
+                    js_entry_file='src/ts-build/index.js')
+    finally:
+        variant_reset(ctx)
