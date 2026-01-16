@@ -1,0 +1,63 @@
+{
+  "name": "transit-status",
+  "version": "1.0.0",
+  "author": "C-D-Lewis & CometDog",
+  "private": true,
+  "dependencies": {
+    "pebble-events": "^1.2.0",
+    "pebble-packet": "^1.4.0",
+    "pebble-scalable": "^1.5.1"
+  },
+  "devDependencies": {
+    "pkts": "^0.2.1"
+  },
+  "scripts": {
+    "build": "pkts build"
+  },
+  "keywords": [
+    "pebble-app"
+  ],
+  "pebble": {
+    "sdkVersion": "3",
+    "resources": {
+      "media": [
+        {
+          "type": "bitmap",
+          "name": "SPANNER",
+          "file": "images/spanner.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "APP_ICON",
+          "file": "images/app_icon.png",
+          "menuIcon": true
+        }
+      ]
+    },
+    "projectType": "native",
+    "uuid": "5178c764-a688-449b-8521-e867281a3859",
+    "messageKeys": [
+      "LineIndex",
+      "LineType",
+      "LineStatus",
+      "LineReason",
+      "FlagIsComplete",
+      "FlagLineCount"
+    ],
+    "enableMultiJS": true,
+    "displayName": "Transit Status",
+    "watchapp": {
+      "onlyShownOnCommunication": false,
+      "hiddenApp": false,
+      "watchface": false
+    },
+    "targetPlatforms": [
+      "aplite",
+      "basalt",
+      "chalk",
+      "diorite",
+      "emery"
+    ],
+    "capabilities": []
+  }
+}

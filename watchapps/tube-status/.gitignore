@@ -7,3 +7,7 @@ node_modules
 assets
 pid
 ts-build
+
+# Allow multiple package.json builds
+package-lock.json
+package.json
