@@ -22,6 +22,7 @@
 
 static Window *s_window;
 static Layer *s_canvas_layer;
+// TODO: Most text can probably just be drawn to save some space
 static TextLayer
   *s_status_layer,
   *s_desc_layer,
@@ -234,36 +235,15 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   graphics_context_set_fill_color(ctx, GColorBlack);
   graphics_fill_rect(ctx, scl_grect(0, 160, 930, 120), 0, GCornerNone);
 
-  // Row dividers
-  graphics_context_set_stroke_color(ctx, GColorBlack);
-  graphics_context_set_stroke_width(ctx, DIV_W);
-  // Vertical
-  const int v_div_x = (PS_DISP_W / 2) - scl_x(40);
-  const int v_div_y = scl_y_pp({.o = 365, .e = 355});
-  const int v_div_h = scl_y_pp({.o = 465, .e = 470});
-  graphics_draw_line(
-    ctx,
-    GPoint(v_div_x, v_div_y),
-    GPoint(v_div_x, v_div_y + v_div_h)
-  );
-  // Horizontal below row 1
-  const int row_2_div_y = scl_y_pp({.o = 650, .e = 630});
-  graphics_draw_line(
-    ctx,
-    GPoint(0, row_2_div_y),
-    GPoint(PS_DISP_W - (ACTION_BAR_W), row_2_div_y)
-  );
-  // Horizontal below row 2
-  const int row_3_div_y = scl_y_pp({.o = 830, .e = 835});
-  graphics_draw_line(
-    ctx,
-    GPoint(0, row_3_div_y),
-    GPoint(PS_DISP_W - ACTION_BAR_W, row_3_div_y)
-  );
   // Actions BG
   graphics_context_set_fill_color(ctx, PBL_IF_COLOR_ELSE(GColorDarkCandyAppleRed, GColorLightGray));
-  GRect actions_rect = GRect(PS_DISP_W - ACTION_BAR_W, 0, ACTION_BAR_W, PS_DISP_H);
-  graphics_fill_rect(ctx, actions_rect, 0, GCornerNone);
+  GRect actions_rect = GRect(
+    PS_DISP_W - ACTION_BAR_W,
+    -10,
+    2 * ACTION_BAR_W,
+    scl_y_pp({.o = 730, .e = 720})
+  );
+  graphics_fill_rect(ctx, actions_rect, 5, GCornersAll);
 
   const int hint_x = PS_DISP_W - (HINT_W / 2);
 
@@ -287,15 +267,6 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   graphics_context_set_fill_color(ctx, GColorBlack);
   graphics_fill_rect(
     ctx, GRect(hint_x, menu_y, HINT_W, HINT_H),
-    3,
-    GCornersAll
-  );
-
-  // Log hint
-  const int log_y = ((5 * PS_DISP_H) / 6) - (HINT_H / 2);
-  graphics_context_set_fill_color(ctx, GColorBlack);
-  graphics_fill_rect(
-    ctx, GRect(hint_x, log_y, HINT_W, HINT_H),
     3,
     GCornersAll
   );
@@ -333,37 +304,43 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   graphics_draw_bitmap_in_rect(
     ctx,
     s_batt_bitmap,
-    GRect(scl_x(40), scl_y(390), ICON_SIZE, ICON_SIZE)
+    GRect(scl_x(40), scl_y(380), ICON_SIZE, ICON_SIZE)
   );
 #else
   // Use dedicated image
   graphics_draw_bitmap_in_rect(
     ctx,
     bitmaps_get(RESOURCE_ID_REMAINING),
-    GRect(scl_x(40), scl_y_pp({.o = 390, .e = 385}), ICON_SIZE, ICON_SIZE)
+    GRect(scl_x(40), scl_y_pp({.o = 380, .e = 375}), ICON_SIZE, ICON_SIZE)
    );
 #endif
   graphics_draw_bitmap_in_rect(
     ctx,
     bitmaps_get(RESOURCE_ID_RATE),
-    GRect(scl_x(530), scl_y_pp({.o = 390, .e = 385}), ICON_SIZE, ICON_SIZE)
+    GRect(scl_x(530), scl_y_pp({.o = 380, .e = 375}), ICON_SIZE, ICON_SIZE)
   );
 
   graphics_draw_bitmap_in_rect(
     ctx,
     bitmaps_get(RESOURCE_ID_LAST_CHARGE),
-    GRect(scl_x(30), scl_y_pp({.o = 665, .e = 670}), ICON_SIZE, ICON_SIZE)
+    GRect(scl_x(30), scl_y_pp({.o = 645, .e = 640}), ICON_SIZE, ICON_SIZE)
   );
   graphics_draw_bitmap_in_rect(
     ctx,
     bitmaps_get(RESOURCE_ID_NEXT_CHARGE),
-    GRect(scl_x(490), scl_y_pp({.o = 665, .e = 670}), ICON_SIZE, ICON_SIZE)
+    GRect(
+      scl_x_pp({.o = 480, .e = 490}),
+      scl_y_pp({.o = 645, .e = 640}),
+      ICON_SIZE,
+      ICON_SIZE
+    )
   );
 
+  // Current battery level
   graphics_draw_bitmap_in_rect(
     ctx,
     s_batt_bitmap,
-    GRect(scl_x(10), scl_y_pp({.o = 845, .e = 860}), ICON_SIZE, ICON_SIZE)
+    GRect(scl_x(10), scl_y_pp({.o = 800, .e = 800}), ICON_SIZE, ICON_SIZE)
   );
 
 #if defined(PBL_PLATFORM_APLITE)
@@ -385,9 +362,45 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   graphics_draw_bitmap_in_rect(
     ctx,
     bitmaps_get(RESOURCE_ID_READING),
-    GRect(scl_x_pp({.o = 435, .e = 455}), scl_y_pp({.o = 850, .e = 860}), ICON_SIZE, ICON_SIZE)
+    GRect(scl_x_pp({.o = 480, .e = 490}), scl_y(800), ICON_SIZE, ICON_SIZE)
    );
 #endif
+
+  graphics_context_set_stroke_color(ctx, GColorBlack);
+  graphics_context_set_stroke_width(ctx, DIV_W);
+  
+  // Vertical divider
+  const int v_div_x = (PS_DISP_W / 2) - scl_x(40);
+  const int v_div_y = scl_y_pp({.o = 365, .e = 355});
+  const int v_div_h = scl_y_pp({.o = 430, .e = 425});
+  graphics_draw_line(
+    ctx,
+    GPoint(v_div_x, v_div_y),
+    GPoint(v_div_x, v_div_y + v_div_h)
+  );
+  
+  // Horizontal divider below row 1
+  const int row_2_div_y = scl_y_pp({.o = 630, .e = 620});
+  graphics_draw_line(
+    ctx,
+    GPoint(0, row_2_div_y),
+    GPoint(PS_DISP_W - (ACTION_BAR_W), row_2_div_y)
+  );
+  
+  // Horizontal divider below row 2
+  const int row_3_div_y = scl_y_pp({.o = 790, .e = 780});
+  graphics_draw_line(
+    ctx,
+    GPoint(0, row_3_div_y),
+    GPoint(PS_DISP_W, row_3_div_y)
+  );
+
+  // Down hint
+  graphics_draw_bitmap_in_rect(
+    ctx,
+    bitmaps_get(RESOURCE_ID_DOWN),
+    scl_center_x(GRect(0, scl_y_pp({.o = 940, .e = 940}), 16, 9))
+  );
 }
 
 ////////////////////////////////////////////// Clicks //////////////////////////////////////////////
@@ -455,7 +468,7 @@ static void window_load(Window *window) {
 
   // Row 1
   int row_x = scl_x_pp({.o = 40, .e = 50});
-  int row_y = scl_y_pp({.o = 390, .e = 385});
+  int row_y = scl_y_pp({.o = 380, .e = 375});
   int text_ico_off = scl_x_pp({.o = 190, .e = 160});
   int text_y_off = scl_y_pp({.o = -40, .e = -20});
 
@@ -481,7 +494,7 @@ static void window_load(Window *window) {
 
   // Row 2
   row_x = scl_x(30);
-  row_y = scl_y_pp({.o = 665, .e = 670});
+  row_y = scl_y_pp({.o = 645, .e = 640});
   text_ico_off = scl_x_pp({.o = 120, .e = 120});
   text_y_off = scl_y_pp({.o = -35, .e = -25});
   
@@ -502,7 +515,7 @@ static void window_load(Window *window) {
 
   // Row 3
   row_x = scl_x(10);
-  row_y = scl_y_pp({.o = 845, .e = 860});
+  row_y = scl_y_pp({.o = 785, .e = 800});
   text_ico_off = scl_x_pp({.o = 160, .e = 150});
   text_y_off = scl_y_pp({.o = -30, .e = -20});
 
@@ -512,11 +525,10 @@ static void window_load(Window *window) {
   );
   layer_add_child(root_layer, text_layer_get_layer(s_battery_layer));
 
-  row_x += scl_x_pp({.o = 430, .e = 450});
+  row_x += scl_x_pp({.o = 470, .e = 480});
 
-  const int x_nudge = scl_x_pp({.o = 20, .e = 10});
   s_reading_layer = util_make_text_layer(
-    GRect(row_x + text_ico_off + x_nudge, row_y + text_y_off, PS_DISP_W, 100),
+    GRect(row_x + text_ico_off, row_y + text_y_off, PS_DISP_W, 100),
     scl_get_font(SFI_Medium)
   );
   layer_add_child(root_layer, text_layer_get_layer(s_reading_layer));

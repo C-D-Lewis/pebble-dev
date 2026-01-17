@@ -90,6 +90,11 @@
           "file": "images/next-charge.png"
         },
         {
+          "type": "bitmap",
+          "name": "DOWN",
+          "file": "images/down.png"
+        },
+        {
           "type": "font",
           "name": "GOTCHA_GOTHIC_30",
           "file": "fonts/Gotcha-Gothic.ttf"

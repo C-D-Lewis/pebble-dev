@@ -207,5 +207,5 @@ void log_window_push() {
     });
   }
 
-  window_stack_push(s_window, true);
+  window_stack_push(s_window, false);
 }
