@@ -1,5 +1,6 @@
 #include "data.h"
 
+static TransitSystemData s_transit_system_data[MAX_TRANSIT_SYSTEMS];
 static LineConfig s_line_configs[MAX_LINES];
 static LineData s_line_data[MAX_LINES];
 static int s_progress = 0;
@@ -9,6 +10,31 @@ void data_init() {
 }
 
 void data_deinit() {
+}
+
+void data_set_transit_system_data(int index, const char *name, const char *region) {
+  if (index < 0 || index >= MAX_TRANSIT_SYSTEMS) {
+    return;
+  }
+
+  TransitSystemData *transit_system_data = &s_transit_system_data[index];
+  transit_system_data->index = index;
+  snprintf(transit_system_data->name, sizeof(transit_system_data->name), "%s", name);
+  snprintf(transit_system_data->region, sizeof(transit_system_data->region), "%s", region);
+}
+
+char *data_get_transit_system_name(int index) {
+  if (index < 0 || index >= MAX_TRANSIT_SYSTEMS) {
+    return "";
+  }
+  return s_transit_system_data[index].name;
+}
+
+char *data_get_transit_system_region(int index) {
+  if (index < 0 || index >= MAX_TRANSIT_SYSTEMS) {
+    return "";
+  }
+  return s_transit_system_data[index].region;
 }
 
 void data_set_line_config(int index, const char *name, uint32_t color, bool striped) {

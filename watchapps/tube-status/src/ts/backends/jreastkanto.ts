@@ -10,7 +10,8 @@ interface SimpleLineStatus {
  */
 class JrEastKantoBackend extends TransitBackend {
     readonly id = 'jreastkanto';
-    readonly name = 'JR East Kanto';
+    readonly name = 'JR East';
+    readonly region = 'Kanto, Japan';
 
     private readonly baseUrl = 'https://traininfo.jreast.co.jp/train_info';
 

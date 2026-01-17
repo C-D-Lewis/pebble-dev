@@ -24,7 +24,8 @@ interface RouteIssue {
  */
 class NycMtaSubwayBackend extends TransitBackend {
     readonly id = 'nyc';
-    readonly name = 'NYC MTA Subway';
+    readonly name = 'MTA Subway';
+    readonly region = 'NYC, USA';
 
     private readonly apiUrl = 'https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/camsys%2Fsubway-alerts.json';
 

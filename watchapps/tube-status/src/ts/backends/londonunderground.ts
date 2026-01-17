@@ -15,7 +15,8 @@ type TfLApiResult = {
  */
 class LondonUndergroundBackend extends TransitBackend {
   readonly id = 'tfl';
-  readonly name = 'London Underground';
+  readonly name = 'TfL';
+  readonly region = 'London, UK';
 
   private readonly MODES = ['tube', 'dlr', 'elizabeth-line', 'overground'];
   private readonly apiUrl = `https://api.tfl.gov.uk/Line/Mode/${this.MODES.join(',')}/Status`;

@@ -20,7 +20,7 @@ static void select_click_handler(struct MenuLayer *menu_layer, MenuIndex *cell_i
 
 /********************************* MenuLayer **********************************/
 
-void draw_row_handler(GContext *ctx, const Layer *cell_layer, MenuIndex *cell_index, void *context) {
+static void draw_row_handler(GContext *ctx, const Layer *cell_layer, MenuIndex *cell_index, void *context) {
   GRect bounds = layer_get_bounds(cell_layer);
   int index = cell_index->row;
 
@@ -150,7 +150,7 @@ void draw_row_handler(GContext *ctx, const Layer *cell_layer, MenuIndex *cell_in
   graphics_fill_rect(ctx, GRect(bounds.origin.x, bounds.size.h - sep_h, bounds.size.w, sep_h), GCornerNone, 0);
 }
 
-uint16_t get_num_rows_handler(MenuLayer *menu_layer, uint16_t section_index, void *context) {
+static uint16_t get_num_rows_handler(MenuLayer *menu_layer, uint16_t section_index, void *context) {
   // Number of concern sent by JS plus one for 'all others are good' notice
   return data_get_lines_received() + 1;
 }

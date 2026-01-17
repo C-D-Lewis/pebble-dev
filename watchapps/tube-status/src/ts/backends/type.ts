@@ -35,6 +35,7 @@ export type LineStatus = {
 export abstract class TransitBackend {
   abstract readonly id: string;
   abstract readonly name: string;
+  abstract readonly region: string;
 
   protected abstract lineConfigs: LineConfig[];
   protected abstract lineIdToIndex: { [key: string]: number };

@@ -37,7 +37,11 @@
     "projectType": "native",
     "uuid": "5120531c-9d73-4852-b26d-3d3cee90d92a",
     "messageKeys": [
-      "FlagJSReady",
+      "Type",
+      "RequestAvailableTransitSystems",
+      "AvailableTransitSystemName",
+      "AvailableTransitSystemRegion",
+      "AvailableTransitSystemIndex",
       "RequestTransitSystem",
       "LineStatusIndex",
       "LineStatus",
