@@ -7,6 +7,9 @@
 
 #include "../config.h"
 #include "../windows/common/splash_window.h"
+#if defined(APP_VARIANT_TRANSIT_STATUS)
+#include "../windows/transit_status/transit_system_selection_window.h"
+#endif
 #include "../windows/rect/line_window.h"
 #include "../windows/round/line_window.h"
 #include "data.h"
@@ -17,3 +20,5 @@
 void comm_init();
 
 void comm_deinit();
+
+void comm_request_transit_system(int index);
