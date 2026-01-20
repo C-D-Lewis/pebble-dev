@@ -1,41 +1,24 @@
 #include "menu_window.h"
 
-#define MIN_SAMPLES_FOR_GRAPH 4
-
 static Window *s_window;
 static MenuLayer *s_menu_layer;
 
 typedef enum {
-  MI_GRAPH = 0,
+  MI_SETTINGS = 0,
   MI_BATTERY_TIPS,
   MI_INFORMATION,
-  MI_SETTINGS,
 
   MI_MAX,
 } MenuItems;
-
-static bool graph_is_available() {
-  return data_get_log_length() >= MIN_SAMPLES_FOR_GRAPH;
-}
 
 static uint16_t get_num_rows_callback(MenuLayer *menu_layer, uint16_t section_index, void *context) {
   return MI_MAX;
 }
 
 static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_index, void *context) {
-  // Graph availability after 4 samples
-  const bool graph_valid = graph_is_available();
-  static char s_graph_buff[22];
-  snprintf(s_graph_buff, sizeof(s_graph_buff), "Awaiting %d samples...", MIN_SAMPLES_FOR_GRAPH);
-
   switch(cell_index->row) {
-    case MI_GRAPH:
-      util_menu_cell_draw(
-        ctx,
-        cell_layer,
-        "Log graph",
-        graph_valid ? NULL : s_graph_buff
-      );
+    case MI_SETTINGS:
+      util_menu_cell_draw(ctx, cell_layer, "Settings", NULL);
       break;
     case MI_BATTERY_TIPS:
       util_menu_cell_draw(ctx, cell_layer, "Battery tips", NULL);
@@ -43,39 +26,24 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
     case MI_INFORMATION:
       util_menu_cell_draw(ctx, cell_layer, "Information", NULL);
       break;
-    case MI_SETTINGS:
-      util_menu_cell_draw(ctx, cell_layer, "Settings", NULL);
-      break;
     default: break;
   }
 }
 
 static int16_t get_cell_height_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) {
-  switch(cell_index->row) {
-    case MI_GRAPH:
-      return graph_is_available() ? ROW_HEIGHT_SMALL : ROW_HEIGHT_LARGE;
-    default:
-      return ROW_HEIGHT_SMALL;
-  }
+  return ROW_HEIGHT_SMALL;
 }
 
 static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) {
   switch(cell_index->row) {
-    case MI_GRAPH: {
-      if (graph_is_available()) {
-        graph_window_push();
-      } else {
-        vibes_double_pulse();
-      }
-    } break;
+    case MI_SETTINGS:
+      settings_window_push();
+      break;
     case MI_BATTERY_TIPS:
       message_window_push(MSG_TIPS, false, false);
       break;
     case MI_INFORMATION:
       message_window_push(MSG_INFORMATION, false, false);
-      break;
-    case MI_SETTINGS:
-      settings_window_push();
       break;
     default: break;
   }

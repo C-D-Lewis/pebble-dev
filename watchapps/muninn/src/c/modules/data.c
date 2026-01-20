@@ -93,11 +93,11 @@ static void test_data_generator() {
   // const int changes[NUM_SAMPLES] = {2, 2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
   //
   // 2 - Test case: Should show 10 days at 8% per day (from 80%)
-  // const int changes[NUM_SAMPLES] = {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
+  const int changes[NUM_SAMPLES] = {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
   //
   // 3 - Test case: Should show 11 days at 7% (two other events are ignored)
   //     Note: includes the two special statuses
-  const int changes[NUM_SAMPLES] = {-20, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
+  // const int changes[NUM_SAMPLES] = {-20, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
   //
   // 4 - Test case: Should show 6 days at 12% per day (from 80%)
   // const int changes[NUM_SAMPLES] = {3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
@@ -115,7 +115,10 @@ static void test_data_generator() {
   // const int changes[NUM_SAMPLES] = {0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0};
   //
   // 7 - Test case: Big charge half way through
-  // const int changes[NUM_SAMPLES] = {3, 0, 3, 3, 0, 3, 3, 3, -30, 3, 3, 3, 3, 3, 3, 3};
+  // const int changes[NUM_SAMPLES] = {3, 0, 3, 3, 0, 3, 3, 3, -30, 3, 3, 3, 3, 3, 3, 3;
+  //
+  // 8 - Test case: Should show graph with minimum points
+  // const int changes[NUM_SAMPLES] = {3, 1, 2, 3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
 
   int total_change = 0;
   for(int i = 0; i < NUM_SAMPLES; i++) {

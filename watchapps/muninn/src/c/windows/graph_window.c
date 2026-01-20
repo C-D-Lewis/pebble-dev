@@ -1,9 +1,8 @@
 #include "log_window.h"
 
-#define GRAPH_MARGIN scl_x(100)
-#define GRAPH_W scl_x(900)
+#define GRAPH_MARGIN scl_x(65)
+#define GRAPH_W scl_x_pp({.o = 890, .e = 880})
 #define GRAPH_H scl_y(550)
-#define AXIS_S scl_x(10)
 #define NOTCH_S scl_x(35)
 
 // Not scaled
@@ -34,14 +33,43 @@ static void anim_update(Animation *anim, AnimationProgress dist_normalized) {
 
 ////////////////////////////////////////////// Layout //////////////////////////////////////////////
 
+static bool graph_is_available() {
+  return data_get_log_length() >= MIN_SAMPLES_FOR_GRAPH;
+}
+
 static char* get_exp_sign(int acc) {
   if (acc == 0) return "=";
   return acc > 0 ? ">" : "<";
 }
 
 static void canvas_update_proc(Layer *layer, GContext *ctx) {
+  // Button hints
+  util_draw_button_hints(ctx, (bool[3]){false, true, false});
+
   graphics_context_set_fill_color(ctx, GColorBlack);
   graphics_context_set_text_color(ctx, GColorBlack);
+
+  // Title underline
+  graphics_fill_rect(
+    ctx,
+    GRect(0, scl_y(110), PS_DISP_W - ACTION_BAR_W, LINE_W),
+    0,
+    GCornerNone
+  );
+
+  // No data?
+  if (!graph_is_available()) {
+    graphics_draw_text(
+      ctx,
+      "Not yet collected enough data.\n\nCome back soon!",
+      scl_get_font(SFI_Medium),
+      GRect(10, scl_y(250), PS_DISP_W - ACTION_BAR_W - 20, 300),
+      GTextOverflowModeWordWrap,
+      GTextAlignmentCenter,
+      NULL
+    );
+    return;
+  }
 
 #if !defined(PBL_PLATFORM_APLITE)
   const int count = util_is_animating() ? s_anim_count : data_get_log_length();
@@ -70,7 +98,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
 
   // Draw Y and X axes
   graphics_context_set_stroke_color(ctx, GColorBlack);
-  graphics_context_set_stroke_width(ctx, AXIS_S);
+  graphics_context_set_stroke_width(ctx, LINE_W);
   graphics_draw_line(ctx, GPoint(GRAPH_MARGIN, root_y), GPoint(GRAPH_MARGIN, root_y + GRAPH_H));
   graphics_draw_line(ctx, GPoint(GRAPH_MARGIN, root_y + GRAPH_H), GPoint(max_x, root_y + GRAPH_H));
 
@@ -134,7 +162,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     graphics_context_set_stroke_width(ctx, 1);
     graphics_context_set_stroke_color(ctx, GColorBlack);
 
-    if (idx + 1 < count) {
+    if (idx + 1 <= count) {
       // The next oldest sample is idx + 1
       const Sample *prev_s = data_get_sample(idx + 1);
 
@@ -229,6 +257,10 @@ static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
   layer_mark_dirty(s_canvas_layer);
 }
 
+static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
+  log_window_push();
+}
+
 static void down_click_handler(ClickRecognizerRef recognizer, void *context) {
   if (s_selection > 0) s_selection--;
 
@@ -236,8 +268,9 @@ static void down_click_handler(ClickRecognizerRef recognizer, void *context) {
 }
 
 static void click_config_provider(void *context) {
-  window_single_click_subscribe(BUTTON_ID_DOWN, down_click_handler);
   window_single_click_subscribe(BUTTON_ID_UP, up_click_handler);
+  window_single_click_subscribe(BUTTON_ID_SELECT, select_click_handler);
+  window_single_click_subscribe(BUTTON_ID_DOWN, down_click_handler);
 }
 
 static void main_window_load(Window *window) {
@@ -245,40 +278,43 @@ static void main_window_load(Window *window) {
   GRect bounds = layer_get_bounds(root_layer);
 
   s_header_layer = util_make_text_layer(
-    GRect(0, scl_y_pp({.o = -50, .e = -30}), bounds.size.w, 100),
-    scl_get_font(SFI_Medium)
+    GRect(0, scl_y(-30), PS_DISP_W - ACTION_BAR_W, 100),
+    scl_get_font(SFI_Small)
   );
   text_layer_set_text(s_header_layer, "Log Graph");
   text_layer_set_text_alignment(s_header_layer, GTextAlignmentCenter);
   layer_add_child(root_layer, text_layer_get_layer(s_header_layer));
 
   s_canvas_layer = layer_create(
-    GRect(0, 0, bounds.size.w, bounds.size.h)
+    GRect(0, 0, PS_DISP_W, bounds.size.h)
   );
   layer_set_update_proc(s_canvas_layer, canvas_update_proc);
   layer_add_child(root_layer, s_canvas_layer);
 
   s_desc_layer = util_make_text_layer(
-    GRect(scl_x(50), scl_y(860), bounds.size.w, 100),
+    GRect(scl_x(50), scl_y(860), PS_DISP_W, 100),
     scl_get_font(SFI_Small)
   );
-  const int acc = data_calculate_accuracy();
-  static char s_desc_buff[48];
-  snprintf(
-    s_desc_buff,
-    sizeof(s_desc_buff),
-#if defined(PBL_PLATFORM_EMERY)
-    "Trend: %s%d%% (%s expected)",
-#else
-    "Trend: %s%d%% (%s expctd.)",
-#endif
-    acc >= 0 ? "+" : "",
-    acc,
-    get_exp_sign(acc)
-  );
-  text_layer_set_text(s_desc_layer, s_desc_buff);
   text_layer_set_overflow_mode(s_desc_layer, GTextOverflowModeWordWrap);
-  layer_add_child(root_layer, text_layer_get_layer(s_desc_layer));
+  layer_add_child(root_layer, text_layer_get_layer(s_desc_layer));;
+
+  if (graph_is_available()) {
+    const int acc = data_calculate_accuracy();
+    static char s_desc_buff[48];
+    snprintf(
+      s_desc_buff,
+      sizeof(s_desc_buff),
+#if defined(PBL_PLATFORM_EMERY)
+      "Trend: %s%d%% (%s expected)",
+#else
+      "Trend: %s%d%% (%s expd.)",
+#endif
+      acc >= 0 ? "+" : "",
+      acc,
+      get_exp_sign(acc)
+    );
+    text_layer_set_text(s_desc_layer, s_desc_buff);
+  }
 }
 
 static void window_unload(Window *window) {
@@ -300,12 +336,12 @@ static void window_disappear(Window *window) {
 void graph_window_push() {
   if (!s_window) {
     s_window = window_create();
+    window_set_click_config_provider(s_window, click_config_provider);
     window_set_window_handlers(s_window, (WindowHandlers) {
       .load = main_window_load,
       .unload = window_unload,
       .disappear = window_disappear
     });
-    window_set_click_config_provider(s_window, click_config_provider);
   }
 
   window_stack_push(s_window, true);

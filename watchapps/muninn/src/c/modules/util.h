@@ -27,6 +27,8 @@ void util_draw_braid(GContext *ctx, GRect rect);
 
 void util_menu_cell_draw(GContext *ctx, Layer *layer, char *title, char *desc);
 
+void util_draw_button_hints(GContext *ctx, bool hints[3]);
+
 #if !defined(PBL_PLATFORM_APLITE)
 void util_animate(int duration, int delay, AnimationImplementation *implementation, bool handlers);
 

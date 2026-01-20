@@ -1,8 +1,8 @@
 #include "log_window.h"
 
-#define ROW_HEIGHT scl_y(410)
-#define DIV_Y scl_y(125)
-#define MENU_INSET scl_y(135)
+#define ROW_HEIGHT scl_y(390)
+#define DIV_Y scl_y_pp({.o = 115, .e = 105})
+#define MENU_INSET scl_y(110)
 
 // Extra precision needed
 #if defined(PBL_PLATFORM_EMERY)
@@ -12,8 +12,19 @@
 #endif
 
 static Window *s_window;
+static Layer *s_canvas_layer;
 static TextLayer *s_header_layer;
 static MenuLayer *s_menu_layer;
+
+static void canvas_update_proc(Layer *layer, GContext *ctx) {
+  // Title underline
+  graphics_fill_rect(
+    ctx,
+    GRect(0, scl_y(110), PS_DISP_W, LINE_W),
+    0,
+    GCornerNone
+  );
+}
 
 static void draw_changes(GContext *ctx, const GRect bounds, const Sample *s) {
   // Adjust timestamp back by a minute so it's within the interval
@@ -30,7 +41,7 @@ static void draw_changes(GContext *ctx, const GRect bounds, const Sample *s) {
     ctx,
     s_lst_buff,
     scl_get_font(SFI_Medium),
-    GRect(scl_x(20), scl_y_pp({.o = 100, .e = 110}), PS_DISP_W, 100),
+    GRect(scl_x(20), scl_y_pp({.o = 90, .e = 100}), PS_DISP_W, 100),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentLeft,
     NULL
@@ -43,7 +54,7 @@ static void draw_changes(GContext *ctx, const GRect bounds, const Sample *s) {
     ctx,
     s_lcp_buff,
     scl_get_font(SFI_Medium),
-    GRect(scl_x(20), scl_y_pp({.o = 210, .e = 220}), PS_DISP_W, 100),
+    GRect(scl_x(20), scl_y_pp({.o = 200, .e = 210}), PS_DISP_W, 100),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentLeft,
     NULL
@@ -56,7 +67,7 @@ static void draw_changes(GContext *ctx, const GRect bounds, const Sample *s) {
     ctx,
     s_ts_diff_buff,
     scl_get_font(SFI_Medium),
-    GRect(0, scl_y_pp({.o = 100, .e = 110}), scl_x(980), 100),
+    GRect(0, scl_y_pp({.o = 90, .e = 100}), scl_x(980), 100),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentRight,
     NULL
@@ -68,7 +79,7 @@ static void draw_changes(GContext *ctx, const GRect bounds, const Sample *s) {
     ctx,
     s_perc_diff_buff,
     scl_get_font(SFI_Medium),
-    GRect(0, scl_y_pp({.o = 210, .e = 220}), scl_x(980), 100),
+    GRect(0, scl_y_pp({.o = 200, .e = 210}), scl_x(980), 100),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentRight,
     NULL
@@ -91,19 +102,14 @@ static void draw_result_and_datetime(GContext *ctx, const GRect bounds, const Sa
   } else if (s->result == STATUS_CHARGED) {
     snprintf(s_result_buff, sizeof(s_result_buff), "Charged up");
   } else {
-    snprintf(
-      s_result_buff,
-      sizeof(s_result_buff),
-      "Est: %d%%/d",
-      s->result
-    );
+    snprintf(s_result_buff, sizeof(s_result_buff), "Discharged");
   }
 
   graphics_draw_text(
     ctx,
     s_datetime_buff,
-    scl_get_font(SFI_Medium),
-    GRect(scl_x(20), scl_y_pp({.o = -50, .e = -30}), PS_DISP_W, 100),
+    scl_get_font(SFI_Small),
+    GRect(scl_x(20), scl_y(-25), PS_DISP_W, 100),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentLeft,
     NULL
@@ -111,8 +117,8 @@ static void draw_result_and_datetime(GContext *ctx, const GRect bounds, const Sa
   graphics_draw_text(
     ctx,
     s_result_buff,
-    scl_get_font(SFI_Medium),
-    GRect(0, scl_y_pp({.o = -50, .e = -30}), scl_x(980), 100),
+    scl_get_font(SFI_Small),
+    GRect(0, scl_y(-25), scl_x(980), 100),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentRight,
     NULL
@@ -162,12 +168,13 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
 }
 
 static void main_window_load(Window *window) {
-  Layer *window_layer = window_get_root_layer(window);
-  GRect bounds = layer_get_bounds(window_layer);
+  Layer *root_layer = window_get_root_layer(window);
+  GRect bounds = layer_get_bounds(root_layer);
 
-  const GRect header_rect = GRect(0, scl_y_pp({.o = -40, .e = -20}), PS_DISP_W, 100);
-
-  s_header_layer = util_make_text_layer(header_rect, scl_get_font(SFI_Medium));
+  s_header_layer = util_make_text_layer(
+    GRect(0, scl_y_pp({.o = -30, .e = -20}), PS_DISP_W, 100),
+    scl_get_font(SFI_Small)
+  );
   static char s_header_buff[17];
   snprintf(
     s_header_buff,
@@ -178,7 +185,7 @@ static void main_window_load(Window *window) {
   );
   text_layer_set_text(s_header_layer, s_header_buff);
   text_layer_set_text_alignment(s_header_layer, GTextAlignmentCenter);
-  layer_add_child(window_layer, text_layer_get_layer(s_header_layer));
+  layer_add_child(root_layer, text_layer_get_layer(s_header_layer));
 
   s_menu_layer = menu_layer_create(grect_inset(bounds, GEdgeInsets(MENU_INSET, 0, 0, 0)));
   menu_layer_set_click_config_onto_window(s_menu_layer, window);
@@ -187,10 +194,15 @@ static void main_window_load(Window *window) {
     .draw_row = (MenuLayerDrawRowCallback)draw_row_callback,
     .get_cell_height = (MenuLayerGetCellHeightCallback)get_cell_height_callback
   });
-  layer_add_child(window_layer, menu_layer_get_layer(s_menu_layer));
+  layer_add_child(root_layer, menu_layer_get_layer(s_menu_layer));
+
+  s_canvas_layer = layer_create(bounds);
+  layer_set_update_proc(s_canvas_layer, canvas_update_proc);
+  layer_add_child(root_layer, s_canvas_layer);
 }
 
 static void window_unload(Window *window) {
+  layer_destroy(s_canvas_layer);
   text_layer_destroy(s_header_layer);
   menu_layer_destroy(s_menu_layer);
 

@@ -199,6 +199,58 @@ void util_menu_cell_draw(GContext *ctx, Layer *layer, char *title, char *desc) {
   }
 }
 
+void util_draw_button_hints(GContext *ctx, bool hints[3]) {
+  // Actions BG
+  graphics_context_set_fill_color(ctx, PBL_IF_COLOR_ELSE(GColorDarkCandyAppleRed, GColorLightGray));
+  GRect actions_rect = GRect(PS_DISP_W - ACTION_BAR_W, 0, ACTION_BAR_W, PS_DISP_H);
+  graphics_fill_rect(ctx, actions_rect, 0, GCornerNone);
+
+  const int hint_x = PS_DISP_W - (HINT_W / 2);
+
+  if (hints[0]) {
+    // Top hint
+    const int top_y = PS_DISP_H / 6 - (HINT_H / 2);
+    graphics_context_set_fill_color(ctx, GColorBlack);
+    graphics_fill_rect(
+      ctx, GRect(hint_x, top_y, HINT_W, HINT_H),
+      3,
+      GCornersAll
+    );
+
+    // TODO: Ugly, can't configure long press emphasis but only used in one place for now.
+    graphics_context_set_fill_color(ctx, GColorWhite);
+    const GPoint select_center = {
+      .x = hint_x + (HINT_W / 2),
+      .y = top_y + (HINT_H / 2)
+    };
+    graphics_fill_circle(ctx, select_center, scl_x(20));
+  }
+
+  if (hints[1]) {
+    // Middle hint
+    const int middle_y = (PS_DISP_H / 2) - (HINT_H / 2);
+    graphics_context_set_fill_color(ctx, GColorBlack);
+    graphics_fill_rect(
+      ctx, GRect(hint_x, middle_y, HINT_W, HINT_H),
+      3,
+      GCornersAll
+    );
+  }
+
+  if (hints[2]) {
+    // Bottom hint
+    const int bottom_y = ((5 * PS_DISP_H) / 6) - (HINT_H / 2);
+    graphics_context_set_fill_color(ctx, GColorBlack);
+    graphics_fill_rect(
+      ctx, GRect(hint_x, bottom_y, HINT_W, HINT_H),
+      3,
+      GCornersAll
+    );
+  }
+}
+
+////////////////////////////////////////// Animation Utils /////////////////////////////////////////
+
 #if !defined(PBL_PLATFORM_APLITE)
 static Animation *s_animation;
 static bool s_animating; // For now, we can assume only one is every active

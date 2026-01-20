@@ -8,4 +8,6 @@
 #include "../modules/util.h"
 #include "../modules/scalable.h"
 
+#include "log_window.h"
+
 void graph_window_push();

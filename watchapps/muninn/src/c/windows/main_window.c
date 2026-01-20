@@ -15,10 +15,7 @@
   #define ICON_SIZE 24
 #endif
 
-#define ACTION_BAR_W scl_x(70)
 #define BRAID_Y scl_y_pp({.o = 280, .e = 275})
-#define HINT_W scl_x(70)
-#define HINT_H scl_y(200)
 
 static Window *s_window;
 static Layer *s_canvas_layer;
@@ -230,13 +227,10 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   const GRect braid_rect = GRect(0, BRAID_Y, PS_DISP_W - ACTION_BAR_W, BRAID_H);
   util_draw_braid(ctx, braid_rect);
 
-  // Status BG
-  graphics_context_set_fill_color(ctx, GColorBlack);
-  graphics_fill_rect(ctx, scl_grect(0, 160, 930, 120), 0, GCornerNone);
-
   // Row dividers
   graphics_context_set_stroke_color(ctx, GColorBlack);
   graphics_context_set_stroke_width(ctx, DIV_W);
+
   // Vertical
   const int v_div_x = (PS_DISP_W / 2) - scl_x(40);
   const int v_div_y = scl_y_pp({.o = 365, .e = 355});
@@ -246,6 +240,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     GPoint(v_div_x, v_div_y),
     GPoint(v_div_x, v_div_y + v_div_h)
   );
+
   // Horizontal below row 1
   const int row_2_div_y = scl_y_pp({.o = 650, .e = 630});
   graphics_draw_line(
@@ -253,6 +248,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     GPoint(0, row_2_div_y),
     GPoint(PS_DISP_W - (ACTION_BAR_W), row_2_div_y)
   );
+
   // Horizontal below row 2
   const int row_3_div_y = scl_y_pp({.o = 830, .e = 835});
   graphics_draw_line(
@@ -260,45 +256,12 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     GPoint(0, row_3_div_y),
     GPoint(PS_DISP_W - ACTION_BAR_W, row_3_div_y)
   );
-  // Actions BG
-  graphics_context_set_fill_color(ctx, PBL_IF_COLOR_ELSE(GColorDarkCandyAppleRed, GColorLightGray));
-  GRect actions_rect = GRect(PS_DISP_W - ACTION_BAR_W, 0, ACTION_BAR_W, PS_DISP_H);
-  graphics_fill_rect(ctx, actions_rect, 0, GCornerNone);
 
-  const int hint_x = PS_DISP_W - (HINT_W / 2);
-
-  // Enable hint
-  const int enable_y = PS_DISP_H / 6 - (HINT_H / 2);
+  // Status BG
   graphics_context_set_fill_color(ctx, GColorBlack);
-  graphics_fill_rect(
-    ctx, GRect(hint_x, enable_y, HINT_W, HINT_H),
-    3,
-    GCornersAll
-  );
-  graphics_context_set_fill_color(ctx, GColorWhite);
-  const GPoint select_center = {
-    .x = hint_x + (HINT_W / 2),
-    .y = enable_y + (HINT_H / 2)
-  };
-  graphics_fill_circle(ctx, select_center, scl_x(20));
+  graphics_fill_rect(ctx, scl_grect(0, 160, 930, 120), 0, GCornerNone);
 
-  // Menu hint
-  const int menu_y = (PS_DISP_H / 2) - (HINT_H / 2);
-  graphics_context_set_fill_color(ctx, GColorBlack);
-  graphics_fill_rect(
-    ctx, GRect(hint_x, menu_y, HINT_W, HINT_H),
-    3,
-    GCornersAll
-  );
-
-  // Log hint
-  const int log_y = ((5 * PS_DISP_H) / 6) - (HINT_H / 2);
-  graphics_context_set_fill_color(ctx, GColorBlack);
-  graphics_fill_rect(
-    ctx, GRect(hint_x, log_y, HINT_W, HINT_H),
-    3,
-    GCornersAll
-  );
+  util_draw_button_hints(ctx, (bool[3]){true, true, true});
 
   // Mascot
   if (s_mascot_bitmap != NULL) {
@@ -392,7 +355,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
 
 ////////////////////////////////////////////// Clicks //////////////////////////////////////////////
 
-static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
+static void up_long_click_handler(ClickRecognizerRef recognizer, void *context) {
   const bool should_enable = !util_is_not_status(data_get_wakeup_id());
   if (should_enable) {
     s_blink_budget = 5;
@@ -408,24 +371,17 @@ static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
 }
 
 static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
-  menu_window_push();
-}
-
-static void down_click_handler(ClickRecognizerRef recognizer, void *context) {
-  log_window_push();
-}
-
-static void down_long_click_handler(ClickRecognizerRef recognizer, void *context) {
   graph_window_push();
 }
 
+static void down_click_handler(ClickRecognizerRef recognizer, void *context) {
+  menu_window_push();
+}
+
 static void click_config_provider(void *context) {
-  window_long_click_subscribe(BUTTON_ID_UP, 1000, up_click_handler, NULL);
+  window_long_click_subscribe(BUTTON_ID_UP, 1000, up_long_click_handler, NULL);
   window_single_click_subscribe(BUTTON_ID_SELECT, select_click_handler);
   window_single_click_subscribe(BUTTON_ID_DOWN, down_click_handler);
-
-  // Debugging info
-  window_long_click_subscribe(BUTTON_ID_DOWN, 3000, down_long_click_handler, NULL);
 }
 
 ////////////////////////////////////////////// Window //////////////////////////////////////////////
@@ -484,7 +440,7 @@ static void window_load(Window *window) {
   row_y = scl_y_pp({.o = 665, .e = 670});
   text_ico_off = scl_x_pp({.o = 120, .e = 120});
   text_y_off = scl_y_pp({.o = -35, .e = -25});
-  
+
   const int text_ico_nudge = scl_x_pp({.o = 60, .e = 40});
   s_last_charge_layer = util_make_text_layer(
     GRect(row_x + text_ico_off + text_ico_nudge, row_y + text_y_off, PS_DISP_W, 100),

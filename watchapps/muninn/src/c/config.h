@@ -17,16 +17,27 @@
 #define VERSION "1.19.0"
 // Minimum samples before providing estimations
 #define MIN_SAMPLES 2
+// Min samples before graph is shown
+#define MIN_SAMPLES_FOR_GRAPH 4
 // Maximum number of extra minutes if a collision
 #define EXTRA_MINUTES_MAX 10
 // Multipler for elevated rate alarm
 #define EVEVATED_RATE_MULT 3
 // Minimum negative charge_diff to count as charging
 #define MIN_CHARGE_AMOUNT 10
+
 // MenuLayer single row height
 #define ROW_HEIGHT_SMALL scl_y(220)
 // MenuLayer two row height
 #define ROW_HEIGHT_LARGE scl_y(300)
+// Action bar width
+#define ACTION_BAR_W scl_x(70)
+// Action bar hint width
+#define HINT_W scl_x(70)
+// Action bar hint height
+#define HINT_H scl_y(200)
+// Line width
+#define LINE_W scl_x(10)
 
 ///////////// Testing area ////////////////
 //                                       //
