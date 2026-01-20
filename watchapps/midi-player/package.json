@@ -1,0 +1,42 @@
+{
+  "name": "midi-player",
+  "version": "1.0.0",
+  "author": "Chris Lewis",
+  "private": true,
+  "dependencies": {
+    "pebble-scalable": "^2.0.0"
+  },
+  "devDependencies": {
+  },
+  "keywords": [
+    "pebble-app"
+  ],
+  "pebble": {
+    "sdkVersion": "3",
+    "resources": {
+      "media": [
+        {
+          "type": "bitmap",
+          "name": "APP_ICON",
+          "file": "images/app_icon.png",
+          "menuIcon": true
+        }
+      ]
+    },
+    "projectType": "native",
+    "uuid": "f4250383-7868-41a9-b0d8-7ae6a134f08a",
+    "messageKeys": [
+    ],
+    "enableMultiJS": true,
+    "displayName": "MIDI Player",
+    "watchapp": {
+      "onlyShownOnCommunication": false,
+      "hiddenApp": false,
+      "watchface": false
+    },
+    "targetPlatforms": [
+      "emery"
+    ],
+    "capabilities": []
+  }
+}
