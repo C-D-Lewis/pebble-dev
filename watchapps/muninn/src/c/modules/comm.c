@@ -25,7 +25,7 @@ void inbox_received_handler(DictionaryIterator *iter, void *context) {
       comm_push_timeline_pins();
     }
 
-    comm_get_last_timestamp();
+    // comm_get_last_timestamp();
     return;
   }
 
@@ -64,6 +64,8 @@ void comm_push_timeline_pins() {
 
   DictionaryIterator *iter;
   app_message_outbox_begin(&iter);
+  Tuplet push_tuple = TupletInteger(MESSAGE_KEY_PUSH_PIN, 1);
+  dict_write_tuplet(iter, &push_tuple);
   Tuplet days_tuple = TupletInteger(MESSAGE_KEY_DAYS_REMAINING, days);
   dict_write_tuplet(iter, &days_tuple);
   Tuplet rate_tuple = TupletInteger(MESSAGE_KEY_DISCHARGE_RATE, rate);

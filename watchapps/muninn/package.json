@@ -1,7 +1,7 @@
 {
   "name": "muninn",
   "author": "Chris Lewis",
-  "version": "1.19.0",
+  "version": "1.20.0",
   "_note": "Also update config.h & check Aplite!",
   "private": true,
   "keywords": [

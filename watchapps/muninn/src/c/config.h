@@ -14,7 +14,7 @@
 ///////////////////////////////////////////
 
 // MUST match package.json
-#define VERSION "1.19.0"
+#define VERSION "1.20.0"
 // Minimum samples before providing estimations
 #define MIN_SAMPLES 2
 // Min samples before graph is shown

@@ -94,13 +94,13 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   graphics_context_set_fill_color(ctx, GColorBlack);
   graphics_fill_rect(
     ctx,
-    GRect(GRAPH_MARGIN - LINE_W / 2, root_y, LINE_W, GRAPH_H),
+    GRect(GRAPH_MARGIN, root_y, LINE_W, GRAPH_H),
     0,
     GCornerNone
   );
   graphics_fill_rect(
     ctx,
-    GRect(GRAPH_MARGIN, root_y + GRAPH_H - LINE_W / 2, max_x - GRAPH_MARGIN, LINE_W),
+    GRect(GRAPH_MARGIN, root_y + GRAPH_H, max_x - GRAPH_MARGIN + LINE_W, LINE_W),
     0,
     GCornerNone
   );
@@ -344,7 +344,6 @@ static void window_unload(Window *window) {
   window_destroy(window);
   s_window = NULL;
 }
-
 
 static void window_disappear(Window *window) {
 #if !defined(PBL_PLATFORM_APLITE)

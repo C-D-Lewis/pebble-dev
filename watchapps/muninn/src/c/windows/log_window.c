@@ -175,15 +175,7 @@ static void main_window_load(Window *window) {
     GRect(0, scl_y_pp({-30, .e = -25}), PS_DISP_W, 100),
     scl_get_font(SFI_Small)
   );
-  static char s_header_buff[17];
-  snprintf(
-    s_header_buff,
-    sizeof(s_header_buff),
-    "History (%d/%d)",
-    data_get_log_length(),
-    NUM_SAMPLES
-  );
-  text_layer_set_text(s_header_layer, s_header_buff);
+  text_layer_set_text(s_header_layer, "Recent samples");
   text_layer_set_text_alignment(s_header_layer, GTextAlignmentCenter);
   layer_add_child(root_layer, text_layer_get_layer(s_header_layer));
 
