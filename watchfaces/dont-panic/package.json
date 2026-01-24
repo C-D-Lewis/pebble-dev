@@ -1,0 +1,41 @@
+{
+  "version": "1.0.0",
+  "author": "Chris Lewis",
+  "private": true,
+  "keywords": [
+    "pebble-app"
+  ],
+  "pebble": {
+    "sdkVersion": "3",
+    "resources": {
+      "media": [
+        {
+          "type": "png",
+          "name": "BACKGROUND",
+          "file": "images/background.png"
+        },
+        {
+          "type": "font",
+          "name": "ABSENDER_64",
+          "file": "fonts/absender.ttf"
+        }
+      ]
+    },
+    "projectType": "native",
+    "uuid": "e1886c59-5b71-4b00-959c-424242424242",
+    "messageKeys": {
+    },
+    "enableMultiJS": true,
+    "displayName": "dont-panic",
+    "watchapp": {
+      "onlyShownOnCommunication": false,
+      "hiddenApp": false,
+      "watchface": true
+    },
+    "targetPlatforms": [
+      "emery"
+    ],
+    "capabilities": []
+  },
+  "name": "dont-panic"
+}
