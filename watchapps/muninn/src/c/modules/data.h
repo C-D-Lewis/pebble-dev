@@ -65,6 +65,7 @@ typedef struct {
   int rate;             //
 
   // Saved per sample, adding new fields okay
+  // NOTE: Consider how to handle (& if needed) in JS model
 } Sample;
 
 // Methods

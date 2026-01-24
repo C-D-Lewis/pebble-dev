@@ -4,13 +4,11 @@
 #if defined(PBL_PLATFORM_EMERY)
   #define MASCOT_SIZE 30
   #define EYE_RECT GRect(28, 11, 4, 4)
-  #define DIV_W 2
   #define BRAID_H 18
   #define ICON_SIZE 28
 #else
   #define MASCOT_SIZE 24
   #define EYE_RECT GRect(20, 7, 4, 4)
-  #define DIV_W 1
   #define BRAID_H 14
   #define ICON_SIZE 24
 #endif
@@ -210,6 +208,7 @@ static void update_data() {
     // Next reading
     static char s_wakeup_buff[8];
     util_fmt_time(wakeup_ts, &s_wakeup_buff[0], sizeof(s_wakeup_buff));
+    // text_layer_set_text(s_reading_layer, "22:00");
     text_layer_set_text(s_reading_layer, s_wakeup_buff);
   }
 
@@ -229,7 +228,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
 
   // Row dividers
   graphics_context_set_stroke_color(ctx, GColorBlack);
-  graphics_context_set_stroke_width(ctx, DIV_W);
+  graphics_context_set_stroke_width(ctx, LINE_W);
 
   // Vertical
   const int v_div_x = (PS_DISP_W / 2) - scl_x(40);
@@ -320,7 +319,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   graphics_draw_bitmap_in_rect(
     ctx,
     bitmaps_get(RESOURCE_ID_NEXT_CHARGE),
-    GRect(scl_x(490), scl_y_pp({.o = 665, .e = 670}), ICON_SIZE, ICON_SIZE)
+    GRect(scl_x_pp({.o = 480, .e = 490}), scl_y_pp({.o = 665, .e = 670}), ICON_SIZE, ICON_SIZE)
   );
 
   graphics_draw_bitmap_in_rect(
@@ -348,7 +347,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   graphics_draw_bitmap_in_rect(
     ctx,
     bitmaps_get(RESOURCE_ID_READING),
-    GRect(scl_x_pp({.o = 435, .e = 455}), scl_y_pp({.o = 850, .e = 860}), ICON_SIZE, ICON_SIZE)
+    GRect(scl_x_pp({.o = 440, .e = 470}), scl_y_pp({.o = 850, .e = 860}), ICON_SIZE, ICON_SIZE)
    );
 #endif
 }
@@ -371,11 +370,11 @@ static void up_long_click_handler(ClickRecognizerRef recognizer, void *context) 
 }
 
 static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
-  graph_window_push();
+  settings_window_push();
 }
 
 static void down_click_handler(ClickRecognizerRef recognizer, void *context) {
-  menu_window_push();
+  graph_window_push();
 }
 
 static void click_config_provider(void *context) {

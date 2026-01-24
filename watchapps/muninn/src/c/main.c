@@ -38,11 +38,6 @@ static void init() {
     message_window_push("Data reset to allow some new features to work correctly.", true, false);
   }
 
-  if (data_get_push_timeline_pins()) {
-    // Try and push a pin
-    comm_push_timeline_pins();
-  }
-
   // In case an event comes when the app is open
   wakeup_service_subscribe(wakeup_handler);
 

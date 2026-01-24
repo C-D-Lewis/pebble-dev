@@ -36,8 +36,13 @@
 #define HINT_W scl_x(70)
 // Action bar hint height
 #define HINT_H scl_y(200)
+
+#if defined(PBL_PLATFORM_EMERY)
 // Line width
-#define LINE_W scl_x(10)
+#define LINE_W 2
+#else
+#define LINE_W 1
+#endif
 
 ///////////// Testing area ////////////////
 //                                       //

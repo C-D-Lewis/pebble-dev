@@ -11,6 +11,8 @@ typedef enum {
   MI_PUSH_TIMELINE_PINS,
   MI_ELEVATED_RATE_ALERT,
   MI_ONE_DAY_ALERT,
+
+  MI_BATTERY_TIPS,
   MI_DELETE_ALL_DATA,
   MI_VERSION,
 
@@ -71,6 +73,9 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
         data_get_one_day_alert() ? "Enabled" : "Disabled"
       );
       break;
+    case MI_BATTERY_TIPS:
+      util_menu_cell_draw(ctx, cell_layer, "Battery tips", NULL);
+      break;
     case MI_DELETE_ALL_DATA:
       util_menu_cell_draw(
         ctx,
@@ -85,7 +90,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
       util_menu_cell_draw(
         ctx,
         cell_layer,
-        "Muninn",
+        "About Muninn",
         s_v_buff
       );
       break;
@@ -112,6 +117,7 @@ static int16_t get_cell_height_callback(struct MenuLayer *menu_layer, MenuIndex 
 
 static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) {
   switch(cell_index->row) {
+    // Options
     case MI_VIBE_ON_SAMPLE:
       data_set_vibe_on_sample(!data_get_vibe_on_sample());
       break;
@@ -130,6 +136,11 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
     case MI_ONE_DAY_ALERT:
       data_set_one_day_alert(!data_get_one_day_alert());
       break;
+
+    // Other
+    case MI_BATTERY_TIPS:
+      message_window_push(MSG_TIPS, false, false);
+      break;
     case MI_DELETE_ALL_DATA:
       if (s_reset_confirm) {
         data_reset_all();
@@ -140,7 +151,10 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
       }
 
       s_reset_confirm = !s_reset_confirm;
+      break;
     case MI_VERSION:
+      message_window_push(MSG_INFORMATION, false, false);
+      break;
     default: break;
   }
 

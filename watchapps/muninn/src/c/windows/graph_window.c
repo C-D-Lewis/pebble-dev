@@ -57,30 +57,12 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     GCornerNone
   );
 
-  // No data?
-  if (!graph_is_available()) {
-    graphics_draw_text(
-      ctx,
-      "Not yet collected enough data.\n\nCome back soon!",
-      scl_get_font(SFI_Medium),
-      GRect(10, scl_y(250), PS_DISP_W - ACTION_BAR_W - 20, 300),
-      GTextOverflowModeWordWrap,
-      GTextAlignmentCenter,
-      NULL
-    );
-    return;
-  }
-
+  const int log_len = data_get_log_length();
 #if !defined(PBL_PLATFORM_APLITE)
-  const int count = util_is_animating() ? s_anim_count : data_get_log_length();
+  int count = util_is_animating() ? s_anim_count : log_len;
 #else
-  const int count = data_get_log_length();
+  int count = log_len;
 #endif
-  if (count < 1) return;
-
-  const int x_gap = GRAPH_W / count;
-  const int root_y = scl_y(160);
-  const int max_x = GRAPH_MARGIN + ((count - 1) * x_gap);
 
   // Find Y ranges, rounded to nearest 10
   int low_v = 100, high_v = 0;
@@ -96,20 +78,42 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   low_v = ((low_v / 10) * 10) - 5;
   high_v = (((high_v + 9) / 10) * 10) + 5;
 
+  // Dummy values for illustrative purposes
+  if (!graph_is_available()) {
+    low_v = 50;
+    high_v = 80;
+    count = NUM_SAMPLES;
+  }
+
+  const int x_gap = GRAPH_W / count;
+  const int root_y = scl_y(160);
+  // Always show full X axis size, even when animating
+  const int max_x = GRAPH_W;
+
   // Draw Y and X axes
-  graphics_context_set_stroke_color(ctx, GColorBlack);
-  graphics_context_set_stroke_width(ctx, LINE_W);
-  graphics_draw_line(ctx, GPoint(GRAPH_MARGIN, root_y), GPoint(GRAPH_MARGIN, root_y + GRAPH_H));
-  graphics_draw_line(ctx, GPoint(GRAPH_MARGIN, root_y + GRAPH_H), GPoint(max_x, root_y + GRAPH_H));
+  graphics_context_set_fill_color(ctx, GColorBlack);
+  graphics_fill_rect(
+    ctx,
+    GRect(GRAPH_MARGIN - LINE_W / 2, root_y, LINE_W, GRAPH_H),
+    0,
+    GCornerNone
+  );
+  graphics_fill_rect(
+    ctx,
+    GRect(GRAPH_MARGIN, root_y + GRAPH_H - LINE_W / 2, max_x - GRAPH_MARGIN, LINE_W),
+    0,
+    GCornerNone
+  );
 
   // Draw Y axis notches every 10 units within the range
   const int y_range = high_v - low_v;
   for (int y_val = low_v; y_val <= high_v; y_val += 10) {
     const int notch_y = root_y + GRAPH_H - ((y_val - low_v) * GRAPH_H / y_range);
-    graphics_draw_line(
+    graphics_fill_rect(
       ctx,
-      GPoint(GRAPH_MARGIN - NOTCH_S, notch_y),
-      GPoint(GRAPH_MARGIN, notch_y)
+      GRect(GRAPH_MARGIN - NOTCH_S, notch_y - LINE_W / 2, NOTCH_S, LINE_W),
+      0,
+      GCornerNone
     );
   }
 
@@ -117,12 +121,27 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   for (int i = 0; i < count; i++) {
     if (i % 2 == 0 || i == count - 1) {
       const int notch_x = GRAPH_MARGIN + (i * x_gap);
-      graphics_draw_line(
+      graphics_fill_rect(
         ctx,
-        GPoint(notch_x, root_y + GRAPH_H),
-        GPoint(notch_x, root_y + GRAPH_H + NOTCH_S)
+        GRect(notch_x - LINE_W / 2, root_y + GRAPH_H, LINE_W, NOTCH_S),
+        0,
+        GCornerNone
       );
     }
+  }
+
+  // No data?
+  if (!graph_is_available()) {
+    graphics_draw_text(
+      ctx,
+      "Not enough data (yet!)",
+      scl_get_font(SFI_Medium),
+      GRect(20, scl_y(180), PS_DISP_W - ACTION_BAR_W - 40, 300),
+      GTextOverflowModeWordWrap,
+      GTextAlignmentCenter,
+      NULL
+    );
+    return;
   }
 
   const bool flip = count - s_selection < (count / 2);
@@ -258,7 +277,7 @@ static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
 }
 
 static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
-  log_window_push();
+  log_window_push(s_selection);
 }
 
 static void down_click_handler(ClickRecognizerRef recognizer, void *context) {
@@ -278,10 +297,10 @@ static void main_window_load(Window *window) {
   GRect bounds = layer_get_bounds(root_layer);
 
   s_header_layer = util_make_text_layer(
-    GRect(0, scl_y(-30), PS_DISP_W - ACTION_BAR_W, 100),
+    GRect(0, scl_y_pp({-30, .e = -25}), PS_DISP_W - ACTION_BAR_W, 100),
     scl_get_font(SFI_Small)
   );
-  text_layer_set_text(s_header_layer, "Log Graph");
+  text_layer_set_text(s_header_layer, "Change over time");
   text_layer_set_text_alignment(s_header_layer, GTextAlignmentCenter);
   layer_add_child(root_layer, text_layer_get_layer(s_header_layer));
 
@@ -348,6 +367,6 @@ void graph_window_push() {
 
 #if !defined(PBL_PLATFORM_APLITE)
   static AnimationImplementation anim_implementation = { .update = anim_update };
-  util_animate(1200, 0, &anim_implementation, true);
+  util_animate(800, 0, &anim_implementation, true);
 #endif
 }

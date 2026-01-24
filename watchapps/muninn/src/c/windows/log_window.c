@@ -172,7 +172,7 @@ static void main_window_load(Window *window) {
   GRect bounds = layer_get_bounds(root_layer);
 
   s_header_layer = util_make_text_layer(
-    GRect(0, scl_y_pp({.o = -30, .e = -20}), PS_DISP_W, 100),
+    GRect(0, scl_y_pp({-30, .e = -25}), PS_DISP_W, 100),
     scl_get_font(SFI_Small)
   );
   static char s_header_buff[17];
@@ -210,7 +210,13 @@ static void window_unload(Window *window) {
   s_window = NULL;
 }
 
-void log_window_push() {
+void scroll_timer_handler(void *context) {
+  int index = (int)context;
+  MenuIndex next = { .row = index };
+  menu_layer_set_selected_index(s_menu_layer, next, MenuRowAlignCenter, true);
+}
+
+void log_window_push(int index) {
   if (!s_window) {
     s_window = window_create();
     window_set_window_handlers(s_window, (WindowHandlers) {
@@ -220,4 +226,8 @@ void log_window_push() {
   }
 
   window_stack_push(s_window, true);
+
+  if (index != 0) {
+    app_timer_register(250, scroll_timer_handler, (void *)index);
+  }
 }

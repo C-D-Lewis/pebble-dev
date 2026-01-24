@@ -2,10 +2,6 @@
 
 #include <pebble.h>
 
-#if !defined(PBL_PLATFORM_APLITE)
-#include <pebble-packet/pebble-packet.h>
-#endif
-
 #include "data.h"
 
 void comm_init();
@@ -14,4 +10,6 @@ void comm_deinit();
 
 void comm_push_timeline_pins();
 
-void comm_push_sync_data(int index);
+void comm_get_last_timestamp();
+
+void comm_send_samples(int last_ts);

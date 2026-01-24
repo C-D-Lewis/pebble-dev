@@ -97,14 +97,21 @@
       ]
     },
     "messageKeys": [
+      "READY",
       "PUSH_PIN",
       "DAYS_REMAINING",
       "DISCHARGE_RATE",
-      "SYNC"
+      "GET_LAST_TIMESTAMP",
+      "LAST_TIMESTAMP",
+      "EXPORT_TIMESTAMP",
+      "EXPORT_RESULT",
+      "EXPORT_CHARGE_PERC",
+      "EXPORT_TIME_DIFF",
+      "EXPORT_CHARGE_DIFF",
+      "EXPORT_RATE"
     ]
   },
   "dependencies": {
-    "pebble-packet": "^1.5.0",
     "pebble-scalable": "^2.0.0",
     "pebble-timeline-js": "^2.1.1"
   }
