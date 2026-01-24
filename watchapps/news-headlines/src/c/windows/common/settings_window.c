@@ -1,6 +1,6 @@
 #include "settings_window.h"
 
-#define NUM_SETTINGS 5
+#define NUM_SETTINGS 4
 #define ROW_HEIGHT_LARGE scalable_y(300)
 
 static Window *s_main_window;
