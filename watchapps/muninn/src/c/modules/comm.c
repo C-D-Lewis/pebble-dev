@@ -25,6 +25,7 @@ void inbox_received_handler(DictionaryIterator *iter, void *context) {
       comm_push_timeline_pins();
     }
 
+    // Feature disabled for now
     // comm_get_last_timestamp();
     return;
   }
