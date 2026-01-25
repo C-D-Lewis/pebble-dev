@@ -1,5 +1,5 @@
 const { handlePushTimelinePin } = require('./timeline');
-const { handleExport, handleGetLastTimestamp } = require('./export');
+const { handleSync, handleGetSyncInfo } = require('./sync');
 
 Pebble.addEventListener('ready', function() {
   console.log('PebbleKit JS ready!');
@@ -19,14 +19,14 @@ Pebble.addEventListener('appmessage', function(e) {
     }
 
     // Tell watch the last sample we saw
-    if (dict.GET_LAST_TIMESTAMP) {
-      handleGetLastTimestamp();
+    if (dict.GET_SYNC_INFO) {
+      handleGetSyncInfo();
       return;
     }
 
     // Handle a sample sent from the watch
-    if (dict.EXPORT_TIMESTAMP) {
-      handleExport(dict);
+    if (dict.SYNC_SAMPLE) {
+      handleSync(dict);
       return;
     }
   } catch (e) {

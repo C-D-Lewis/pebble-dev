@@ -98,11 +98,16 @@
     },
     "messageKeys": [
       "READY",
+
       "PUSH_PIN",
       "DAYS_REMAINING",
       "DISCHARGE_RATE",
-      "GET_LAST_TIMESTAMP",
-      "LAST_TIMESTAMP",
+
+      "GET_SYNC_INFO",
+      "SYNC_TIMESTAMP",
+      "SYNC_COUNT",
+
+      "SYNC_SAMPLE",
       "EXPORT_TIMESTAMP",
       "EXPORT_RESULT",
       "EXPORT_CHARGE_PERC",

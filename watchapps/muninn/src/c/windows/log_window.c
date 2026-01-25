@@ -2,7 +2,6 @@
 
 #define ROW_HEIGHT scl_y(390)
 #define DIV_Y scl_y_pp({.o = 115, .e = 105})
-#define MENU_INSET scl_y(110)
 
 // Extra precision needed
 #if defined(PBL_PLATFORM_EMERY)
@@ -18,12 +17,7 @@ static MenuLayer *s_menu_layer;
 
 static void canvas_update_proc(Layer *layer, GContext *ctx) {
   // Title underline
-  graphics_fill_rect(
-    ctx,
-    GRect(0, scl_y(110), PS_DISP_W, LINE_W),
-    0,
-    GCornerNone
-  );
+  graphics_fill_rect(ctx, GRect(0, scl_y(110), PS_DISP_W, LINE_W), 0, GCornerNone);
 }
 
 static void draw_changes(GContext *ctx, const GRect bounds, const Sample *s) {
@@ -179,7 +173,7 @@ static void main_window_load(Window *window) {
   text_layer_set_text_alignment(s_header_layer, GTextAlignmentCenter);
   layer_add_child(root_layer, text_layer_get_layer(s_header_layer));
 
-  s_menu_layer = menu_layer_create(grect_inset(bounds, GEdgeInsets(MENU_INSET, 0, 0, 0)));
+  s_menu_layer = menu_layer_create(grect_inset(bounds, GEdgeInsets(HEADER_INSET, 0, 0, 0)));
   menu_layer_set_click_config_onto_window(s_menu_layer, window);
   menu_layer_set_callbacks(s_menu_layer, NULL, (MenuLayerCallbacks) {
     .get_num_rows = (MenuLayerGetNumberOfRowsInSectionsCallback)get_num_rows_callback,

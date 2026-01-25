@@ -17,24 +17,33 @@ void out_sent_handler(DictionaryIterator *iterator, void *context) {
   }
 }
 
+static void get_sync_info() {
+  DictionaryIterator *iter;
+  app_message_outbox_begin(&iter);
+  Tuplet days_tuple = TupletInteger(MESSAGE_KEY_GET_SYNC_INFO, 1);
+  dict_write_tuplet(iter, &days_tuple);
+  app_message_outbox_send();
+}
+
 void inbox_received_handler(DictionaryIterator *iter, void *context) {
   // Things to do when JS is ready
   Tuple *ready_tuple = dict_find(iter, MESSAGE_KEY_READY);
   if (ready_tuple) {
-    if (data_get_push_timeline_pins()) {
-      comm_push_timeline_pins();
-    }
+    if (data_get_push_timeline_pins()) comm_push_timeline_pins();
 
-    // Feature disabled for now
-    // comm_get_last_timestamp();
+    get_sync_info();
     return;
   }
 
   // Response to last timestamp request
-  Tuple *timestamp_tuple = dict_find(iter, MESSAGE_KEY_LAST_TIMESTAMP);
+  Tuple *timestamp_tuple = dict_find(iter, MESSAGE_KEY_SYNC_TIMESTAMP);
   if (timestamp_tuple) {
-    int last_ts = (int)timestamp_tuple->value->int32;
+    const int last_ts = (int)timestamp_tuple->value->int32;
     APP_LOG(APP_LOG_LEVEL_INFO, "last ts %d", last_ts);
+
+    Tuple *count_tuple = dict_find(iter, MESSAGE_KEY_SYNC_COUNT);
+    const int sync_count = (int)count_tuple->value->int32;
+    APP_LOG(APP_LOG_LEVEL_INFO, "count %d", sync_count);
 
     // Send all samples newer than this (greater timestamp)
     comm_send_samples(last_ts);
@@ -74,19 +83,13 @@ void comm_push_timeline_pins() {
   app_message_outbox_send();
 }
 
-void comm_get_last_timestamp() {
-  DictionaryIterator *iter;
-  app_message_outbox_begin(&iter);
-  Tuplet days_tuple = TupletInteger(MESSAGE_KEY_GET_LAST_TIMESTAMP, 1);
-  dict_write_tuplet(iter, &days_tuple);
-  app_message_outbox_send();
-}
-
 static void send_sample(int index) {
   const Sample *s = data_get_sample(index);
   
   DictionaryIterator *iter;
   app_message_outbox_begin(&iter);
+  Tuplet sync_tuple = TupletInteger(MESSAGE_KEY_SYNC_SAMPLE, 1);
+  dict_write_tuplet(iter, &sync_tuple);
   Tuplet timestamp_tuple = TupletInteger(MESSAGE_KEY_EXPORT_TIMESTAMP, s->timestamp);
   dict_write_tuplet(iter, &timestamp_tuple);
   Tuplet result_tuple = TupletInteger(MESSAGE_KEY_EXPORT_RESULT, s->result);

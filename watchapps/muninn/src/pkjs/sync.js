@@ -41,7 +41,7 @@ function loadHistory() {
 /**
  * Send the watch the last seen timestamp so updates can be incremental.
  */
-function handleGetLastTimestamp() {
+function handleGetSyncInfo() {
   var lastTimestamp = -1;
 
   var history = loadHistory();
@@ -50,7 +50,10 @@ function handleGetLastTimestamp() {
     lastTimestamp = history[history.length - 1].timestamp;
   }
 
-  Pebble.sendAppMessage({ LAST_TIMESTAMP: lastTimestamp });
+  Pebble.sendAppMessage({
+    SYNC_TIMESTAMP: lastTimestamp,
+    SYNC_COUNT: history.length,
+  });
 }
 
 /**
@@ -58,7 +61,7 @@ function handleGetLastTimestamp() {
  *
  * TODO: How do we handle adding new fields?
  */
-function handleExport(dict) {
+function handleSync(dict) {
   var history = loadHistory();
 
   // Have we seen this before?
@@ -81,11 +84,10 @@ function handleExport(dict) {
   console.log('Saved new sample: ' + JSON.stringify(sample));
 
   // TODO: Which order on timestamp should we sort?
-
   saveHistory(history);
 }
 
 module.exports = {
-  handleGetLastTimestamp,
-  handleExport,
+  handleGetSyncInfo,
+  handleSync,
 };

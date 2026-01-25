@@ -14,6 +14,7 @@
 ///////////////////////////////////////////
 
 // MUST match package.json
+// Check Aplite works before releasing
 #define VERSION "1.20.0"
 // Minimum samples before providing estimations
 #define MIN_SAMPLES 2
@@ -36,6 +37,8 @@
 #define HINT_W scl_x(70)
 // Action bar hint height
 #define HINT_H scl_y(200)
+// Header inset
+#define HEADER_INSET scl_y(110)
 
 #if defined(PBL_PLATFORM_EMERY)
 // Line width
@@ -46,7 +49,7 @@
 
 ///////////// Testing area ////////////////
 //                                       //
-// #define USE_TEST_DATA true            //
+#define USE_TEST_DATA true            //
 //                                       //
 // #define SAVE_TEST_DATA true           //
 //                                       //
