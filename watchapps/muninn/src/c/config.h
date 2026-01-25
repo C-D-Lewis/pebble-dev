@@ -13,8 +13,8 @@
 #define NUM_SAMPLES 16                   //
 ///////////////////////////////////////////
 
-// MUST match package.json
-// Check Aplite works before releasing
+// ! MUST match package.json
+// ! Check Aplite works before releasing
 #define VERSION "1.20.0"
 // Minimum samples before providing estimations
 #define MIN_SAMPLES 2

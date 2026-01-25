@@ -290,26 +290,18 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   s_batt_bitmap = bitmaps_get(util_get_battery_resource_id(state.charge_percent));
 
   // Save memory for Aplite, draw icons that don't change without a BitmapLayer
-#if defined(PBL_PLATFORM_APLITE)
-  // Use same as for battery gauge
-  graphics_draw_bitmap_in_rect(
-    ctx,
-    s_batt_bitmap,
-    GRect(scl_x(40), scl_y(390), ICON_SIZE, ICON_SIZE)
-  );
-#else
-  // Use dedicated image
+#if !defined(PBL_PLATFORM_APLITE)
   graphics_draw_bitmap_in_rect(
     ctx,
     bitmaps_get(RESOURCE_ID_REMAINING),
     GRect(scl_x(40), scl_y_pp({.o = 390, .e = 385}), ICON_SIZE, ICON_SIZE)
    );
-#endif
   graphics_draw_bitmap_in_rect(
     ctx,
     bitmaps_get(RESOURCE_ID_RATE),
     GRect(scl_x(530), scl_y_pp({.o = 390, .e = 385}), ICON_SIZE, ICON_SIZE)
   );
+#endif
 
   graphics_draw_bitmap_in_rect(
     ctx,
@@ -411,7 +403,11 @@ static void window_load(Window *window) {
   // Row 1
   int row_x = scl_x_pp({.o = 40, .e = 50});
   int row_y = scl_y_pp({.o = 390, .e = 385});
+#if defined(PBL_PLATFORM_APLITE)
+  int text_ico_off = scl_x_pp({.o = 100, .e = 100});
+#else
   int text_ico_off = scl_x_pp({.o = 190, .e = 160});
+#endif
   int text_y_off = scl_y_pp({.o = -40, .e = -20});
 
   s_remaining_layer = util_make_text_layer(
