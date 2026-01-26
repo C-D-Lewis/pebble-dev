@@ -15,6 +15,7 @@ typedef enum {
   MI_ONE_DAY_ALERT,
 
   MI_BATTERY_TIPS,
+  MI_SYNC_INFO,
   MI_DELETE_ALL_DATA,
   MI_VERSION,
 
@@ -37,6 +38,15 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
   static char s_alert_buff[24];
   if (!alert_disabled) {
     snprintf(s_alert_buff, sizeof(s_alert_buff), "Notifying near %d%%", alert_level);
+  }
+
+  // Sync status
+  static char s_sync_buff[18];
+  const int sync_count = data_get_sync_count();
+  if (sync_count == STATUS_EMPTY) {
+    snprintf(s_sync_buff, sizeof(s_sync_buff), "Loading...");
+  } else {
+    snprintf(s_sync_buff, sizeof(s_sync_buff), "%d items", sync_count);
   }
 
   switch(cell_index->row) {
@@ -83,6 +93,14 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
     case MI_BATTERY_TIPS:
       util_menu_cell_draw(ctx, cell_layer, "Battery tips", NULL);
       break;
+    case MI_SYNC_INFO:
+      util_menu_cell_draw(
+        ctx,
+        cell_layer,
+        "History on phone",
+        s_sync_buff
+      );
+      break;
     case MI_DELETE_ALL_DATA:
       util_menu_cell_draw(
         ctx,
@@ -113,6 +131,7 @@ static int16_t get_cell_height_callback(struct MenuLayer *menu_layer, MenuIndex 
     case MI_PUSH_TIMELINE_PINS:
     case MI_ELEVATED_RATE_ALERT:
     case MI_ONE_DAY_ALERT:
+    case MI_SYNC_INFO:
     case MI_VERSION:
       return ROW_HEIGHT_LARGE;
     case MI_DELETE_ALL_DATA:
@@ -131,12 +150,9 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
     case MI_CUSTOM_ALERT_LEVEL:
       data_cycle_custom_alert_level();
       break;
-    case MI_PUSH_TIMELINE_PINS: {
-      const bool now_enabled = !data_get_push_timeline_pins();
-      data_set_push_timeline_pins(now_enabled);
-
-      if (now_enabled) comm_push_timeline_pins();
-    } break;
+    case MI_PUSH_TIMELINE_PINS:
+      data_set_push_timeline_pins(!data_get_push_timeline_pins());
+      break;
     case MI_ELEVATED_RATE_ALERT:
       data_set_elevated_rate_alert(!data_get_elevated_rate_alert());
       break;
@@ -148,9 +164,14 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
     case MI_BATTERY_TIPS:
       message_window_push(MSG_TIPS, false, false);
       break;
+    case MI_SYNC_INFO:
+      // Show more details on message window or dedicated window - value!
+      message_window_push("Samples are being sent to a larger history on the phone.\n\nWatch this space...", false, false);
+      break;
     case MI_DELETE_ALL_DATA:
       if (s_reset_confirm) {
         data_reset_all();
+        comm_request_deletion();
         vibes_double_pulse();
         window_stack_pop_all(true);
       } else {
@@ -216,4 +237,8 @@ void settings_window_push() {
   }
 
   window_stack_push(s_window, true);
+}
+
+void settings_window_reload() {
+  if(s_menu_layer) menu_layer_reload_data(s_menu_layer);
 }

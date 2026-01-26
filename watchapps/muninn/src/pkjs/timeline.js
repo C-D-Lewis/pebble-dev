@@ -2,10 +2,12 @@ var timeline = require('pebble-timeline-js');
 
 /** Seconds in a day */
 var SECONDS_PER_DAY = 60 * 60 * 24;
-
 /** Predicted low charge time pin ID */
 var PIN_ID_PREDICTION = 'muninn-prediction';
 
+/**
+ * Handle request to push a timeline pin.
+ */
 function handlePushTimelinePin(dict) {
   var days = dict.DAYS_REMAINING;
   var rate = dict.DISCHARGE_RATE;
@@ -31,10 +33,7 @@ function handlePushTimelinePin(dict) {
   };
 
   console.log('Inserting pin: ' + JSON.stringify(pin));
-  timeline.insertUserPin(pin, function(responseText) { 
-    // Coreapp returns nothing here, we assume this callback means OK
-    console.log('Result: ' + responseText);
-  });
+  timeline.insertUserPin(pin, function(responseText) { });
 }
 
 module.exports = {

@@ -4,10 +4,10 @@
 
 #include "data.h"
 
+#include "../windows/settings_window.h"
+
 void comm_init();
 
 void comm_deinit();
 
-void comm_push_timeline_pins();
-
-void comm_send_samples(int last_ts);
+void comm_request_deletion();

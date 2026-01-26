@@ -15,6 +15,7 @@
 
 // ! MUST match package.json
 // ! Check Aplite works before releasing
+// ! Comment out INFO logs
 #define VERSION "1.20.0"
 // Minimum samples before providing estimations
 #define MIN_SAMPLES 2
@@ -27,6 +28,23 @@
 // Minimum negative charge_diff to count as charging
 #define MIN_CHARGE_AMOUNT 10
 
+///////////// Testing area ////////////////
+//                                       //
+// #define USE_TEST_DATA true            //
+//                                       //
+// #define SAVE_TEST_DATA true           //
+//                                       //
+// #define LOG_STATE true                //
+//                                       //
+// #define WAKEUP_NEXT_MINUTE true       //
+//                                       //
+// #define TEST_COLLISION true           //
+//                                       //
+// #define TEST_TIMELINE_PIN true        //
+//                                       //
+///////////////////////////////////////////
+
+// Layout values
 // MenuLayer single row height
 #define ROW_HEIGHT_SMALL scl_y(220)
 // MenuLayer two row height
@@ -40,29 +58,10 @@
 // Header inset
 #define HEADER_INSET scl_y(110)
 
+// Per-platform layout values
 #if defined(PBL_PLATFORM_EMERY)
 // Line width
 #define LINE_W 2
 #else
 #define LINE_W 1
 #endif
-
-///////////// Testing area ////////////////
-//                                       //
-#define USE_TEST_DATA true            //
-//                                       //
-// #define SAVE_TEST_DATA true           //
-//                                       //
-// #define LOG_STATE true                //
-//                                       //
-// #define WAKEUP_NEXT_MINUTE true       //
-//                                       //
-// #define TEST_COLLISION true           //
-//                                       //
-// #define TEST_TIMELINE_PIN true        //
-//                                       //
-// #define TEST_FORCE_SCALING true       //
-//                                       //
-// #define TEST_OVERESTIMATION true      //
-//                                       //
-///////////////////////////////////////////

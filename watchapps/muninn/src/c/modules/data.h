@@ -16,7 +16,7 @@
 // NOTE: ADD ONLY - Changing keys will affect existing users!
 typedef enum {
   // App data key
-  SK_AppData = 1,
+  SK_PersistData = 1,
   // Sample data key base - due to the 256B limit per-key we need to store separately
   SK_SampleBase = 10,
   // Wipe - adding new fields to Sample struct and expanding number of samples
@@ -50,7 +50,14 @@ typedef struct {
   bool one_day_alert;       // Show 'one day remaining' alert
 
   // Singleton, adding new fields OK, removing from middle is NOT OK
-} AppData;
+} PersistData;
+
+// NOT persisted data
+typedef struct {
+  int sync_count; // Count of synchronized items to the phone
+
+  // Singleton, adding new fields OK, removing from middle is NOT OK
+} AppState;
 
 // A full wakeup sample
 typedef struct {
@@ -64,8 +71,8 @@ typedef struct {
   int days_remaining;   // Interesting for analysis
   int rate;             //
 
-  // Saved per sample, adding new fields okay
-  // NOTE: Consider how to handle (& if needed) in JS model
+  // Saved per sample, adding new fields okay, removing from middle is NOT OK
+  // NOTE: Consider how to update JS model
 } Sample;
 
 // Methods
@@ -112,6 +119,8 @@ void data_set_last_charge_time(int ts);
 int data_get_last_charge_time();
 bool data_get_one_day_alert();
 void data_set_one_day_alert(bool b);
+void data_set_sync_count(int v);
+int data_get_sync_count();
 
 // Strings
 #define MSG_WELCOME "Welcome to Muninn!\n\nEstimates will appear after two samples are taken.\n\nPlease launch me if the watch is off and a sample is missed."

@@ -2,35 +2,31 @@
 var MAX_ITEMS = 64;
 /** LocalStorage key - data history */
 var LS_KEY_HISTORY = 'history';
-/** Fields required in each AppMessage sample payload */
-var EXPORT_KEYS = [
-  'EXPORT_TIMESTAMP',
-  'EXPORT_RESULT',
-  'EXPORT_CHARGE_PERC',
-  'EXPORT_TIME_DIFF',
-  'EXPORT_CHARGE_DIFF',
-  'EXPORT_RATE'
-];
 /** Map of AppMessage fields to JS sample model */
 var FIELD_MAP = {
-  EXPORT_TIMESTAMP: 'timestamp',
-  EXPORT_RESULT: 'result',
-  EXPORT_CHARGE_PERC: 'chargePerc',
-  EXPORT_TIME_DIFF: 'timeDiff',
-  EXPORT_CHARGE_DIFF: 'chargeDiff',
-  EXPORT_RATE: 'rate'
+  SAMPLE_TIMESTAMP: 'timestamp',
+  SAMPLE_RESULT: 'result',
+  SAMPLE_CHARGE_PERC: 'chargePerc',
+  SAMPLE_TIME_DIFF: 'timeDiff',
+  SAMPLE_CHARGE_DIFF: 'chargeDiff',
+  SAMPLE_RATE: 'rate'
 };
+/** All expected keys */
+var MESSAGE_KEYS = Object.keys(FIELD_MAP);
 
+/**
+ * Save the history of samples.
+ */
 function saveHistory(history) {
   localStorage.setItem(LS_KEY_HISTORY, JSON.stringify(history));
-  // console.log('Saved history (' + history.length + ' items)');
 }
 
+/**
+ * Load the history of samples.
+ */
 function loadHistory() {
   try {
-    var history = JSON.parse(localStorage.getItem(LS_KEY_HISTORY) || '[]');
-    // console.log('Loaded history (' + history.length + ' items)');
-    return history;
+    return JSON.parse(localStorage.getItem(LS_KEY_HISTORY) || '[]');
   } catch (e) {
     console.error('Failed to load history');
     console.error(e);
@@ -42,17 +38,17 @@ function loadHistory() {
  * Send the watch the last seen timestamp so updates can be incremental.
  */
 function handleGetSyncInfo() {
-  var lastTimestamp = -1;
-
   var history = loadHistory();
   // console.log(JSON.stringify(localStorage.getItem('history')));
+
+  var timestamp = -1; // STATUS_EMPTY
   if (history.length > 0) {
-    lastTimestamp = history[history.length - 1].timestamp;
+    timestamp = history[0].timestamp;
   }
 
   Pebble.sendAppMessage({
-    SYNC_TIMESTAMP: lastTimestamp,
-    SYNC_COUNT: history.length,
+    SYNC_TIMESTAMP: timestamp,
+    SYNC_COUNT: history.length
   });
 }
 
@@ -63,28 +59,34 @@ function handleGetSyncInfo() {
  */
 function handleSync(dict) {
   var history = loadHistory();
+  var timestamp = dict.SAMPLE_TIMESTAMP;
 
-  // Have we seen this before?
-  var timestamp = dict.EXPORT_TIMESTAMP;
-  if (history.find(function (p) { return p.timestamp === timestamp })) {
-    console.log('Skipping duplicate: ' + timestamp);
-    return;
+  // Manual loop replaces .find() which coreapp doesn't like
+  for (var i = 0; i < history.length; i++) {
+    if (history[i].timestamp === timestamp) {
+      console.log('Skipping duplicate: ' + timestamp);
+      return;
+    }
   }
 
   // Construct local sample
   var sample = {};
-  for (var i = 0; i < EXPORT_KEYS.length; i++) {
-    let key = EXPORT_KEYS[i];
+  for (var j = 0; j < MESSAGE_KEYS.length; j++) {
+    var key = MESSAGE_KEYS[j];
     if (typeof dict[key] === 'undefined') throw new Error('Missing field: ' + key);
     if (!FIELD_MAP[key]) throw new Error('Unknown key: ' + key);
 
     sample[FIELD_MAP[key]] = dict[key];
   }
   history.push(sample);
-  console.log('Saved new sample: ' + JSON.stringify(sample));
 
-  // TODO: Which order on timestamp should we sort?
+  // Sort to match watch order and limit length
+  history = history
+    .sort(function(a, b) { return a.timestamp > b.timestamp ? -1 : 1 })
+    .slice(0, MAX_ITEMS);
+
   saveHistory(history);
+  console.log('Saved new sample: ' + JSON.stringify(sample));
 }
 
 module.exports = {

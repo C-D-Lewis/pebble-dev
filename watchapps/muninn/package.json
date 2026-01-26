@@ -106,14 +106,15 @@
       "GET_SYNC_INFO",
       "SYNC_TIMESTAMP",
       "SYNC_COUNT",
+      "SYNC_DELETE",
 
       "SYNC_SAMPLE",
-      "EXPORT_TIMESTAMP",
-      "EXPORT_RESULT",
-      "EXPORT_CHARGE_PERC",
-      "EXPORT_TIME_DIFF",
-      "EXPORT_CHARGE_DIFF",
-      "EXPORT_RATE"
+      "SAMPLE_TIMESTAMP",
+      "SAMPLE_RESULT",
+      "SAMPLE_CHARGE_PERC",
+      "SAMPLE_TIME_DIFF",
+      "SAMPLE_CHARGE_DIFF",
+      "SAMPLE_RATE"
     ]
   },
   "dependencies": {

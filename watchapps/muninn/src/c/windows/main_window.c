@@ -216,7 +216,7 @@ static void update_data() {
   if (data_calculate_avg_discharge_rate() != STATUS_EMPTY) {
     // If data to show, begin smooth animation
     static AnimationImplementation anim_implementation = { .update = anim_update };
-    util_animate(1000, 100, &anim_implementation, true);
+    util_animate(800, 50, &anim_implementation, true);
   }
 #endif
 }
@@ -509,9 +509,13 @@ static void window_unload(Window *window) {
 }
 
 static void window_disappear(Window *window) {
-#if !defined(PBL_PLATFORM_APLITE)
-  util_stop_animation();
-#endif
+  // Fully complete animation - FIXME: doesn't work yet
+// #if !defined(PBL_PLATFORM_APLITE)
+//   util_stop_animation();
+// #endif
+  // s_anim_days = s_days_remaining;
+  // s_anim_rate = s_rate;
+  // layer_mark_dirty(s_canvas_layer);
 
   // Remove images that will loaded in canvas update proc
   bitmaps_destroy_ptr(s_mascot_bitmap);

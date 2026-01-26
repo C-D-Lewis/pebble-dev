@@ -1,7 +1,8 @@
 #include "data.h"
 
 // Persisted
-static AppData s_app_data;
+static PersistData s_persist_data;
+static AppState s_app_state;
 static Sample s_samples[NUM_SAMPLES];
 
 // Not persisted
@@ -17,13 +18,13 @@ static void delete_all_data() {
 }
 
 static void save_all() {
-  status_t result = persist_write_data(SK_AppData, &s_app_data, sizeof(AppData));
+  status_t result = persist_write_data(SK_PersistData, &s_persist_data, sizeof(PersistData));
   if (result < 0) {
-    APP_LOG(APP_LOG_LEVEL_ERROR, "data write fail %d", (int)result);
+    APP_LOG(APP_LOG_LEVEL_ERROR, "data w err %d", (int)result);
     data_set_error("Error writing app data");
   }
-  if (result < (int)sizeof(AppData)) {
-    APP_LOG(APP_LOG_LEVEL_ERROR, "data write trunc");
+  if (result < (int)sizeof(PersistData)) {
+    APP_LOG(APP_LOG_LEVEL_ERROR, "data w trunc");
   }
 
   for (int i = 0; i < NUM_SAMPLES; i++) {
@@ -31,25 +32,25 @@ static void save_all() {
     const int key = SK_SampleBase + i;
     result = persist_write_data(key, &s_samples[i], sizeof(Sample));
     if (result < 0) {
-      APP_LOG(APP_LOG_LEVEL_ERROR, "sample write fail %d", (int)result);
+      APP_LOG(APP_LOG_LEVEL_ERROR, "sample w err %d", (int)result);
       data_set_error("Error writing sample data");
     }
   }
 }
 
 static void init_data_fields() {
-  s_app_data.last_sample_time = STATUS_EMPTY;
-  s_app_data.last_charge_perc = STATUS_EMPTY;
-  s_app_data.wakeup_id = STATUS_EMPTY;
-  s_app_data.seen_first_launch = false;
-  s_app_data.vibe_on_sample = false;
-  s_app_data.custom_alert_level = AL_OFF;
-  s_app_data.ca_has_notified = false;
-  s_app_data.push_timeline_pins = false;
-  s_app_data.elevated_rate_alert = false;
-  s_app_data.one_day_notified = false;
-  s_app_data.last_charge_time = STATUS_EMPTY;
-  s_app_data.one_day_alert = false;
+  s_persist_data.last_sample_time = STATUS_EMPTY;
+  s_persist_data.last_charge_perc = STATUS_EMPTY;
+  s_persist_data.wakeup_id = STATUS_EMPTY;
+  s_persist_data.seen_first_launch = false;
+  s_persist_data.vibe_on_sample = false;
+  s_persist_data.custom_alert_level = AL_OFF;
+  s_persist_data.ca_has_notified = false;
+  s_persist_data.push_timeline_pins = false;
+  s_persist_data.elevated_rate_alert = false;
+  s_persist_data.one_day_notified = false;
+  s_persist_data.last_charge_time = STATUS_EMPTY;
+  s_persist_data.one_day_alert = false;
 
   for (int i = 0; i < NUM_SAMPLES; i++) {
     Sample *s = &s_samples[i];
@@ -136,18 +137,18 @@ static void test_data_generator() {
 
   // Set fixed test values for this launch
   // TODO: Use the array's newest value here?
-  s_app_data.last_sample_time = base;
-  s_app_data.last_charge_perc = 80;  // Agrees with emulator
-  s_app_data.wakeup_id = base + (12 * SECONDS_PER_HOUR);   // Won't be found
-  s_app_data.seen_first_launch = true;
-  s_app_data.vibe_on_sample = true;
-  s_app_data.custom_alert_level = AL_20;
-  s_app_data.ca_has_notified = false;
-  s_app_data.elevated_rate_alert = false;
-  s_app_data.push_timeline_pins = false;
-  s_app_data.one_day_notified = false;
-  s_app_data.last_charge_time = base - (3 * SECONDS_PER_DAY);
-  s_app_data.one_day_alert = false;
+  s_persist_data.last_sample_time = base;
+  s_persist_data.last_charge_perc = 80;  // Agrees with emulator
+  s_persist_data.wakeup_id = base + (12 * SECONDS_PER_HOUR);   // Won't be found
+  s_persist_data.seen_first_launch = true;
+  s_persist_data.vibe_on_sample = true;
+  s_persist_data.custom_alert_level = AL_20;
+  s_persist_data.ca_has_notified = false;
+  s_persist_data.elevated_rate_alert = false;
+  s_persist_data.push_timeline_pins = false;
+  s_persist_data.one_day_notified = false;
+  s_persist_data.last_charge_time = base - (3 * SECONDS_PER_DAY);
+  s_persist_data.one_day_alert = false;
 
   for (int i = 0; i < NUM_SAMPLES; i++) {
     Sample *s = &s_samples[i];
@@ -156,7 +157,7 @@ static void test_data_generator() {
 
     if (i == 0) {
       s->timestamp = base;
-      s->charge_perc = s_app_data.last_charge_perc;
+      s->charge_perc = s_persist_data.last_charge_perc;
       s->last_sample_time = base - interval_s;
       s->last_charge_perc = s->charge_perc + gap;
       s->charge_diff = gap;
@@ -184,9 +185,6 @@ static void test_data_generator() {
     // Make this deliberately incorrect for testing
     if (util_is_not_status(s->result)) {
       int result = s->result;
-#if defined(TEST_OVERESTIMATION)
-      result *= 2;
-#endif
       s->days_remaining = s->charge_perc / result;
       s->rate = result;
     }
@@ -196,8 +194,8 @@ static void test_data_generator() {
 
 // Handle new fields with default values
 static void handle_new_fields() {
-  if (s_app_data.last_charge_time == 0) {
-    s_app_data.last_charge_time = STATUS_EMPTY;
+  if (s_persist_data.last_charge_time == 0) {
+    s_persist_data.last_charge_time = STATUS_EMPTY;
   }
 }
 
@@ -215,12 +213,15 @@ void data_init() {
   return;
 #endif
 
+  // Init AppState emphemeral fields
+  s_app_state.sync_count = STATUS_EMPTY;
+
   // Never used, write defaults
-  if (!persist_exists(SK_AppData)) {
+  if (!persist_exists(SK_PersistData)) {
     data_reset_all();
   } else {
     // Load current data
-    status_t result = persist_read_data(SK_AppData, &s_app_data, sizeof(AppData));
+    status_t result = persist_read_data(SK_PersistData, &s_persist_data, sizeof(PersistData));
     if (result < 0) {
       APP_LOG(APP_LOG_LEVEL_ERROR, "app read fail %d", (int)result);
       data_set_error("Error reading app data");
@@ -253,23 +254,23 @@ void data_deinit() {
 void data_log_state() {
 #if defined(LOG_STATE)
   time_t wakeup_ts = STATUS_EMPTY;
-  const bool is_enabled = util_is_not_status(s_app_data.wakeup_id);
+  const bool is_enabled = util_is_not_status(s_persist_data.wakeup_id);
   if (is_enabled) {
-    wakeup_query(s_app_data.wakeup_id, &wakeup_ts);
+    wakeup_query(s_persist_data.wakeup_id, &wakeup_ts);
   }
 
   // App state
   APP_LOG(
     APP_LOG_LEVEL_INFO,
     "lst:%d lcp:%d wi:%d wts:%d sfl:%s vos:%s cal:%d chn:%s",
-    s_app_data.last_sample_time,
-    s_app_data.last_charge_perc,
-    s_app_data.wakeup_id,
+    s_persist_data.last_sample_time,
+    s_persist_data.last_charge_perc,
+    s_persist_data.wakeup_id,
     (int)wakeup_ts,
-    s_app_data.seen_first_launch == 1 ? "T" : "F",
-    s_app_data.vibe_on_sample == 1 ? "T" : "F",
-    s_app_data.custom_alert_level,
-    s_app_data.ca_has_notified == 1 ? "T" : "F"
+    s_persist_data.seen_first_launch == 1 ? "T" : "F",
+    s_persist_data.vibe_on_sample == 1 ? "T" : "F",
+    s_persist_data.custom_alert_level,
+    s_persist_data.ca_has_notified == 1 ? "T" : "F"
   );
 
   // Sample history
@@ -398,19 +399,19 @@ bool data_get_rate_is_elevated() {
 }
 
 void data_cycle_custom_alert_level() {
-  switch (s_app_data.custom_alert_level) {
+  switch (s_persist_data.custom_alert_level) {
     case AL_OFF:
-      s_app_data.custom_alert_level = AL_50;
+      s_persist_data.custom_alert_level = AL_50;
       break;
     case AL_50:
-      s_app_data.custom_alert_level = AL_20;
+      s_persist_data.custom_alert_level = AL_20;
       break;
     case AL_20:
-      s_app_data.custom_alert_level = AL_10;
+      s_persist_data.custom_alert_level = AL_10;
       break;
     case AL_10:
     default:
-      s_app_data.custom_alert_level = AL_OFF;
+      s_persist_data.custom_alert_level = AL_OFF;
       break;
   }
 
@@ -568,27 +569,27 @@ int data_calculate_days_remaining_accuracy() {
 ///////////////////////////////////////// Getters / Setters ////////////////////////////////////////
 
 int data_get_last_sample_time() {
-  return s_app_data.last_sample_time;
+  return s_persist_data.last_sample_time;
 }
 
 void data_set_last_sample_time(int time) {
-  s_app_data.last_sample_time = time;
+  s_persist_data.last_sample_time = time;
 }
 
 int data_get_last_charge_perc() {
-  return s_app_data.last_charge_perc;
+  return s_persist_data.last_charge_perc;
 }
 
 void data_set_last_charge_perc(int perc) {
-  s_app_data.last_charge_perc = perc;
+  s_persist_data.last_charge_perc = perc;
 }
 
 int data_get_wakeup_id() {
-  return s_app_data.wakeup_id;
+  return s_persist_data.wakeup_id;
 }
 
 void data_set_wakeup_id(int id) {
-  s_app_data.wakeup_id = id;
+  s_persist_data.wakeup_id = id;
 }
 
 Sample* data_get_sample(int index) {
@@ -609,23 +610,23 @@ char* data_get_error() {
 }
 
 void data_set_seen_first_launch() {
-  s_app_data.seen_first_launch = true;
+  s_persist_data.seen_first_launch = true;
 }
 
 bool data_get_seen_first_launch() {
-  return s_app_data.seen_first_launch;
+  return s_persist_data.seen_first_launch;
 }
 
 bool data_get_vibe_on_sample() {
-  return s_app_data.vibe_on_sample;
+  return s_persist_data.vibe_on_sample;
 }
 
 void data_set_vibe_on_sample(bool v) {
-  s_app_data.vibe_on_sample = v;
+  s_persist_data.vibe_on_sample = v;
 }
 
 int data_get_custom_alert_level() {
-  return s_app_data.custom_alert_level;
+  return s_persist_data.custom_alert_level;
 }
 
 int data_get_valid_samples_count() {
@@ -660,49 +661,57 @@ int data_get_log_length() {
 }
 
 bool data_get_ca_has_notified() {
-  return s_app_data.ca_has_notified;
+  return s_persist_data.ca_has_notified;
 }
 
 void data_set_ca_has_notified(bool notified) {
-  s_app_data.ca_has_notified = notified;
+  s_persist_data.ca_has_notified = notified;
 }
 
 bool data_get_push_timeline_pins() {
-  return s_app_data.push_timeline_pins;
+  return s_persist_data.push_timeline_pins;
 }
 
 void data_set_push_timeline_pins(bool b) {
-  s_app_data.push_timeline_pins = b;
+  s_persist_data.push_timeline_pins = b;
 }
 
 bool data_get_elevated_rate_alert() {
-  return s_app_data.elevated_rate_alert;
+  return s_persist_data.elevated_rate_alert;
 }
 
 void data_set_elevated_rate_alert(bool b) {
-  s_app_data.elevated_rate_alert = b;
+  s_persist_data.elevated_rate_alert = b;
 }
 
 bool data_get_one_day_notified() {
-  return s_app_data.one_day_notified;
+  return s_persist_data.one_day_notified;
 }
 
 void data_set_one_day_notified(bool b) {
-  s_app_data.one_day_notified = b;
+  s_persist_data.one_day_notified = b;
 }
 
 void data_set_last_charge_time(int ts) {
-  s_app_data.last_charge_time = ts;
+  s_persist_data.last_charge_time = ts;
 }
 
 int data_get_last_charge_time() {
-  return s_app_data.last_charge_time;
+  return s_persist_data.last_charge_time;
 }
 
 bool data_get_one_day_alert() {
-  return s_app_data.one_day_alert;
+  return s_persist_data.one_day_alert;
 }
 
 void data_set_one_day_alert(bool b) {
-  s_app_data.one_day_alert = b;
+  s_persist_data.one_day_alert = b;
+}
+
+void data_set_sync_count(int v) {
+  s_app_state.sync_count = v;
+}
+
+int data_get_sync_count() {
+  return s_app_state.sync_count;
 }

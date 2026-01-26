@@ -152,13 +152,11 @@ void util_menu_cell_draw(GContext *ctx, Layer *layer, char *title, char *desc) {
   PreferredContentSize content_size = preferred_content_size();
   // APP_LOG(APP_LOG_LEVEL_INFO, "content_size: %d", (int)content_size);
 
-#if !defined(TEST_FORCE_SCALING)
   // Medium or smaller (rare?), use regular rendering
   if (content_size <= PreferredContentSizeMedium) {
     menu_cell_basic_draw(ctx, layer, title, desc, NULL);
     return;
   }
-#endif
 
   // Else, use larger one
   GRect title_rect = GRect(
