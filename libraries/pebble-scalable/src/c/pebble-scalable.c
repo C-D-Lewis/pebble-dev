@@ -13,6 +13,8 @@
 
 // Half the scale input in thousandths
 #define _T_PERC_HALF_RANGE 500
+// Square root of 2 divided 2, multiplied by 1000
+#define SQRT_2_OVER_2 707
 
 static int scale(int t_perc, int dimension) {
   return ((t_perc * dimension) + _T_PERC_HALF_RANGE) / 1000;
@@ -57,10 +59,20 @@ GRect scl_center(GRect r) {
   return scl_center_x(scl_center_y(r));
 }
 
+GRect scl_largest_square() {
+#if defined(PBL_PLATFORM_CHALK)
+  // Side size is diameter * (sqrt(2) / 2)
+  const int side = (PS_DISP_W * SQRT_2_OVER_2) / 1000;
+  return scl_center(GRect(0, 0, side, side));
+#else
+  return scl_center(GRect(0, 0, PS_DISP_W, PS_DISP_W));
+#endif
+}
+
 /////////////////////////////////////////////// Fonts //////////////////////////////////////////////
 
 // Max font sets that can be stored
-#define _MAX_FONT_SETS 16
+#define _MAX_FONT_SETS 32
 
 // Macro to pick the pointer based on the build target
 #if defined(PBL_PLATFORM_CHALK)
@@ -73,21 +85,21 @@ GRect scl_center(GRect r) {
 
 static GFont s_fonts_ptrs[_MAX_FONT_SETS];
 
-void _scl_set_fonts_impl(int size_id, SF fonts) {
-  if (size_id >= _MAX_FONT_SETS) {
-    APP_LOG(APP_LOG_LEVEL_ERROR, "ps: font id %d exceeds max", size_id);
+void _scl_set_fonts_impl(int font_id, SF fonts) {
+  if (font_id >= _MAX_FONT_SETS) {
+    APP_LOG(APP_LOG_LEVEL_ERROR, "ps: font id %d exceeds max", font_id);
     return;
   }
 
   // Pick the correct pointer now and store only that one
-  s_fonts_ptrs[size_id] = GET_SF(fonts);
+  s_fonts_ptrs[font_id] = GET_SF(fonts);
 }
 
-GFont scl_get_font(int size_id) {
-  if (size_id >= _MAX_FONT_SETS || s_fonts_ptrs[size_id] == NULL) {
-    APP_LOG(APP_LOG_LEVEL_ERROR, "ps: font %d not set", size_id);
+GFont scl_get_font(int font_id) {
+  if (font_id >= _MAX_FONT_SETS || s_fonts_ptrs[font_id] == NULL) {
+    APP_LOG(APP_LOG_LEVEL_ERROR, "ps: font %d not set", font_id);
     return NULL; 
   }
 
-  return s_fonts_ptrs[size_id];
+  return s_fonts_ptrs[font_id];
 }

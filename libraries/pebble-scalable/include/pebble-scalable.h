@@ -72,6 +72,11 @@ GRect scl_center_y(GRect r);
  */
 GRect scl_center(GRect r);
 
+/**
+ * Get the largest possible centered GRect (useful for circular displays)
+ */
+GRect scl_largest_square();
+
 ////////////////////////////////////////////// Fonts ///////////////////////////////////////////////
 
 // Struct allowing specifying per-platform fonts (expandable!)

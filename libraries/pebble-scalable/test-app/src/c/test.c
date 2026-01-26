@@ -93,6 +93,10 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     scl_center_x(scl_grect(0, 850, 150, 150))
   );
 
+  // Draw largest available square, inset 2px
+  GRect lrg_sq = grect_inset(scl_largest_square(), GEdgeInsets(2));
+  graphics_draw_rect(ctx, lrg_sq);
+
   APP_LOG(APP_LOG_LEVEL_INFO, "W/H: %dx%d", PS_DISP_W, PS_DISP_H);
 }
 
