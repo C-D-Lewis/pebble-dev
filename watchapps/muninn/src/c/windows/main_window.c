@@ -487,7 +487,7 @@ static void window_load(Window *window) {
 
   update_data();
 
-  APP_LOG(APP_LOG_LEVEL_INFO, "Heap %d", heap_bytes_free());
+  // APP_LOG(APP_LOG_LEVEL_INFO, "Heap %d", heap_bytes_free());
 }
 
 static void window_unload(Window *window) {
