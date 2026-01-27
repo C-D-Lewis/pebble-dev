@@ -16,15 +16,16 @@ Some PBWs can be found in `/pbw` for sideloading.
 
 > Platforms: `A` = Aplite, `B` = Basalt, `C` = Chalk, `D` = Diorite, `E` = Emery, `F` = Flint
 
-| Name                  | Screenshot                                                 | Builds                  | Icon | PBW                                |
-|-----------------------|------------------------------------------------------------|-------------------------|------|------------------------------------|
-| `beam-up`             | ![](watchfaces/beam-up/screenshots/aplite.png)             | `A` `B` `C` `D` `E` `F` | ✅    | [pbw](pbw/beam-up.pbw)             |
-| `brackets`            | ![](watchfaces/brackets/screenshots/diorite.png)           | `A` `B` `C` `D` `E`     | ✅    | [pbw](pbw/brackets.pbw)            |
-| `cards`               | ![](watchfaces/cards/screenshots/diorite.png)              | `A` `B` `D`             |      | [pbw](pbw/cards.pbw)               |
-| `cmd-time-typed`      | ![](watchfaces/cmd-time-typed/screenshots/diorite.png)     | `A` `B` `C` `D` `E`     | ✅    | [pbw](pbw/cmd-time-typed.pbw)      |
-| `cmd-time`            | ![](watchfaces/cmd-time/screenshots/diorite.png)           | `A` `B` `C` `D` `E`     | ✅    | [pbw](pbw/cmd-time.pbw)            |
-| `dayring`             | ![](watchfaces/dayring/screenshots/basalt.png)             | `A` `B` `C` `D` `E` `F` |      | [pbw](pbw/dayring.pbw)             |
-| `deep-rock`           | ![](watchfaces/deep-rock/screenshots/basalt.png)           | `A` `B` `D`             |      | [pbw](pbw/deep-rock.pbw)           |
+| Name             | Screenshot                                             | Builds                  | Icon | PBW                           |
+|------------------|--------------------------------------------------------|-------------------------|------|-------------------------------|
+| `beam-up`        | ![](watchfaces/beam-up/screenshots/aplite.png)         | `A` `B` `C` `D` `E` `F` | ✅    | [pbw](pbw/beam-up.pbw)        |
+| `brackets`       | ![](watchfaces/brackets/screenshots/diorite.png)       | `A` `B` `C` `D` `E`     | ✅    | [pbw](pbw/brackets.pbw)       |
+| `cards`          | ![](watchfaces/cards/screenshots/diorite.png)          | `A` `B` `D`             |      | [pbw](pbw/cards.pbw)          |
+| `cmd-time-typed` | ![](watchfaces/cmd-time-typed/screenshots/diorite.png) | `A` `B` `C` `D` `E`     | ✅    | [pbw](pbw/cmd-time-typed.pbw) |
+| `cmd-time`       | ![](watchfaces/cmd-time/screenshots/diorite.png)       | `A` `B` `C` `D` `E`     | ✅    | [pbw](pbw/cmd-time.pbw)       |
+| `dayring`        | ![](watchfaces/dayring/screenshots/basalt.png)         | `A` `B` `C` `D` `E` `F` |      | [pbw](pbw/dayring.pbw)        |
+| `deep-rock`      | ![](watchfaces/deep-rock/screenshots/basalt.png)       | `A` `B` `D`             |      | [pbw](pbw/deep-rock.pbw)      |
+| `dont-panic` | ![](watchfaces/dont-panic/screenshots/emery.png) | `E` | [pbw](pbw/dont-panic.pbw) |
 | `dual-gauge`          | ![](watchfaces/dual-gauge/screenshots/basalt.png)          | `A` `B` `C` `D`         |      | [pbw](pbw/dual-gauge.pbw)          |
 | `eclipse`             | ![](watchfaces/eclipse/screenshots/aplite.png)             | `A` `B` `D`             |      | [pbw](pbw/eclipse.pbw)             |
 | `eventful`            | ![](watchfaces/eventful/screenshots/aplite.png)            | `A` `B` `C` `D`         |      | [pbw](pbw/eventful.pbw)            |
