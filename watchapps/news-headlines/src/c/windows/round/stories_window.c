@@ -1,8 +1,6 @@
 #include "stories_window.h"
 
-// TODO: Revert scalable changes
-
-#define STATUS_BAR_H scalable_y(120)
+#define STATUS_BAR_H scl_y(120)
 
 static Window *s_window;
 static Layer *s_title_layer;

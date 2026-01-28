@@ -1,6 +1,6 @@
 #include "splash_window.h"
 
-#define BAR_WIDTH scalable_x(450)
+#define BAR_WIDTH scl_x(450)
 
 static Window *s_window;
 static BitmapLayer *s_logo_layer;
@@ -44,7 +44,7 @@ static void load_cache_handler(void *context) {
  * Simple progress bar with inset
  */
 static void progress_bar_update_proc(Layer *layer, GContext *ctx) {
-  const int cap_radius = scalable_x(35);
+  const int cap_radius = scl_x(35);
   const int inset = 2;
 
   // Background
@@ -91,7 +91,7 @@ static void window_load(Window *this) {
   s_bar_layer = layer_create(
     GRect(
       x_margin,
-      logo_y_margin + logo_size.h + scalable_y(100),
+      logo_y_margin + logo_size.h + scl_y(100),
       bounds.size.w - (2 * x_margin),
       25
     )

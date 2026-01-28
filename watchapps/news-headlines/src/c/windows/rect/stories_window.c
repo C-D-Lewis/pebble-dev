@@ -1,6 +1,6 @@
 #include "stories_window.h"
 
-#define STATUS_BAR_H scalable_y(120)
+#define STATUS_BAR_H scl_y(120)
 
 static Window *s_window;
 static Layer *s_title_layer;
@@ -54,7 +54,7 @@ static void title_update_proc(Layer *layer, GContext *ctx) {
   graphics_fill_rect(ctx, bounds, 0, GCornerNone);
 
   // Top decorations
-  const int deco_margin = scalable_x(30);
+  const int deco_margin = scl_x(30);
   graphics_context_set_fill_color(ctx, GColorDarkGray);
   graphics_fill_rect(
     ctx,
@@ -62,7 +62,7 @@ static void title_update_proc(Layer *layer, GContext *ctx) {
       bounds.origin.x + deco_margin,
       bounds.origin.y + deco_margin,
       bounds.size.w - (2 * deco_margin),
-      scalable_y(20)
+      scl_y(20)
     ),
     0,
     GCornerNone
@@ -73,7 +73,7 @@ static void title_update_proc(Layer *layer, GContext *ctx) {
       bounds.origin.x + deco_margin,
       bounds.origin.y + (2 * deco_margin) + 2,
       bounds.size.w - (2 * deco_margin),
-      scalable_y(30)
+      scl_y(30)
     ),
     0,
     GCornerNone
@@ -82,13 +82,13 @@ static void title_update_proc(Layer *layer, GContext *ctx) {
   // Title
   GRect title_bounds = grect_inset(
     bounds,
-    GEdgeInsets(scalable_y_pp(60, 70), scalable_x(10), 0, scalable_x(10))
+    GEdgeInsets(scl_y_pp({.o = 60, .e = 70}), scl_x(10), 0, scl_x(10))
   );
   graphics_context_set_text_color(ctx, GColorBlack);
   graphics_draw_text(
     ctx,
     story->title,
-    scalable_get_font(SFI_MediumBold),
+    scl_get_font(SFI_MediumBold),
     title_bounds,
     GTextOverflowModeWordWrap,
     GTextAlignmentCenter,
@@ -97,7 +97,7 @@ static void title_update_proc(Layer *layer, GContext *ctx) {
 
   GSize title_size = graphics_text_layout_get_content_size(
     story->title,
-    scalable_get_font(SFI_MediumBold),
+    scl_get_font(SFI_MediumBold),
     title_bounds,
     GTextOverflowModeWordWrap,
     GTextAlignmentCenter
@@ -106,7 +106,7 @@ static void title_update_proc(Layer *layer, GContext *ctx) {
   // Dummy text boxes
   graphics_context_set_fill_color(ctx, GColorLightGray);
   srand(time(NULL));
-  int y = bounds.origin.y + scalable_y(50) + title_size.h + scalable_y(60);
+  int y = bounds.origin.y + scl_y(50) + title_size.h + scl_y(60);
   graphics_fill_rect(
     ctx,
     GRect(
@@ -118,7 +118,7 @@ static void title_update_proc(Layer *layer, GContext *ctx) {
     0,
     GCornerNone
   );
-  y += (s_fake_para_widths[0] / 2) + scalable_y(20);
+  y += (s_fake_para_widths[0] / 2) + scl_y(20);
   graphics_fill_rect(
     ctx,
     GRect(
@@ -130,7 +130,7 @@ static void title_update_proc(Layer *layer, GContext *ctx) {
     0,
     GCornerNone
   );
-  y += (s_fake_para_widths[1] / 2) + scalable_y(20);
+  y += (s_fake_para_widths[1] / 2) + scl_y(20);
   graphics_fill_rect(
     ctx,
     GRect(
@@ -240,7 +240,7 @@ static void window_load(Window *this) {
   s_wrench_bitmap = gbitmap_create_with_resource(RESOURCE_ID_SPANNER);
 
   const GEdgeInsets title_insets = {
-    .top = STATUS_BAR_H + scalable_y(2),
+    .top = STATUS_BAR_H + scl_y(2),
   };
   s_title_layer = layer_create(grect_inset(bounds, title_insets));
   layer_set_update_proc(s_title_layer, title_update_proc);
@@ -293,7 +293,7 @@ static void window_load(Window *this) {
 #endif
   s_status_layer = text_layer_create(status_bounds);
   text_layer_set_text_color(s_status_layer, GColorWhite);
-  text_layer_set_font(s_status_layer, scalable_get_font(SFI_StatusLayer));
+  text_layer_set_font(s_status_layer, scl_get_font(SFI_StatusLayer));
   text_layer_set_background_color(s_status_layer, GColorClear);
   text_layer_set_text_alignment(s_status_layer, GTextAlignmentRight);
   text_layer_set_overflow_mode(s_status_layer, GTextOverflowModeTrailingEllipsis);

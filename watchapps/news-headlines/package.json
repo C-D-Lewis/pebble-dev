@@ -1,10 +1,10 @@
 {
   "name": "news-headlines",
-  "version": "4.11.0",
+  "version": "4.12.0",
   "author": "Chris Lewis",
   "private": true,
   "dependencies": {
-    "pebble-scalable": "^1.5.1"
+    "pebble-scalable": "^2.1.0"
   },
   "keywords": [
     "pebble-app"

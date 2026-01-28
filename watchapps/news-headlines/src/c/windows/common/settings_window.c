@@ -1,7 +1,7 @@
 #include "settings_window.h"
 
 #define NUM_SETTINGS 4
-#define ROW_HEIGHT_LARGE scalable_y(300)
+#define ROW_HEIGHT_LARGE scl_y(300)
 
 static Window *s_main_window;
 static MenuLayer *s_menu_layer;
@@ -25,18 +25,15 @@ static void menu_cell_draw(GContext *ctx, Layer *layer, char *title, char *desc)
 #endif
 
   // Else, use larger one
-  GRect title_rect = scalable_grect_pp(
-    GRect(30, -30, 1000, 300),
-    GRect(30, -10, 1000, 300)
-  );
+  GRect title_rect = GRect(scl_x(30), scl_y_pp({.o = -30, .e = -10}), PS_DISP_W, scl_y(300));
   if (desc == NULL) {
-    title_rect.origin.y += scalable_y(30);
+    title_rect.origin.y += scl_y(30);
   }
 
   graphics_draw_text(
     ctx,
     title,
-    scalable_get_font(SFI_MediumBold),
+    scl_get_font(SFI_MediumBold),
     title_rect,
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentLeft,
@@ -47,11 +44,8 @@ static void menu_cell_draw(GContext *ctx, Layer *layer, char *title, char *desc)
     graphics_draw_text(
       ctx,
       desc,
-      scalable_get_font(SFI_Medium),
-      scalable_grect_pp(
-        GRect(30, 110, 1000, 300),
-        GRect(30, 130, 1000, 300)
-      ),
+      scl_get_font(SFI_Medium),
+      GRect(scl_x(30), scl_y_pp({.o = 110, .e = 130}), PS_DISP_W, scl_y(300)),
       GTextOverflowModeTrailingEllipsis,
       GTextAlignmentLeft,
       NULL
