@@ -3,6 +3,7 @@
 Package aiming to make it easy to make scaling layouts for different display
 sizes by defining their dimensions only once in an app.
 
+- [Features](#features)
 - [Setting up](#setting-up)
 - [Layout](#layout)
 - [Constants](#constants)
@@ -10,7 +11,9 @@ sizes by defining their dimensions only once in an app.
 - [Fonts](#fonts)
 - [Images](#images)
 
-See `include/pebble-scalable.h` for function documentation.
+## Features
+
+See `include/pebble-scalable.h` for full function documentation.
 
 ## Setting up
 
@@ -95,6 +98,14 @@ const GRect centered_v = scl_center_y(r);
 
 // Or both!
 const GRect centered = scl_center(r);
+```
+
+On any display shape, you can get the largest completely visible square, which
+is useful on round displays if you want to avoid things being obscured by the
+corners:
+
+```c
+const GRect visible = scl_largest_square();
 ```
 
 ## Fonts
