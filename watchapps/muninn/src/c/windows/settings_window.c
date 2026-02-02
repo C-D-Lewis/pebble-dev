@@ -15,7 +15,7 @@ typedef enum {
   MI_ONE_DAY_ALERT,
 
   MI_BATTERY_TIPS,
-  // MI_SYNC_INFO,
+  MI_SYNC_INFO,
   MI_DELETE_ALL_DATA,
   MI_VERSION,
 
@@ -93,14 +93,14 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
     case MI_BATTERY_TIPS:
       util_menu_cell_draw(ctx, cell_layer, "Battery tips", NULL);
       break;
-    // case MI_SYNC_INFO:
-    //   util_menu_cell_draw(
-    //     ctx,
-    //     cell_layer,
-    //     "History on phone",
-    //     s_sync_buff
-    //   );
-    //   break;
+    case MI_SYNC_INFO:
+      util_menu_cell_draw(
+        ctx,
+        cell_layer,
+        "History on phone",
+        s_sync_buff
+      );
+      break;
     case MI_DELETE_ALL_DATA:
       util_menu_cell_draw(
         ctx,
@@ -131,7 +131,7 @@ static int16_t get_cell_height_callback(struct MenuLayer *menu_layer, MenuIndex 
     case MI_PUSH_TIMELINE_PINS:
     case MI_ELEVATED_RATE_ALERT:
     case MI_ONE_DAY_ALERT:
-    // case MI_SYNC_INFO:
+    case MI_SYNC_INFO:
     case MI_VERSION:
       return ROW_HEIGHT_LARGE;
     case MI_DELETE_ALL_DATA:
@@ -164,10 +164,10 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
     case MI_BATTERY_TIPS:
       message_window_push(MSG_TIPS, false, false);
       break;
-    // case MI_SYNC_INFO:
-      // // Show more details on message window or dedicated window - value!
-      // message_window_push("Samples are being sent to a larger history on the phone.\n\nWatch this space...", false, false);
-      // break;
+    case MI_SYNC_INFO:
+      // TODO: Show more details on message window or dedicated window - value!
+      message_window_push("Samples are being sent to a larger history on the phone.\n\nWatch this space...", false, false);
+      break;
     case MI_DELETE_ALL_DATA:
       if (s_reset_confirm) {
         data_reset_all();

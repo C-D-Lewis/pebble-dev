@@ -1,30 +1,21 @@
+import { HistoryItem } from './types';
+
 /** Maximum stored items */
-var MAX_ITEMS = 64;
+const MAX_ITEMS = 64;
 /** LocalStorage key - data history */
-var LS_KEY_HISTORY = 'history';
-/** Map of AppMessage fields to JS sample model */
-var FIELD_MAP = {
-  SAMPLE_TIMESTAMP: 'timestamp',
-  SAMPLE_RESULT: 'result',
-  SAMPLE_CHARGE_PERC: 'chargePerc',
-  SAMPLE_TIME_DIFF: 'timeDiff',
-  SAMPLE_CHARGE_DIFF: 'chargeDiff',
-  SAMPLE_RATE: 'rate'
-};
-/** All expected keys */
-var MESSAGE_KEYS = Object.keys(FIELD_MAP);
+const LS_KEY_HISTORY = 'history';
 
 /**
  * Save the history of samples.
  */
-function saveHistory(history) {
+const saveHistory = (history: HistoryItem[]) => {
   localStorage.setItem(LS_KEY_HISTORY, JSON.stringify(history));
-}
+};
 
 /**
  * Load the history of samples.
  */
-function loadHistory() {
+const loadHistory = (): HistoryItem[] => {
   try {
     return JSON.parse(localStorage.getItem(LS_KEY_HISTORY) || '[]');
   } catch (e) {
@@ -32,37 +23,37 @@ function loadHistory() {
     console.error(e);
     throw e;
   }
-}
+};
 
 /**
  * Send the watch the last seen timestamp so updates can be incremental.
  */
-function handleGetSyncInfo() {
-  var history = loadHistory();
+export const handleGetSyncInfo = async () => {
+  const history = loadHistory();
   // console.log(JSON.stringify(localStorage.getItem('history')));
 
-  var timestamp = -1; // STATUS_EMPTY
+  let timestamp = -1; // STATUS_EMPTY
   if (history.length > 0) {
     timestamp = history[0].timestamp;
   }
 
-  Pebble.sendAppMessage({
+  await PebbleTS.sendAppMessage({
     SYNC_TIMESTAMP: timestamp,
     SYNC_COUNT: history.length
   });
-}
+};
 
 /**
  * Importing data should be as robust as possible.
  *
  * TODO: How do we handle adding new fields?
  */
-function handleSync(dict) {
-  var history = loadHistory();
-  var timestamp = dict.SAMPLE_TIMESTAMP;
+export const handleSync = async (dict: Record<string, any>) => {
+  let history = loadHistory();
+  const timestamp = dict.SAMPLE_TIMESTAMP;
 
   // Manual loop replaces .find() which coreapp doesn't like
-  for (var i = 0; i < history.length; i++) {
+  for (let i = 0; i < history.length; i++) {
     if (history[i].timestamp === timestamp) {
       console.log('Skipping duplicate: ' + timestamp);
       return;
@@ -70,26 +61,21 @@ function handleSync(dict) {
   }
 
   // Construct local sample
-  var sample = {};
-  for (var j = 0; j < MESSAGE_KEYS.length; j++) {
-    var key = MESSAGE_KEYS[j];
-    if (typeof dict[key] === 'undefined') throw new Error('Missing field: ' + key);
-    if (!FIELD_MAP[key]) throw new Error('Unknown key: ' + key);
-
-    sample[FIELD_MAP[key]] = dict[key];
-  }
+  const sample: HistoryItem = {
+    timestamp: dict.SAMPLE_TIMESTAMP,
+    result: dict.SAMPLE_RESULT,
+    chargePerc: dict.SAMPLE_CHARGE_PERC,
+    timeDiff: dict.SAMPLE_TIME_DIFF,
+    chargeDiff: dict.SAMPLE_CHARGE_DIFF,
+    rate: dict.SAMPLE_RATE,
+  };
   history.push(sample);
 
   // Sort to match watch order and limit length
   history = history
-    .sort(function(a, b) { return a.timestamp > b.timestamp ? -1 : 1 })
+    .sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     .slice(0, MAX_ITEMS);
 
   saveHistory(history);
   console.log('Saved new sample: ' + JSON.stringify(sample));
-}
-
-module.exports = {
-  handleGetSyncInfo,
-  handleSync,
 };

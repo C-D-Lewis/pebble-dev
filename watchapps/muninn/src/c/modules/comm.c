@@ -2,7 +2,7 @@
 
 // Can't use pebble-packet due to low memory on aplite. Sad packet noises.
 
-static int s_sync_index = -1;
+static int s_sync_index = STATUS_EMPTY;
 
 static void add_push_pin_data(DictionaryIterator *iter) {
 #if defined(TEST_TIMELINE_PIN)
@@ -54,7 +54,6 @@ static void send_sample(int index) {
 static void send_timer_handler(void *context) {
   int index = (int)context;
 
-  // Send the one we found
   // APP_LOG(APP_LOG_LEVEL_INFO, "Export %d", index);
   s_sync_index = index;
   send_sample(index);
@@ -70,7 +69,6 @@ static void send_samples_after(int last_ts) {
     index--;
   }
 
-  // Reached end
   if (index < 0) {
     // APP_LOG(APP_LOG_LEVEL_INFO, "Exported");
     return;
@@ -84,11 +82,10 @@ void out_failed_handler(DictionaryIterator *failed, AppMessageResult reason, voi
 }
 
 void out_sent_handler(DictionaryIterator *iterator, void *context) {
-  if (s_sync_index > 0) {
-    // Find next item from here
-    const Sample *s = data_get_sample(s_sync_index);
-    send_samples_after(s->timestamp);
-  }
+  if (s_sync_index < 0) return;
+
+  const Sample *s = data_get_sample(s_sync_index);
+  send_samples_after(s->timestamp);
 }
 
 void inbox_received_handler(DictionaryIterator *iter, void *context) {
@@ -99,10 +96,7 @@ void inbox_received_handler(DictionaryIterator *iter, void *context) {
     DictionaryIterator *iter;
     app_message_outbox_begin(&iter);
     if (data_get_push_timeline_pins()) add_push_pin_data(iter);
-
-    // Feature is WIP
-    // add_get_sync_info_data(iter);
-    
+    add_get_sync_info_data(iter);
     app_message_outbox_send();
     return;
   }
@@ -114,7 +108,7 @@ void inbox_received_handler(DictionaryIterator *iter, void *context) {
 
     Tuple *count_tuple = dict_find(iter, MESSAGE_KEY_SYNC_COUNT);
     const int sync_count = (int)count_tuple->value->int32;
-    // APP_LOG(APP_LOG_LEVEL_INFO, "Sync: %d (%d)", last_ts, sync_count);
+    APP_LOG(APP_LOG_LEVEL_INFO, "Sync: %d (%d)", last_ts, sync_count);
 
     // TODO: If watch is empty and phone has data, option to sync back to watch?
     //       Only if it is intended that JS data persists when watchapp is uninstalled

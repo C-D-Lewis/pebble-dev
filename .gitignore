@@ -13,3 +13,4 @@ node_modules/
 *.DS_Store
 
 secrets.js.bak
+ts-build
