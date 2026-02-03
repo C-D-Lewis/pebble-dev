@@ -40,7 +40,7 @@
 //                                       //
 // #define TEST_COLLISION true           //
 //                                       //
-#define TEST_TIMELINE_PIN true        //
+// #define TEST_TIMELINE_PIN true        //
 //                                       //
 ///////////////////////////////////////////
 

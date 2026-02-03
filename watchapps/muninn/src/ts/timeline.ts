@@ -17,16 +17,28 @@ const timelineRequest = async (pin: TimelinePin, method: HttpMethod) => {
   const url = `${API_URL_ROOT}/v1/user/pins/${pin.id}`;
 
   const token = await PebbleTS.getTimelineToken();
-  const res = await fetch(url, {
-    method,
-    headers: {
-      'Content-Type': 'application/json',
-      'X-User-Token': token,
-    },
-  });
 
-  const json = await res.json();
-  return json;
+  // coreapp throws:
+  //   InvalidStateError: Failed to execute 'send' on 'XMLHttpRequest': The object's state must be OPENED
+  //
+  // const res = await fetch(url, {
+  //   method,
+  //   headers: {
+  //     'Content-Type': 'application/json',
+  //     'X-User-Token': token,
+  //   },
+  // });
+  // const json = await res.json();
+  // console.log(JSON.stringify(json));
+
+  return new Promise((resolve) => {
+    var xhr = new XMLHttpRequest();
+    xhr.onload = resolve;
+    xhr.open(method, url);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.setRequestHeader('X-User-Token', token);
+    xhr.send(JSON.stringify(pin));
+  });
 };
 
 /**
@@ -63,5 +75,6 @@ export const handlePushTimelinePin = async (dict: Record<string, any>) => {
   };
 
   console.log(`Inserting pin: ${JSON.stringify(pin)}`);
-  return insertUserPin(pin);
+  await insertUserPin(pin);
+  console.log('Pin insert returned');
 };
