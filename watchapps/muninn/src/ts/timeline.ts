@@ -10,10 +10,10 @@ const PIN_ID_PREDICTION = 'muninn-prediction';
 
 /**
  * Send a request to the Rebble public web timeline API.
+ *
  * @param pin The JSON pin to insert. Must contain 'id' field.
- * @param method The method of request, either PUT or DELETE.
  */
-const timelineRequest = async (pin: TimelinePin, method: HttpMethod) => {
+const timelineRequest = async (pin: TimelinePin) => {
   const url = `${API_URL_ROOT}/v1/user/pins/${pin.id}`;
 
   const token = await PebbleTS.getTimelineToken();
@@ -22,7 +22,7 @@ const timelineRequest = async (pin: TimelinePin, method: HttpMethod) => {
   //   InvalidStateError: Failed to execute 'send' on 'XMLHttpRequest': The object's state must be OPENED
   //
   // const res = await fetch(url, {
-  //   method,
+  //   method: 'PUT',
   //   headers: {
   //     'Content-Type': 'application/json',
   //     'X-User-Token': token,
@@ -31,21 +31,15 @@ const timelineRequest = async (pin: TimelinePin, method: HttpMethod) => {
   // const json = await res.json();
   // console.log(JSON.stringify(json));
 
-  return new Promise((resolve) => {
+  await new Promise((resolve) => {
     var xhr = new XMLHttpRequest();
     xhr.onload = resolve;
-    xhr.open(method, url);
+    xhr.open('PUT', url);
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.setRequestHeader('X-User-Token', token);
     xhr.send(JSON.stringify(pin));
   });
 };
-
-/**
- * Insert a pin into the timeline for this user.
- * @param pin The JSON pin to insert.
- */
-const insertUserPin = async (pin: TimelinePin) => timelineRequest(pin, 'PUT');
 
 /**
  * Handle request to push a timeline pin.
@@ -75,6 +69,13 @@ export const handlePushTimelinePin = async (dict: Record<string, any>) => {
   };
 
   console.log(`Inserting pin: ${JSON.stringify(pin)}`);
-  await insertUserPin(pin);
+  try {
+    await PebbleTS.insertTimelinePin(pin);
+  } catch (e) {
+    console.log(e);
+
+    // Fallback method
+    await timelineRequest(pin);
+  }
   console.log('Pin insert returned');
 };
