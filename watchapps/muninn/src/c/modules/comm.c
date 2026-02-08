@@ -89,35 +89,49 @@ void out_sent_handler(DictionaryIterator *iterator, void *context) {
 }
 
 void inbox_received_handler(DictionaryIterator *iter, void *context) {
+  PersistData *persist_data = data_get_persist_data();
+  AppState *app_state = data_get_app_state();
+
   // Things to do when JS is ready
-  Tuple *ready_tuple = dict_find(iter, MESSAGE_KEY_READY);
-  if (ready_tuple) {
+  Tuple *r_tuple = dict_find(iter, MESSAGE_KEY_READY);
+  if (r_tuple) {
     // We can only respond with one AppMessage at a time it seems
     DictionaryIterator *iter;
     app_message_outbox_begin(&iter);
-    if (data_get_push_timeline_pins()) add_push_pin_data(iter);
+    if (persist_data->push_timeline_pins) add_push_pin_data(iter);
     add_get_sync_info_data(iter);
     app_message_outbox_send();
     return;
   }
 
   // Response to last timestamp request
-  Tuple *timestamp_tuple = dict_find(iter, MESSAGE_KEY_SYNC_TIMESTAMP);
-  if (timestamp_tuple) {
-    const int last_ts = (int)timestamp_tuple->value->int32;
+  Tuple *t_tuple = dict_find(iter, MESSAGE_KEY_SYNC_TIMESTAMP);
+  if (t_tuple) {
+    const int last_ts = (int)t_tuple->value->int32;
 
-    Tuple *count_tuple = dict_find(iter, MESSAGE_KEY_SYNC_COUNT);
-    const int sync_count = (int)count_tuple->value->int32;
+    Tuple *c_tuple = dict_find(iter, MESSAGE_KEY_SYNC_COUNT);
+    const int sync_count = (int)c_tuple->value->int32;
     APP_LOG(APP_LOG_LEVEL_INFO, "Sync: %d (%d)", last_ts, sync_count);
 
     // TODO: If watch is empty and phone has data, option to sync back to watch?
     //       Only if it is intended that JS data persists when watchapp is uninstalled
 
-    data_set_sync_count(sync_count);
+    app_state->sync_count = sync_count;
     settings_window_reload();
 
     send_samples_after(last_ts);
     return;
+  }
+
+  // Response to sync stats request
+  Tuple *t_d_tuple = dict_find(iter, MESSAGE_KEY_STAT_TOTAL_DAYS);
+  if (t_d_tuple) {
+    app_state->stat_total_days = t_d_tuple->value->int32;
+
+    Tuple *a_t_r_tuple = dict_find(iter, MESSAGE_KEY_STAT_ALL_TIME_RATE);
+    app_state->stat_all_time_rate = a_t_r_tuple->value->int32;
+
+    stats_window_reload();
   }
 }
 

@@ -32,8 +32,11 @@ static uint16_t get_num_rows_callback(MenuLayer *menu_layer, uint16_t section_in
 }
 
 static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_index, void *context) {
+  PersistData *persist_data = data_get_persist_data();
+  AppState *app_state = data_get_app_state();
+
   // Alert level detail
-  const int alert_level = data_get_custom_alert_level();
+  const int alert_level = persist_data->custom_alert_level;
   const bool alert_disabled = alert_level == AL_OFF;
   static char s_alert_buff[24];
   if (!alert_disabled) {
@@ -42,7 +45,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
 
   // Sync status
   static char s_sync_buff[18];
-  const int sync_count = data_get_sync_count();
+  const int sync_count = app_state->sync_count;
   if (sync_count == STATUS_EMPTY) {
     snprintf(s_sync_buff, sizeof(s_sync_buff), "Loading...");
   } else {
@@ -55,7 +58,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
         ctx,
         cell_layer,
         "Vibrate on sample",
-        data_get_vibe_on_sample() ? "Enabled" : "Disabled"
+        persist_data->vibe_on_sample ? "Enabled" : "Disabled"
       );
       break;
     case MI_CUSTOM_ALERT_LEVEL:
@@ -71,7 +74,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
         ctx,
         cell_layer,
         "Timeline pins",
-        data_get_push_timeline_pins() ? "Enabled" : "Disabled"
+        persist_data->push_timeline_pins ? "Enabled" : "Disabled"
       );
       break;
     case MI_ELEVATED_RATE_ALERT:
@@ -79,7 +82,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
         ctx,
         cell_layer,
         "High drain alert",
-        data_get_elevated_rate_alert() ? "Enabled" : "Disabled"
+        persist_data->elevated_rate_alert ? "Enabled" : "Disabled"
       );
       break;
     case MI_ONE_DAY_ALERT:
@@ -87,7 +90,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
         ctx,
         cell_layer,
         "One day left alert",
-        data_get_one_day_alert() ? "Enabled" : "Disabled"
+        persist_data->one_day_alert ? "Enabled" : "Disabled"
       );
       break;
     case MI_BATTERY_TIPS:
@@ -142,22 +145,25 @@ static int16_t get_cell_height_callback(struct MenuLayer *menu_layer, MenuIndex 
 }
 
 static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) {
+  PersistData *persist_data = data_get_persist_data();
+  AppState *app_state = data_get_app_state();
+
   switch(cell_index->row) {
     // Options
     case MI_VIBE_ON_SAMPLE:
-      data_set_vibe_on_sample(!data_get_vibe_on_sample());
+      persist_data->vibe_on_sample = !persist_data->vibe_on_sample;
       break;
     case MI_CUSTOM_ALERT_LEVEL:
       data_cycle_custom_alert_level();
       break;
     case MI_PUSH_TIMELINE_PINS:
-      data_set_push_timeline_pins(!data_get_push_timeline_pins());
+      persist_data->push_timeline_pins = !persist_data->push_timeline_pins;
       break;
     case MI_ELEVATED_RATE_ALERT:
-      data_set_elevated_rate_alert(!data_get_elevated_rate_alert());
+      persist_data->elevated_rate_alert = !persist_data->elevated_rate_alert;
       break;
     case MI_ONE_DAY_ALERT:
-      data_set_one_day_alert(!data_get_one_day_alert());
+      persist_data->one_day_alert = !persist_data->one_day_alert;
       break;
 
     // Other
@@ -165,7 +171,7 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
       message_window_push(MSG_TIPS, false, false);
       break;
     case MI_SYNC_INFO:
-      if (data_get_sync_count() != STATUS_EMPTY) stats_window_push();
+      if (app_state->sync_count != STATUS_EMPTY) stats_window_push();
       break;
     case MI_DELETE_ALL_DATA:
       if (s_reset_confirm) {

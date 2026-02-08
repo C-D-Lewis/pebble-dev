@@ -55,7 +55,7 @@ typedef struct {
 // NOT persisted data
 typedef struct {
   int sync_count;         // Count of synchronized items to the phone
-  int stat_days;          // Days covered by JS history
+  int stat_total_days;          // Days covered by JS history
   int stat_all_time_rate; // All-time avg discharge rate
   // More...
 
@@ -92,38 +92,17 @@ void data_reset_log();
 time_t data_get_next_charge_time();
 int data_calculate_accuracy();
 int data_calculate_days_remaining_accuracy();
-
-// Interface getters/setters
-int data_get_last_sample_time(void);
-void data_set_last_sample_time(int time);
-int data_get_last_charge_perc(void);
-void data_set_last_charge_perc(int perc);
-int data_get_wakeup_id();
-void data_set_wakeup_id(int id);
-Sample* data_get_sample(int index);
-void data_set_error(char *err);
-char* data_get_error();
-void data_set_seen_first_launch();
-bool data_get_seen_first_launch();
-bool data_get_vibe_on_sample();
-void data_set_vibe_on_sample(bool v);
-int data_get_custom_alert_level();
 int data_get_valid_samples_count();
 int data_get_log_length();
-bool data_get_ca_has_notified();
-void data_set_ca_has_notified(bool notified);
-bool data_get_push_timeline_pins();
-void data_set_push_timeline_pins(bool b);
-bool data_get_elevated_rate_alert();
-void data_set_elevated_rate_alert(bool b);
-bool data_get_one_day_notified();
-void data_set_one_day_notified(bool b);
-void data_set_last_charge_time(int ts);
-int data_get_last_charge_time();
-bool data_get_one_day_alert();
-void data_set_one_day_alert(bool b);
-void data_set_sync_count(int v);
-int data_get_sync_count();
+
+// Interface getters/setters
+void data_set_error(char *err);
+char* data_get_error();
+
+// Struct getters/setters - I trust myself!
+Sample* data_get_sample(int index);
+PersistData* data_get_persist_data();
+AppState* data_get_app_state();
 
 // Strings
 #define MSG_WELCOME "Welcome to Muninn!\n\nEstimates will appear after two samples are taken.\n\nPlease launch me if the watch is off and a sample is missed."

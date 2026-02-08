@@ -80,11 +80,13 @@ void util_fmt_time_unit(time_t ts, char *buff, int size) {
 }
 
 char* util_get_status_string() {
-  const bool is_enabled = util_is_not_status(data_get_wakeup_id());
+  PersistData *persist_data = data_get_persist_data();
+
+  const bool is_enabled = util_is_not_status(persist_data->wakeup_id);
   if (!is_enabled) return "Not monitoring";
 
   // No readings at all yet
-  if (!util_is_not_status(data_get_last_sample_time())) return "Awaiting sample...";
+  if (!util_is_not_status(persist_data->last_sample_time)) return "Awaiting sample...";
 
   // Edge case here: no change or charging samples don't count
   // We can't produce a prediction AT ALL unless we have 'discharging' samples...

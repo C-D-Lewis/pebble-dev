@@ -118,8 +118,10 @@ static void cancel_blink() {
 ///////////////////////////////////////////// Handlers /////////////////////////////////////////////
 
 static void update_data() {
+  PersistData *persist_data = data_get_persist_data();
+
   time_t wakeup_ts;
-  const int wakeup_id = data_get_wakeup_id();
+  const int wakeup_id = persist_data->wakeup_id;
   const bool wakeup_id_set = util_is_not_status(wakeup_id);
   const bool found = wakeup_query(wakeup_id, &wakeup_ts);
   s_is_enabled = wakeup_id_set && found;
@@ -182,7 +184,7 @@ static void update_data() {
 
     // "Xd" last charge time
     static char s_fmt_lc_buff[8];
-    const int last_charge_ts = data_get_last_charge_time();
+    const int last_charge_ts = persist_data->last_charge_time;
     if (util_is_not_status(last_charge_ts)) {
       util_fmt_time_ago(
         last_charge_ts,
@@ -347,7 +349,9 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
 ////////////////////////////////////////////// Clicks //////////////////////////////////////////////
 
 static void up_long_click_handler(ClickRecognizerRef recognizer, void *context) {
-  const bool should_enable = !util_is_not_status(data_get_wakeup_id());
+  PersistData *persist_data = data_get_persist_data();
+
+  const bool should_enable = !util_is_not_status(persist_data->wakeup_id);
   if (should_enable) {
     s_blink_budget = 5;
     schedule_blink();

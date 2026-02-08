@@ -36,5 +36,17 @@ void stats_window_push() {
 }
 
 void stats_window_reload() {
-  
+  AppState *app_state = data_get_app_state();
+
+  // Display the stats
+  // TODO: Nice layout with icons? As long as they are unloaded!
+  static char s_buff[64];
+  snprintf(
+    s_buff,
+    sizeof(s_buff),
+    "%d days\n%d avg. rate",
+    app_state->stat_total_days,
+    app_state->stat_all_time_rate
+  );
+  text_layer_set_text(s_text_layer, s_buff);
 }

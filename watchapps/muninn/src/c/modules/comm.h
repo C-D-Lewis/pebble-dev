@@ -5,6 +5,7 @@
 #include "data.h"
 
 #include "../windows/settings_window.h"
+#include "../windows/stats_window.h"
 
 void comm_init();
 

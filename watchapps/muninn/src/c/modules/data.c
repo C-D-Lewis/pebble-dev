@@ -416,7 +416,7 @@ void data_cycle_custom_alert_level() {
   }
 
   // If changed to less than current, don't skip
-  data_set_ca_has_notified(false);
+  s_persist_data.ca_has_notified = false;
 }
 
 void data_reset_log() {
@@ -566,69 +566,6 @@ int data_calculate_days_remaining_accuracy() {
   return actual_elapsed - estimated_elapsed;
 }
 
-///////////////////////////////////////// Getters / Setters ////////////////////////////////////////
-
-int data_get_last_sample_time() {
-  return s_persist_data.last_sample_time;
-}
-
-void data_set_last_sample_time(int time) {
-  s_persist_data.last_sample_time = time;
-}
-
-int data_get_last_charge_perc() {
-  return s_persist_data.last_charge_perc;
-}
-
-void data_set_last_charge_perc(int perc) {
-  s_persist_data.last_charge_perc = perc;
-}
-
-int data_get_wakeup_id() {
-  return s_persist_data.wakeup_id;
-}
-
-void data_set_wakeup_id(int id) {
-  s_persist_data.wakeup_id = id;
-}
-
-Sample* data_get_sample(int index) {
-  return &s_samples[index];
-}
-
-void data_set_error(char *err) {
-  snprintf(s_error_buff, sizeof(s_error_buff), "Error: %s", err);
-  message_window_push(
-    data_get_error(),
-    true,
-    false
-  );
-}
-
-char* data_get_error() {
-  return &s_error_buff[0];
-}
-
-void data_set_seen_first_launch() {
-  s_persist_data.seen_first_launch = true;
-}
-
-bool data_get_seen_first_launch() {
-  return s_persist_data.seen_first_launch;
-}
-
-bool data_get_vibe_on_sample() {
-  return s_persist_data.vibe_on_sample;
-}
-
-void data_set_vibe_on_sample(bool v) {
-  s_persist_data.vibe_on_sample = v;
-}
-
-int data_get_custom_alert_level() {
-  return s_persist_data.custom_alert_level;
-}
-
 int data_get_valid_samples_count() {
   int count = 0;
   bool discharged = false;
@@ -660,58 +597,29 @@ int data_get_log_length() {
   return count;
 }
 
-bool data_get_ca_has_notified() {
-  return s_persist_data.ca_has_notified;
+///////////////////////////////////////// Getters / Setters ////////////////////////////////////////
+
+void data_set_error(char *err) {
+  snprintf(s_error_buff, sizeof(s_error_buff), "Error: %s", err);
+  message_window_push(
+    data_get_error(),
+    true,
+    false
+  );
 }
 
-void data_set_ca_has_notified(bool notified) {
-  s_persist_data.ca_has_notified = notified;
+char* data_get_error() {
+  return &s_error_buff[0];
 }
 
-bool data_get_push_timeline_pins() {
-  return s_persist_data.push_timeline_pins;
+Sample* data_get_sample(int index) {
+  return &s_samples[index];
 }
 
-void data_set_push_timeline_pins(bool b) {
-  s_persist_data.push_timeline_pins = b;
+PersistData* data_get_persist_data() {
+  return &s_persist_data;
 }
 
-bool data_get_elevated_rate_alert() {
-  return s_persist_data.elevated_rate_alert;
-}
-
-void data_set_elevated_rate_alert(bool b) {
-  s_persist_data.elevated_rate_alert = b;
-}
-
-bool data_get_one_day_notified() {
-  return s_persist_data.one_day_notified;
-}
-
-void data_set_one_day_notified(bool b) {
-  s_persist_data.one_day_notified = b;
-}
-
-void data_set_last_charge_time(int ts) {
-  s_persist_data.last_charge_time = ts;
-}
-
-int data_get_last_charge_time() {
-  return s_persist_data.last_charge_time;
-}
-
-bool data_get_one_day_alert() {
-  return s_persist_data.one_day_alert;
-}
-
-void data_set_one_day_alert(bool b) {
-  s_persist_data.one_day_alert = b;
-}
-
-void data_set_sync_count(int v) {
-  s_app_state.sync_count = v;
-}
-
-int data_get_sync_count() {
-  return s_app_state.sync_count;
+AppState* data_get_app_state() {
+  return &s_app_state;
 }

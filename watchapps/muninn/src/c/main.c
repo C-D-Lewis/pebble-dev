@@ -13,15 +13,13 @@
 #include "windows/message_window.h"
 
 static void init() {
-  // Temporary - to be removed a few versions after 1.12.0
-  const int old_appdata_key = 0;
-  const bool notify_wipe = persist_exists(old_appdata_key) && !persist_exists(SK_Migration_1);
+  PersistData *persist_data = data_get_persist_data();
 
   data_init();
   comm_init();
   scalable_init();
 
-  if (launch_reason() == APP_LAUNCH_WAKEUP && !notify_wipe) {
+  if (launch_reason() == APP_LAUNCH_WAKEUP) {
     WakeupId id = 0;
     int32_t reason = 0;
     wakeup_get_launch_event(&id, &reason);
@@ -30,13 +28,9 @@ static void init() {
   }
   
   const bool missed = wakeup_handle_missed();
-  const bool first_launch = !data_get_seen_first_launch();
+  const bool first_launch = !persist_data->seen_first_launch;
 
   main_window_push();
-
-  if (notify_wipe) {
-    message_window_push("Data reset to allow some new features to work correctly.", true, false);
-  }
 
   // In case an event comes when the app is open
   wakeup_service_subscribe(wakeup_handler);
@@ -49,7 +43,7 @@ static void init() {
 
   if (first_launch) {
     message_window_push(MSG_WELCOME, false, false);
-    data_set_seen_first_launch();
+    persist_data->seen_first_launch = true;
   }
 }
 
