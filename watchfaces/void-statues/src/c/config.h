@@ -5,7 +5,7 @@
 // Comment before release!
 // #define TEST
 
-#ifdef PBL_PLATFORM_EMERY
+#if defined(PBL_PLATFORM_EMERY)
   #define DISPLAY_W 200
   #define DISPLAY_H 228
   #define PROJECTION_OFFSET GPoint((DISPLAY_W / 4) - 7, (DISPLAY_H / 2) - 18)
@@ -13,6 +13,14 @@
   #define B_H 13
   #define MINUTE_ROW_OFFSET -6
   #define X_NUDGE 0
+#elif defined(PBL_PLATFORM_CHALK)
+  #define DISPLAY_W 180
+  #define DISPLAY_H 180
+  #define PROJECTION_OFFSET GPoint((DISPLAY_W / 4), (DISPLAY_H / 2) - 12)
+  #define B_W 8
+  #define B_H 10
+  #define MINUTE_ROW_OFFSET -4
+  #define X_NUDGE 1
 #else
   #define DISPLAY_W 144
   #define DISPLAY_H 168

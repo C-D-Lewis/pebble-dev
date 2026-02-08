@@ -41,9 +41,9 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `split-horizon`       | ![](watchfaces/split-horizon/screenshots/diorite.png)      | `A` `B` `D`             | ✅    | [pbw](pbw/split-horizon.pbw)       |
 | `starfield-demo`      | ![](watchfaces/starfield-demo/screenshots/aplite.png)      | `A` `B` `C` `D`         |      | [pbw](pbw/starfield-demo.pbw)      |
 | `starfield-smooth`    | ![](watchfaces/starfield-smooth/screenshots/aplite.png)    | `A` `B` `C`             | ✅    | [pbw](pbw/starfield-smooth.pbw)    |
-| `thin`                | ![](watchfaces/thin/screenshots/basalt.png)                | `A` `B` `C` `D` `E`     | ✅    | [pbw](pbw/thin.pbw)                |
+| `thin`                | ![](watchfaces/thin/screenshots/basalt.png)                | `A` `B` `C` `D` `E` `F`     | ✅    | [pbw](pbw/thin.pbw)                |
 | `time-dots-appstore`  | ![](watchfaces/time-dots-appstore/screenshots/basalt1.png) | `A` `B` `C` `D` `E` `F` |      | [pbw](pbw/time-dots-appstore.pbw)  |
-| `void-statues`        | ![](watchfaces/void-statues/screenshots/basalt.png)        | `A` `B` `C` `D` `E`     |      | [pbw](pbw/void-statues.pbw)        |
+| `void-statues`        | ![](watchfaces/void-statues/screenshots/basalt.png)        | `A` `B` `C` `D` `E` `F`     |      | [pbw](pbw/void-statues.pbw)        |
 
 
 ## `watchapps`
