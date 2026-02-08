@@ -4,14 +4,14 @@
 
 #include "modules/scalable.h"
 
-///////////////////////////////////////////
-// DO NOT CHANGE WITHOUT DUE CARE        //
-//                                       //
-// Hours between wakeups (check strings) //
-#define WAKEUP_MOD_H 6                   //
-// Number of stored samples              //
-#define NUM_SAMPLES 16                   //
-///////////////////////////////////////////
+//////////////////////////////////////////////////
+// DO NOT CHANGE WITHOUT DUE CARE               //
+//                                              //
+// Hours between wakeups (check strings and JS) //
+#define WAKEUP_MOD_H 6                          //
+// Number of stored samples                     //
+#define NUM_SAMPLES 16                          //
+//////////////////////////////////////////////////
 
 // ! MUST match package.json
 // ! Check Aplite works before releasing
@@ -30,7 +30,7 @@
 
 ///////////// Testing area ////////////////
 //                                       //
-#define USE_TEST_DATA true            //
+// #define USE_TEST_DATA true            //
 //                                       //
 // #define SAVE_TEST_DATA true           //
 //                                       //

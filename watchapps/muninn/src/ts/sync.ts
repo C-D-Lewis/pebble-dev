@@ -91,30 +91,31 @@ export const deleteWatchHistory = () => {
 
 /**
  * Average discharge rate using all history samples.
+ * Because this represents per-day and counts 6H samples, we multiply by 4 
  */
 const calculateAllTimeRate = (history: HistoryItem[]): number => {
   if (history.length === 0) return STATUS_EMPTY;
 
-  let count = 0;
-  let totalDischarge = 0;
+  let samples = 0;
+  let change = 0;
   history.forEach((item) => {
-    const { rate, chargeDiff, result } = item;
-    // console.log(JSON.stringify({ count, chargeDiff, totalDischarge }));
+    const { chargeDiff, result } = item;
 
     // No data, or charged.
     if ([STATUS_EMPTY, STATUS_CHARGED].includes(result)) return;
-
     // No change, but time still elapsed
     if (result === STATUS_NO_CHANGE) {
-      count++;
+      samples++;
       return;
     }
 
     // Discharged
-    count++;
-    totalDischarge += Math.abs(chargeDiff);
+    samples++;
+    change += Math.abs(chargeDiff);
   });
-  return totalDischarge / count;
+  const result = Math.round(change / samples) * 4;
+  console.log(JSON.stringify({ samples, change, result }));
+  return result;
 };
 
 /**
