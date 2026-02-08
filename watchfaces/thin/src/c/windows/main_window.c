@@ -1,12 +1,12 @@
 #include "main_window.h"
 
-#define MARGIN             scalable_x(35)
-#define THICKNESS          scalable_x(20)
+#define MARGIN             scl_x(35)
+#define THICKNESS          scl_x(20)
 #define ANIMATION_DELAY    300
 #define ANIMATION_DURATION 1000
-#define HAND_LENGTH_SEC    scalable_x(440)
+#define HAND_LENGTH_SEC    scl_x(440)
 #define HAND_LENGTH_MIN    HAND_LENGTH_SEC
-#define HAND_LENGTH_HOUR   (HAND_LENGTH_SEC - scalable_x(130))
+#define HAND_LENGTH_HOUR   (HAND_LENGTH_SEC - scl_x(130))
 
 typedef struct {
   int days;
@@ -287,32 +287,32 @@ static void window_load(Window *window) {
   layer_set_update_proc(s_bg_layer, bg_update_proc);
   layer_add_child(window_layer, s_bg_layer);
 
-  const int x_offset = scalable_x(710);
-  const int y_offset = scalable_y(305);
+  const int x_offset = scl_x(710);
+  const int y_offset = scl_y(305);
   const int text_s = 100;
 
   GColor month_day_color = data_get_color(MESSAGE_KEY_ColorMonthDay);
   GColor date_color = data_get_color(MESSAGE_KEY_ColorDate);
 
-  s_weekday_layer = text_layer_create(GRect(x_offset, y_offset + scalable_y(35), text_s, text_s));
-  text_layer_set_font(s_weekday_layer, scalable_get_font(SFI_SmallBold));
+  s_weekday_layer = text_layer_create(GRect(x_offset, y_offset + scl_y(35), text_s, text_s));
+  text_layer_set_font(s_weekday_layer, scl_get_font(SFI_SmallBold));
   text_layer_set_text_color(s_weekday_layer, date_color);
   text_layer_set_background_color(s_weekday_layer, GColorClear);
 
   s_day_in_month_layer = text_layer_create(
-    GRect(x_offset + scalable_x(10), y_offset + scalable_y_pp(105, 120), text_s, text_s)
+    GRect(x_offset + scl_x(10), y_offset + scl_y_pp({.o = 105, .e = 120}), text_s, text_s)
   );
-  text_layer_set_font(s_day_in_month_layer, scalable_get_font(SFI_MediumBold));
+  text_layer_set_font(s_day_in_month_layer, scl_get_font(SFI_MediumBold));
   text_layer_set_text_color(s_day_in_month_layer, month_day_color);
   text_layer_set_background_color(s_day_in_month_layer, GColorClear);
 
-  s_month_layer = text_layer_create(GRect(x_offset, y_offset + scalable_y_pp(260, 250), text_s, text_s));
-  text_layer_set_font(s_month_layer, scalable_get_font(SFI_SmallBold));
+  s_month_layer = text_layer_create(GRect(x_offset, y_offset + scl_y_pp({.o = 260, .e = 250}), text_s, text_s));
+  text_layer_set_font(s_month_layer, scl_get_font(SFI_SmallBold));
   text_layer_set_text_color(s_month_layer, date_color);
   text_layer_set_background_color(s_month_layer, GColorClear);
 
-  s_step_layer = text_layer_create(scalable_center_x(scalable_grect(0, 700, 1000, 300)));
-  text_layer_set_font(s_step_layer, scalable_get_font(SFI_MediumBold));
+  s_step_layer = text_layer_create(scl_center_x(scl_grect(0, 700, 1000, 300)));
+  text_layer_set_font(s_step_layer, scl_get_font(SFI_MediumBold));
   text_layer_set_text_color(s_step_layer, date_color);
   text_layer_set_text_alignment(s_step_layer, GTextAlignmentCenter);
   text_layer_set_background_color(s_step_layer, GColorClear);
