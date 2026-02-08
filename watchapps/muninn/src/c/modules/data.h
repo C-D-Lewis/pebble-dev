@@ -54,7 +54,10 @@ typedef struct {
 
 // NOT persisted data
 typedef struct {
-  int sync_count; // Count of synchronized items to the phone
+  int sync_count;         // Count of synchronized items to the phone
+  int stat_days;          // Days covered by JS history
+  int stat_all_time_rate; // All-time avg discharge rate
+  // More...
 
   // Singleton, adding new fields OK, removing from middle is NOT OK
 } AppState;

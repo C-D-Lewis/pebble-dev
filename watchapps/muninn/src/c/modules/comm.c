@@ -131,10 +131,18 @@ void comm_init() {
 
 void comm_deinit() {}
 
-void comm_request_deletion() {
+static void send_int(uint32_t key) {
   DictionaryIterator *iter;
   app_message_outbox_begin(&iter);
-  Tuplet sync_tuple = TupletInteger(MESSAGE_KEY_SYNC_DELETE, 1);
+  Tuplet sync_tuple = TupletInteger(key, 1);
   dict_write_tuplet(iter, &sync_tuple);
   app_message_outbox_send();
+}
+
+void comm_request_deletion() {
+  send_int(MESSAGE_KEY_SYNC_DELETE);
+}
+
+void comm_request_sync_stats() {
+  send_int(MESSAGE_KEY_GET_STATS);
 }

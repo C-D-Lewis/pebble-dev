@@ -1,15 +1,17 @@
+import { STATUS_CHARGED, STATUS_EMPTY, STATUS_NO_CHANGE } from './constants';
 import { HistoryItem } from './types';
 
-/** Maximum stored items */
-const MAX_ITEMS = 64;
-/** LocalStorage key - data history */
-const LS_KEY_HISTORY = 'history';
+/** Maximum stored items - 32 days */
+const MAX_ITEMS = 128;
+
+/** LocalStorage key - data history on a per-watch basis */
+const buildHistoryKey = () => `history-${Pebble.getWatchToken()}`;
 
 /**
  * Save the history of samples.
  */
 const saveHistory = (history: HistoryItem[]) => {
-  localStorage.setItem(LS_KEY_HISTORY, JSON.stringify(history));
+  localStorage.setItem(buildHistoryKey(), JSON.stringify(history));
 };
 
 /**
@@ -17,7 +19,7 @@ const saveHistory = (history: HistoryItem[]) => {
  */
 const loadHistory = (): HistoryItem[] => {
   try {
-    return JSON.parse(localStorage.getItem(LS_KEY_HISTORY) || '[]');
+    return JSON.parse(localStorage.getItem(buildHistoryKey()) || '[]');
   } catch (e) {
     console.error('Failed to load history');
     console.error(e);
@@ -32,7 +34,7 @@ export const handleGetSyncInfo = async () => {
   const history = loadHistory();
   // console.log(JSON.stringify(localStorage.getItem('history')));
 
-  let timestamp = -1; // STATUS_EMPTY
+  let timestamp = STATUS_EMPTY;
   if (history.length > 0) {
     timestamp = history[0].timestamp;
   }
@@ -55,7 +57,7 @@ export const handleSync = async (dict: Record<string, any>) => {
   // Manual loop replaces .find() which coreapp doesn't like
   for (let i = 0; i < history.length; i++) {
     if (history[i].timestamp === timestamp) {
-      console.log('Skipping duplicate: ' + timestamp);
+      console.log(`Skipping duplicate: ${timestamp}`);
       return;
     }
   }
@@ -63,11 +65,11 @@ export const handleSync = async (dict: Record<string, any>) => {
   // Construct local sample
   const sample: HistoryItem = {
     timestamp: dict.SAMPLE_TIMESTAMP,
-    result: dict.SAMPLE_RESULT,
     chargePerc: dict.SAMPLE_CHARGE_PERC,
     timeDiff: dict.SAMPLE_TIME_DIFF,
     chargeDiff: dict.SAMPLE_CHARGE_DIFF,
     rate: dict.SAMPLE_RATE,
+    result: dict.SAMPLE_RESULT,
   };
   history.push(sample);
 
@@ -77,5 +79,56 @@ export const handleSync = async (dict: Record<string, any>) => {
     .slice(0, MAX_ITEMS);
 
   saveHistory(history);
-  console.log('Saved new sample: ' + JSON.stringify(sample));
+  console.log(`Saved new sample: ${JSON.stringify(sample)}`);
+};
+
+/**
+ * Delete history for this watch.
+ */
+export const deleteWatchHistory = () => {
+  localStorage.removeItem(buildHistoryKey());
+};
+
+/**
+ * Average discharge rate using all history samples.
+ */
+const calculateAllTimeRate = (history: HistoryItem[]): number => {
+  if (history.length === 0) return STATUS_EMPTY;
+
+  let count = 0;
+  let totalDischarge = 0;
+  history.forEach((item) => {
+    const { rate, chargeDiff, result } = item;
+    // console.log(JSON.stringify({ count, chargeDiff, totalDischarge }));
+
+    // No data, or charged.
+    if ([STATUS_EMPTY, STATUS_CHARGED].includes(result)) return;
+
+    // No change, but time still elapsed
+    if (result === STATUS_NO_CHANGE) {
+      count++;
+      return;
+    }
+
+    // Discharged
+    count++;
+    totalDischarge += Math.abs(chargeDiff);
+  });
+  return totalDischarge / count;
+};
+
+/**
+ * Handle request for stats based on all data stored for this watch.
+ * TODO: Future graph points?
+ */
+export const handleGetSyncStats = async () => {
+  const history = loadHistory();
+
+  await PebbleTS.sendAppMessage({
+    STAT_TOTAL_DAYS: Math.floor(history.length / 4),
+    STAT_ALL_TIME_RATE: calculateAllTimeRate(history),
+    // STAT_LAST_WEEK_RATE: calculateLastWeekRate(history),
+    // STAT_NUM_CHARGES: calculateNumCharges(history),
+    // STAT_MTBC: calculateMeanTimeBetweenCharges(history),
+  });
 };

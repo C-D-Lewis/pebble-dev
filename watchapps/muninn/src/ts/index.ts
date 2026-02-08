@@ -1,8 +1,8 @@
-import { handleGetSyncInfo, handleSync } from './sync';
+import { handleGetSyncInfo, handleGetSyncStats, handleSync } from './sync';
 import { handlePushTimelinePin } from './timeline';
 
 /**
- * Clear all data phone-side.
+ * Clear all data phone-side for this watch.
  */
 const deleteAll = () => {
   localStorage.clear();
@@ -15,14 +15,15 @@ Pebble.addEventListener('ready', async (e) => {
 });
 
 Pebble.addEventListener('appmessage', async (e) => {
-  var dict = e.payload;
-  console.log('appmessage: ' + JSON.stringify(dict));
+  const { payload: dict } = e;
+  console.log(`appmessage: ${JSON.stringify(dict)}`);
 
   try {
     if (dict.PUSH_PIN) await handlePushTimelinePin(dict);
     if (dict.GET_SYNC_INFO) await handleGetSyncInfo();
     if (dict.SYNC_SAMPLE) await handleSync(dict);
     if (dict.SYNC_DELETE) await deleteAll();
+    if (dict.GET_STATS) await handleGetSyncStats();
   } catch (e) {
     console.log('Failed to handle message');
     console.log(e);

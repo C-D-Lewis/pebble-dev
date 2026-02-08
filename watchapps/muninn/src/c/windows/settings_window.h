@@ -10,6 +10,7 @@
 #include "../modules/scalable.h"
 
 #include "message_window.h"
+#include "stats_window.h"
 
 void settings_window_push();
 

@@ -216,7 +216,7 @@ static void update_data() {
   if (data_calculate_avg_discharge_rate() != STATUS_EMPTY) {
     // If data to show, begin smooth animation
     static AnimationImplementation anim_implementation = { .update = anim_update };
-    util_animate(800, 50, &anim_implementation, true);
+    util_animate(500, 50, &anim_implementation, true);
   }
 #endif
 }

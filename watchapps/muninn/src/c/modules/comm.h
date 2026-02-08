@@ -11,3 +11,5 @@ void comm_init();
 void comm_deinit();
 
 void comm_request_deletion();
+
+void comm_request_sync_stats();

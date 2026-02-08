@@ -111,7 +111,10 @@
       "SAMPLE_CHARGE_PERC",
       "SAMPLE_TIME_DIFF",
       "SAMPLE_CHARGE_DIFF",
-      "SAMPLE_RATE"
+      "SAMPLE_RATE",
+      "GET_STATS",
+      "STAT_TOTAL_DAYS",
+      "STAT_ALL_TIME_RATE"
     ]
   },
   "dependencies": {

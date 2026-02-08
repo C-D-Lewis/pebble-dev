@@ -366,6 +366,6 @@ void graph_window_push() {
 
 #if !defined(PBL_PLATFORM_APLITE)
   static AnimationImplementation anim_implementation = { .update = anim_update };
-  util_animate(800, 0, &anim_implementation, true);
+  util_animate(500, 0, &anim_implementation, true);
 #endif
 }

@@ -165,8 +165,7 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
       message_window_push(MSG_TIPS, false, false);
       break;
     case MI_SYNC_INFO:
-      // TODO: Show more details on message window or dedicated window - value!
-      message_window_push("Samples are being sent to a larger history on the phone.\n\nWatch this space...", false, false);
+      if (data_get_sync_count() != STATUS_EMPTY) stats_window_push();
       break;
     case MI_DELETE_ALL_DATA:
       if (s_reset_confirm) {
