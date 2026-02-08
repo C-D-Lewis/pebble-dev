@@ -19,7 +19,7 @@ Some PBWs can be found in `/pbw` for sideloading.
 | Name             | Screenshot                                             | Builds                  | Icon | PBW                           |
 |------------------|--------------------------------------------------------|-------------------------|------|-------------------------------|
 | `beam-up`        | ![](watchfaces/beam-up/screenshots/aplite.png)         | `A` `B` `C` `D` `E` `F` | ✅    | [pbw](pbw/beam-up.pbw)        |
-| `brackets`       | ![](watchfaces/brackets/screenshots/diorite.png)       | `A` `B` `C` `D` `E`     | ✅    | [pbw](pbw/brackets.pbw)       |
+| `brackets`       | ![](watchfaces/brackets/screenshots/diorite.png)       | `A` `B` `C` `D` `E` `F` | ✅    | [pbw](pbw/brackets.pbw)       |
 | `cards`          | ![](watchfaces/cards/screenshots/diorite.png)          | `A` `B` `D`             |      | [pbw](pbw/cards.pbw)          |
 | `cmd-time-typed` | ![](watchfaces/cmd-time-typed/screenshots/diorite.png) | `A` `B` `C` `D` `E`     | ✅    | [pbw](pbw/cmd-time-typed.pbw) |
 | `cmd-time`       | ![](watchfaces/cmd-time/screenshots/diorite.png)       | `A` `B` `C` `D` `E`     | ✅    | [pbw](pbw/cmd-time.pbw)       |
