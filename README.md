@@ -32,7 +32,7 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `events`              | ![](watchfaces/events/screenshots/aplite.png)              | `A` `B` `D` `E`         | ✅    | [pbw](pbw/events.pbw)              |
 | `hollywatch`          | ![](watchfaces/hollywatch/screenshots/basalt.png)          | `A` `B` `C` `D`         |      | [pbw](pbw/hollywatch.pbw)          |
 | `index`               | ![](watchfaces/index/screenshots/aplite.png)               | `A` `B` `C` `D`         |      | [pbw](pbw/index.pbw)               |
-| `isotime-appstore`    | ![](watchfaces/isotime-appstore/screenshots/yellow.png)    | `A` `B` `C` `D` `E`     | ✅    | [pbw](pbw/isotime.pbw)             |
+| `isotime-appstore`    | ![](watchfaces/isotime-appstore/screenshots/yellow.png)    | `A` `B` `C` `D` `E`     | ✅    | [pbw](pbw/isotime-appstore.pbw)             |
 | `kitty-watchface`     | ![](watchfaces/kitty-watchface/screenshots/aplite.png)     | `A` `B` `D`             |      | [pbw](pbw/kitty-watchface.pbw)     |
 | `morndas`             | ![](watchfaces/morndas/screenshots/basalt.png)             | `A` `B` `D` `E` `F`            |      | [pbw](pbw/morndas.pbw)             |
 | `past-present-future` | ![](watchfaces/past-present-future/screenshots/aplite.png) | `A` `B` `D`             |      | [pbw](pbw/past-present-future.pbw) |
