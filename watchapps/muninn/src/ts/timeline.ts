@@ -1,10 +1,8 @@
-import { HttpMethod } from './types';
+import { SECONDS_PER_DAY } from "./constants";
 
 /** Timeline API root that coreapp will respond to */
 const API_URL_ROOT = 'https://timeline-api.rebble.io';
 
-/** Seconds in a day */
-const SECONDS_PER_DAY = 60 * 60 * 24;
 /** Predicted low charge time pin ID */
 const PIN_ID_PREDICTION = 'muninn-prediction';
 

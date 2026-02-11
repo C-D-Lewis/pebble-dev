@@ -37,11 +37,8 @@ void bitmaps_destroy_ptr(GBitmap *ptr) {
       gbitmap_destroy(s_arr[i]);
       s_arr[i] = NULL;
       s_res_ids[i] = -1;
-      return;
     }
   }
-
-  // APP_LOG(APP_LOG_LEVEL_ERROR, "Bitmap ptr not found");
 }
 
 void bitmaps_destroy_id(uint32_t res_id) {
@@ -54,8 +51,6 @@ void bitmaps_destroy_id(uint32_t res_id) {
       return;
     }
   }
-
-  // APP_LOG(APP_LOG_LEVEL_ERROR, "Bitmap id not found");
 }
 
 void bitmaps_destroy_all() {
@@ -66,6 +61,14 @@ void bitmaps_destroy_all() {
       s_res_ids[i] = -1;
     }
   }
+}
 
-  // APP_LOG(APP_LOG_LEVEL_INFO, "Bitmaps destroyed (heap %d)", heap_bytes_free());
+void bitmap_log_allocated_count() {
+  int count = 0;
+  for (int i = 0; i < MAX_BITMAPS; i++) {
+    if (s_arr[i] != NULL) {
+      count++;
+    }
+  }
+  // APP_LOG(APP_LOG_LEVEL_INFO, "Rem bmp %d", count);
 }

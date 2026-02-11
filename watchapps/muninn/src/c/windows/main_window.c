@@ -49,7 +49,7 @@ static void update_subtitle(int days) {
 //////////////////////////////////////////// Animations ////////////////////////////////////////////
 
 static void update_anim_text() {
-#if !defined(PBL_PLATFORM_APLITE)
+#ifdef FEATURE_ANIMATIONS
   const bool animating = util_is_animating();
 #else
   const bool animating = false;
@@ -67,7 +67,7 @@ static void update_anim_text() {
   text_layer_set_text(s_rate_layer, s_rate_buff);
 }
 
-#if !defined(PBL_PLATFORM_APLITE)
+#ifdef FEATURE_ANIMATIONS
 static void anim_update(Animation *anim, AnimationProgress dist_normalized) {
   s_anim_days = util_anim_percentage(dist_normalized, s_days_remaining);
   s_anim_rate = util_anim_percentage(dist_normalized, s_rate);
@@ -157,7 +157,7 @@ static void update_data() {
     // Days remaining
     s_days_remaining = data_calculate_days_remaining();
     if (util_is_not_status(s_days_remaining)) {
-#if !defined(PBL_PLATFORM_APLITE)
+#ifdef FEATURE_ANIMATIONS
       // Handled in animation
       text_layer_set_text(s_remaining_layer, "--");
 #else
@@ -173,7 +173,7 @@ static void update_data() {
     // Rate per day
     s_rate = data_calculate_avg_discharge_rate();
     if (util_is_not_status(s_rate)) {
-#if !defined(PBL_PLATFORM_APLITE)
+#ifdef FEATURE_ANIMATIONS
       text_layer_set_text(s_rate_layer, "--");
 #else
       update_anim_text();
@@ -214,7 +214,7 @@ static void update_data() {
     text_layer_set_text(s_reading_layer, s_wakeup_buff);
   }
 
-#if !defined(PBL_PLATFORM_APLITE)
+#ifdef FEATURE_ANIMATIONS
   if (data_calculate_avg_discharge_rate() != STATUS_EMPTY) {
     // If data to show, begin smooth animation
     static AnimationImplementation anim_implementation = { .update = anim_update };
@@ -366,11 +366,17 @@ static void up_long_click_handler(ClickRecognizerRef recognizer, void *context) 
 }
 
 static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
-  settings_window_push();
+#ifdef FEATURE_ANIMATIONS
+  if (!util_is_animating())
+#endif
+    settings_window_push();
 }
 
 static void down_click_handler(ClickRecognizerRef recognizer, void *context) {
-  graph_window_push();
+#ifdef FEATURE_ANIMATIONS
+  if (!util_is_animating())
+#endif
+    graph_window_push();
 }
 
 static void click_config_provider(void *context) {
@@ -491,7 +497,7 @@ static void window_load(Window *window) {
 
   update_data();
 
-  // APP_LOG(APP_LOG_LEVEL_INFO, "Heap %d", heap_bytes_free());
+  APP_LOG(APP_LOG_LEVEL_INFO, "Heap %d", heap_bytes_free());
 }
 
 static void window_unload(Window *window) {
@@ -513,25 +519,14 @@ static void window_unload(Window *window) {
 }
 
 static void window_disappear(Window *window) {
-  // Fully complete animation - FIXME: doesn't work yet
-// #if !defined(PBL_PLATFORM_APLITE)
-//   util_stop_animation();
-// #endif
-  // s_anim_days = s_days_remaining;
-  // s_anim_rate = s_rate;
-  // layer_mark_dirty(s_canvas_layer);
+  bitmaps_destroy_all();
 
-  // Remove images that will loaded in canvas update proc
-  bitmaps_destroy_ptr(s_mascot_bitmap);
+  // Note images that will loaded in canvas update proc
   s_mascot_bitmap = NULL;
-  bitmaps_destroy_ptr(s_batt_bitmap);
   s_batt_bitmap = NULL;
 
-  bitmaps_destroy_id(RESOURCE_ID_RATE);
-  bitmaps_destroy_id(RESOURCE_ID_LAST_CHARGE);
-  bitmaps_destroy_id(RESOURCE_ID_NEXT_CHARGE);
-
-  // APP_LOG(APP_LOG_LEVEL_INFO, "d %d", heap_bytes_free());
+  APP_LOG(APP_LOG_LEVEL_INFO, "wd %dB", heap_bytes_free());
+  bitmap_log_allocated_count();
 }
 
 void main_window_push() {

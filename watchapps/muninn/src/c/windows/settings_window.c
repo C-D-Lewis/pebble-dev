@@ -14,8 +14,10 @@ typedef enum {
   MI_ELEVATED_RATE_ALERT,
   MI_ONE_DAY_ALERT,
 
-  MI_BATTERY_TIPS,
+#ifdef FEATURE_SYNC
   MI_SYNC_INFO,
+#endif
+  MI_BATTERY_TIPS,
   MI_DELETE_ALL_DATA,
   MI_VERSION,
 
@@ -44,12 +46,12 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
   }
 
   // Sync status
-  static char s_sync_buff[18];
+  static char s_sync_buff[20];
   const int sync_count = app_state->sync_count;
   if (sync_count == STATUS_EMPTY) {
     snprintf(s_sync_buff, sizeof(s_sync_buff), "Loading...");
   } else {
-    snprintf(s_sync_buff, sizeof(s_sync_buff), "%d items", sync_count);
+    snprintf(s_sync_buff, sizeof(s_sync_buff), "Synced %d items", sync_count);
   }
 
   switch(cell_index->row) {
@@ -93,16 +95,18 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
         persist_data->one_day_alert ? "Enabled" : "Disabled"
       );
       break;
-    case MI_BATTERY_TIPS:
-      util_menu_cell_draw(ctx, cell_layer, "Battery tips", NULL);
-      break;
+#ifdef FEATURE_SYNC
     case MI_SYNC_INFO:
       util_menu_cell_draw(
         ctx,
         cell_layer,
-        "History on phone",
+        "Historical stats",
         s_sync_buff
       );
+      break;
+#endif
+    case MI_BATTERY_TIPS:
+      util_menu_cell_draw(ctx, cell_layer, "Battery tips", NULL);
       break;
     case MI_DELETE_ALL_DATA:
       util_menu_cell_draw(
@@ -134,7 +138,9 @@ static int16_t get_cell_height_callback(struct MenuLayer *menu_layer, MenuIndex 
     case MI_PUSH_TIMELINE_PINS:
     case MI_ELEVATED_RATE_ALERT:
     case MI_ONE_DAY_ALERT:
+#ifdef FEATURE_SYNC
     case MI_SYNC_INFO:
+#endif
     case MI_VERSION:
       return ROW_HEIGHT_LARGE;
     case MI_DELETE_ALL_DATA:
@@ -146,7 +152,6 @@ static int16_t get_cell_height_callback(struct MenuLayer *menu_layer, MenuIndex 
 
 static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) {
   PersistData *persist_data = data_get_persist_data();
-  AppState *app_state = data_get_app_state();
 
   switch(cell_index->row) {
     // Options
@@ -167,16 +172,21 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
       break;
 
     // Other
+#ifdef FEATURE_SYNC
+    case MI_SYNC_INFO: {
+      AppState *app_state = data_get_app_state();
+      if (app_state->sync_count != STATUS_EMPTY) stats_window_push();
+    } break;
+#endif
     case MI_BATTERY_TIPS:
       message_window_push(MSG_TIPS, false, false);
-      break;
-    case MI_SYNC_INFO:
-      if (app_state->sync_count != STATUS_EMPTY) stats_window_push();
       break;
     case MI_DELETE_ALL_DATA:
       if (s_reset_confirm) {
         data_reset_all();
+#ifdef FEATURE_SYNC
         comm_request_deletion();
+#endif
         vibes_double_pulse();
         window_stack_pop_all(true);
       } else {

@@ -251,9 +251,9 @@ void util_draw_button_hints(GContext *ctx, bool hints[3]) {
 
 ////////////////////////////////////////// Animation Utils /////////////////////////////////////////
 
-#if !defined(PBL_PLATFORM_APLITE)
+#ifdef FEATURE_ANIMATIONS
 static Animation *s_animation;
-static bool s_animating; // For now, we can assume only one is every active
+static bool s_animating; // For now, we can assume only one is ever active
 
 void util_stop_animation() {
   if (s_animation) {
@@ -261,6 +261,7 @@ void util_stop_animation() {
     animation_destroy(s_animation);
     s_animation = NULL;
   }
+  s_animating = false;
 }
 
 int util_anim_percentage(AnimationProgress dist_normalized, int max) {
@@ -272,8 +273,6 @@ static void animation_started(Animation *anim, void *context) {
 }
 
 static void animation_stopped(Animation *anim, bool stopped, void *context) {
-  s_animating = false;
-
   util_stop_animation();
 }
 

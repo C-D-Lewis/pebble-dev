@@ -23,6 +23,7 @@ static void add_push_pin_data(DictionaryIterator *iter) {
   dict_write_tuplet(iter, &rate_tuple);
 }
 
+#ifdef FEATURE_SYNC
 static void add_get_sync_info_data(DictionaryIterator *iter) {
   Tuplet sync_tuple = TupletInteger(MESSAGE_KEY_GET_SYNC_INFO, 1);
   dict_write_tuplet(iter, &sync_tuple);
@@ -76,6 +77,7 @@ static void send_samples_after(int last_ts) {
 
   app_timer_register(100, send_timer_handler, (void*)index);
 }
+#endif
 
 void out_failed_handler(DictionaryIterator *failed, AppMessageResult reason, void *context) {
   APP_LOG(APP_LOG_LEVEL_ERROR, "Out fail");
@@ -84,33 +86,39 @@ void out_failed_handler(DictionaryIterator *failed, AppMessageResult reason, voi
 void out_sent_handler(DictionaryIterator *iterator, void *context) {
   if (s_sync_index < 0) return;
 
+#ifdef FEATURE_SYNC
   const Sample *s = data_get_sample(s_sync_index);
   send_samples_after(s->timestamp);
+#endif
 }
 
 void inbox_received_handler(DictionaryIterator *iter, void *context) {
   PersistData *persist_data = data_get_persist_data();
-  AppState *app_state = data_get_app_state();
 
   // Things to do when JS is ready
-  Tuple *r_tuple = dict_find(iter, MESSAGE_KEY_READY);
-  if (r_tuple) {
+  Tuple *t = dict_find(iter, MESSAGE_KEY_READY);
+  if (t) {
     // We can only respond with one AppMessage at a time it seems
     DictionaryIterator *iter;
     app_message_outbox_begin(&iter);
     if (persist_data->push_timeline_pins) add_push_pin_data(iter);
+#ifdef FEATURE_SYNC
     add_get_sync_info_data(iter);
+#endif
     app_message_outbox_send();
     return;
   }
 
-  // Response to last timestamp request
-  Tuple *t_tuple = dict_find(iter, MESSAGE_KEY_SYNC_TIMESTAMP);
-  if (t_tuple) {
-    const int last_ts = (int)t_tuple->value->int32;
+#ifdef FEATURE_SYNC
+  AppState *app_state = data_get_app_state();
 
-    Tuple *c_tuple = dict_find(iter, MESSAGE_KEY_SYNC_COUNT);
-    const int sync_count = (int)c_tuple->value->int32;
+  // Response to last timestamp request
+  t = dict_find(iter, MESSAGE_KEY_SYNC_TIMESTAMP);
+  if (t) {
+    const int last_ts = (int)t->value->int32;
+
+    t = dict_find(iter, MESSAGE_KEY_SYNC_COUNT);
+    const int sync_count = (int)t->value->int32;
     APP_LOG(APP_LOG_LEVEL_INFO, "Sync: %d (%d)", last_ts, sync_count);
 
     // TODO: If watch is empty and phone has data, option to sync back to watch?
@@ -124,27 +132,44 @@ void inbox_received_handler(DictionaryIterator *iter, void *context) {
   }
 
   // Response to sync stats request
-  Tuple *t_d_tuple = dict_find(iter, MESSAGE_KEY_STAT_TOTAL_DAYS);
-  if (t_d_tuple) {
-    app_state->stat_total_days = t_d_tuple->value->int32;
+  t = dict_find(iter, MESSAGE_KEY_STAT_TOTAL_DAYS);
+  if (t) {
+    app_state->stat_total_days = t->value->int32;
 
-    Tuple *a_t_r_tuple = dict_find(iter, MESSAGE_KEY_STAT_ALL_TIME_RATE);
-    app_state->stat_all_time_rate = a_t_r_tuple->value->int32;
+    t = dict_find(iter, MESSAGE_KEY_STAT_ALL_TIME_RATE);
+    app_state->stat_all_time_rate = t->value->int32;
+
+    t = dict_find(iter, MESSAGE_KEY_STAT_LAST_WEEK_RATE);
+    app_state->stat_last_week_rate = t->value->int32;
+
+    t = dict_find(iter, MESSAGE_KEY_STAT_NUM_CHARGES);
+    app_state->stat_num_charges = t->value->int32;
+
+    t = dict_find(iter, MESSAGE_KEY_STAT_MTBC);
+    app_state->stat_mtbc = t->value->int32;
 
     stats_window_reload();
   }
+#endif
 }
 
 void comm_init() {
   app_message_register_outbox_failed(out_failed_handler);
   app_message_register_outbox_sent(out_sent_handler);
   app_message_register_inbox_received(inbox_received_handler);
+
   // Consider Aplite when adding to these
-  app_message_open(32, 128);
+#ifdef FEATURE_SYNC
+  const int inbox_size = 128;
+#else
+  const int inbox_size = 32;
+#endif
+  app_message_open(inbox_size, 64);
 }
 
 void comm_deinit() {}
 
+#ifdef FEATURE_SYNC
 static void send_int(uint32_t key) {
   DictionaryIterator *iter;
   app_message_outbox_begin(&iter);
@@ -160,3 +185,4 @@ void comm_request_deletion() {
 void comm_request_sync_stats() {
   send_int(MESSAGE_KEY_GET_STATS);
 }
+#endif

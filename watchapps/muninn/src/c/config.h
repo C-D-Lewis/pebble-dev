@@ -16,6 +16,7 @@
 // ! MUST match package.json
 // ! Check Aplite works before releasing
 // ! Comment out INFO logs
+// ! Check TS test flags
 #define VERSION "1.20.0"
 // Minimum samples before providing estimations
 #define MIN_SAMPLES 2
@@ -43,6 +44,14 @@
 // #define TEST_TIMELINE_PIN true        //
 //                                       //
 ///////////////////////////////////////////
+
+//////////////// Features /////////
+#if defined(PBL_PLATFORM_APLITE) //
+#else                            //
+#define FEATURE_SYNC true        //
+#define FEATURE_ANIMATIONS true  //
+#endif                           //
+///////////////////////////////////
 
 // Layout values
 // MenuLayer single row height

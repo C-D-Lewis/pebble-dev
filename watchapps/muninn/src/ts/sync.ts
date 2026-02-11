@@ -1,8 +1,14 @@
-import { STATUS_CHARGED, STATUS_EMPTY, STATUS_NO_CHANGE } from './constants';
+import {
+  MAX_ITEMS,
+  MIN_CHARGE_AMOUNT,
+  SECONDS_PER_DAY,
+  STATUS_CHARGED,
+  STATUS_EMPTY,
+  STATUS_NO_CHANGE,
+  TEST_SAMPLE_DATA,
+} from './constants';
 import { HistoryItem } from './types';
-
-/** Maximum stored items - 32 days */
-const MAX_ITEMS = 128;
+import { generateTestData } from './util';
 
 /** LocalStorage key - data history on a per-watch basis */
 const buildHistoryKey = () => `history-${Pebble.getWatchToken()}`;
@@ -18,6 +24,8 @@ const saveHistory = (history: HistoryItem[]) => {
  * Load the history of samples.
  */
 const loadHistory = (): HistoryItem[] => {
+  if (TEST_SAMPLE_DATA) return generateTestData();
+
   try {
     return JSON.parse(localStorage.getItem(buildHistoryKey()) || '[]');
   } catch (e) {
@@ -51,6 +59,9 @@ export const handleGetSyncInfo = async () => {
  * TODO: How do we handle adding new fields?
  */
 export const handleSync = async (dict: Record<string, any>) => {
+  // Ignore the watch sending data if we're using the generated data
+  if (TEST_SAMPLE_DATA) return;
+
   let history = loadHistory();
   const timestamp = dict.SAMPLE_TIMESTAMP;
 
@@ -91,31 +102,90 @@ export const deleteWatchHistory = () => {
 
 /**
  * Average discharge rate using all history samples.
- * Because this represents per-day and counts 6H samples, we multiply by 4 
  */
-const calculateAllTimeRate = (history: HistoryItem[]): number => {
+const calculateDischargeRate = (history: HistoryItem[]): number => {
   if (history.length === 0) return STATUS_EMPTY;
 
-  let samples = 0;
-  let change = 0;
-  history.forEach((item) => {
-    const { chargeDiff, result } = item;
+  let count = 0;
+  let rateSum = 0;
+  history.forEach((p) => {
+    const { rate, result } = p;
 
     // No data, or charged.
     if ([STATUS_EMPTY, STATUS_CHARGED].includes(result)) return;
     // No change, but time still elapsed
     if (result === STATUS_NO_CHANGE) {
-      samples++;
+      count++;
       return;
     }
 
-    // Discharged
-    samples++;
-    change += Math.abs(chargeDiff);
+    // Discharged, count it
+    count++;
+    rateSum += rate;
   });
-  const result = Math.round(change / samples) * 4;
-  console.log(JSON.stringify({ samples, change, result }));
+  const result = count > 0 ? Math.round(rateSum / count) : STATUS_EMPTY;
+  // console.log(JSON.stringify({ rateSum, count, result }));
   return result;
+};
+
+/**
+ * Calculate the average discharge rate for the last week only.
+ * Uses calculateDischargeRate internally.
+ */
+const calculateLastWeekRate = (history: HistoryItem[]): number => {
+  // Assumes 4 samples per day, we need a whole week's worth to start
+  if (history.length < 28) return STATUS_EMPTY;
+
+  // Use a subset of items for the last week only
+  const now = new Date().getTime();
+  const subset = history.filter((p) => {
+    const itemDate = new Date(p.timestamp * 1000).getTime();
+    const diffD = (now - itemDate) / (SECONDS_PER_DAY * 1000);
+    // console.log({ itemDate, diffD, now });
+    return diffD <= 7;
+  });
+
+  return calculateDischargeRate(subset);
+};
+
+/**
+ * Determine if a history item is a valid charge event.
+ */
+const isChargeEvent = (item: HistoryItem) =>
+  item.result === STATUS_CHARGED && item.chargeDiff >= MIN_CHARGE_AMOUNT;
+
+/**
+ * Calculate the number of significant charge events.
+ */
+const calculateNumCharges = (history: HistoryItem[]): number =>
+  history.filter(isChargeEvent).length;
+
+/**
+ * Calculate mean time between charge events, in days.
+ */
+const calculateMeanTimeBetweenCharges = (history: HistoryItem[]): number => {
+  if (calculateNumCharges(history) < 2) return STATUS_EMPTY;
+
+  // Get timestamps of charge events
+  const chargeTimes = history
+    .filter(isChargeEvent)
+    .map(p => p.timestamp)
+    .sort((a, b) => a - b);
+  // console.log(JSON.stringify(chargeTimes));
+
+  // Calculate time differences between consecutive charges
+  const timeDiffs = [];
+  for (let i = 1; i < chargeTimes.length; i++) {
+    timeDiffs.push(chargeTimes[i] - chargeTimes[i - 1]);
+  }
+  // console.log(JSON.stringify(timeDiffs));
+
+  // Calculate mean time between charges (in days)
+  const meanTimeS = timeDiffs.reduce((acc, p) => acc + p, 0) / timeDiffs.length;
+  const meanDays = meanTimeS / SECONDS_PER_DAY;
+  // console.log({ meanTimeS, meanDays });
+  
+  return Math.round(meanDays);
 };
 
 /**
@@ -127,9 +197,9 @@ export const handleGetSyncStats = async () => {
 
   await PebbleTS.sendAppMessage({
     STAT_TOTAL_DAYS: Math.floor(history.length / 4),
-    STAT_ALL_TIME_RATE: calculateAllTimeRate(history),
-    // STAT_LAST_WEEK_RATE: calculateLastWeekRate(history),
-    // STAT_NUM_CHARGES: calculateNumCharges(history),
-    // STAT_MTBC: calculateMeanTimeBetweenCharges(history),
+    STAT_ALL_TIME_RATE: calculateDischargeRate(history),
+    STAT_LAST_WEEK_RATE: calculateLastWeekRate(history),
+    STAT_NUM_CHARGES: calculateNumCharges(history),
+    STAT_MTBC: calculateMeanTimeBetweenCharges(history),
   });
 };

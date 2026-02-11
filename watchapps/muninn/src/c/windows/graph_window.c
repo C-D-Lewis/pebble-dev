@@ -17,13 +17,13 @@ static TextLayer *s_header_layer, *s_desc_layer;
 static Layer *s_canvas_layer;
 
 static int s_selection = 0;
-#if !defined(PBL_PLATFORM_APLITE)
+#ifdef FEATURE_ANIMATIONS
 static int s_anim_count = 0;
 #endif
 
 //////////////////////////////////////////// Animations ////////////////////////////////////////////
 
-#if !defined(PBL_PLATFORM_APLITE)
+#ifdef FEATURE_ANIMATIONS
 static void anim_update(Animation *anim, AnimationProgress dist_normalized) {
   s_anim_count = util_anim_percentage(dist_normalized, data_get_log_length());
 
@@ -58,7 +58,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   );
 
   const int log_len = data_get_log_length();
-#if !defined(PBL_PLATFORM_APLITE)
+#ifdef FEATURE_ANIMATIONS
   int count = util_is_animating() ? s_anim_count : log_len;
 #else
   int count = log_len;
@@ -68,6 +68,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   int low_v = 100, high_v = 0;
   for (int i = 0; i < count; i++) {
     const Sample *vs = data_get_sample(i);
+    if (!vs) break; // No data yet, but we still want to render the skeleton
     if (vs->charge_perc < low_v) {
       low_v = vs->charge_perc;
     }
@@ -106,7 +107,8 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   );
 
   // Draw Y axis notches every 10 units within the range
-  const int y_range = high_v - low_v;
+  int y_range = high_v - low_v;
+  if (y_range == 0) y_range = 10;
   for (int y_val = low_v; y_val <= high_v; y_val += 10) {
     const int notch_y = root_y + GRAPH_H - ((y_val - low_v) * GRAPH_H / y_range);
     graphics_fill_rect(
@@ -184,16 +186,17 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     if (idx + 1 <= count) {
       // The next oldest sample is idx + 1
       const Sample *prev_s = data_get_sample(idx + 1);
+      if (!prev_s) break;
 
       // Draw the line to this point
-      if (prev_x != -1 && prev_s && util_is_not_status(prev_s->charge_perc)) {
+      if (prev_x != -1 && util_is_not_status(prev_s->charge_perc)) {
         graphics_draw_line(ctx, GPoint(prev_x, prev_y), GPoint(x, y));
       }
       prev_x = x;
       prev_y = y;
 
       // Draw prediction based on previous rate
-      if (prev_s && util_is_not_status(prev_s->rate)) {
+      if (util_is_not_status(prev_s->rate)) {
         const int time_diff = s->timestamp - prev_s->timestamp;
         const int est_drop = (prev_s->rate * time_diff) / SECONDS_PER_DAY;
         const int est_val = prev_s->charge_perc - est_drop;
@@ -346,7 +349,7 @@ static void window_unload(Window *window) {
 }
 
 static void window_disappear(Window *window) {
-#if !defined(PBL_PLATFORM_APLITE)
+#ifdef FEATURE_ANIMATIONS
   util_stop_animation();
 #endif
 }
@@ -364,8 +367,10 @@ void graph_window_push() {
 
   window_stack_push(s_window, true);
 
-#if !defined(PBL_PLATFORM_APLITE)
-  static AnimationImplementation anim_implementation = { .update = anim_update };
-  util_animate(500, 0, &anim_implementation, true);
+#ifdef FEATURE_ANIMATIONS
+  if (graph_is_available()) {
+    static AnimationImplementation anim_implementation = { .update = anim_update };
+    util_animate(500, 0, &anim_implementation, true);
+  }
 #endif
 }
