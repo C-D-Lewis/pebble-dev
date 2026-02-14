@@ -51,7 +51,12 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
   if (sync_count == STATUS_EMPTY) {
     snprintf(s_sync_buff, sizeof(s_sync_buff), "Loading...");
   } else {
-    snprintf(s_sync_buff, sizeof(s_sync_buff), "Synced %d items", sync_count);
+    // None yet, or first sync is in progress
+    if (sync_count == 0) {
+      snprintf(s_sync_buff, sizeof(s_sync_buff), "Syncing soon");
+    } else {
+      snprintf(s_sync_buff, sizeof(s_sync_buff), "Synced %d items", sync_count);
+    }
   }
 
   switch(cell_index->row) {
@@ -183,10 +188,10 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
       break;
     case MI_DELETE_ALL_DATA:
       if (s_reset_confirm) {
-        data_reset_all();
 #ifdef FEATURE_SYNC
         comm_request_deletion();
 #endif
+        data_reset_all();
         vibes_double_pulse();
         window_stack_pop_all(true);
       } else {
@@ -255,5 +260,7 @@ void settings_window_push() {
 }
 
 void settings_window_reload() {
-  if(s_menu_layer) menu_layer_reload_data(s_menu_layer);
+  if(!s_window) return;
+  
+  menu_layer_reload_data(s_menu_layer);
 }

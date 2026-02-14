@@ -199,10 +199,6 @@ static void window_load(Window *window) {
   scroll_layer_set_click_config_onto_window(s_scroll_layer, window);
   scroll_layer_add_child(s_scroll_layer, s_canvas_layer);
   layer_add_child(root_layer, scroll_layer_get_layer(s_scroll_layer));
-
-  // Request data
-  // TODO: this could be done earlier (menu window?)
-  comm_request_sync_stats();
 }
 
 static void window_unload(Window *window) {
@@ -228,6 +224,8 @@ void stats_window_push() {
 }
 
 void stats_window_reload() {
+  if (!s_window) return;
+  
   layer_mark_dirty(s_canvas_layer);
 }
 

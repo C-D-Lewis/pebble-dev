@@ -15,10 +15,7 @@ void util_fmt_time(int timestamp_s, char* buff, int size) {
 
   const time_t t = (time_t)timestamp_s;
   const struct tm *tm_info = localtime(&t);
-  const int hours = tm_info->tm_hour;
-  const int mins = tm_info->tm_min;
-
-  snprintf(buff, size, "%02d:%02d", hours, mins);
+  strftime(buff, size, "%H:%M", tm_info);
 }
 
 void util_fmt_time_ago(time_t then, char *buff, int size) {
@@ -44,17 +41,6 @@ void util_fmt_time_ago(time_t then, char *buff, int size) {
   }
 
   snprintf(buff, size, "%d%s", value, unit);
-}
-
-int util_hours_until_next_interval() {
-  time_t now = time(NULL);
-  struct tm *tm_info = localtime(&now);
-
-  int hour = tm_info->tm_hour;
-  int rem = hour % WAKEUP_MOD_H;
-  int hours = WAKEUP_MOD_H - rem;
-  if (hours == 0) hours = WAKEUP_MOD_H;
-  return hours;
 }
 
 void util_fmt_time_unit(time_t ts, char *buff, int size) {
@@ -93,9 +79,9 @@ char* util_get_status_string() {
   const int count = data_get_valid_samples_count();
   if (count < MIN_SAMPLES) {
     const int diff = MIN_SAMPLES - count;
-    static char s_need_buff[20];
-    snprintf(s_need_buff, sizeof(s_need_buff), "Need %d sample%s...", diff, diff == 1 ? "" : "s");
-    return &s_need_buff[0];
+    static char s_buff[20];
+    snprintf(s_buff, sizeof(s_buff), "Need %d sample%s...", diff, diff == 1 ? "" : "s");
+    return &s_buff[0];
   }
 
   // Ongoing readings
@@ -113,7 +99,7 @@ bool util_is_not_status(int v) {
 }
 
 bool util_is_not_charging(int v) {
-  // Allow result and STATUS_NO_CHANGE
+  // Allow result and STATUS_NO_CHANGE (still plugged in)
   return util_is_not_status(v) || v == STATUS_NO_CHANGE;
 }
 
@@ -150,7 +136,7 @@ void util_menu_cell_draw(GContext *ctx, Layer *layer, char *title, char *desc) {
   // TODO: Can we use ContentSize here without layout issues?
   //       It may conflict with pebble-scalable font system
   //
-  // Somehow removing this consumes 200B more memory!?
+  // Somehow removing this consumes 200B more static memory!?
   PreferredContentSize content_size = preferred_content_size();
   // APP_LOG(APP_LOG_LEVEL_INFO, "content_size: %d", (int)content_size);
 
@@ -161,12 +147,7 @@ void util_menu_cell_draw(GContext *ctx, Layer *layer, char *title, char *desc) {
   }
 
   // Else, use larger one
-  GRect title_rect = GRect(
-    scl_x(30),
-    scl_y_pp({.o = -30, .e = -10}),
-    PS_DISP_W,
-    100
-  );
+  GRect title_rect = GRect(scl_x(30), scl_y_pp({.o = -30, .e = -10}), PS_DISP_W, 100);
   if (desc == NULL) {
     title_rect.origin.y += scl_y(30);
   }
@@ -186,12 +167,7 @@ void util_menu_cell_draw(GContext *ctx, Layer *layer, char *title, char *desc) {
       ctx,
       desc,
       scl_get_font(SFI_Medium),
-      GRect(
-        scl_x(30),
-        scl_y_pp({.o = 110, .e = 130}),
-        PS_DISP_W,
-        100
-      ),
+      GRect(scl_x(30), scl_y_pp({.o = 110, .e = 130}), PS_DISP_W, 100),
       GTextOverflowModeTrailingEllipsis,
       GTextAlignmentLeft,
       NULL
@@ -211,18 +187,11 @@ void util_draw_button_hints(GContext *ctx, bool hints[3]) {
     // Top hint
     const int top_y = PS_DISP_H / 6 - (HINT_H / 2);
     graphics_context_set_fill_color(ctx, GColorBlack);
-    graphics_fill_rect(
-      ctx, GRect(hint_x, top_y, HINT_W, HINT_H),
-      3,
-      GCornersAll
-    );
+    graphics_fill_rect(ctx, GRect(hint_x, top_y, HINT_W, HINT_H), 3, GCornersAll);
 
     // TODO: Ugly, can't configure long press emphasis but only used in one place for now.
     graphics_context_set_fill_color(ctx, GColorWhite);
-    const GPoint select_center = {
-      .x = hint_x + (HINT_W / 2),
-      .y = top_y + (HINT_H / 2)
-    };
+    const GPoint select_center = { .x = hint_x + (HINT_W / 2), .y = top_y + (HINT_H / 2) };
     graphics_fill_circle(ctx, select_center, scl_x(20));
   }
 
@@ -230,22 +199,14 @@ void util_draw_button_hints(GContext *ctx, bool hints[3]) {
     // Middle hint
     const int middle_y = (PS_DISP_H / 2) - (HINT_H / 2);
     graphics_context_set_fill_color(ctx, GColorBlack);
-    graphics_fill_rect(
-      ctx, GRect(hint_x, middle_y, HINT_W, HINT_H),
-      3,
-      GCornersAll
-    );
+    graphics_fill_rect(ctx, GRect(hint_x, middle_y, HINT_W, HINT_H), 3, GCornersAll);
   }
 
   if (hints[2]) {
     // Bottom hint
     const int bottom_y = ((5 * PS_DISP_H) / 6) - (HINT_H / 2);
     graphics_context_set_fill_color(ctx, GColorBlack);
-    graphics_fill_rect(
-      ctx, GRect(hint_x, bottom_y, HINT_W, HINT_H),
-      3,
-      GCornersAll
-    );
+    graphics_fill_rect(ctx, GRect(hint_x, bottom_y, HINT_W, HINT_H), 3, GCornersAll);
   }
 }
 

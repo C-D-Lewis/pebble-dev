@@ -57,8 +57,8 @@ static void window_load(Window *window) {
   );
   text_size.h += 10;
   GRect text_bounds = bounds;
-  text_bounds.origin.x += 2;
-  text_bounds.size.w -= 4;
+  text_bounds.origin.x += 4;
+  text_bounds.size.w -= 8;
   text_bounds.size.h = text_size.h;
 
   s_text_layer = util_make_text_layer(text_bounds, scl_get_font(SFI_Medium));

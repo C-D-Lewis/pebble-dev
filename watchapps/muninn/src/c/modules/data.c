@@ -2,17 +2,14 @@
 
 // Persisted
 static PersistData s_persist_data;
-static AppState s_app_state;
 static Sample s_samples[NUM_SAMPLES];
 
 // Not persisted
+static AppState s_app_state;
 static char s_error_buff[64];
 
 static void delete_all_data() {
-  for (int i = 0; i < SK_Max; i += 1) {
-    // if (!persist_exists(i)) continue;
-    persist_delete(i);
-  }
+  for (int i = 0; i < SK_Max; i += 1) persist_delete(i);
   wakeup_cancel_all();
 // APP_LOG(APP_LOG_LEVEL_INFO, "!!! RESET ALL DATA !!!");
 }
@@ -27,8 +24,8 @@ static void save_all() {
     APP_LOG(APP_LOG_LEVEL_ERROR, "data w trunc");
   }
 
+  // Save each Sample using SK_SampleBase + i
   for (int i = 0; i < NUM_SAMPLES; i++) {
-    // Save each Sample using SK_SampleBase + i
     const int key = SK_SampleBase + i;
     result = persist_write_data(key, &s_samples[i], sizeof(Sample));
     if (result < 0) {
@@ -68,10 +65,7 @@ static void init_data_fields() {
 
 void data_reset_all() {
   delete_all_data();
-
-  // Write defaults - some will be init'd when tracking begins
   init_data_fields();
-
   save_all();
 }
 
@@ -121,10 +115,6 @@ static void test_data_generator() {
   // 8 - Test case: Should show graph with minimum points
   // const int changes[NUM_SAMPLES] = {3, 1, 2, 3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
 
-  int total_change = 0;
-  for(int i = 0; i < NUM_SAMPLES; i++) {
-    total_change += changes[i];
-  }
   const int interval_s = WAKEUP_MOD_H * SECONDS_PER_HOUR;
 
   // Use the most recent interval time as a base with 0 minutes
@@ -139,7 +129,7 @@ static void test_data_generator() {
   // TODO: Use the array's newest value here?
   s_persist_data.last_sample_time = base;
   s_persist_data.last_charge_perc = 80;  // Agrees with emulator
-  s_persist_data.wakeup_id = base + (12 * SECONDS_PER_HOUR);   // Won't be found
+  s_persist_data.wakeup_id = base + (12 * SECONDS_PER_HOUR);  // Won't be found
   s_persist_data.seen_first_launch = true;
   s_persist_data.vibe_on_sample = true;
   s_persist_data.custom_alert_level = AL_20;
@@ -184,7 +174,7 @@ static void test_data_generator() {
     s->result = result_from_gap(gap);
     // Make this deliberately incorrect for testing
     if (util_is_not_status(s->result)) {
-      int result = s->result;
+      const int result = s->result;
       s->days_remaining = s->charge_perc / result;
       s->rate = result;
     }
@@ -241,7 +231,6 @@ void data_init() {
   }
 
   handle_new_fields();
-
   data_log_state();
 }
 
@@ -274,7 +263,7 @@ void data_log_state() {
   );
 
   // Sample history
-// APP_LOG(APP_LOG_LEVEL_INFO, "i,lst,ts,td,lcp,cp,cd,r,dr,rt");
+  APP_LOG(APP_LOG_LEVEL_INFO, "i,lst,ts,td,lcp,cp,cd,r,dr,rt");
   for (int i = 0; i < NUM_SAMPLES; i++) {
     Sample *s = &s_samples[i];
     APP_LOG(
@@ -326,35 +315,33 @@ void data_push_sample(int charge_perc, int last_sample_time, int last_charge_per
  */
 int data_calculate_avg_discharge_rate() {
   const int total = data_get_valid_samples_count();
-
-  // Not enough samples yet
   if (total < MIN_SAMPLES) return STATUS_EMPTY;
 
-  int result_x2 = 0;
+  int total_x2 = 0;
   int weight_x2 = 0;
   int count = 0;
 
   for (int i = 0; i < NUM_SAMPLES; i++) {
     const Sample *s = &s_samples[i];
-    int r = s->result;
+    int result = s->result;
 
     // Log ends here, we never skip a slot when adding to it
-    if (r == STATUS_EMPTY) break;
+    if (result == STATUS_EMPTY) break;
     // No charge change but we still count the time period elapsed
-    if (r == STATUS_NO_CHANGE) {
-      r = 0;
+    if (result == STATUS_NO_CHANGE) {
+      result = 0;
     }
     // Tricky - decision to ignore this time period for now (not discharging time)
-    if (r == STATUS_CHARGED) continue;
+    if (result == STATUS_CHARGED) continue;
 
     count++;
 
-    // Weight the most recent 4 samples more heavily
+    // Weight the most recent 4 samples (last day) more heavily
     if (count <= 4) {
-      result_x2 += r * 2;
+      total_x2 += result * 2;
       weight_x2 += 2;
     } else {
-      result_x2 += r * 1;
+      total_x2 += result * 1;
       weight_x2 += 1;
     }
   }
@@ -362,11 +349,11 @@ int data_calculate_avg_discharge_rate() {
   // We didn't count anything - empty log?
   if (weight_x2 == 0) return STATUS_EMPTY;
 
-  // If the majority samples are no-change, we may have a zero rate
-  // This case is a problem: 90% chagre becomes 90 days...
-  if (result_x2 == 0) return 1;
+  // If the majority samples are no-change, we may have a zero rate average
+  // This case is a problem: 90% charge becomes 90 days at 1% rate...
+  if (total_x2 == 0) return 1;
 
-  return result_x2 / weight_x2;
+  return total_x2 / weight_x2;
 }
 
 int data_calculate_days_remaining() {
@@ -377,11 +364,9 @@ int data_calculate_days_remaining() {
 
   // If not enough data
   if (data_get_valid_samples_count() < MIN_SAMPLES) return STATUS_EMPTY;
-
   // Data not available yet
   if (!util_is_not_status(rate)) return STATUS_EMPTY;
-
-  // Only ever charged, or rate is zero (return 1 above should prevent this)
+  // Only ever charged, or rate is zero ('return 1' above should prevent this)
   if (rate <= 0) return STATUS_EMPTY;
 
   return charge_perc / rate;
@@ -415,23 +400,8 @@ void data_cycle_custom_alert_level() {
       break;
   }
 
-  // If changed to less than current, don't skip
+  // If changed to less than current, re-enable notification
   s_persist_data.ca_has_notified = false;
-}
-
-void data_reset_log() {
-  for (int i = 0; i < NUM_SAMPLES; i++) {
-    Sample *s = &s_samples[i];
-    s->timestamp = STATUS_EMPTY;
-    s->charge_perc = STATUS_EMPTY;
-    s->last_sample_time = STATUS_EMPTY;
-    s->last_charge_perc = STATUS_EMPTY;
-    s->time_diff = STATUS_EMPTY;
-    s->charge_diff = STATUS_EMPTY;
-    s->result = STATUS_EMPTY;
-    s->days_remaining = STATUS_EMPTY;
-    s->rate = STATUS_EMPTY;
-  }
 }
 
 time_t data_get_next_charge_time() {
@@ -457,7 +427,7 @@ int data_calculate_accuracy() {
   int expected_acc = 0;
   int actual_acc = 0;
 
-  // Pre-fill last_valid_rate in case the first rate isn't useful
+  // Bodge: pre-fill last_valid_rate in case the first rate ever is missing
   int last_valid_rate = 0;
   for (int i = newest_i; i <= oldest_i; i++) {
     if (util_is_not_status(s_samples[i].rate)) {
@@ -487,16 +457,17 @@ int data_calculate_accuracy() {
     }
   }
 
-  // Prevent divide by zero - actually nothing dropped
+  // Prevent divide by zero - somehow nothing dropped
   if (expected_acc <= 0 || actual_acc <= 0) return STATUS_EMPTY;
 
   // Convert expected_acc (percent-seconds) to raw percentage points
-  int expected_total_perc = expected_acc / SECONDS_PER_DAY;
+  const int exp_total_perc = expected_acc / SECONDS_PER_DAY;
 
   // Return the difference in battery gauge units
-  return actual_acc - expected_total_perc;
+  return actual_acc - exp_total_perc;
 }
 
+// Currently not used
 int data_calculate_days_remaining_accuracy() {
   // If there is at least a whole day of continuous discharge samples, compare the
   // days_remaining estimate at the start and end of that period.
@@ -569,6 +540,7 @@ int data_calculate_days_remaining_accuracy() {
 int data_get_valid_samples_count() {
   int count = 0;
   bool discharged = false;
+
   for (int i = 0; i < NUM_SAMPLES; i++) {
     // Count only discharging and no-change samples
     const int r = s_samples[i].result;
@@ -581,6 +553,7 @@ int data_get_valid_samples_count() {
   }
 
   // At least one must a be a full discharging sample
+  // This means old watches with a good battery may wait longer for stats to appear
   if (!discharged) return 0;
 
   return count;
@@ -588,6 +561,7 @@ int data_get_valid_samples_count() {
 
 int data_get_log_length() {
   int count = 0;
+
   for (int i = 0; i < NUM_SAMPLES; i++) {
     // Count all, regardless of status unless they're truly empty
     if (s_samples[i].result != STATUS_EMPTY) {
@@ -601,11 +575,7 @@ int data_get_log_length() {
 
 void data_set_error(char *err) {
   snprintf(s_error_buff, sizeof(s_error_buff), "Error: %s", err);
-  message_window_push(
-    data_get_error(),
-    true,
-    false
-  );
+  message_window_push(data_get_error(), true, false);
 }
 
 char* data_get_error() {

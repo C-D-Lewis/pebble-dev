@@ -13,11 +13,11 @@
 // If this sample looked like it was higher than the last
 #define STATUS_CHARGED -103
 
-// NOTE: ADD ONLY - Changing keys will affect existing users!
+// NOTE: APPEND ONLY - Changing keys will affect existing users!
 typedef enum {
   // App data key
   SK_PersistData = 1,
-  // Sample data key base - due to the 256B limit per-key we need to store separately
+  // Sample data key base - due to the 256B limit per-key we need to store each separately
   SK_SampleBase = 10,
   // Wipe - adding new fields to Sample struct and expanding number of samples
   SK_Migration_1 = 50,
@@ -90,7 +90,6 @@ int data_calculate_avg_discharge_rate();
 int data_calculate_days_remaining();
 void data_cycle_custom_alert_level();
 bool data_get_rate_is_elevated();
-void data_reset_log();
 time_t data_get_next_charge_time();
 int data_calculate_accuracy();
 int data_calculate_days_remaining_accuracy();
@@ -108,5 +107,5 @@ AppState* data_get_app_state();
 
 // Strings
 #define MSG_WELCOME "Welcome to Muninn!\n\nEstimates will appear after two samples are taken.\n\nPlease launch me if the watch is off and a sample is missed."
-#define MSG_TIPS "Use a watchface that updates every minute.\n\nFilter notifications from very noisy apps.\n\nDisable the motion activated backlight and lower intensity."
+#define MSG_TIPS "Use a watchface that updates every minute.\n\nFilter notifications from any very noisy apps.\n\nDisable the motion activated backlight and lower intensity."
 #define MSG_INFORMATION "Samples are taken every 6 hours.\n\nThe main screen shows:\n- Estimate data if available.\n- Last detected & next predicted charge.\n- Current battery level and next sample time.\n\nThe graph shows each reading, with an outlined circle for predicted levels.\n\nIf watch is off when a wakeup is missed, the app must be launched again."

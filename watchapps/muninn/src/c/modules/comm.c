@@ -2,7 +2,9 @@
 
 // Can't use pebble-packet due to low memory on aplite. Sad packet noises.
 
+#ifdef FEATURE_SYNC
 static int s_sync_index = STATUS_EMPTY;
+#endif
 
 static void add_push_pin_data(DictionaryIterator *iter) {
 #if defined(TEST_TIMELINE_PIN)
@@ -15,18 +17,21 @@ static void add_push_pin_data(DictionaryIterator *iter) {
 
   if (!util_is_not_status(days) || !util_is_not_status(rate)) return;
 
-  Tuplet push_tuple = TupletInteger(MESSAGE_KEY_PUSH_PIN, 1);
-  dict_write_tuplet(iter, &push_tuple);
-  Tuplet days_tuple = TupletInteger(MESSAGE_KEY_DAYS_REMAINING, days);
-  dict_write_tuplet(iter, &days_tuple);
-  Tuplet rate_tuple = TupletInteger(MESSAGE_KEY_DISCHARGE_RATE, rate);
-  dict_write_tuplet(iter, &rate_tuple);
+  dict_write_int32(iter, MESSAGE_KEY_PUSH_PIN, 1);
+  dict_write_int32(iter, MESSAGE_KEY_DAYS_REMAINING, days);
+  dict_write_int32(iter, MESSAGE_KEY_DISCHARGE_RATE, rate);
 }
 
 #ifdef FEATURE_SYNC
+static void send_int(uint32_t key) {
+  DictionaryIterator *iter;
+  app_message_outbox_begin(&iter);
+  dict_write_int32(iter, key, 1);
+  app_message_outbox_send();
+}
+
 static void add_get_sync_info_data(DictionaryIterator *iter) {
-  Tuplet sync_tuple = TupletInteger(MESSAGE_KEY_GET_SYNC_INFO, 1);
-  dict_write_tuplet(iter, &sync_tuple);
+  dict_write_int32(iter, MESSAGE_KEY_GET_SYNC_INFO, 1);
 }
 
 static void send_sample(int index) {
@@ -34,33 +39,25 @@ static void send_sample(int index) {
   
   DictionaryIterator *iter;
   app_message_outbox_begin(&iter);
-  Tuplet sync_tuple = TupletInteger(MESSAGE_KEY_SYNC_SAMPLE, 1);
-  dict_write_tuplet(iter, &sync_tuple);
-  Tuplet timestamp_tuple = TupletInteger(MESSAGE_KEY_SAMPLE_TIMESTAMP, s->timestamp);
-  dict_write_tuplet(iter, &timestamp_tuple);
-  Tuplet result_tuple = TupletInteger(MESSAGE_KEY_SAMPLE_RESULT, s->result);
-  dict_write_tuplet(iter, &result_tuple);
-  Tuplet charge_perc_tuple = TupletInteger(MESSAGE_KEY_SAMPLE_CHARGE_PERC, s->charge_perc);
-  dict_write_tuplet(iter, &charge_perc_tuple);
-  Tuplet time_diff_tuple = TupletInteger(MESSAGE_KEY_SAMPLE_TIME_DIFF, s->time_diff);
-  dict_write_tuplet(iter, &time_diff_tuple);
-  Tuplet charge_diff_tuple = TupletInteger(MESSAGE_KEY_SAMPLE_CHARGE_DIFF, s->charge_diff);
-  dict_write_tuplet(iter, &charge_diff_tuple);
-  Tuplet rate_tuple = TupletInteger(MESSAGE_KEY_SAMPLE_RATE, s->rate);
-  dict_write_tuplet(iter, &rate_tuple);
+  dict_write_int32(iter, MESSAGE_KEY_SYNC_SAMPLE, 1);
+  dict_write_int32(iter, MESSAGE_KEY_SAMPLE_TIMESTAMP, s->timestamp);
+  dict_write_int32(iter, MESSAGE_KEY_SAMPLE_RESULT, s->result);
+  dict_write_int32(iter, MESSAGE_KEY_SAMPLE_CHARGE_PERC, s->charge_perc);
+  dict_write_int32(iter, MESSAGE_KEY_SAMPLE_TIME_DIFF, s->time_diff);
+  dict_write_int32(iter, MESSAGE_KEY_SAMPLE_CHARGE_DIFF, s->charge_diff);
+  dict_write_int32(iter, MESSAGE_KEY_SAMPLE_RATE, s->rate);
   app_message_outbox_send();
 }
 
 // Need timer so inbox handler completes for JS
 static void send_timer_handler(void *context) {
-  int index = (int)context;
-
-  // APP_LOG(APP_LOG_LEVEL_INFO, "Export %d", index);
+  const int index = (int)context;
+  // APP_LOG(APP_LOG_LEVEL_INFO, "Send %d", index);
   s_sync_index = index;
   send_sample(index);
 }
 
-static void send_samples_after(int last_ts) {
+static void send_next_sample_after(int last_ts) {
   // Locate index of next sample that has a newer timestamp
   int index = data_get_log_length() - 1;
   while (index >= 0) {
@@ -71,24 +68,25 @@ static void send_samples_after(int last_ts) {
   }
 
   if (index < 0) {
-    // APP_LOG(APP_LOG_LEVEL_INFO, "Exported");
+    APP_LOG(APP_LOG_LEVEL_INFO, "syncd");
     return;
   }
 
+  // Break appmessage event loop
   app_timer_register(100, send_timer_handler, (void*)index);
 }
 #endif
 
 void out_failed_handler(DictionaryIterator *failed, AppMessageResult reason, void *context) {
-  APP_LOG(APP_LOG_LEVEL_ERROR, "Out fail");
+  APP_LOG(APP_LOG_LEVEL_ERROR, "Out f %d", (int)reason);
 }
 
 void out_sent_handler(DictionaryIterator *iterator, void *context) {
+#ifdef FEATURE_SYNC
   if (s_sync_index < 0) return;
 
-#ifdef FEATURE_SYNC
   const Sample *s = data_get_sample(s_sync_index);
-  send_samples_after(s->timestamp);
+  send_next_sample_after(s->timestamp);
 #endif
 }
 
@@ -96,9 +94,9 @@ void inbox_received_handler(DictionaryIterator *iter, void *context) {
   PersistData *persist_data = data_get_persist_data();
 
   // Things to do when JS is ready
+  // We can only respond with one AppMessage at a time it seems
   Tuple *t = dict_find(iter, MESSAGE_KEY_READY);
   if (t) {
-    // We can only respond with one AppMessage at a time it seems
     DictionaryIterator *iter;
     app_message_outbox_begin(&iter);
     if (persist_data->push_timeline_pins) add_push_pin_data(iter);
@@ -110,9 +108,7 @@ void inbox_received_handler(DictionaryIterator *iter, void *context) {
   }
 
 #ifdef FEATURE_SYNC
-  AppState *app_state = data_get_app_state();
-
-  // Response to last timestamp request
+  // Response to sync info request
   t = dict_find(iter, MESSAGE_KEY_SYNC_TIMESTAMP);
   if (t) {
     const int last_ts = (int)t->value->int32;
@@ -121,19 +117,10 @@ void inbox_received_handler(DictionaryIterator *iter, void *context) {
     const int sync_count = (int)t->value->int32;
     APP_LOG(APP_LOG_LEVEL_INFO, "Sync: %d (%d)", last_ts, sync_count);
 
-    // TODO: If watch is empty and phone has data, option to sync back to watch?
-    //       Only if it is intended that JS data persists when watchapp is uninstalled
-
+    AppState *app_state = data_get_app_state();
     app_state->sync_count = sync_count;
-    settings_window_reload();
 
-    send_samples_after(last_ts);
-    return;
-  }
-
-  // Response to sync stats request
-  t = dict_find(iter, MESSAGE_KEY_STAT_TOTAL_DAYS);
-  if (t) {
+    t = dict_find(iter, MESSAGE_KEY_STAT_TOTAL_DAYS);
     app_state->stat_total_days = t->value->int32;
 
     t = dict_find(iter, MESSAGE_KEY_STAT_ALL_TIME_RATE);
@@ -148,7 +135,17 @@ void inbox_received_handler(DictionaryIterator *iter, void *context) {
     t = dict_find(iter, MESSAGE_KEY_STAT_MTBC);
     app_state->stat_mtbc = t->value->int32;
 
+    // TODO: Non-looping way to update the UI when sync progresses
+    settings_window_reload();
     stats_window_reload();
+
+    // TODO: If watch is empty and phone has data, option to sync back to watch?
+    //       Only if it is intended that JS data persists when watchapp is uninstalled
+    //       This might be stale data though.
+
+    // Continue sync after summary is received, but not every time
+    send_next_sample_after(last_ts);
+    return;
   }
 #endif
 }
@@ -161,23 +158,17 @@ void comm_init() {
   // Consider Aplite when adding to these
 #ifdef FEATURE_SYNC
   const int inbox_size = 128;
+  const int outbox_size = inbox_size;
 #else
   const int inbox_size = 32;
+  const int outbox_size = 64;
 #endif
-  app_message_open(inbox_size, 64);
+  app_message_open(inbox_size, outbox_size);
 }
 
 void comm_deinit() {}
 
 #ifdef FEATURE_SYNC
-static void send_int(uint32_t key) {
-  DictionaryIterator *iter;
-  app_message_outbox_begin(&iter);
-  Tuplet sync_tuple = TupletInteger(key, 1);
-  dict_write_tuplet(iter, &sync_tuple);
-  app_message_outbox_send();
-}
-
 void comm_request_deletion() {
   send_int(MESSAGE_KEY_SYNC_DELETE);
 }

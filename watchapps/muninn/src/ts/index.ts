@@ -1,4 +1,4 @@
-import { handleGetSyncInfo, handleGetSyncStats, handleSync } from './sync';
+import { handleGetSyncInfo, handleSync } from './sync';
 import { handlePushTimelinePin } from './timeline';
 
 /**
@@ -10,6 +10,9 @@ const deleteAll = () => {
 };
 
 Pebble.addEventListener('ready', async (e) => {
+  // !!! TEST ONLY
+  // deleteAll();
+  
   console.log('PebbleKit JS ready!');
   await PebbleTS.sendAppMessage({ READY: 1 });
 });
@@ -23,7 +26,6 @@ Pebble.addEventListener('appmessage', async (e) => {
     if (dict.GET_SYNC_INFO) await handleGetSyncInfo();
     if (dict.SYNC_SAMPLE) await handleSync(dict);
     if (dict.SYNC_DELETE) await deleteAll();
-    if (dict.GET_STATS) await handleGetSyncStats();
   } catch (e) {
     console.log('Failed to handle message');
     console.log(e);

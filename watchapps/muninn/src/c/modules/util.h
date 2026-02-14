@@ -11,8 +11,6 @@ void util_fmt_time(int timestamp_s, char* buff, int size);
 
 void util_fmt_time_ago(time_t then, char *buff, int size);
 
-int util_hours_until_next_interval();
-
 void util_fmt_time_unit(time_t ts, char *buff, int size);
 
 char* util_get_status_string();

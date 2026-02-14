@@ -9,7 +9,7 @@
 //                                              //
 // Hours between wakeups (check strings and JS) //
 #define WAKEUP_MOD_H 6                          //
-// Number of stored samples                     //
+// Number of stored samples  (4 days)           //
 #define NUM_SAMPLES 16                          //
 //////////////////////////////////////////////////
 
@@ -23,7 +23,7 @@
 // Min samples before graph is shown
 #define MIN_SAMPLES_FOR_GRAPH 4
 // Maximum number of extra minutes if a collision
-#define EXTRA_MINUTES_MAX 10
+#define WAKEUP_WINDOW_M 10
 // Multipler for elevated rate alarm
 #define EVEVATED_RATE_MULT 3
 // Minimum negative charge_diff to count as charging
@@ -45,13 +45,12 @@
 //                                       //
 ///////////////////////////////////////////
 
-//////////////// Features /////////
-#if defined(PBL_PLATFORM_APLITE) //
-#else                            //
-#define FEATURE_SYNC true        //
-#define FEATURE_ANIMATIONS true  //
-#endif                           //
-///////////////////////////////////
+//////////////// Features //////////
+#if !defined(PBL_PLATFORM_APLITE) //
+#define FEATURE_ANIMATIONS true   //
+#define FEATURE_SYNC true         //
+#endif                            //
+////////////////////////////////////
 
 // Layout values
 // MenuLayer single row height

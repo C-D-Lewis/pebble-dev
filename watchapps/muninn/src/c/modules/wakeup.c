@@ -1,20 +1,17 @@
 #include "wakeup.h"
 
 void wakeup_unschedule() {
-  PersistData *persist_data = data_get_persist_data();
-
   wakeup_cancel_all();
+
+  PersistData *persist_data = data_get_persist_data();
   persist_data->wakeup_id = STATUS_EMPTY;
 }
 
 void wakeup_schedule_next() {
-  PersistData *persist_data = data_get_persist_data();
-
   // We only want one - this one
   wakeup_unschedule();
 
   const time_t ts_now = time(NULL);
-
 #if defined(WAKEUP_NEXT_MINUTE)
   // For faster testing of wakeups
   const time_t future = ts_now + 60;
@@ -31,7 +28,7 @@ void wakeup_schedule_next() {
   const time_t future = mktime(&tm_future);
 #endif
 
-// APP_LOG(APP_LOG_LEVEL_INFO, "future %d", (int)future);
+  // APP_LOG(APP_LOG_LEVEL_INFO, "future %d", (int)future);
   int id = wakeup_schedule(future, 0, true);
 #if defined(TEST_COLLISION)
   // To test collision rescheduling
@@ -42,8 +39,8 @@ void wakeup_schedule_next() {
   if (id < 0) {
     // Try again in the future if a collision with another app
     int extra_mins = 1;
-    while (id < 0 && extra_mins <= EXTRA_MINUTES_MAX) {
-    // APP_LOG(APP_LOG_LEVEL_INFO, "E_RANGE, trying again with +%dm", extra_mins);
+    while (id < 0 && extra_mins <= WAKEUP_WINDOW_M) {
+      // APP_LOG(APP_LOG_LEVEL_INFO, "E_RANGE, trying again with +%dm", extra_mins);
       id = wakeup_schedule(future + (extra_mins * 60), 0, true);
       extra_mins++;
     }
@@ -51,16 +48,15 @@ void wakeup_schedule_next() {
 
   // If still failed
   if (id < 0) {
-    APP_LOG(APP_LOG_LEVEL_ERROR, "schedule fail");
-
     static char err_buff[64];
     snprintf(err_buff, sizeof(err_buff), "Failed to schedule wakeup: %d", id);
     data_set_error(err_buff);
     return;
   }
 
+  PersistData *persist_data = data_get_persist_data();
   persist_data->wakeup_id = id;
-// APP_LOG(APP_LOG_LEVEL_INFO, "Scheduled wakeup: %d", id);
+  // APP_LOG(APP_LOG_LEVEL_INFO, "Scheduled: %d", id);
 }
 
 void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
@@ -72,22 +68,22 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
   // Did we wake too early? Seen on PT2
   const time_t ts_now = time(NULL);
   const struct tm *now = localtime(&ts_now);
-  if (now->tm_min > EXTRA_MINUTES_MAX) {
+  if (now->tm_min > WAKEUP_WINDOW_M) {
     // Try scheduling again
     wakeup_schedule_next();
     return;
   }
 
-  const int last_charge_perc = persist_data->last_charge_perc;
   const BatteryChargeState state = battery_state_service_peek();
   const int charge_percent = state.charge_percent;
+  const int last_charge_perc = persist_data->last_charge_perc;
   const int last_sample_time = persist_data->last_sample_time;
 
   int result = STATUS_EMPTY;
 
   // First ever sample - nothing to compare to
   if (!util_is_not_status(last_sample_time)) {
-  // APP_LOG(APP_LOG_LEVEL_INFO, "First sample!");
+    // APP_LOG(APP_LOG_LEVEL_INFO, "First sample!");
 
     // Record state and wait for next time
     persist_data->last_charge_perc = charge_percent;
@@ -95,7 +91,7 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
   } else {
     const int time_diff_s = ts_now - last_sample_time;
     const int discharge_perc = last_charge_perc - charge_percent;
-  // APP_LOG(APP_LOG_LEVEL_INFO, "Time diff: %d, Charge diff: %d", time_diff_s, discharge_perc);
+    // APP_LOG(APP_LOG_LEVEL_INFO, "Time diff: %d, Charge diff: %d", time_diff_s, discharge_perc);
 
     const bool battery_bumped = discharge_perc < 0 && discharge_perc > -MIN_CHARGE_AMOUNT;
     if (!battery_bumped) {
@@ -105,6 +101,7 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
     }
 
     if (discharge_perc < 0) {
+      // Charged up
       // Can't combine with the 'if' above due to the 'else' otherwise being taken
       if (!battery_bumped) {
         // Recently charged by user a significant amount
@@ -117,7 +114,7 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
     } else {
       // Calculate new daily discharge rate estimate!
       result = (discharge_perc * SECONDS_PER_DAY) / time_diff_s;
-    // APP_LOG(APP_LOG_LEVEL_INFO, "estimate: %d", result);
+      // APP_LOG(APP_LOG_LEVEL_INFO, "estimate: %d", result);
     }
 
     if (result != STATUS_EMPTY) {
