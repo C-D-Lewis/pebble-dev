@@ -63,6 +63,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
 #else
   int count = log_len;
 #endif
+  if (count == 0) count = 1;
 
   // Find Y ranges, rounded to nearest 10
   int low_v = 100, high_v = 0;
