@@ -35,7 +35,9 @@ const loadHistory = (): HistoryItem[] => {
   } catch (e) {
     console.error('Failed to load history');
     console.error(e);
-    throw e;
+
+    // Can't load JSON, user can't fix. Reset it.
+    return [];
   }
 };
 
@@ -68,7 +70,7 @@ const calculateDischargeRate = (history: HistoryItem[]): number => {
     rateSum += rate;
   });
   const result = count > 0 ? Math.round(rateSum / count) : STATUS_EMPTY;
-  console.log(JSON.stringify({ rateSum, count, result }));
+  // console.log(JSON.stringify({ rateSum, count, result }));
   return result;
 };
 

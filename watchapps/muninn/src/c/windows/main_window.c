@@ -525,8 +525,8 @@ static void window_disappear(Window *window) {
   s_mascot_bitmap = NULL;
   s_batt_bitmap = NULL;
 
-  APP_LOG(APP_LOG_LEVEL_INFO, "wd %d B", heap_bytes_free());
-  bitmap_log_allocated_count();
+  // APP_LOG(APP_LOG_LEVEL_INFO, "wd %d B", heap_bytes_free());
+  // bitmap_log_allocated_count();
 }
 
 void main_window_push() {

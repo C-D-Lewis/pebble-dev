@@ -1,7 +1,7 @@
 #include "log_window.h"
 
 #define GRAPH_MARGIN scl_x(65)
-#define GRAPH_W scl_x_pp({.o = 890, .e = 880})
+#define GRAPH_W scl_x_pp({.o = 820, .e = 830})
 #define GRAPH_H scl_y(550)
 #define NOTCH_S scl_x(35)
 
@@ -87,10 +87,14 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     count = NUM_SAMPLES;
   }
 
-  const int x_gap = GRAPH_W / count;
+  // Find total time and so the gap between intervals
+  int time_total = 0;
+  for (int i = 0; i < count - 1; i++) {
+    const Sample *s = data_get_sample(i);
+    time_total += s->time_diff;
+  }
+  const int x_gap = (GRAPH_W * SECONDS_PER_DAY) / time_total;
   const int root_y = scl_y(160);
-  // Always show full X axis size, even when animating
-  const int max_x = GRAPH_W;
 
   // Draw Y and X axes
   graphics_context_set_fill_color(ctx, GColorBlack);
@@ -102,7 +106,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   );
   graphics_fill_rect(
     ctx,
-    GRect(GRAPH_MARGIN, root_y + GRAPH_H, max_x - GRAPH_MARGIN + LINE_W, LINE_W),
+    GRect(GRAPH_MARGIN, root_y + GRAPH_H, GRAPH_W, LINE_W),
     0,
     GCornerNone
   );
@@ -118,19 +122,6 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
       0,
       GCornerNone
     );
-  }
-
-  // Draw X axis notches at x_gap intervals, including last
-  for (int i = 0; i < count; i++) {
-    if (i % 2 == 0 || i == count - 1) {
-      const int notch_x = GRAPH_MARGIN + (i * x_gap);
-      graphics_fill_rect(
-        ctx,
-        GRect(notch_x - LINE_W / 2, root_y + GRAPH_H, LINE_W, NOTCH_S),
-        0,
-        GCornerNone
-      );
-    }
   }
 
   // No data?
@@ -150,29 +141,40 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   const bool flip = count - s_selection < (count / 2);
   int prev_x = -1, prev_y = -1;
 
-  graphics_context_set_stroke_width(ctx, 1);
-
   // Draw points from oldest to newest
+  const int oldest_ts = data_get_sample(count - 1)->timestamp;
   for (int i = 0; i < count; i++) {
     const int idx = count - i - 1;
     const Sample *s = data_get_sample(idx);
     if (!s || !util_is_not_status(s->charge_perc)) continue;
 
-    const int x = GRAPH_MARGIN + (i * x_gap);
+    // Find it's percentage x of the total based on timestamp more than oldest ts
+    const int x = GRAPH_MARGIN + ((s->timestamp - oldest_ts) * x_gap) / SECONDS_PER_DAY;
     const int y = root_y + GRAPH_H - (( (s->charge_perc - low_v) * GRAPH_H) / y_range);
 
     // Draw this point
     graphics_context_set_fill_color(ctx, GColorBlack);
     graphics_fill_circle(ctx, GPoint(x, y), POINT_S);
 
+    if (i % 2 == 0) {
+      // Draw its notch on the X axis
+      graphics_fill_rect(
+        ctx,
+        GRect(x - (LINE_W / 2), root_y + GRAPH_H, LINE_W, NOTCH_S),
+        0,
+        GCornerNone
+      );
+    }
+
     // If selected point, show dashed lines
+    graphics_context_set_stroke_width(ctx, 1);
     if (idx == s_selection) {
       if (!flip) {
         for (int lx = GRAPH_MARGIN; lx <= x; lx += 8) {
           graphics_draw_line(ctx, GPoint(lx, y), GPoint(lx + 3, y));
         }
       } else {
-        for (int lx = x; lx <= max_x; lx += 8) {
+        for (int lx = x; lx <= GRAPH_W; lx += 8) {
           graphics_draw_line(ctx, GPoint(lx, y), GPoint(lx + 3, y));
         }
       }
