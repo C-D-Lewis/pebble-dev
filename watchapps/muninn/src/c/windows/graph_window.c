@@ -93,6 +93,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     const Sample *s = data_get_sample(i);
     time_total += s->time_diff;
   }
+  if (time_total == 0) time_total = SECONDS_PER_DAY; // Avoid divide by zero, show something
   const int x_gap = (GRAPH_W * SECONDS_PER_DAY) / time_total;
   const int root_y = scl_y(160);
 
@@ -142,11 +143,14 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   int prev_x = -1, prev_y = -1;
 
   // Draw points from oldest to newest
-  const int oldest_ts = data_get_sample(count - 1)->timestamp;
   for (int i = 0; i < count; i++) {
     const int idx = count - i - 1;
     const Sample *s = data_get_sample(idx);
     if (!s || !util_is_not_status(s->charge_perc)) continue;
+
+    const Sample *oldest_s = data_get_sample(count - 1);
+    if (!oldest_s) continue; // TODO: Can we do better here?
+    const int oldest_ts = oldest_s->timestamp;
 
     // Find it's percentage x of the total based on timestamp more than oldest ts
     const int x = GRAPH_MARGIN + ((s->timestamp - oldest_ts) * x_gap) / SECONDS_PER_DAY;

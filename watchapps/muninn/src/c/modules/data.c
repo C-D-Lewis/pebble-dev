@@ -85,7 +85,7 @@ static void test_data_generator() {
   // Test data scenarios
   //
   // 1 - Arbitrary scenario
-  // const int changes[NUM_SAMPLES] = {0, 2, 2, 2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
+  const int changes[NUM_SAMPLES] = {0, 2, 2, 2, 2, 2, 2, -1, -1, -1, -1, -1, -1, -1, -1, -1};
   //
   // 2 - Test case: Should show 10 days at 8% per day (from 80%)
   // const int changes[NUM_SAMPLES] = {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
@@ -110,7 +110,7 @@ static void test_data_generator() {
   // const int changes[NUM_SAMPLES] = {0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0};
   //
   // 7 - Test case: Big charge half way through
-  const int changes[NUM_SAMPLES] = {3, 0, 3, 3, 0, 3, 3, 3, -30, 3, 3, 3, 3, 3, 3, 3};
+  // const int changes[NUM_SAMPLES] = {3, 0, 3, 3, 0, 3, 3, 3, -30, 3, 3, 3, 3, 3, 3, 3};
   //
   // 8 - Test case: Should show graph with minimum points
   // const int changes[NUM_SAMPLES] = {3, 1, 2, 3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
