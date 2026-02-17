@@ -180,7 +180,7 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
 #ifdef FEATURE_SYNC
     case MI_SYNC_INFO: {
       AppState *app_state = data_get_app_state();
-      if (app_state->sync_count != STATUS_EMPTY) stats_window_push();
+      if (app_state->sync_count > 0) stats_window_push();
     } break;
 #endif
     case MI_BATTERY_TIPS:

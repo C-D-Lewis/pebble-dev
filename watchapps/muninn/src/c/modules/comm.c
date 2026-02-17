@@ -100,7 +100,7 @@ void inbox_received_handler(DictionaryIterator *iter, void *context) {
     DictionaryIterator *iter;
     app_message_outbox_begin(&iter);
     if (persist_data->push_timeline_pins) add_push_pin_data(iter);
-#ifdef FEATURE_SYNC
+#if defined(FEATURE_SYNC) && !defined(USE_TEST_DATA)
     add_get_sync_info_data(iter);
 #endif
     app_message_outbox_send();
