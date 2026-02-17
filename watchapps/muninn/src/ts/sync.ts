@@ -97,7 +97,7 @@ const calculateLastWeekRate = (history: HistoryItem[]): number => {
  * Determine if a history item is a valid charge event.
  */
 const isChargeEvent = (item: HistoryItem) =>
-  item.result === STATUS_CHARGED && item.chargeDiff >= MIN_CHARGE_AMOUNT;
+  item.result === STATUS_CHARGED && item.chargeDiff <= (-MIN_CHARGE_AMOUNT);
 
 /**
  * Calculate the number of significant charge events.
@@ -127,7 +127,7 @@ const calculateMeanTimeBetweenCharges = (history: HistoryItem[]): number => {
   const meanTimeS = timeDiffs.reduce((acc, p) => acc + p, 0) / timeDiffs.length;
   const meanDays = meanTimeS / SECONDS_PER_DAY;
   // console.log({ chargeTimes, timeDiffs, meanTimeS, meanDays });
-  
+
   return Math.round(meanDays);
 };
 
