@@ -100,7 +100,7 @@ void inbox_received_handler(DictionaryIterator *iter, void *context) {
     DictionaryIterator *iter;
     app_message_outbox_begin(&iter);
     if (persist_data->push_timeline_pins) add_push_pin_data(iter);
-#if defined(FEATURE_SYNC) && !defined(USE_TEST_DATA)
+#if defined(FEATURE_SYNC)
     add_get_sync_info_data(iter);
 #endif
     app_message_outbox_send();
@@ -143,8 +143,10 @@ void inbox_received_handler(DictionaryIterator *iter, void *context) {
     //       Only if it is intended that JS data persists when watchapp is uninstalled
     //       This might be stale data though.
 
+#if !defined(USE_TEST_DATA) || (defined(USE_TEST_DATA) && defined(SYNC_TEST_DATA))
     // Continue sync after summary is received, but not every time
     send_next_sample_after(last_ts);
+#endif
     return;
   }
 #endif

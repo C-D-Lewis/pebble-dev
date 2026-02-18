@@ -13,7 +13,7 @@ import { generateTestData } from './util';
 /** LocalStorage key - data history on a per-watch basis */
 const buildHistoryKey = () => {
   const key = `history-${Pebble.getWatchToken()}`;
-  // console.log(JSON.stringify({ key }));
+  console.log(JSON.stringify({ key }));
   return key;
 };
 
@@ -21,7 +21,9 @@ const buildHistoryKey = () => {
  * Save the history of samples.
  */
 const saveHistory = (history: HistoryItem[]) => {
+  const start = Date.now();
   localStorage.setItem(buildHistoryKey(), JSON.stringify(history));
+  console.log(`saveHistory: ${history.length} items in ${Date.now() - start}ms`);
 };
 
 /**
@@ -31,7 +33,11 @@ const loadHistory = (): HistoryItem[] => {
   if (TEST_SAMPLE_DATA) return generateTestData();
 
   try {
-    return JSON.parse(localStorage.getItem(buildHistoryKey()) || '[]');
+    const start = Date.now();
+    const arr = JSON.parse(localStorage.getItem(buildHistoryKey()) || '[]');
+    // console.log(JSON.stringify(arr));
+    console.log(`loadHistory: ${arr.length} items in ${Date.now() - start}ms`);
+    return arr;
   } catch (e) {
     console.error('Failed to load history');
     console.error(e);
@@ -59,7 +65,7 @@ const calculateDischargeRate = (history: HistoryItem[]): number => {
       return;
     }
 
-    // FIXME: Why is this happening?
+    // FIXME: Why/is this happening?
     if (!rate) {
       console.log(`WARN: HistoryItem had no rate: ${JSON.stringify(p)}`);
       return;
@@ -136,15 +142,14 @@ const calculateMeanTimeBetweenCharges = (history: HistoryItem[]): number => {
  */
 export const handleGetSyncInfo = async () => {
   const history = loadHistory();
-  // console.log(JSON.stringify(history));
 
-  let timestamp = STATUS_EMPTY;
+  let lastTs = STATUS_EMPTY;
   if (history.length > 0) {
-    timestamp = history[0].timestamp;
+    lastTs = history[0].timestamp;
   }
 
   const res = {
-    SYNC_TIMESTAMP: timestamp,
+    SYNC_TIMESTAMP: lastTs,
     SYNC_COUNT: history.length,
     STAT_TOTAL_DAYS: Math.floor(history.length / 4),
     STAT_ALL_TIME_RATE: calculateDischargeRate(history),

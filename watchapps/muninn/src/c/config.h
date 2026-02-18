@@ -35,6 +35,8 @@
 //                                       //
 // #define SAVE_TEST_DATA true           //
 //                                       //
+// #define SYNC_TEST_DATA true           //
+//                                       //
 // #define LOG_STATE true                //
 //                                       //
 // #define WAKEUP_NEXT_MINUTE true       //

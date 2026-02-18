@@ -37,7 +37,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   // Total days
   graphics_draw_text(
     ctx,
-    "Days of samples synced",
+    "Total duration synced",
     scl_get_font(SFI_Small),
     GRect(0, y, PS_DISP_W, 300),
     GTextOverflowModeWordWrap,
@@ -61,7 +61,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   // All time avg
   graphics_draw_text(
     ctx,
-    "Average rate",
+    "Avg. discharge rate",
     scl_get_font(SFI_Small),
     GRect(0, y, PS_DISP_W, 300),
     GTextOverflowModeWordWrap,
@@ -126,7 +126,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     NULL
   );
   static char s_n_c_buff[12];
-  snprintf(s_n_c_buff, sizeof(s_n_c_buff), "%d events", app_state->stat_num_charges);
+  snprintf(s_n_c_buff, sizeof(s_n_c_buff), "%d", app_state->stat_num_charges);
   graphics_draw_text(
     ctx,
     s_n_c_buff,
@@ -142,7 +142,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   // Mean time between charges
   graphics_draw_text(
     ctx,
-    "Mean charge interval",
+    "Avg. charge interval",
     scl_get_font(SFI_Small),
     GRect(0, y, PS_DISP_W, 300),
     GTextOverflowModeWordWrap,
