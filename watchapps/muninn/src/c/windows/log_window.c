@@ -212,8 +212,7 @@ void log_window_push(int index) {
   }
 
   window_stack_push(s_window, true);
-
-  APP_LOG(APP_LOG_LEVEL_INFO, "Heap %d", heap_bytes_free());
+  // APP_LOG(APP_LOG_LEVEL_INFO, "Heap %d", heap_bytes_free());
 
   if (index != 0) {
     app_timer_register(250, scroll_timer_handler, (void *)index);

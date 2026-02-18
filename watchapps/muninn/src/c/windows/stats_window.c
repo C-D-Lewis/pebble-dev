@@ -48,7 +48,11 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   snprintf(s_t_d_buff, sizeof(s_t_d_buff), "%d days", app_state->stat_total_days);
   graphics_draw_text(
     ctx,
+#ifdef USE_TEST_DATA
+    "28 days",
+#else
     s_t_d_buff,
+#endif
     scl_get_font(SFI_Medium),
     GRect(0, y + label_off, PS_DISP_W, 300),
     GTextOverflowModeWordWrap,
@@ -77,7 +81,11 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   }
   graphics_draw_text(
     ctx,
+#ifdef USE_TEST_DATA
+    "12% per day",
+#else
     s_a_t_r_buff,
+#endif
     scl_get_font(SFI_Medium),
     GRect(0, y + label_off, PS_DISP_W, 300),
     GTextOverflowModeWordWrap,
@@ -105,7 +113,11 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   }
   graphics_draw_text(
     ctx,
+#ifdef USE_TEST_DATA
+    "8% per day",
+#else
     s_l_w_r_buff,
+#endif
     scl_get_font(SFI_Medium),
     GRect(0, y + label_off, PS_DISP_W, 300),
     GTextOverflowModeWordWrap,
@@ -129,7 +141,11 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   snprintf(s_n_c_buff, sizeof(s_n_c_buff), "%d", app_state->stat_num_charges);
   graphics_draw_text(
     ctx,
+#ifdef USE_TEST_DATA
+    "3 events",
+#else
     s_n_c_buff,
+#endif
     scl_get_font(SFI_Medium),
     GRect(0, y + label_off, PS_DISP_W, 300),
     GTextOverflowModeWordWrap,
@@ -157,7 +173,11 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   }
   graphics_draw_text(
     ctx,
+#ifdef USE_TEST_DATA
+    "18 days",
+#else
     s_mtbc_buff,
+#endif
     scl_get_font(SFI_Medium),
     GRect(0, y + label_off, PS_DISP_W, 300),
     GTextOverflowModeWordWrap,

@@ -68,7 +68,7 @@ static void send_next_sample_after(int last_ts) {
   }
 
   if (index < 0) {
-    APP_LOG(APP_LOG_LEVEL_INFO, "syncd");
+    // APP_LOG(APP_LOG_LEVEL_INFO, "syncd");
     return;
   }
 
@@ -115,7 +115,7 @@ void inbox_received_handler(DictionaryIterator *iter, void *context) {
 
     t = dict_find(iter, MESSAGE_KEY_SYNC_COUNT);
     const int sync_count = (int)t->value->int32;
-    APP_LOG(APP_LOG_LEVEL_INFO, "Sync: %d (%d)", last_ts, sync_count);
+    // APP_LOG(APP_LOG_LEVEL_INFO, "Sync: %d (%d)", last_ts, sync_count);
 
     AppState *app_state = data_get_app_state();
     app_state->sync_count = sync_count;

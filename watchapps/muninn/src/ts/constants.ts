@@ -10,7 +10,7 @@ export const MAX_ITEMS = 480;
 /** Seconds in a day */
 export const SECONDS_PER_DAY = 60 * 60 * 24;
 /** Minimum charge amount to count */
-export const MIN_CHARGE_AMOUNT = 30;
+export const MIN_CHARGE_AMOUNT = 20;
 
 /** Whether to use test data */
 export const TEST_SAMPLE_DATA = false;
