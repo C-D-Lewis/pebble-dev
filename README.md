@@ -64,7 +64,7 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `pebble-isometric`        | ✅      | ✅        | `A` `B` `C` `D` `E` `F` `G` |
 | `pebble-packet`           | ✅      | ✅        | `A` `B` `C` `D` `E` `F` `G` |
 | `pebble-pge`              | ✅      | ✅        | `A` `B` `C` `D` `E` `F`     |
-| `pebble-scalable`         | ✅      | ✅        | `A` `B` `C` `D` `E` `F`     |
+| `pebble-scalable`         | ✅      | ✅        | `A` `B` `C` `D` `E` `F` `G` |
 | `pebble-timeline-js`      | ✅      | ✅        | `A` `B` `C` `D` `E` `F`     |
 | `pebble-universal-fb`     | ✅      | ✅        | `A` `B` `C` `D` `E` `F` `G` |
 | `pebble-pge-simple`       |        |          |                             |
