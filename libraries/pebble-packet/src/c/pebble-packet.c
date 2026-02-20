@@ -27,8 +27,8 @@ char* packet_result_to_string(AppMessageResult result) {
     case APP_MSG_INTERNAL_ERROR:   return "Internal error";
     case APP_MSG_INVALID_STATE:    return "Invalid state. Is AppMessage open?";
     default: {
-      static char s_buff[32];
-      snprintf(s_buff, sizeof(s_buff), "%s: Unknown error (%d)", TAG, result);
+      static char s_buff[38];
+      snprintf(s_buff, sizeof(s_buff), "%s: Unknown error (%d)", TAG, (int)result);
       return &s_buff[0];
     }
   }
