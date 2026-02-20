@@ -132,11 +132,12 @@ bool pge_ws_add_int(int key, int value) {
     return false;
   }
 
-  AppMessageResult result = dict_write_int(s_outbox_iter, key, &value, sizeof(int), true);
-  if(result != APP_MSG_OK) {
-    parse_result(result);
-    return false;
-  }
+  DictionaryResult result = dict_write_int(s_outbox_iter, key, &value, sizeof(int), true);
+  // FIXME: Separate function for DictionaryResult values
+  // if(result != DICT_OK) {
+  //   parse_result(result);
+  //   return false;
+  // }
 
   return true;
 }
