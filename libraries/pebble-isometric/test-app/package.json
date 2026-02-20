@@ -10,6 +10,9 @@
     "pebble-isometric": "..",
     "pebble-universal-fb": "^1.9.0"
   },
+  "scripts": {
+    "rebuild": "cd ../ && pebble clean && pebble build && cd - && pebble clean && pebble build && pebble install --emulator"
+  },
   "pebble": {
     "displayName": "test-app",
     "uuid": "adde8929-4573-40bd-9f2c-33b96e9e86b1",
@@ -21,7 +24,8 @@
       "chalk",
       "diorite",
       "emery",
-      "flint"
+      "flint",
+      "gabbro"
     ],
     "watchapp": {
       "watchface": false

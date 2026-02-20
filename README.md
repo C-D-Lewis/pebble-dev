@@ -14,7 +14,7 @@ Some PBWs can be found in `/pbw` for sideloading.
 
 ## `watchfaces`
 
-> Platforms: `A` = Aplite, `B` = Basalt, `C` = Chalk, `D` = Diorite, `E` = Emery, `F` = Flint
+> Platforms: `A` = Aplite, `B` = Basalt, `C` = Chalk, `D` = Diorite, `E` = Emery, `F` = Flint, `G` = Gabbro
 
 | Name             | Screenshot                                             | Builds                  | Icon | PBW                           |
 |------------------|--------------------------------------------------------|-------------------------|------|-------------------------------|
@@ -59,19 +59,19 @@ Some PBWs can be found in `/pbw` for sideloading.
 
 ## `libraries`
 
-| Name                      | Status | Test App | Builds                  |
-|---------------------------|--------|----------|-------------------------|
-| `pebble-isometric`        | ✅      | ✅        | `A` `B` `C` `D` `E` `F` |
-| `pebble-packet`           | ✅      | ✅        | `A` `B` `C` `D` `E` `F` |
-| `pebble-pge`              | ✅      | ✅        | `A` `B` `C` `D` `E` `F` |
-| `pebble-scalable`         | ✅      | ✅        | `A` `B` `C` `D` `E` `F` |
-| `pebble-timeline-js`      | ✅      | ✅        | `A` `B` `C` `D` `E` `F` |
-| `pebble-universal-fb`     | ✅      | ✅        | `A` `B` `C` `D` `E` `F` |
-| `pebble-pge-simple`       |        |          |                         |
-| `pebble-simple-request`   |        |          |                         |
-| `pebble-timeline-js-node` |        |          |                         |
-| `InverterLayerCompat`     | ✅      | ✅        | -                       |
-| `notif-layer`             | ✅      | ✅        | -                       |
+| Name                      | Status | Test App | Builds                      |
+|---------------------------|--------|----------|-----------------------------|
+| `pebble-isometric`        | ✅      | ✅        | `A` `B` `C` `D` `E` `F` `G` |
+| `pebble-packet`           | ✅      | ✅        | `A` `B` `C` `D` `E` `F` `G` |
+| `pebble-pge`              | ✅      | ✅        | `A` `B` `C` `D` `E` `F`     |
+| `pebble-scalable`         | ✅      | ✅        | `A` `B` `C` `D` `E` `F`     |
+| `pebble-timeline-js`      | ✅      | ✅        | `A` `B` `C` `D` `E` `F`     |
+| `pebble-universal-fb`     | ✅      | ✅        | `A` `B` `C` `D` `E` `F` `G` |
+| `pebble-pge-simple`       |        |          |                             |
+| `pebble-simple-request`   |        |          |                             |
+| `pebble-timeline-js-node` |        |          |                             |
+| `InverterLayerCompat`     | ✅      | ✅        | -                           |
+| `notif-layer`             | ✅      | ✅        | -                           |
 
 ## `other`
 

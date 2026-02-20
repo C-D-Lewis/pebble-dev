@@ -6,6 +6,9 @@
     "pebble-app"
   ],
   "private": true,
+  "scripts": {
+    "rebuild": "cd ../ && pebble clean && pebble build && cd - && pebble clean && pebble build && pebble install --emulator"
+  },
   "pebble": {
     "displayName": "universal-fb",
     "uuid": "ef141fad-3a6e-4b51-b859-ad25a0b6cc92",
@@ -16,7 +19,9 @@
       "basalt",
       "chalk",
       "diorite",
-      "emery"
+      "emery",
+      "flint",
+      "gabbro"
     ],
     "watchapp": {
       "watchface": false

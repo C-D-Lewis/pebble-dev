@@ -11,7 +11,7 @@ static void test(bool condition, char *tag) {
 }
 
 static void test_universal_fb(GBitmap *fb, GColor c1, GColor c2) {
-  GPoint test_point = GPoint(30, 30);
+  GPoint test_point = GPoint(100, 100);
   GRect bounds = gbitmap_get_bounds(fb);
   GBitmapDataRowInfo info = gbitmap_get_data_row_info(fb, test_point.y);
 
@@ -21,7 +21,7 @@ static void test_universal_fb(GBitmap *fb, GColor c1, GColor c2) {
        "universal_fb_set/get_pixel_color");
 
   // Test swap
-  universal_fb_swap_colors(fb, grect_inset(bounds, GEdgeInsets(20)), c1, c2);
+  universal_fb_swap_colors(fb, grect_inset(bounds, GEdgeInsets(30)), c1, c2);
   test(gcolor_equal(universal_fb_get_pixel_color(info, bounds, test_point), c2), 
        "universal_fb_swap_colors");
 }
