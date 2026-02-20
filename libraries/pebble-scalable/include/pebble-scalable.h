@@ -4,7 +4,10 @@
 
 ///////////////////////////////////////////// Constants ////////////////////////////////////////////
 
-#if defined(PBL_PLATFORM_EMERY)
+#if defined(PBL_PLATFORM_GABBRO)
+  #define PS_DISP_W 260
+  #define PS_DISP_H 260
+#elif defined(PBL_PLATFORM_EMERY)
   #define PS_DISP_W 200
   #define PS_DISP_H 228
 #elif defined(PBL_PLATFORM_CHALK)
@@ -26,6 +29,8 @@ typedef struct {
   int c;
   // Emery
   int e;
+  // Gabbro
+  int g;
 } SV; // "scalable values"
 
 /**
@@ -87,6 +92,8 @@ typedef struct {
   GFont c;
   // Emery
   GFont e;
+  // Gabbro
+  GFont g;
 } SF; // "scalable fonts"
 
 /**

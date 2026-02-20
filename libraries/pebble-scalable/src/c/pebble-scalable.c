@@ -3,10 +3,12 @@
 ///////////////////////////////////////////// Geometry /////////////////////////////////////////////
 
 // A simple helper to pick the right member based on the build platform
-#if defined(PBL_PLATFORM_CHALK)
-  #define _GET_SV(s) ((s).c ? (s).c : (s).o)
+#if defined(PBL_PLATFORM_GABBRO)
+  #define _GET_SV(s) ((s).g ? (s).g : (s).o)
 #elif defined(PBL_PLATFORM_EMERY)
   #define _GET_SV(s) ((s).e ? (s).e : (s).o)
+#elif defined(PBL_PLATFORM_CHALK)
+  #define _GET_SV(s) ((s).c ? (s).c : (s).o)
 #else
   #define _GET_SV(s) ((s).o)
 #endif
@@ -60,7 +62,7 @@ GRect scl_center(GRect r) {
 }
 
 GRect scl_largest_square() {
-#if defined(PBL_PLATFORM_CHALK)
+#if defined(PBL_PLATFORM_CHALK) || defined(PBL_PLATFORM_GABBRO)
   // Side size is diameter * (sqrt(2) / 2)
   const int side = (PS_DISP_W * SQRT_2_OVER_2) / 1000;
   return scl_center(GRect(0, 0, side, side));
@@ -75,10 +77,12 @@ GRect scl_largest_square() {
 #define _MAX_FONT_SETS 32
 
 // Macro to pick the pointer based on the build target
-#if defined(PBL_PLATFORM_CHALK)
-  #define GET_SF(s) ((s).c ? (s).c : (s).o)
+#if defined(PBL_PLATFORM_GABBRO)
+  #define GET_SF(s) ((s).g ? (s).g : (s).o)
 #elif defined(PBL_PLATFORM_EMERY)
   #define GET_SF(s) ((s).e ? (s).e : (s).o)
+#elif defined(PBL_PLATFORM_CHALK)
+  #define GET_SF(s) ((s).c ? (s).c : (s).o)
 #else
   #define GET_SF(s) ((s).o)
 #endif

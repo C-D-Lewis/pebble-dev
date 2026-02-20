@@ -21,7 +21,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     ctx,
     GRect(
       0,
-      scl_y_pp({.o = 60, .e = 65}),
+      scl_y_pp({.o = 60, .e = 65, .g = 70}),
       scl_x(500),
       scl_y(20)
     ),
