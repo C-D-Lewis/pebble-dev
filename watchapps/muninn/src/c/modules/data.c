@@ -85,7 +85,7 @@ static void test_data_generator() {
   // Test data scenarios
   //
   // 1 - Arbitrary scenario
-  const int changes[NUM_SAMPLES] = {0, 2, 2, 2, 2, 2, 2, -1, -1, -1, -1, -1, -1, -1, -1, -1};
+  // const int changes[NUM_SAMPLES] = {0, 2, 2, 2, 2, 2, 2, -1, -1, -1, -1, -1, -1, -1, -1, -1};
   //
   // 2 - Test case: Should show 10 days at 8% per day (from 80%)
   // const int changes[NUM_SAMPLES] = {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
@@ -106,11 +106,11 @@ static void test_data_generator() {
   //            or: Should await 1 sample
   // const int changes[NUM_SAMPLES] = {2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
   //
-  // 6 - Test case: Should show 1% when the majority of events are 'no change' (extreme battery life)
+  // 6 - Test case: Should show 4% at 20 days when the majority of events are 'no change' (extreme battery life)
   // const int changes[NUM_SAMPLES] = {0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0};
   //
   // 7 - Test case: Big charge half way through
-  // const int changes[NUM_SAMPLES] = {3, 0, 3, 3, 0, 3, 3, 3, -30, 3, 3, 3, 3, 3, 3, 3};
+  const int changes[NUM_SAMPLES] = {3, 0, 3, 3, 0, 3, 3, 3, -30, 3, 3, 3, 3, 3, 3, 3};
   //
   // 8 - Test case: Should show graph with minimum points
   // const int changes[NUM_SAMPLES] = {3, 1, 2, 3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
@@ -300,7 +300,7 @@ void data_push_sample(int charge_perc, int last_sample_time, int last_charge_per
   s->result = result;
   if (util_is_not_status(result)) {
     s->days_remaining = data_calculate_days_remaining();
-    s->rate = data_calculate_avg_discharge_rate();
+    s->rate = data_calculate_avg_discharge_rate(false);
   } else {
     s->days_remaining = STATUS_EMPTY;
     s->rate = STATUS_EMPTY;
@@ -313,7 +313,7 @@ void data_push_sample(int charge_perc, int last_sample_time, int last_charge_per
  *
  * Important: count all time periods in the log, not just those with a drop!
  */
-int data_calculate_avg_discharge_rate() {
+int data_calculate_avg_discharge_rate(bool ignore_no_change) {
   const int total = data_get_valid_samples_count();
   if (total < MIN_SAMPLES) return STATUS_EMPTY;
 
@@ -330,6 +330,9 @@ int data_calculate_avg_discharge_rate() {
     // No charge change but we still count the time period elapsed
     if (result == STATUS_NO_CHANGE) {
       result = 0;
+
+      // We are re-counting because the last rate was very low
+      if (ignore_no_change) continue;
     }
     // Tricky - decision to ignore this time period for now (not discharging time)
     if (result == STATUS_CHARGED) continue;
@@ -351,7 +354,13 @@ int data_calculate_avg_discharge_rate() {
 
   // If the majority samples are no-change, we may have a zero rate average
   // This case is a problem: 90% charge becomes 90 days at 1% rate...
-  if (total_x2 == 0) return 1;
+  if (total_x2 == 0) total_x2 = 1;
+
+  const int rate = total_x2 / weight_x2;
+  if (rate < 2 && data_get_valid_samples_count() >= MIN_SAMPLES_FOR_GRAPH) {
+    // Count again, but this time ignore 'no change' time periods
+    return data_calculate_avg_discharge_rate(true);
+  }
 
   return total_x2 / weight_x2;
 }
@@ -359,8 +368,8 @@ int data_calculate_avg_discharge_rate() {
 int data_calculate_days_remaining() {
   // Use live battery level, not last reading
   const BatteryChargeState state = battery_state_service_peek();
-  const int charge_perc = state.charge_percent;
-  const int rate = data_calculate_avg_discharge_rate();
+  const int current_level = state.charge_percent;
+  const int rate = data_calculate_avg_discharge_rate(false);
 
   // If not enough data
   if (data_get_valid_samples_count() < MIN_SAMPLES) return STATUS_EMPTY;
@@ -369,12 +378,12 @@ int data_calculate_days_remaining() {
   // Only ever charged, or rate is zero ('return 1' above should prevent this)
   if (rate <= 0) return STATUS_EMPTY;
 
-  return charge_perc / rate;
+  return current_level / rate;
 }
 
 bool data_get_rate_is_elevated() {
   // Return true if the most recent value is much higher than usual
-  const int avg = data_calculate_avg_discharge_rate();
+  const int avg = data_calculate_avg_discharge_rate(false);
   const int last = s_samples[0].result;
 
   // Last value wasn't a significant one of discharge

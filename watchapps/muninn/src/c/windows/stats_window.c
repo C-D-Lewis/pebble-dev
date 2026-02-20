@@ -37,7 +37,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   // Total days
   graphics_draw_text(
     ctx,
-    "Total duration synced",
+    PBL_IF_ROUND_ELSE("Total duration", "Total duration synced"),
     scl_get_font(SFI_Small),
     GRect(0, y, PS_DISP_W, 300),
     GTextOverflowModeWordWrap,
@@ -190,12 +190,12 @@ static void window_load(Window *window) {
   Layer *root_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(root_layer);
 
-  // TODO: Componentize this across settings, log, stats windows
+  // TODO: Componentize this across settings, log, graph, stats windows
   s_header_layer = util_make_text_layer(
-    GRect(0, scl_y_pp({-30, .e = -25}), PS_DISP_W, 100),
+    GRect(0, scl_y_pp({-30, .c = -20, .e = -25}), PS_DISP_W, 100),
     scl_get_font(SFI_Small)
   );
-  text_layer_set_text(s_header_layer, "Historical stats");
+  text_layer_set_text(s_header_layer, PBL_IF_ROUND_ELSE("Historical", "Historical stats"));
   text_layer_set_text_alignment(s_header_layer, GTextAlignmentCenter);
   layer_add_child(root_layer, text_layer_get_layer(s_header_layer));
 

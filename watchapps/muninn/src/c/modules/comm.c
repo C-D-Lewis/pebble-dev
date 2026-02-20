@@ -1,5 +1,9 @@
 #include "comm.h"
 
+#if !defined(USE_TEST_DATA) || (defined(USE_TEST_DATA) && defined(SYNC_TEST_DATA))
+#define SEND_SAMPLES
+#endif
+
 // Can't use pebble-packet due to low memory on aplite. Sad packet noises.
 
 #ifdef FEATURE_SYNC
@@ -12,7 +16,7 @@ static void add_push_pin_data(DictionaryIterator *iter) {
   const int rate = 4;
 #else
   const int days = data_calculate_days_remaining();
-  const int rate = data_calculate_avg_discharge_rate();
+  const int rate = data_calculate_avg_discharge_rate(false);
 #endif
 
   if (!util_is_not_status(days) || !util_is_not_status(rate)) return;
@@ -115,7 +119,7 @@ void inbox_received_handler(DictionaryIterator *iter, void *context) {
 
     t = dict_find(iter, MESSAGE_KEY_SYNC_COUNT);
     const int sync_count = (int)t->value->int32;
-    // APP_LOG(APP_LOG_LEVEL_INFO, "Sync: %d (%d)", last_ts, sync_count);
+    APP_LOG(APP_LOG_LEVEL_INFO, "Sync: %d (%d)", last_ts, sync_count);
 
     AppState *app_state = data_get_app_state();
     app_state->sync_count = sync_count;
@@ -143,7 +147,7 @@ void inbox_received_handler(DictionaryIterator *iter, void *context) {
     //       Only if it is intended that JS data persists when watchapp is uninstalled
     //       This might be stale data though.
 
-#if !defined(USE_TEST_DATA) || (defined(USE_TEST_DATA) && defined(SYNC_TEST_DATA))
+#ifdef SEND_SAMPLES
     // Continue sync after summary is received, but not every time
     send_next_sample_after(last_ts);
 #endif

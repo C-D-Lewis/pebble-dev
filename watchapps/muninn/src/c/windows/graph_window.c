@@ -1,8 +1,9 @@
 #include "log_window.h"
 
-#define GRAPH_MARGIN scl_x(65)
-#define GRAPH_W scl_x_pp({.o = 820, .e = 830})
-#define GRAPH_H scl_y(550)
+#define ROOT_Y scl_y_pp({.o = 160, .c = 200, .e = 160})
+#define GRAPH_MARGIN scl_x_pp({.o = 65, .c = 130, .e = 65})
+#define GRAPH_W scl_x_pp({.o = 820, .c = 760, .e = 830})
+#define GRAPH_H scl_y_pp({.o = 550, .c = 430, .e = 550})
 #define NOTCH_S scl_x(35)
 
 // Not scaled
@@ -95,19 +96,18 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   }
   if (time_total == 0) time_total = SECONDS_PER_DAY; // Avoid divide by zero, show something
   const int x_gap = (GRAPH_W * SECONDS_PER_DAY) / time_total;
-  const int root_y = scl_y(160);
 
   // Draw Y and X axes
   graphics_context_set_fill_color(ctx, GColorBlack);
   graphics_fill_rect(
     ctx,
-    GRect(GRAPH_MARGIN, root_y, LINE_W, GRAPH_H),
+    GRect(GRAPH_MARGIN, ROOT_Y, LINE_W, GRAPH_H),
     0,
     GCornerNone
   );
   graphics_fill_rect(
     ctx,
-    GRect(GRAPH_MARGIN, root_y + GRAPH_H, GRAPH_W, LINE_W),
+    GRect(GRAPH_MARGIN, ROOT_Y + GRAPH_H, GRAPH_W, LINE_W),
     0,
     GCornerNone
   );
@@ -116,7 +116,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   int y_range = high_v - low_v;
   if (y_range == 0) y_range = 10;
   for (int y_val = low_v; y_val <= high_v; y_val += 10) {
-    const int notch_y = root_y + GRAPH_H - ((y_val - low_v) * GRAPH_H / y_range);
+    const int notch_y = ROOT_Y + GRAPH_H - ((y_val - low_v) * GRAPH_H / y_range);
     graphics_fill_rect(
       ctx,
       GRect(GRAPH_MARGIN - NOTCH_S, notch_y - LINE_W / 2, NOTCH_S, LINE_W),
@@ -154,7 +154,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
 
     // Find it's percentage x of the total based on timestamp more than oldest ts
     const int x = GRAPH_MARGIN + ((s->timestamp - oldest_ts) * x_gap) / SECONDS_PER_DAY;
-    const int y = root_y + GRAPH_H - (( (s->charge_perc - low_v) * GRAPH_H) / y_range);
+    const int y = ROOT_Y + GRAPH_H - (( (s->charge_perc - low_v) * GRAPH_H) / y_range);
 
     // Draw this point
     graphics_context_set_fill_color(ctx, GColorBlack);
@@ -164,7 +164,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
       // Draw its notch on the X axis
       graphics_fill_rect(
         ctx,
-        GRect(x - (LINE_W / 2), root_y + GRAPH_H, LINE_W, NOTCH_S),
+        GRect(x - (LINE_W / 2), ROOT_Y + GRAPH_H, LINE_W, NOTCH_S),
         0,
         GCornerNone
       );
@@ -182,7 +182,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
           graphics_draw_line(ctx, GPoint(lx, y), GPoint(lx + 3, y));
         }
       }
-      for (int ly = y; ly <= root_y + GRAPH_H; ly += 8) {
+      for (int ly = y; ly <= ROOT_Y + GRAPH_H; ly += 8) {
         graphics_draw_line(ctx, GPoint(x, ly), GPoint(x, ly + 3));
       }
     }
@@ -207,7 +207,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
         const int time_diff = s->timestamp - prev_s->timestamp;
         const int est_drop = (prev_s->rate * time_diff) / SECONDS_PER_DAY;
         const int est_val = prev_s->charge_perc - est_drop;
-        const int est_y = root_y + GRAPH_H - (((est_val - low_v) * GRAPH_H) / y_range);
+        const int est_y = ROOT_Y + GRAPH_H - (((est_val - low_v) * GRAPH_H) / y_range);
 
         if (est_y != y) {
           // Draw prediction circle
@@ -219,9 +219,9 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
 
   // Box around date
   const int box_h = scl_y(100);
-  const int date_box_y = root_y + GRAPH_H + scl_y(60);
+  const int date_box_y = ROOT_Y + GRAPH_H + scl_y(60);
   const GRect box_rect = scl_center_x(
-    GRect(0, date_box_y, scl_x_pp({.o = 630, .e = 580}), box_h)
+    GRect(0, date_box_y, scl_x_pp({.o = 630, .c = 580, .e = 580}), box_h)
   );
   graphics_context_set_stroke_color(ctx, GColorBlack);
   graphics_draw_rect(ctx, box_rect);
@@ -239,7 +239,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
       ctx,
       s_date_buff,
       scl_get_font(SFI_Small),
-      GRect(0, date_box_y - scl_y(25), PS_DISP_W, 300),
+      GRect(0, date_box_y - scl_y_pp({.o = 25, .c = 20, .e = 25}), PS_DISP_W, 300),
       GTextOverflowModeTrailingEllipsis,
       GTextAlignmentCenter,
       NULL
@@ -248,7 +248,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
 
   // Draw sample's value in box, on either side
   if (sel_s && util_is_not_status(sel_s->charge_perc)) {
-    const int sel_y = root_y + GRAPH_H - (((sel_s->charge_perc - low_v) * GRAPH_H) / y_range);
+    const int sel_y = ROOT_Y + GRAPH_H - (((sel_s->charge_perc - low_v) * GRAPH_H) / y_range);
     const int box_w = scl_x(210);
     const int box_x = flip ? PS_DISP_W - box_w : 0;
     const int box_y = sel_y - (box_h / 2);
@@ -307,10 +307,15 @@ static void main_window_load(Window *window) {
   GRect bounds = layer_get_bounds(root_layer);
 
   s_header_layer = util_make_text_layer(
-    GRect(0, scl_y_pp({-30, .e = -25}), PS_DISP_W - ACTION_BAR_W, 100),
+    GRect(
+      0,
+      scl_y_pp({-30, .c = -20, .e = -25}),
+      PS_DISP_W - PBL_IF_ROUND_ELSE(0, ACTION_BAR_W),
+      100
+    ),
     scl_get_font(SFI_Small)
   );
-  text_layer_set_text(s_header_layer, "Change over time");
+  text_layer_set_text(s_header_layer, PBL_IF_ROUND_ELSE("Graph", "Change over time"));
   text_layer_set_text_alignment(s_header_layer, GTextAlignmentCenter);
   layer_add_child(root_layer, text_layer_get_layer(s_header_layer));
 
@@ -321,9 +326,10 @@ static void main_window_load(Window *window) {
   layer_add_child(root_layer, s_canvas_layer);
 
   s_desc_layer = util_make_text_layer(
-    GRect(scl_x(50), scl_y(860), PS_DISP_W, 100),
+    GRect(0, scl_y_pp({.o = 860, .c = 770, .e = 860}), PS_DISP_W, 100),
     scl_get_font(SFI_Small)
   );
+  text_layer_set_text_alignment(s_desc_layer, GTextAlignmentCenter);
   text_layer_set_overflow_mode(s_desc_layer, GTextOverflowModeWordWrap);
   layer_add_child(root_layer, text_layer_get_layer(s_desc_layer));;
 

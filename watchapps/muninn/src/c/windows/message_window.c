@@ -47,7 +47,8 @@ static void window_load(Window *window) {
   layer_add_child(root_layer, s_braid_layer);
 
   // Code from devsite to try and fit text inside a TextLayer inside a ScrollLayer
-  GRect shrinking_rect = GRect(2, 0, bounds.size.w - 4, 4000);
+  const int margin = PBL_IF_ROUND_ELSE(8, 4);
+  GRect shrinking_rect = GRect(margin, 0, bounds.size.w - (2 * margin), 4000);
   GSize text_size = graphics_text_layout_get_content_size(
     s_text_ptr,
     scl_get_font(SFI_Medium), 
@@ -57,12 +58,15 @@ static void window_load(Window *window) {
   );
   text_size.h += 50;
   GRect text_bounds = bounds;
-  text_bounds.origin.x += 4;
-  text_bounds.size.w -= 8;
+  text_bounds.origin.x += margin;
+  text_bounds.size.w -= (2 * margin);
   text_bounds.size.h = text_size.h;
 
   s_text_layer = util_make_text_layer(text_bounds, scl_get_font(SFI_Medium));
-  text_layer_set_text_alignment(s_text_layer, GTextAlignmentLeft);
+  text_layer_set_text_alignment(
+    s_text_layer,
+    PBL_IF_ROUND_ELSE(GTextAlignmentCenter, GTextAlignmentLeft)
+  );
   text_layer_set_text(s_text_layer, s_text_ptr);
   
   const int scroll_y = braid_y + BRAID_H;

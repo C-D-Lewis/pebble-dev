@@ -2,6 +2,8 @@
 
 #define ROW_HEIGHT scl_y(390)
 #define DIV_Y scl_y_pp({.o = 115, .e = 105})
+#define X_START scl_x_pp({.o = 20, .c = 70, .e = 20})
+#define X_END scl_x_pp({.o = 980, .c = 930, .e = 20})
 
 // Extra precision needed
 #if defined(PBL_PLATFORM_EMERY)
@@ -35,7 +37,7 @@ static void draw_changes(GContext *ctx, const GRect bounds, const Sample *s) {
     ctx,
     s_lst_buff,
     scl_get_font(SFI_Medium),
-    GRect(scl_x(20), scl_y_pp({.o = 90, .e = 100}), PS_DISP_W, 100),
+    GRect(X_START, scl_y_pp({.o = 90, .e = 100}), PS_DISP_W, 100),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentLeft,
     NULL
@@ -48,7 +50,7 @@ static void draw_changes(GContext *ctx, const GRect bounds, const Sample *s) {
     ctx,
     s_lcp_buff,
     scl_get_font(SFI_Medium),
-    GRect(scl_x(20), scl_y_pp({.o = 200, .e = 210}), PS_DISP_W, 100),
+    GRect(X_START, scl_y_pp({.o = 200, .e = 210}), PS_DISP_W, 100),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentLeft,
     NULL
@@ -61,7 +63,7 @@ static void draw_changes(GContext *ctx, const GRect bounds, const Sample *s) {
     ctx,
     s_ts_diff_buff,
     scl_get_font(SFI_Medium),
-    GRect(0, scl_y_pp({.o = 90, .e = 100}), scl_x(980), 100),
+    GRect(0, scl_y_pp({.o = 90, .e = 100}), X_END, 100),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentRight,
     NULL
@@ -73,7 +75,7 @@ static void draw_changes(GContext *ctx, const GRect bounds, const Sample *s) {
     ctx,
     s_perc_diff_buff,
     scl_get_font(SFI_Medium),
-    GRect(0, scl_y_pp({.o = 200, .e = 210}), scl_x(980), 100),
+    GRect(0, scl_y_pp({.o = 200, .e = 210}), X_END, 100),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentRight,
     NULL
@@ -103,7 +105,7 @@ static void draw_result_and_datetime(GContext *ctx, const GRect bounds, const Sa
     ctx,
     s_datetime_buff,
     scl_get_font(SFI_Small),
-    GRect(scl_x(20), scl_y(-25), PS_DISP_W, 100),
+    GRect(X_START, scl_y(-25), PS_DISP_W, 100),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentLeft,
     NULL
@@ -112,7 +114,7 @@ static void draw_result_and_datetime(GContext *ctx, const GRect bounds, const Sa
     ctx,
     s_result_buff,
     scl_get_font(SFI_Small),
-    GRect(0, scl_y(-25), scl_x(980), 100),
+    GRect(0, scl_y(-25), X_END, 100),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentRight,
     NULL
@@ -166,10 +168,10 @@ static void main_window_load(Window *window) {
   GRect bounds = layer_get_bounds(root_layer);
 
   s_header_layer = util_make_text_layer(
-    GRect(0, scl_y_pp({-30, .e = -25}), PS_DISP_W, 100),
+    GRect(0, scl_y_pp({-30, .c = -20, .e = -25}), PS_DISP_W, 100),
     scl_get_font(SFI_Small)
   );
-  text_layer_set_text(s_header_layer, "Recent samples");
+  text_layer_set_text(s_header_layer, PBL_IF_ROUND_ELSE("History", "Recent samples"));
   text_layer_set_text_alignment(s_header_layer, GTextAlignmentCenter);
   layer_add_child(root_layer, text_layer_get_layer(s_header_layer));
 

@@ -214,7 +214,7 @@ static void main_window_load(Window *window) {
   GRect bounds = layer_get_bounds(root_layer);
 
   s_header_layer = util_make_text_layer(
-    GRect(0, scl_y_pp({-30, .e = -25}), PS_DISP_W, 100),
+    GRect(0, scl_y_pp({-30, .c = -20, .e = -25}), PS_DISP_W, 100),
     scl_get_font(SFI_Small)
   );
   text_layer_set_text(s_header_layer, "Settings");

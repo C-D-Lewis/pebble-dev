@@ -171,7 +171,7 @@ static void update_data() {
     update_subtitle(s_days_remaining);
 
     // Rate per day
-    s_rate = data_calculate_avg_discharge_rate();
+    s_rate = data_calculate_avg_discharge_rate(false);
     if (util_is_not_status(s_rate)) {
 #ifdef FEATURE_ANIMATIONS
       text_layer_set_text(s_rate_layer, "--");
@@ -215,7 +215,7 @@ static void update_data() {
   }
 
 #ifdef FEATURE_ANIMATIONS
-  if (data_calculate_avg_discharge_rate() != STATUS_EMPTY) {
+  if (data_calculate_avg_discharge_rate(false) != STATUS_EMPTY) {
     // If data to show, begin smooth animation
     static AnimationImplementation anim_implementation = { .update = anim_update };
     util_animate(500, 50, &anim_implementation, true);
@@ -453,7 +453,7 @@ static void window_load(Window *window) {
   );
   layer_add_child(root_layer, text_layer_get_layer(s_last_charge_layer));
 
-  row_x += scl_x_pp({.o = 460, .e = 460});
+  row_x += scl_x_pp({.o = 450, .e = 450});
 
   s_next_charge_layer = util_make_text_layer(
     GRect(row_x + text_ico_off, row_y + text_y_off, PS_DISP_W, 100),
