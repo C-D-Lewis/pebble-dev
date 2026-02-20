@@ -9,7 +9,7 @@
     "pebble-package"
   ],
   "dependencies": {
-    "pebble-universal-fb": "^1.9.0"
+    "pebble-universal-fb": "^1.10.0"
   },
   "pebble": {
     "projectType": "package",
