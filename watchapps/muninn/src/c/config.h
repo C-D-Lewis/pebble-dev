@@ -31,11 +31,11 @@
 
 ///////////// Testing area ////////////////
 //                                       //
-#define USE_TEST_DATA true            //
+// #define USE_TEST_DATA true            //
 //                                       //
 // #define SAVE_TEST_DATA true           //
 //                                       //
-#define SYNC_TEST_DATA true           //
+// #define SYNC_TEST_DATA true           //
 //                                       //
 // #define LOG_STATE true                //
 //                                       //

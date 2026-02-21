@@ -300,13 +300,15 @@ static void window_load(Window *window) {
   text_layer_set_background_color(s_weekday_layer, GColorClear);
 
   s_day_in_month_layer = text_layer_create(
-    GRect(x_offset + scl_x(10), y_offset + scl_y_pp({.o = 105, .e = 120}), text_s, text_s)
+    GRect(x_offset + scl_x(10), y_offset + scl_y_pp({.o = 105, .e = 120, .g = 120}), text_s, text_s)
   );
   text_layer_set_font(s_day_in_month_layer, scl_get_font(SFI_MediumBold));
   text_layer_set_text_color(s_day_in_month_layer, month_day_color);
   text_layer_set_background_color(s_day_in_month_layer, GColorClear);
 
-  s_month_layer = text_layer_create(GRect(x_offset, y_offset + scl_y_pp({.o = 260, .e = 250}), text_s, text_s));
+  s_month_layer = text_layer_create(
+    GRect(x_offset, y_offset + scl_y_pp({.o = 260, .e = 250, .g = 250}), text_s, text_s)
+  );
   text_layer_set_font(s_month_layer, scl_get_font(SFI_SmallBold));
   text_layer_set_text_color(s_month_layer, date_color);
   text_layer_set_background_color(s_month_layer, GColorClear);
