@@ -1,7 +1,7 @@
 {
   "name": "pebble-pge",
   "author": "Chris Lewis <bonsitm@gmail.com>",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "description": "Simple looping game engine for Pebble",
   "repository": "C-D-Lewis/pebble-dev",
   "files": [
