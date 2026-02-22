@@ -5,6 +5,9 @@
   "keywords": [
     "pebble-app"
   ],
+  "scripts": {
+    "rebuild": "cd ../ && pebble clean && pebble build && cd - && pebble clean && pebble build && pebble install --emulator"
+  },
   "pebble": {
     "sdkVersion": "3",
     "resources": {
@@ -27,13 +30,15 @@
       "basalt",
       "chalk",
       "diorite",
-      "emery"
+      "emery",
+      "flint",
+      "gabbro"
     ],
     "capabilities": []
   },
   "name": "pge-test",
   "dependencies": {
-    "pebble-isometric": "^1.0.0",
-    "pebble-pge-simple": "file:///Users/chrislewis/Dropbox/Pebble-Dev/4.0/lib/pebble-pge-simple"
+    "pebble-isometric": "^1.5.0",
+    "pebble-pge-simple": ".."
   }
 }
