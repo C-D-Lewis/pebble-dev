@@ -1,7 +1,7 @@
 {
   "name": "pebble-timeline-js",
   "author": "Chris Lewis",
-  "version": "2.1.1",
+  "version": "2.2.0",
   "keywords": [
     "pebble-package"
   ],
@@ -15,7 +15,8 @@
       "chalk",
       "diorite",
       "emery",
-      "flint"
+      "flint",
+      "gabbro"
     ],
     "resources": {
       "media": []

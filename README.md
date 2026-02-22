@@ -16,15 +16,15 @@ Some PBWs can be found in `/pbw` for sideloading.
 
 > Platforms: `A` = Aplite, `B` = Basalt, `C` = Chalk, `D` = Diorite, `E` = Emery, `F` = Flint, `G` = Gabbro
 
-| Name             | Screenshot                                             | Builds                  | Icon | PBW                           |
-|------------------|--------------------------------------------------------|-------------------------|------|-------------------------------|
-| `beam-up`        | ![](watchfaces/beam-up/screenshots/aplite.png)         | `A` `B` `C` `D` `E` `F` | ✅    | [pbw](pbw/beam-up.pbw)        |
-| `brackets`       | ![](watchfaces/brackets/screenshots/diorite.png)       | `A` `B` `C` `D` `E` `F` | ✅    | [pbw](pbw/brackets.pbw)       |
-| `cards`          | ![](watchfaces/cards/screenshots/diorite.png)          | `A` `B` `D`             |      | [pbw](pbw/cards.pbw)          |
-| `cmd-time-typed` | ![](watchfaces/cmd-time-typed/screenshots/diorite.png) | `A` `B` `C` `D` `E`     | ✅    | [pbw](pbw/cmd-time-typed.pbw) |
-| `cmd-time`       | ![](watchfaces/cmd-time/screenshots/diorite.png)       | `A` `B` `C` `D` `E`     | ✅    | [pbw](pbw/cmd-time.pbw)       |
-| `dayring`        | ![](watchfaces/dayring/screenshots/basalt.png)         | `A` `B` `C` `D` `E` `F` |      | [pbw](pbw/dayring.pbw)        |
-| `deep-rock`      | ![](watchfaces/deep-rock/screenshots/basalt.png)       | `A` `B` `D`             |      | [pbw](pbw/deep-rock.pbw)      |
+| Name             | Screenshot                                             | Builds              | Icon | PBW                           |
+|------------------|--------------------------------------------------------|---------------------|------|-------------------------------|
+| `beam-up`        | ![](watchfaces/beam-up/screenshots/aplite.png)         | `A - F`             | ✅    | [pbw](pbw/beam-up.pbw)        |
+| `brackets`       | ![](watchfaces/brackets/screenshots/diorite.png)       | `A - F`             | ✅    | [pbw](pbw/brackets.pbw)       |
+| `cards`          | ![](watchfaces/cards/screenshots/diorite.png)          | `A` `B` `D`         |      | [pbw](pbw/cards.pbw)          |
+| `cmd-time-typed` | ![](watchfaces/cmd-time-typed/screenshots/diorite.png) | `A` `B` `C` `D` `E` | ✅    | [pbw](pbw/cmd-time-typed.pbw) |
+| `cmd-time`       | ![](watchfaces/cmd-time/screenshots/diorite.png)       | `A` `B` `C` `D` `E` | ✅    | [pbw](pbw/cmd-time.pbw)       |
+| `dayring`        | ![](watchfaces/dayring/screenshots/basalt.png)         | `A - F`             |      | [pbw](pbw/dayring.pbw)        |
+| `deep-rock`      | ![](watchfaces/deep-rock/screenshots/basalt.png)       | `A` `B` `D`         |      | [pbw](pbw/deep-rock.pbw)      |
 | `dont-panic` | ![](watchfaces/dont-panic/screenshots/emery.png) | `E` | [pbw](pbw/dont-panic.pbw) |
 | `dual-gauge`          | ![](watchfaces/dual-gauge/screenshots/basalt.png)          | `A` `B` `C` `D`         |      | [pbw](pbw/dual-gauge.pbw)          |
 | `eclipse`             | ![](watchfaces/eclipse/screenshots/aplite.png)             | `A` `B` `D`             |      | [pbw](pbw/eclipse.pbw)             |
@@ -37,13 +37,13 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `morndas`             | ![](watchfaces/morndas/screenshots/basalt.png)             | `A` `B` `D` `E` `F`            |      | [pbw](pbw/morndas.pbw)             |
 | `past-present-future` | ![](watchfaces/past-present-future/screenshots/aplite.png) | `A` `B` `D`             |      | [pbw](pbw/past-present-future.pbw) |
 | `potential-divider`   | ![](watchfaces/potential-divider/screenshots/aplite.png)   | `A` `B` `D`             | ✅    | [pbw](pbw/potential-divider.pbw)   |
-| `pseudotime`          | ![](watchfaces/pseudotime/screenshots/basalt.png)          | `A` `B` `C` `D` `E` `F` |      | [pbw](pbw/pseudotime.pbw)          |
+| `pseudotime`          | ![](watchfaces/pseudotime/screenshots/basalt.png)          | `A - F` |      | [pbw](pbw/pseudotime.pbw)          |
 | `split-horizon`       | ![](watchfaces/split-horizon/screenshots/diorite.png)      | `A` `B` `D`             | ✅    | [pbw](pbw/split-horizon.pbw)       |
 | `starfield-demo`      | ![](watchfaces/starfield-demo/screenshots/aplite.png)      | `A` `B` `C` `D`         |      | [pbw](pbw/starfield-demo.pbw)      |
 | `starfield-smooth`    | ![](watchfaces/starfield-smooth/screenshots/aplite.png)    | `A` `B` `C`             | ✅    | [pbw](pbw/starfield-smooth.pbw)    |
-| `thin`                | ![](watchfaces/thin/screenshots/basalt.png)                | `A` `B` `C` `D` `E` `F`     | ✅    | [pbw](pbw/thin.pbw)                |
-| `time-dots-appstore`  | ![](watchfaces/time-dots-appstore/screenshots/basalt1.png) | `A` `B` `C` `D` `E` `F` |      | [pbw](pbw/time-dots-appstore.pbw)  |
-| `void-statues`        | ![](watchfaces/void-statues/screenshots/basalt.png)        | `A` `B` `C` `D` `E` `F`     |      | [pbw](pbw/void-statues.pbw)        |
+| `thin`                | ![](watchfaces/thin/screenshots/basalt.png)                | `A - F`     | ✅    | [pbw](pbw/thin.pbw)                |
+| `time-dots-appstore`  | ![](watchfaces/time-dots-appstore/screenshots/basalt1.png) | `A - F` |      | [pbw](pbw/time-dots-appstore.pbw)  |
+| `void-statues`        | ![](watchfaces/void-statues/screenshots/basalt.png)        | `A - F`     |      | [pbw](pbw/void-statues.pbw)        |
 
 
 ## `watchapps`
@@ -59,19 +59,19 @@ Some PBWs can be found in `/pbw` for sideloading.
 
 ## `libraries`
 
-| Name                      | Status | Test App | Builds                      |
-|---------------------------|--------|----------|-----------------------------|
-| `pebble-isometric`        | ✅      | ✅        | `A` `B` `C` `D` `E` `F` `G` |
-| `pebble-packet`           | ✅      | ✅        | `A` `B` `C` `D` `E` `F` `G` |
-| `pebble-pge`              | ✅      | ✅        | `A` `B` `C` `D` `E` `F`     |
-| `pebble-scalable`         | ✅      | ✅        | `A` `B` `C` `D` `E` `F` `G` |
-| `pebble-timeline-js`      | ✅      | ✅        | `A` `B` `C` `D` `E` `F`     |
-| `pebble-universal-fb`     | ✅      | ✅        | `A` `B` `C` `D` `E` `F` `G` |
-| `pebble-pge-simple`       |        |          |                             |
-| `pebble-simple-request`   |        |          |                             |
-| `pebble-timeline-js-node` |        |          |                             |
-| `InverterLayerCompat`     | ✅      | ✅        | -                           |
-| `notif-layer`             | ✅      | ✅        | -                           |
+| Name                      | Status | Test App | Builds  |
+|---------------------------|--------|----------|---------|
+| `pebble-isometric`        | ✅      | ✅        | `A - G` |
+| `pebble-packet`           | ✅      | ✅        | `A - G` |
+| `pebble-pge`              | ✅      | ✅        | `A - F` |
+| `pebble-scalable`         | ✅      | ✅        | `A - G` |
+| `pebble-timeline-js`      | ✅      | ✅        | `A - G` |
+| `pebble-universal-fb`     | ✅      | ✅        | `A - G` |
+| `pebble-pge-simple`       |        |          |         |
+| `pebble-simple-request`   |        |          |         |
+| `pebble-timeline-js-node` |        |          |         |
+| `InverterLayerCompat`     | ✅      | ✅        | -       |
+| `notif-layer`             | ✅      | ✅        | -       |
 
 ## `other`
 

@@ -9,6 +9,9 @@
   "dependencies": {
     "pebble-timeline-js": ".."
   },
+  "scripts": {
+    "rebuild": "cd ../ && pebble clean && pebble build && cd - && pebble clean && pebble build && pebble install --emulator"
+  },
   "pebble": {
     "displayName": "test-app",
     "uuid": "2a5bc9dc-b7f9-42e2-8846-434ebaed565c",
@@ -20,7 +23,8 @@
       "chalk",
       "diorite",
       "emery",
-      "flint"
+      "flint",
+      "gabbro"
     ],
     "watchapp": {
       "watchface": false
