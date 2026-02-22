@@ -4,11 +4,14 @@
   "private": true,
   "dependencies": {
     "pebble-pge": "..",
-    "pebble-universal-fb": "^1.9.0"
+    "pebble-universal-fb": "^1.10.0"
   },
   "keywords": [
     "pebble-app"
   ],
+  "scripts": {
+    "rebuild": "cd ../ && pebble clean && pebble build && cd - && pebble clean && pebble build && pebble install --emulator"
+  },
   "pebble": {
     "sdkVersion": "3",
     "resources": {
@@ -32,7 +35,8 @@
       "chalk",
       "diorite",
       "emery",
-      "flint"
+      "flint",
+      "gabbro"
     ],
     "capabilities": []
   },
