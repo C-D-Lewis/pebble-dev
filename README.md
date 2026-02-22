@@ -67,7 +67,7 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `pebble-scalable`         | ✅      | ✅        | `A - G` |
 | `pebble-timeline-js`      | ✅      | ✅        | `A - G` |
 | `pebble-universal-fb`     | ✅      | ✅        | `A - G` |
-| `pebble-pge-simple`       |        |          |         |
+| `pebble-pge-simple`       | ✅      | ✅        | `A - G` |
 | `pebble-simple-request`   |        |          |         |
 | `pebble-timeline-js-node` |        |          |         |
 | `InverterLayerCompat`     | ✅      | ✅        | -       |

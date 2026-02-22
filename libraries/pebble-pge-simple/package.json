@@ -1,11 +1,17 @@
 {
   "name": "pebble-pge-simple",
   "author": "Chris Lewis <bonsitm@gmail.com>",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Simple looping game engine for Pebble. Simple version without extra modules.",
   "repository": "C-D-Lewis/pebble-pge-simple",
-  "files": ["dist.zip"],
-  "keywords": ["pebble-package", "pge", "game"],
+  "files": [
+    "dist.zip"
+  ],
+  "keywords": [
+    "pebble-package",
+    "pge",
+    "game"
+  ],
   "license": "MIT",
   "pebble": {
     "projectType": "package",
