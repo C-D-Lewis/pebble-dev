@@ -1,13 +1,13 @@
 {
-  "version": "1.14.0",
+  "version": "1.15.0",
   "author": "Chris Lewis",
   "name": "isotime",
   "dependencies": {
-    "@rebble/clay": "^1.0.6",
-    "pebble-isometric": "^1.1.0",
-    "pebble-packet": "^1.5.0",
-    "pebble-pge-simple": "^1.0.1",
-    "pebble-universal-fb": "^1.7.2"
+    "@rebble/clay": "^1.0.8",
+    "pebble-isometric": "^1.5.0",
+    "pebble-packet": "^1.6.0",
+    "pebble-pge-simple": "^1.1.0",
+    "pebble-universal-fb": "^1.10.0"
   },
   "private": true,
   "keywords": [
@@ -46,7 +46,9 @@
       "basalt",
       "chalk",
       "diorite",
-      "emery"
+      "emery",
+      "flint",
+      "gabbro"
     ],
     "capabilities": [
       "configurable"

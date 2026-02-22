@@ -7,7 +7,7 @@
 #include "../config.h"
 
 #define SEGMENT_FLY_SPEED 10
-#define SEGMENT_Z_MAX 220
+#define SEGMENT_Z_MAX 320
 #define SEGMENT_DELAY_COEFF 10
 
 typedef struct {

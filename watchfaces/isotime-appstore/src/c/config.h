@@ -10,7 +10,7 @@
 #define HOURS_OFFSET      40
 #define MINS_OFFSET       25
 
-#if defined(PBL_PLATFORM_APLITE) || defined(PBL_PLATFORM_BASALT) || defined(PBL_PLATFORM_DIORITE)
+#if defined(PBL_PLATFORM_APLITE) || defined(PBL_PLATFORM_BASALT) || defined(PBL_PLATFORM_DIORITE) || defined(PBL_PLATFORM_FLINT)
 #define PROJECTION_OFFSET GPoint(100, 45)
 #define BLOCK_SIZE        10
 #define BASE_Y            0
@@ -21,5 +21,9 @@
 #elif defined(PBL_PLATFORM_EMERY)
 #define PROJECTION_OFFSET GPoint(133, 45)
 #define BLOCK_SIZE        13
+#define BASE_Y            -10
+#elif defined(PBL_PLATFORM_GABBRO)
+#define PROJECTION_OFFSET GPoint(155, 45)
+#define BLOCK_SIZE        16
 #define BASE_Y            -10
 #endif
