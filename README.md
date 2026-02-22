@@ -115,4 +115,4 @@ should be used instead
 - [x] Verify correct tick unit used to save power.
 - [x] Rebuild and publish supported libraries with new SDK.
 - [ ] Menu icons for all current watchfaces and watchapps.
-- [ ] Upgrade more for Emery.
+- [ ] Upgrade more for Emery and Gabbro.

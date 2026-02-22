@@ -181,11 +181,19 @@ void util_draw_button_hints(GContext *ctx, bool hints[3]) {
   GRect actions_rect = GRect(PS_DISP_W - ACTION_BAR_W, 0, ACTION_BAR_W, PS_DISP_H);
   graphics_fill_rect(ctx, actions_rect, 0, GCornerNone);
 
+#if defined(PBL_PLATFORM_CHALK)
+  const int hint_x = PS_DISP_W - ((2 *HINT_W) / 3);
+#else
   const int hint_x = PS_DISP_W - (HINT_W / 2);
+#endif
 
   if (hints[0]) {
     // Top hint
+#if !defined(PBL_PLATFORM_CHALK)
     const int top_y = PS_DISP_H / 6 - (HINT_H / 2);
+#else
+    const int top_y = ((2 * PS_DISP_H) / 5) - (HINT_H / 2);
+#endif
     graphics_context_set_fill_color(ctx, GColorBlack);
     graphics_fill_rect(ctx, GRect(hint_x, top_y, HINT_W, HINT_H), 3, GCornersAll);
 
@@ -197,14 +205,22 @@ void util_draw_button_hints(GContext *ctx, bool hints[3]) {
 
   if (hints[1]) {
     // Middle hint
+#if !defined(PBL_PLATFORM_CHALK)
     const int middle_y = (PS_DISP_H / 2) - (HINT_H / 2);
+#else
+    const int middle_y = (PS_DISP_H / 2) - (HINT_H / 2);
+#endif
     graphics_context_set_fill_color(ctx, GColorBlack);
     graphics_fill_rect(ctx, GRect(hint_x, middle_y, HINT_W, HINT_H), 3, GCornersAll);
   }
 
   if (hints[2]) {
     // Bottom hint
+#if !defined(PBL_PLATFORM_CHALK)
     const int bottom_y = ((5 * PS_DISP_H) / 6) - (HINT_H / 2);
+#else
+    const int bottom_y = ((3 * PS_DISP_H) / 5) - (HINT_H / 2);
+#endif
     graphics_context_set_fill_color(ctx, GColorBlack);
     graphics_fill_rect(ctx, GRect(hint_x, bottom_y, HINT_W, HINT_H), 3, GCornersAll);
   }
