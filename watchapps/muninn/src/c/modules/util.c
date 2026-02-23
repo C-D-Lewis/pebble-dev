@@ -181,10 +181,10 @@ void util_draw_button_hints(GContext *ctx, bool hints[3]) {
   GRect actions_rect = GRect(PS_DISP_W - ACTION_BAR_W, 0, ACTION_BAR_W, PS_DISP_H);
   graphics_fill_rect(ctx, actions_rect, 0, GCornerNone);
 
-#if defined(PBL_PLATFORM_CHALK)
-  const int hint_x = PS_DISP_W - ((2 *HINT_W) / 3);
-#else
+#if !defined(PBL_PLATFORM_CHALK)
   const int hint_x = PS_DISP_W - (HINT_W / 2);
+#else
+  const int hint_x = PS_DISP_W - ((2 * HINT_W) / 3);
 #endif
 
   if (hints[0]) {
@@ -192,15 +192,19 @@ void util_draw_button_hints(GContext *ctx, bool hints[3]) {
 #if !defined(PBL_PLATFORM_CHALK)
     const int top_y = PS_DISP_H / 6 - (HINT_H / 2);
 #else
-    const int top_y = ((2 * PS_DISP_H) / 5) - (HINT_H / 2);
+    const int top_y = ((3 * PS_DISP_H) / 8) - (HINT_H / 2);
 #endif
     graphics_context_set_fill_color(ctx, GColorBlack);
     graphics_fill_rect(ctx, GRect(hint_x, top_y, HINT_W, HINT_H), 3, GCornersAll);
 
     // TODO: Ugly, can't configure long press emphasis but only used in one place for now.
     graphics_context_set_fill_color(ctx, GColorWhite);
-    const GPoint select_center = { .x = hint_x + (HINT_W / 2), .y = top_y + (HINT_H / 2) };
-    graphics_fill_circle(ctx, select_center, scl_x(20));
+    int select_x = hint_x + (HINT_W / 2);
+#ifdef PBL_PLATFORM_CHALK
+    select_x -= 2;
+#endif
+    const GPoint select_center = { .x = select_x, .y = top_y + (HINT_H / 2) };
+    graphics_fill_circle(ctx, select_center, scl_x_pp({.o = 20, .c = 10}));
   }
 
   if (hints[1]) {
@@ -219,7 +223,7 @@ void util_draw_button_hints(GContext *ctx, bool hints[3]) {
 #if !defined(PBL_PLATFORM_CHALK)
     const int bottom_y = ((5 * PS_DISP_H) / 6) - (HINT_H / 2);
 #else
-    const int bottom_y = ((3 * PS_DISP_H) / 5) - (HINT_H / 2);
+    const int bottom_y = ((5 * PS_DISP_H) / 8) - (HINT_H / 2);
 #endif
     graphics_context_set_fill_color(ctx, GColorBlack);
     graphics_fill_rect(ctx, GRect(hint_x, bottom_y, HINT_W, HINT_H), 3, GCornersAll);

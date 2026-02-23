@@ -31,7 +31,7 @@
 
 ///////////// Testing area ////////////////
 //                                       //
-#define USE_TEST_DATA true            //
+// #define USE_TEST_DATA true            //
 //                                       //
 // #define SAVE_TEST_DATA true           //
 //                                       //
@@ -60,7 +60,7 @@
 // MenuLayer two row height
 #define ROW_HEIGHT_LARGE scl_y(300)
 // Action bar width
-#define ACTION_BAR_W scl_x_pp({.o = 70, .c = 100, .e = 70})
+#define ACTION_BAR_W scl_x_pp({.o = 70, .c = 90, .e = 70})
 // Action bar hint width
 #define HINT_W ACTION_BAR_W
 // Action bar hint height

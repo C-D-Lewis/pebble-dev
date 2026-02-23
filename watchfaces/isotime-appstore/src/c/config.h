@@ -4,6 +4,7 @@
 
 // #define DRAW_BG
 // #define BENCHMARK
+// #define TEST_ALL_ZEROS
 
 #define FRAME_RATE_HIGH PBL_IF_ROUND_ELSE(10, 30)
 
@@ -23,7 +24,7 @@
 #define BLOCK_SIZE        13
 #define BASE_Y            -10
 #elif defined(PBL_PLATFORM_GABBRO)
-#define PROJECTION_OFFSET GPoint(155, 45)
-#define BLOCK_SIZE        16
+#define PROJECTION_OFFSET GPoint(168, 55)
+#define BLOCK_SIZE        15
 #define BASE_Y            -10
 #endif

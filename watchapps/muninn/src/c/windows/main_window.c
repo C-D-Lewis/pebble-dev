@@ -3,12 +3,17 @@
 // Not scaled
 #if defined(PBL_PLATFORM_EMERY)
   #define MASCOT_SIZE 30
-  #define EYE_RECT GRect(28, 11, 4, 4)
+  #define EYE_RECT GRect(96, 11, 3, 3)
   #define BRAID_H 18
   #define ICON_SIZE 28
+#elif defined(PBL_PLATFORM_CHALK)
+  #define MASCOT_SIZE 24
+  #define EYE_RECT GRect(91, 9, 2, 2)
+  #define BRAID_H 14
+  #define ICON_SIZE 24
 #else
   #define MASCOT_SIZE 24
-  #define EYE_RECT GRect(20, 7, 4, 4)
+  #define EYE_RECT GRect(72, 7, 2, 2)
   #define BRAID_H 14
   #define ICON_SIZE 24
 #endif
@@ -18,7 +23,6 @@
 static Window *s_window;
 static Layer *s_canvas_layer;
 static TextLayer
-  *s_status_layer,
   *s_desc_layer,
   *s_battery_layer,
   *s_reading_layer,
@@ -130,8 +134,6 @@ static void update_data() {
   if (wakeup_id_set && !found) {
     data_set_error("Scheduled wakeup was not found");
   }
-
-  text_layer_set_text(s_status_layer, s_is_enabled ? "AWAKE" : "ASLEEP");
 
   cancel_blink();
 
@@ -278,7 +280,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     ctx,
     s_mascot_bitmap,
     GRect(
-      scl_x_pp({.o = 40, .c = 430, .e = 60}),
+      scl_x_pp({.o = 400, .c = 430, .e = 400}),
       scl_y_pp({.o = 20, .c = 25, .e = 25}),
       MASCOT_SIZE,
       MASCOT_SIZE
@@ -355,7 +357,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     bitmaps_get(RESOURCE_ID_READING),
     GRect(
       scl_x_pp({.o = 440, .c = 330, .e = 470}),
-      scl_y_pp({.o = 850, .c = 835, .e = 860}),
+      scl_y_pp({.o = 850, .c = 840, .e = 860}),
       ICON_SIZE,
       ICON_SIZE
     )
@@ -412,15 +414,6 @@ static void window_load(Window *window) {
   layer_set_update_proc(s_canvas_layer, canvas_update_proc);
   layer_add_child(root_layer, s_canvas_layer);
 
-  s_status_layer = util_make_text_layer(
-    GRect(0, scl_y_pp({.o = -35, .e = 5}), PS_DISP_W, 100),
-    scl_get_font(SFI_LargeBold)
-  );
-  text_layer_set_text_alignment(s_status_layer, GTextAlignmentCenter);
-#if !defined(PBL_PLATFORM_CHALK)
-  layer_add_child(root_layer, text_layer_get_layer(s_status_layer));
-#endif
-
   s_desc_layer = util_make_text_layer(
     GRect(0, scl_y_pp({.o = 145, .e = 135}), scl_x_pp({.o = 930, .c = 1000}), scl_y(150)),
     scl_get_font(SFI_Small)
@@ -431,16 +424,15 @@ static void window_load(Window *window) {
 
   // Row 1
   int row_x = scl_x_pp({.o = 40, .c = 80, .e = 50});
-  int row_y = scl_y_pp({.o = 390, .e = 385});
+  int row_y = scl_y_pp({.o = 350, .e = 365});
 #if defined(PBL_PLATFORM_APLITE)
-  int text_ico_off = scl_x_pp({.o = 100, .e = 100});
+  row_x += scl_x(100);
 #else
-  int text_ico_off = scl_x_pp({.o = 190, .e = 160});
+  row_x += scl_x_pp({.o = 190, .e = 150});
 #endif
-  int text_y_off = scl_y_pp({.o = -40, .e = -20});
 
   s_remaining_layer = util_make_text_layer(
-    GRect(row_x + text_ico_off, row_y + text_y_off, PS_DISP_W, 100),
+    GRect(row_x, row_y, PS_DISP_W, 100),
     scl_get_font(SFI_LargeBold)
   );
   layer_add_child(root_layer, text_layer_get_layer(s_remaining_layer));
@@ -448,26 +440,24 @@ static void window_load(Window *window) {
   row_x += scl_x_pp({.o = 485, .c = 445, .e = 485});
 
   s_rate_layer = util_make_text_layer(
-    GRect(row_x + text_ico_off, row_y + text_y_off, PS_DISP_W, 100),
+    GRect(row_x, row_y, PS_DISP_W, 100),
     scl_get_font(SFI_LargeBold)
   );
   layer_add_child(root_layer, text_layer_get_layer(s_rate_layer));
 
   s_row_1_subtitle_layer = util_make_text_layer(
-    GRect(2, row_y + scl_y_pp({.o = 115, .e = 100}), PS_DISP_W - ACTION_BAR_W, 40),
+    GRect(2, row_y + scl_y_pp({.o = 155, .e = 120}), PS_DISP_W - ACTION_BAR_W, 40),
     scl_get_font(SFI_Small)
   );
   layer_add_child(root_layer, text_layer_get_layer(s_row_1_subtitle_layer));
 
   // Row 2
-  row_x = scl_x_pp({.o = 30, .c = 110});
-  row_y = scl_y_pp({.o = 665, .e = 670});
-  text_ico_off = scl_x_pp({.o = 120, .e = 120});
-  text_y_off = scl_y_pp({.o = -35, .e = -25});
+  row_x = scl_x_pp({.o = 150, .c = 230});
+  row_y = scl_y_pp({.o = 635, .c = 640, .e = 650});
 
   const int text_ico_nudge = scl_x_pp({.o = 60, .e = 40});
   s_last_charge_layer = util_make_text_layer(
-    GRect(row_x + text_ico_off + text_ico_nudge, row_y + text_y_off, PS_DISP_W, 100),
+    GRect(row_x + text_ico_nudge, row_y, PS_DISP_W, 100),
     scl_get_font(SFI_Medium)
   );
   layer_add_child(root_layer, text_layer_get_layer(s_last_charge_layer));
@@ -475,30 +465,28 @@ static void window_load(Window *window) {
   row_x += scl_x_pp({.o = 450, .c = 380, .e = 450});
 
   s_next_charge_layer = util_make_text_layer(
-    GRect(row_x + text_ico_off, row_y + text_y_off, PS_DISP_W, 100),
+    GRect(row_x, row_y, PS_DISP_W, 100),
     scl_get_font(SFI_Medium)
   );
   layer_add_child(root_layer, text_layer_get_layer(s_next_charge_layer));
 
   // Row 3
-  row_x = scl_x(10);
-  row_y = scl_y_pp({.o = 845, .c = 835, .e = 860});
-  text_ico_off = scl_x_pp({.o = 160, .e = 150});
-  text_y_off = scl_y_pp({.o = -30, .e = -20});
+  row_x = scl_x_pp({.o = 170, .e = 160});
+  row_y = scl_y_pp({.o = 815, .c = 810, .e = 840});
 
   s_battery_layer = util_make_text_layer(
-    GRect(row_x + text_ico_off, row_y + text_y_off, PS_DISP_W, 100),
+    GRect(row_x, row_y, PS_DISP_W, 100),
     scl_get_font(SFI_Medium)
   );
 #if !defined(PBL_PLATFORM_CHALK)
   layer_add_child(root_layer, text_layer_get_layer(s_battery_layer));
 #endif
 
-  row_x += scl_x_pp({.o = 430, .c = 280, .e = 450});
+  row_x += scl_x_pp({.o = 430, .c = 270, .e = 450});
 
   const int x_nudge = scl_x_pp({.o = 20, .e = 10});
   s_reading_layer = util_make_text_layer(
-    GRect(row_x + text_ico_off + x_nudge, row_y + text_y_off, PS_DISP_W, 100),
+    GRect(row_x + x_nudge, row_y, PS_DISP_W, 100),
     scl_get_font(SFI_Medium)
   );
   layer_add_child(root_layer, text_layer_get_layer(s_reading_layer));
@@ -522,7 +510,6 @@ static void window_load(Window *window) {
 }
 
 static void window_unload(Window *window) {
-  text_layer_destroy(s_status_layer);
   text_layer_destroy(s_desc_layer);
   text_layer_destroy(s_row_1_subtitle_layer);
   text_layer_destroy(s_battery_layer);

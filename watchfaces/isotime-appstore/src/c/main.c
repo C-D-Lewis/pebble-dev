@@ -107,6 +107,12 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
     hours -= 12;
   }
 
+#ifdef TEST_ALL_ZEROS
+  digit_set_value(s_digits[0], 0);
+  digit_set_value(s_digits[1], 0);
+  digit_set_value(s_digits[2], 0);
+  digit_set_value(s_digits[3], 0);
+#else
   if(hours < 10) {
     digit_set_value(s_digits[0], 0);
   } else {
@@ -120,6 +126,7 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
     digit_set_value(s_digits[2], mins / 10);
   }
   digit_set_value(s_digits[3], mins % 10);
+#endif
 
   // Smooth transition
   if(data_get_animations()) {
