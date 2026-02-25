@@ -3,7 +3,7 @@
 #define ROW_HEIGHT scl_y(390)
 #define DIV_Y scl_y_pp({.o = 115, .e = 105})
 #define X_START scl_x_pp({.o = 20, .c = 70, .e = 20})
-#define X_END scl_x_pp({.o = 980, .c = 930, .e = 20})
+#define X_END scl_x_pp({.o = 980, .c = 930, .e = 980})
 
 // Extra precision needed
 #if defined(PBL_PLATFORM_EMERY)

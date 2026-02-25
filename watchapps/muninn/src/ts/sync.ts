@@ -1,5 +1,5 @@
 import {
-  MAX_ITEMS,
+  MAX_SYNC_ITEMS,
   MIN_CHARGE_AMOUNT,
   SECONDS_PER_DAY,
   STATUS_CHARGED,
@@ -195,7 +195,7 @@ export const handleSync = async (dict: Record<string, any>) => {
   // Sort to match watch order and limit length
   history = history
     .sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
-    .slice(0, MAX_ITEMS);
+    .slice(0, MAX_SYNC_ITEMS);
 
   saveHistory(history);
   console.log(`Saved: ${JSON.stringify(sample)} (length: ${history.length})`);

@@ -6,16 +6,19 @@
   #define EYE_RECT GRect(96, 11, 3, 3)
   #define BRAID_H 18
   #define ICON_SIZE 28
+  #define CLOUD_SIZE GSize(30, 19)
 #elif defined(PBL_PLATFORM_CHALK)
   #define MASCOT_SIZE 24
   #define EYE_RECT GRect(91, 9, 2, 2)
   #define BRAID_H 14
   #define ICON_SIZE 24
+  #define CLOUD_SIZE GSize(24, 15)
 #else
   #define MASCOT_SIZE 24
   #define EYE_RECT GRect(72, 7, 2, 2)
   #define BRAID_H 14
   #define ICON_SIZE 24
+  #define CLOUD_SIZE GSize(24, 15)
 #endif
 
 #define BRAID_Y scl_y_pp({.o = 280, .e = 275})
@@ -141,6 +144,7 @@ static void update_data() {
   BatteryChargeState state = battery_state_service_peek();
   static char s_battery_buff[8];
   snprintf(s_battery_buff, sizeof(s_battery_buff), "%d%%", state.charge_percent);
+  // text_layer_set_text(s_battery_layer, "100%");
   text_layer_set_text(s_battery_layer, s_battery_buff);
 
   // Current status
@@ -214,7 +218,7 @@ static void update_data() {
     // Next reading
     static char s_wakeup_buff[8];
     util_fmt_time(wakeup_ts, &s_wakeup_buff[0], sizeof(s_wakeup_buff));
-    // text_layer_set_text(s_reading_layer, "22:00");
+    // text_layer_set_text(s_reading_layer, "00:00");
     text_layer_set_text(s_reading_layer, s_wakeup_buff);
   }
 
@@ -228,6 +232,8 @@ static void update_data() {
 }
 
 static void canvas_update_proc(Layer *layer, GContext *ctx) {
+  graphics_context_set_antialiased(ctx, false);
+
   // Divider braid
   const GRect braid_rect = GRect(0, BRAID_Y, PS_DISP_W - ACTION_BAR_W, BRAID_H);
   util_draw_braid(ctx, braid_rect);
@@ -239,7 +245,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   // Vertical
   const int v_div_x = (PS_DISP_W / 2) - scl_x(40);
   const int v_div_y = scl_y_pp({.o = 365, .c = 350, .e = 355});
-  const int v_div_h = scl_y_pp({.o = 465, .c = 475, .e = 470});
+  const int v_div_h = scl_y_pp({.o = 700, .c = 475, .e = 700});
   graphics_draw_line(
     ctx,
     GPoint(v_div_x, v_div_y),
@@ -255,7 +261,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   );
 
   // Horizontal below row 2
-  const int row_3_div_y = scl_y_pp({.o = 830, .e = 835});
+  const int row_3_div_y = scl_y_pp({.o = 830, .c = 835, .e = 835});
   graphics_draw_line(
     ctx,
     GPoint(0, row_3_div_y),
@@ -264,7 +270,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
 
   // Status BG
   graphics_context_set_fill_color(ctx, GColorBlack);
-  graphics_fill_rect(ctx, scl_grect(0, 160, 930, 120), 0, GCornerNone);
+  graphics_fill_rect(ctx, scl_grect(0, 160, 940, 120), 0, GCornerNone);
 
   util_draw_button_hints(ctx, (bool[3]){true, true, true});
 
@@ -291,6 +297,59 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   if (s_is_blinking) {
     graphics_context_set_fill_color(ctx, GColorBlack);
     graphics_fill_rect(ctx, EYE_RECT, 0, GCornerNone);
+  }
+
+  // Decorate mascot banner
+  graphics_context_set_fill_color(ctx, GColorBlack);
+  const time_t now = time(NULL);
+  const struct tm *now_info = localtime(&now);
+  const bool is_nighttime = now_info->tm_hour < 6 || now_info->tm_hour >= 18;
+  if (is_nighttime) {
+    // Draw a couple of stars in black
+    const GPoint stars[] = {
+      GPoint(scl_x(40), scl_y(50)),
+      GPoint(scl_x(90), scl_y(110)),
+      GPoint(scl_x(300), scl_y(80)),
+      GPoint(scl_x(200), scl_y(50)),
+      GPoint(scl_x(800), scl_y(70)),
+      GPoint(scl_x(720), scl_y(90)),
+      GPoint(scl_x(610), scl_y(30)),
+      GPoint(scl_x(880), scl_y(110))
+    };
+    const uint8_t num_stars = 8;
+    const uint8_t star_max_size = scl_x(15);
+    for (int i = 0; i < num_stars; i++) {
+      const uint8_t size = (i % star_max_size) + 1;
+      graphics_fill_rect(ctx, GRect(stars[i].x, stars[i].y, size, size), 0, GCornerNone);
+    }
+
+    // Invert
+    const uint8_t skyline_y = scl_y(155);
+    const GRect skyline_rect = GRect(0, 0, PS_DISP_W - ACTION_BAR_W, skyline_y);
+    GBitmap *fb = graphics_capture_frame_buffer(ctx);
+    universal_fb_swap_colors(fb, skyline_rect, GColorWhite, GColorBlack);
+    graphics_release_frame_buffer(ctx, fb);
+
+    // Skyline below mascot
+    graphics_context_set_stroke_color(ctx, GColorWhite);
+    graphics_context_set_stroke_width(ctx, 1);
+    graphics_draw_line(
+      ctx,
+      GPoint(0, skyline_y),
+      GPoint(PS_DISP_W - ACTION_BAR_W - 1, skyline_y)
+    );
+  } else {
+    // Clouds
+    graphics_draw_bitmap_in_rect(
+      ctx,
+      bitmaps_get(RESOURCE_ID_CLOUD),
+      GRect(scl_x_pp({.o = 60, .c = 240}), scl_y(20), CLOUD_SIZE.w, CLOUD_SIZE.h)
+    );
+    graphics_draw_bitmap_in_rect(
+      ctx,
+      bitmaps_get(RESOURCE_ID_CLOUD),
+      GRect(scl_x(680), scl_y(50), CLOUD_SIZE.w, CLOUD_SIZE.h)
+    );
   }
 
   BatteryChargeState state = battery_state_service_peek();
@@ -341,7 +400,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   graphics_context_set_stroke_color(ctx, GColorBlack);
   graphics_context_set_stroke_width(ctx, 1);
 
-  const int icon_x = scl_x(430) + 3;
+  const int icon_x = scl_x(470);
   const int icon_y = scl_y(845);
   const int center_x = icon_x + (ICON_SIZE / 2);
   const int center_y = icon_y + (ICON_SIZE / 2);
@@ -356,7 +415,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     ctx,
     bitmaps_get(RESOURCE_ID_READING),
     GRect(
-      scl_x_pp({.o = 440, .c = 330, .e = 470}),
+      scl_x_pp({.o = 470, .c = 330, .e = 490}),
       scl_y_pp({.o = 850, .c = 840, .e = 860}),
       ICON_SIZE,
       ICON_SIZE
@@ -415,7 +474,7 @@ static void window_load(Window *window) {
   layer_add_child(root_layer, s_canvas_layer);
 
   s_desc_layer = util_make_text_layer(
-    GRect(0, scl_y_pp({.o = 145, .e = 135}), scl_x_pp({.o = 930, .c = 1000}), scl_y(150)),
+    GRect(0, scl_y_pp({.o = 145, .e = 135}), scl_x_pp({.o = 940, .c = 1000}), scl_y(150)),
     scl_get_font(SFI_Small)
   );
   text_layer_set_text_alignment(s_desc_layer, GTextAlignmentCenter);
@@ -453,7 +512,7 @@ static void window_load(Window *window) {
 
   // Row 2
   row_x = scl_x_pp({.o = 150, .c = 230});
-  row_y = scl_y_pp({.o = 635, .c = 640, .e = 650});
+  row_y = scl_y_pp({.o = 635, .c = 650, .e = 650});
 
   const int text_ico_nudge = scl_x_pp({.o = 60, .e = 40});
   s_last_charge_layer = util_make_text_layer(
@@ -471,7 +530,7 @@ static void window_load(Window *window) {
   layer_add_child(root_layer, text_layer_get_layer(s_next_charge_layer));
 
   // Row 3
-  row_x = scl_x_pp({.o = 170, .e = 160});
+  row_x = scl_x(150);
   row_y = scl_y_pp({.o = 815, .c = 810, .e = 840});
 
   s_battery_layer = util_make_text_layer(
@@ -482,7 +541,7 @@ static void window_load(Window *window) {
   layer_add_child(root_layer, text_layer_get_layer(s_battery_layer));
 #endif
 
-  row_x += scl_x_pp({.o = 430, .c = 270, .e = 450});
+  row_x += scl_x_pp({.o = 470, .c = 280, .e = 480});
 
   const int x_nudge = scl_x_pp({.o = 20, .e = 10});
   s_reading_layer = util_make_text_layer(

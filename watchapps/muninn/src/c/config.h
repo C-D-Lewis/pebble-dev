@@ -28,6 +28,8 @@
 #define EVEVATED_RATE_MULT 3
 // Minimum negative charge_diff to count as charging
 #define MIN_CHARGE_AMOUNT 10
+/** Maximum synced items - 120 days / 4 months (must match constants.ts) */
+#define MAX_SYNC_ITEMS 480
 
 ///////////// Testing area ////////////////
 //                                       //
@@ -60,7 +62,7 @@
 // MenuLayer two row height
 #define ROW_HEIGHT_LARGE scl_y(300)
 // Action bar width
-#define ACTION_BAR_W scl_x_pp({.o = 70, .c = 90, .e = 70})
+#define ACTION_BAR_W scl_x_pp({.o = 60, .c = 90, .e = 70})
 // Action bar hint width
 #define HINT_W ACTION_BAR_W
 // Action bar hint height

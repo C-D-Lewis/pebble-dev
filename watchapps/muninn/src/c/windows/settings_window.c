@@ -55,7 +55,8 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
     if (sync_count == 0) {
       snprintf(s_sync_buff, sizeof(s_sync_buff), "Syncing soon");
     } else {
-      snprintf(s_sync_buff, sizeof(s_sync_buff), "Synced %d items", sync_count);
+      const int sync_perc = (sync_count * 100) / MAX_SYNC_ITEMS;
+      snprintf(s_sync_buff, sizeof(s_sync_buff), "%d samples (%d%%)", sync_count, sync_perc);
     }
   }
 
