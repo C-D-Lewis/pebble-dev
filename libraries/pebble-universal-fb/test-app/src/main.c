@@ -24,6 +24,11 @@ static void test_universal_fb(GBitmap *fb, GColor c1, GColor c2) {
   universal_fb_swap_colors(fb, grect_inset(bounds, GEdgeInsets(30)), c1, c2);
   test(gcolor_equal(universal_fb_get_pixel_color(info, bounds, test_point), c2), 
        "universal_fb_swap_colors");
+
+  // Should go right to the edges
+  universal_fb_swap_colors(fb, GRect(0, 0, 30, 10), c1, c2);
+  test(gcolor_equal(universal_fb_get_pixel_color(info, bounds, GPoint(0, 0)), c2), 
+       "right to the edge");
 }
 
 static void update_proc(Layer *layer, GContext *ctx) {

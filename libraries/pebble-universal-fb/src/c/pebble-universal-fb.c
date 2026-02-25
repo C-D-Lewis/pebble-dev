@@ -19,8 +19,8 @@ static void byte_set_bit(uint8_t *byte, uint8_t bit, uint8_t value) {
 /************************************ API *************************************/
 
 GColor universal_fb_get_pixel_color(GBitmapDataRowInfo info, GRect bounds, GPoint point) {
-  if(point.x > info.min_x && point.x < info.max_x
-  && point.y > bounds.origin.y && point.y < bounds.origin.y + bounds.size.h) {
+  if(point.x >= info.min_x && point.x < info.max_x
+  && point.y >= bounds.origin.y && point.y < bounds.origin.y + bounds.size.h) {
 #if defined(PBL_COLOR)
     return (GColor){ .argb = info.data[point.x] };
 #elif defined(PBL_BW)
@@ -35,8 +35,8 @@ GColor universal_fb_get_pixel_color(GBitmapDataRowInfo info, GRect bounds, GPoin
 }
 
 void universal_fb_set_pixel_color(GBitmapDataRowInfo info, GRect bounds, GPoint point, GColor color) {
-  if(point.x > info.min_x && point.x < info.max_x
-  && point.y > bounds.origin.y && point.y < bounds.origin.y + bounds.size.h) {
+  if(point.x >= info.min_x && point.x < info.max_x
+  && point.y >= bounds.origin.y && point.y < bounds.origin.y + bounds.size.h) {
 #if defined(PBL_COLOR)
     memset(&info.data[point.x], color.argb, 1);
 #elif defined(PBL_BW)
