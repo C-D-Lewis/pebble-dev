@@ -42,7 +42,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
   const bool alert_disabled = alert_level == AL_OFF;
   static char s_alert_buff[24];
   if (!alert_disabled) {
-    snprintf(s_alert_buff, sizeof(s_alert_buff), "Notifying near %d%%", alert_level);
+    snprintf(s_alert_buff, sizeof(s_alert_buff), "Notify near %d%%", alert_level);
   }
 
   // Sync status
@@ -65,7 +65,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
       util_menu_cell_draw(
         ctx,
         cell_layer,
-        "Vibrate on sample",
+        "Vibrate on Sample",
         persist_data->vibe_on_sample ? "Enabled" : "Disabled"
       );
       break;
@@ -73,7 +73,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
       util_menu_cell_draw(
         ctx,
         cell_layer,
-        "Custom alert",
+        "Custom Alert",
         alert_disabled ? "Disabled" : s_alert_buff
       );
       break;
@@ -81,7 +81,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
       util_menu_cell_draw(
         ctx,
         cell_layer,
-        "Timeline pins",
+        "Timeline Pins",
         persist_data->push_timeline_pins ? "Enabled" : "Disabled"
       );
       break;
@@ -89,7 +89,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
       util_menu_cell_draw(
         ctx,
         cell_layer,
-        "High drain alert",
+        "High Drain Alert",
         persist_data->elevated_rate_alert ? "Enabled" : "Disabled"
       );
       break;
@@ -97,7 +97,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
       util_menu_cell_draw(
         ctx,
         cell_layer,
-        "One day left alert",
+        "One Day Left Alert",
         persist_data->one_day_alert ? "Enabled" : "Disabled"
       );
       break;
@@ -106,7 +106,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
       util_menu_cell_draw(
         ctx,
         cell_layer,
-        "Historical stats",
+        "Phone Sync",
         s_sync_buff
       );
       break;
@@ -118,7 +118,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
       util_menu_cell_draw(
         ctx,
         cell_layer,
-        "Delete all data",
+        "Delete All Data",
         s_reset_confirm ? "Tap again to confirm" : NULL
       );
       break;

@@ -209,7 +209,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
         const int est_val = prev_s->charge_perc - est_drop;
         const int est_y = ROOT_Y + GRAPH_H - (((est_val - low_v) * GRAPH_H) / y_range);
 
-        if (est_y != y) {
+        if (est_y != y && s->result != STATUS_CHARGED) {
           // Draw prediction circle
           graphics_draw_circle(ctx, GPoint(x, est_y), POINT_S);
         }

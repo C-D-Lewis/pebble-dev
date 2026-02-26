@@ -231,6 +231,14 @@ static void update_data() {
 #endif
 }
 
+static uint32_t get_mascot_res_id(bool is_nighttime) {
+  if (is_nighttime) {
+    return s_is_enabled ? RESOURCE_ID_AWAKE_HEAD_INV : RESOURCE_ID_ASLEEP_HEAD_INV;
+  }
+
+  return s_is_enabled ? RESOURCE_ID_AWAKE_HEAD : RESOURCE_ID_ASLEEP_HEAD;
+}
+
 static void canvas_update_proc(Layer *layer, GContext *ctx) {
   graphics_context_set_antialiased(ctx, false);
 
@@ -274,13 +282,24 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
 
   util_draw_button_hints(ctx, (bool[3]){true, true, true});
 
+  const time_t now = time(NULL);
+  const struct tm *now_info = localtime(&now);
+  const bool is_nighttime = now_info->tm_hour < 6 || now_info->tm_hour >= 18;
+
+  // Mascot banner
+  graphics_context_set_fill_color(ctx, is_nighttime ? GColorBlack : GColorWhite);
+  const uint8_t skyline_y = scl_y(160);
+  const GRect skyline_rect = GRect(0, 0, PS_DISP_W - ACTION_BAR_W, skyline_y);
+  graphics_fill_rect(ctx, skyline_rect, 0, GCornerNone);
+
   // Mascot
   if (s_mascot_bitmap != NULL) {
     bitmaps_destroy_ptr(s_mascot_bitmap);
     s_mascot_bitmap = NULL;
   }
+  uint32_t mascot_res_id = get_mascot_res_id(is_nighttime);
   s_mascot_bitmap = bitmaps_get(
-    s_is_enabled ? RESOURCE_ID_AWAKE_HEAD : RESOURCE_ID_ASLEEP_HEAD
+    mascot_res_id
   );
   graphics_draw_bitmap_in_rect(
     ctx,
@@ -295,16 +314,13 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
 
   // Blink Muninn's eye
   if (s_is_blinking) {
-    graphics_context_set_fill_color(ctx, GColorBlack);
+    graphics_context_set_fill_color(ctx, is_nighttime ? GColorWhite : GColorBlack);
     graphics_fill_rect(ctx, EYE_RECT, 0, GCornerNone);
   }
 
   // Decorate mascot banner
-  graphics_context_set_fill_color(ctx, GColorBlack);
-  const time_t now = time(NULL);
-  const struct tm *now_info = localtime(&now);
-  const bool is_nighttime = now_info->tm_hour < 6 || now_info->tm_hour >= 18;
   if (is_nighttime) {
+    graphics_context_set_fill_color(ctx, GColorWhite);
     // Draw a couple of stars in black
     const GPoint stars[] = {
       GPoint(scl_x(40), scl_y(50)),
@@ -323,13 +339,6 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
       graphics_fill_rect(ctx, GRect(stars[i].x, stars[i].y, size, size), 0, GCornerNone);
     }
 
-    // Invert
-    const uint8_t skyline_y = scl_y(155);
-    const GRect skyline_rect = GRect(0, 0, PS_DISP_W - ACTION_BAR_W, skyline_y);
-    GBitmap *fb = graphics_capture_frame_buffer(ctx);
-    universal_fb_swap_colors(fb, skyline_rect, GColorWhite, GColorBlack);
-    graphics_release_frame_buffer(ctx, fb);
-
     // Skyline below mascot
     graphics_context_set_stroke_color(ctx, GColorWhite);
     graphics_context_set_stroke_width(ctx, 1);
@@ -339,17 +348,24 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
       GPoint(PS_DISP_W - ACTION_BAR_W - 1, skyline_y)
     );
   } else {
-    // Clouds
+    // Clouds and Huginn
     graphics_draw_bitmap_in_rect(
       ctx,
       bitmaps_get(RESOURCE_ID_CLOUD),
-      GRect(scl_x_pp({.o = 60, .c = 240}), scl_y(20), CLOUD_SIZE.w, CLOUD_SIZE.h)
+      GRect(scl_x_pp({.o = 60, .c = 240, .e = 80}), scl_y(20), CLOUD_SIZE.w, CLOUD_SIZE.h)
     );
     graphics_draw_bitmap_in_rect(
       ctx,
       bitmaps_get(RESOURCE_ID_CLOUD),
       GRect(scl_x(680), scl_y(50), CLOUD_SIZE.w, CLOUD_SIZE.h)
     );
+#if !defined(PBL_PLATFORM_CHALK)
+    graphics_draw_bitmap_in_rect(
+      ctx,
+      bitmaps_get(RESOURCE_ID_BIRD),
+      GRect(scl_x(270), scl_y(30), 16, 16)
+    );
+#endif
   }
 
   BatteryChargeState state = battery_state_service_peek();
@@ -565,7 +581,7 @@ static void window_load(Window *window) {
 
   update_data();
 
-  // APP_LOG(APP_LOG_LEVEL_INFO, "Heap %d", heap_bytes_free());
+  APP_LOG(APP_LOG_LEVEL_INFO, "Heap %d", heap_bytes_free());
 }
 
 static void window_unload(Window *window) {
@@ -592,8 +608,8 @@ static void window_disappear(Window *window) {
   s_mascot_bitmap = NULL;
   s_batt_bitmap = NULL;
 
-  // APP_LOG(APP_LOG_LEVEL_INFO, "wd %d B", heap_bytes_free());
-  // bitmap_log_allocated_count();
+  APP_LOG(APP_LOG_LEVEL_INFO, "wd %d B", heap_bytes_free());
+  bitmap_log_allocated_count();
 }
 
 void main_window_push() {

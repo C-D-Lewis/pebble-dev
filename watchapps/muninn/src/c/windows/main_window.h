@@ -1,7 +1,6 @@
 #pragma once
 
 #include <pebble.h>
-#include <pebble-universal-fb/pebble-universal-fb.h>
 
 #include "../config.h"
 

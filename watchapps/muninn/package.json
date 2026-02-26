@@ -82,6 +82,16 @@
         },
         {
           "type": "bitmap",
+          "name": "AWAKE_HEAD_INV",
+          "file": "images/awake-head-inv.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "ASLEEP_HEAD_INV",
+          "file": "images/asleep-head-inv.png"
+        },
+        {
+          "type": "bitmap",
           "name": "LAST_CHARGE",
           "file": "images/last-charge.png"
         },
@@ -94,6 +104,11 @@
           "type": "bitmap",
           "name": "CLOUD",
           "file": "images/cloud.png"
+        },
+        {
+          "type": "png",
+          "name": "BIRD",
+          "file": "images/bird.png"
         },
         {
           "type": "font",
@@ -127,8 +142,7 @@
     ]
   },
   "dependencies": {
-    "pebble-scalable": "^2.0.0",
-    "pebble-universal-fb": "^1.11.0"
+    "pebble-scalable": "^2.0.0"
   },
   "devDependencies": {
     "pkts": "^0.3.0-beta.1"
