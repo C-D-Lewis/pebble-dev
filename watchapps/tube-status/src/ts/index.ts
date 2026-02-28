@@ -1,95 +1,43 @@
-/** Expected Line ID values */
-type LineId = 'bakerloo' | 'central' | 'circle' | 'district' | 'dlr' | 'elizabeth' |
-  'hammersmith-city' | 'jubilee' | 'liberty' | 'lioness' | 'metropolitan' | 'mildmay' |
-  'northern' | 'piccadilly' | 'suffragette' | 'victoria' | 'waterloo-city' | 'weaver' |
-  'windrush';
+import { type LineConfig, type GenericLineData, jrEastKantoBackend, londonUndergroundBackend, nycMtaSubwayBackend, TransitBackend } from './backends';
 
-/** API data type */
-type TfLApiResult = {
-  id: LineId;
-  lineStatuses: {
-    statusSeverityDescription: string;
-    reason?: string;
-  }[];
-};
+// Order can be changed, Tube Status uses -1 to indicate London Underground
+const TransitBackendIdMap: Record<number, TransitBackend> = {
+  0: londonUndergroundBackend,
+  1: jrEastKantoBackend,
+  2: nycMtaSubwayBackend
+} as const;
 
-/** Processed data type */
-type LineData = {
-  id: string;
-  status: string;
-  reason: string;
-};
-
-/** Despite attempts to not rely on index, need to map these API IDs to C enum values */
-const LINE_TYPE_MAP: { [key in LineId]: number } = {
-  bakerloo: 0,
-  central: 1,
-  circle: 2,
-  district: 3,
-  dlr: 4,
-  elizabeth: 5,
-  'hammersmith-city': 6,
-  jubilee: 7,
-  liberty: 8,
-  lioness: 9,
-  metropolitan: 10,
-  mildmay: 11,
-  northern: 12,
-  piccadilly: 13,
-  suffragette: 14,
-  victoria: 15,
-  'waterloo-city': 16,
-  weaver: 17,
-  windrush: 18,
-};
-
-/** API modes to query */
-const MODES = ['tube', 'dlr', 'elizabeth-line', 'overground'];
-/** Number of lines the API returns */
-const NUM_LINES = 19;
-/** Max reason length */
-const MAX_REASON_LENGTH = 512;
+let ACTIVE_BACKEND: TransitBackend = londonUndergroundBackend;
 
 /**
- * Download all lines statuses.
- * Available modes: https://api.tfl.gov.uk/StopPoint/Meta/modes
+ * Send line configurations to the watch
  */
-const fetchLinesWithIssues = async (): Promise<LineData[]> => {
-  const url = `https://api.tfl.gov.uk/line/mode/${MODES.join(',')}/status`;
-  const json = await PebbleTS.fetchJSON(url) as TfLApiResult[];
-  // console.log(JSON.stringify(json, null, 2));
+const sendLineConfigs = async (configs: LineConfig[]): Promise<void> => {
+  console.log(`Sending ${configs.length} line configurations...`);
 
-  // Send only those with issues (will need better logic if a setting for this is implemented)
-  // return [];
-  return json
-    .filter((obj: TfLApiResult) => obj.lineStatuses[0].statusSeverityDescription !== 'Good Service')
-    .reduce((acc, obj: TfLApiResult): LineData[] => {
-      let reason = obj.lineStatuses[0].reason || '';
-      if (reason?.length > MAX_REASON_LENGTH) {
-        reason = reason?.substring(0, MAX_REASON_LENGTH - 4) + '...';
-      }
+  for (const config of configs) {
+    const dict = {
+      Type: 'lineConfig',
+      ConfigLineIndex: config.index,
+      ConfigLineName: config.name,
+      ConfigLineColor: config.color,
+      ConfigLineStriped: config.striped ? 1 : 0,
+    };
+    await PebbleTS.sendAppMessage(dict);
+    console.log(`Configured line ${config.index}: ${config.name}`);
+  }
 
-      return [
-        ...acc,
-        {
-          id: obj.id,
-          status: obj.lineStatuses[0].statusSeverityDescription || '?',
-          reason,
-        },
-      ];
-    }, []);
+  console.log('All line configurations sent!');
 };
 
 /**
- * Send next line's data.
- *
- * @param {LineData[]} lines - Data for all lines with issues.
- * @param {number} index - Item to send.
+ * Send all status updates with completion flags
  */
-const sendNextLine = async (lines: LineData[], index: number) => {
+const sendLineStatuses = async (lines: GenericLineData[]): Promise<void> => {
   // Everything is awesome!
   if (lines.length === 0) {
     const dict = {
+      Type: 'lineStatus',
       FlagIsComplete: 1,
       FlagLineCount: 0,
     };
@@ -97,37 +45,98 @@ const sendNextLine = async (lines: LineData[], index: number) => {
     return;
   }
 
-  // Completed
-  if (index === lines.length) {
-    console.log('All data sent!');
+  // Send each line status
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const dict = {
+      Type: 'lineStatus',
+      LineStatusIndex: i,
+      LineStatus: line.status,
+      LineStatusSeverity: line.severity,
+      LineReason: line.reason,
+      FlagIsComplete: i === lines.length - 1 ? 1 : 0,
+      FlagLineCount: lines.length,
+    };
+    await PebbleTS.sendAppMessage(dict);
+    console.log(`Sent status ${i + 1}/${lines.length}: Line ${line.index} -> Display index ${i}`);
+  }
+
+  console.log('All status updates sent!');
+};
+
+/**
+ * Send all available transit systems to the watch with completion flag
+ */
+const sendAvailableTransitSystems = async (transitSystems: Record<number, TransitBackend>) => {
+  const transitSystemBackendTotal = Object.keys(transitSystems).length;
+  Object.entries(transitSystems).forEach(async ([id, backend]) => {
+    const dict = {
+      Type: 'availableTransitSystem',
+      AvailableTransitSystemIndex: parseInt(id),
+      AvailableTransitSystemName: backend.name,
+      AvailableTransitSystemRegion: backend.region,
+      FlagLineCount: transitSystemBackendTotal,
+      FlagIsComplete: parseInt(id) === (transitSystemBackendTotal - 1) ? 1 : 0,
+    };
+    await PebbleTS.sendAppMessage(dict);
+    console.log(`Sent available transit system: ${backend.name} (ID: ${id})`);
+  });
+};
+
+Pebble.addEventListener('ready', async (_) => {
+  console.log('PebbleKit JS ready');
+  PebbleTS.sendAppMessage({ Type: 'ready' });
+});
+
+Pebble.addEventListener('appmessage', async (e) => {
+  if (!e.payload) {
     return;
   }
 
-  const lineData = lines[index];
-  if (!lineData) throw new Error(`No lineData for ${index}`);
+  console.log(JSON.stringify(e.payload));
+  if (e.payload.RequestAvailableTransitSystems) {
+    sendAvailableTransitSystems(TransitBackendIdMap);
+    return;
+  }
 
-  const dict = {
-    LineIndex: index,
-    LineType: LINE_TYPE_MAP[lineData.id as LineId],
-    LineStatus: lineData.status,
-    LineReason: lineData.reason,
-    FlagIsComplete: index === lines.length - 1 ? 1 : 0,
-    FlagLineCount: lines.length,
-  };
-  await PebbleTS.sendAppMessage(dict);
-  console.log(`Sent item ${index}: ${JSON.stringify(dict)}`);
+  // This is a 0 index, possible negative, based ID so we should not truthy check it
+  if (e.payload.RequestTransitSystem !== undefined) {
+    if (e.payload.RequestTransitSystem === -1) {
+      ACTIVE_BACKEND = londonUndergroundBackend;
+    } else {
+      ACTIVE_BACKEND = TransitBackendIdMap[e.payload.RequestTransitSystem];
+      if (!ACTIVE_BACKEND) {
+        console.log(`No backend found for transit system ID: ${e.payload.RequestTransitSystem}`);
+        ACTIVE_BACKEND = londonUndergroundBackend;
+      }
+    }
 
-  await sendNextLine(lines, index + 1);
-};
+    console.log(`Active backend: ${ACTIVE_BACKEND.name}`);
 
-Pebble.addEventListener('ready', async (e) => {
-  console.log('PebbleKit JS ready');
+    try {
+      // Fetch lines with issues first
+      const lines = await ACTIVE_BACKEND.fetchLines();
 
-  try {
-    const lines = await fetchLinesWithIssues();
-    await sendNextLine(lines, 0);
-  } catch (e) {
-    console.log('Failed to send data');
-    console.log(e);
+      // Only send configs for lines that have issues
+      if (lines.length > 0) {
+        const allConfigs = ACTIVE_BACKEND.getLineConfigs();
+
+        const neededConfigs = lines.configMapping.map((configIndex: number, displayIndex: number) => {
+          const config = allConfigs[configIndex];
+          return { ...config, index: displayIndex }; // Remap to sequential index
+        });
+
+        console.log(`Sending configs for ${neededConfigs.length} lines with issues (out of ${allConfigs.length} total)`);
+        await sendLineConfigs(neededConfigs);
+      } else {
+        console.log('No issues detected, skipping line configurations');
+      }
+
+      // Send status updates
+      await sendLineStatuses(lines);
+    } catch (e) {
+      console.log('Failed to send data');
+      console.log(e);
+    }
   }
 });
