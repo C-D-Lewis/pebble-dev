@@ -1,7 +1,7 @@
 {
   "name": "muninn",
   "author": "Chris Lewis",
-  "version": "1.21.0",
+  "version": "1.22.0",
   "_note": "Checklist in config.h!",
   "private": true,
   "keywords": [
@@ -33,6 +33,7 @@
           "type": "bitmap",
           "name": "MENU_ICON",
           "file": "images/menu_icon.png",
+          "memoryFormat": "1Bit",
           "menuIcon": true
         },
         {

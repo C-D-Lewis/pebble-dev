@@ -106,7 +106,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
       util_menu_cell_draw(
         ctx,
         cell_layer,
-        "Phone Sync",
+        "Sync to Phone",
         s_sync_buff
       );
       break;
