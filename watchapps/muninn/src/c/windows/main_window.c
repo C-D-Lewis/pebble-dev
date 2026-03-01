@@ -45,7 +45,7 @@ static int s_days_remaining, s_rate, s_anim_days, s_anim_rate;
 static void update_subtitle(int days) {
   static char s_subtitle_buff[40];
 #if defined(PBL_PLATFORM_EMERY)
-  const char *template = "   Day%s left        Est. %%/day";
+  const char *template = "   Day%s left         Est. %%/day";
 #elif defined(PBL_PLATFORM_CHALK)
   const char *template = "     Day%s left        Est. %%/day";
 #else
