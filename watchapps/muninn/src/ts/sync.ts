@@ -126,13 +126,18 @@ const calculateMeanTimeBetweenCharges = (history: HistoryItem[]): number => {
   // Calculate time differences between consecutive charges
   const timeDiffs = [];
   for (let i = 1; i < chargeTimes.length; i++) {
-    timeDiffs.push(chargeTimes[i] - chargeTimes[i - 1]);
+    const diff = chargeTimes[i] - chargeTimes[i - 1];
+    if (diff < SECONDS_PER_DAY) {
+      console.log(`WARN: Ignoring <1d diff (${i} ${i - 1} ${diff}s)`);
+      continue;
+    }
+    timeDiffs.push(diff);
   }
 
   // Calculate mean time between charges (in days)
   const meanTimeS = timeDiffs.reduce((acc, p) => acc + p, 0) / timeDiffs.length;
   const meanDays = meanTimeS / SECONDS_PER_DAY;
-  // console.log({ chargeTimes, timeDiffs, meanTimeS, meanDays });
+  console.log({ chargeTimes, timeDiffs, meanTimeS, meanDays });
 
   return Math.round(meanDays);
 };
