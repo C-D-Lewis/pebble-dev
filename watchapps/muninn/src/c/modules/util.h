@@ -27,6 +27,12 @@ void util_menu_cell_draw(GContext *ctx, Layer *layer, char *title, char *desc);
 
 void util_draw_button_hints(GContext *ctx, bool hints[3]);
 
+void util_draw_skyline(GContext *ctx, bool is_nighttime);
+
+bool util_get_is_night();
+
+uint32_t util_get_mascot_res_id(bool is_enabled, bool is_night);
+
 #ifdef FEATURE_ANIMATIONS
 void util_animate(int duration, int delay, AnimationImplementation *implementation, bool handlers);
 

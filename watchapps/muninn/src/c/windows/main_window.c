@@ -2,23 +2,17 @@
 
 // Not scaled
 #if defined(PBL_PLATFORM_EMERY)
-  #define MASCOT_SIZE 30
   #define EYE_RECT GRect(96, 11, 3, 3)
   #define BRAID_H 18
   #define ICON_SIZE 28
-  #define CLOUD_SIZE GSize(30, 19)
 #elif defined(PBL_PLATFORM_CHALK)
-  #define MASCOT_SIZE 24
   #define EYE_RECT GRect(91, 9, 2, 2)
   #define BRAID_H 14
   #define ICON_SIZE 24
-  #define CLOUD_SIZE GSize(24, 15)
 #else
-  #define MASCOT_SIZE 24
   #define EYE_RECT GRect(72, 7, 2, 2)
   #define BRAID_H 14
   #define ICON_SIZE 24
-  #define CLOUD_SIZE GSize(24, 15)
 #endif
 
 #define BRAID_Y scl_y_pp({.o = 280, .e = 275})
@@ -45,9 +39,9 @@ static int s_days_remaining, s_rate, s_anim_days, s_anim_rate;
 static void update_subtitle(int days) {
   static char s_subtitle_buff[40];
 #if defined(PBL_PLATFORM_EMERY)
-  const char *template = "   Day%s left         Est. %%/day";
+  const char *template = "    Day%s left        Est. %%/day";
 #elif defined(PBL_PLATFORM_CHALK)
-  const char *template = "     Day%s left        Est. %%/day";
+  const char *template = "      Day%s left       Est. %%/day";
 #else
   const char *template = "     Day%s          Est. %%/d";
 #endif
@@ -66,9 +60,16 @@ static void update_anim_text() {
   const int days = animating ? s_anim_days : s_days_remaining;
   const int rate = animating ? s_anim_rate : s_rate;
 
-  // Update text layers
+  const int mult = data_calculate_days_remaining_mult();
+  const int tens = mult / 10;
   static char s_remaining_buff[8];
-  snprintf(s_remaining_buff, sizeof(s_remaining_buff), days < 10 ? "0%d" : "%d", days);
+  if (animating || tens >= 10) {
+    snprintf(s_remaining_buff, sizeof(s_remaining_buff), "%d", days);
+  } else {
+    // Show with more precision if not animating and less than 10 days remaining
+    const int units = mult % 10;
+    snprintf(s_remaining_buff, sizeof(s_remaining_buff), "%d.%d", tens, units);
+  }
   text_layer_set_text(s_remaining_layer, s_remaining_buff);
 
   static char s_rate_buff[8];
@@ -81,6 +82,10 @@ static void anim_update(Animation *anim, AnimationProgress dist_normalized) {
   s_anim_days = util_anim_percentage(dist_normalized, s_days_remaining);
   s_anim_rate = util_anim_percentage(dist_normalized, s_rate);
 
+  update_anim_text();
+}
+
+static void anim_teardown(Animation *anim) {
   update_anim_text();
 }
 #endif
@@ -225,18 +230,13 @@ static void update_data() {
 #ifdef FEATURE_ANIMATIONS
   if (data_calculate_avg_discharge_rate(false) != STATUS_EMPTY) {
     // If data to show, begin smooth animation
-    static AnimationImplementation anim_implementation = { .update = anim_update };
+    static AnimationImplementation anim_implementation = {
+      .update = anim_update,
+      .teardown = anim_teardown
+    };
     util_animate(500, 50, &anim_implementation, true);
   }
 #endif
-}
-
-static uint32_t get_mascot_res_id(bool is_nighttime) {
-  if (is_nighttime) {
-    return s_is_enabled ? RESOURCE_ID_AWAKE_HEAD_INV : RESOURCE_ID_ASLEEP_HEAD_INV;
-  }
-
-  return s_is_enabled ? RESOURCE_ID_AWAKE_HEAD : RESOURCE_ID_ASLEEP_HEAD;
 }
 
 static void canvas_update_proc(Layer *layer, GContext *ctx) {
@@ -280,27 +280,17 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   graphics_context_set_fill_color(ctx, GColorBlack);
   graphics_fill_rect(ctx, scl_grect(0, 160, 940, 120), 0, GCornerNone);
 
+  const bool is_night = util_get_is_night();
+  util_draw_skyline(ctx, is_night);
+
   util_draw_button_hints(ctx, (bool[3]){true, true, true});
-
-  const time_t now = time(NULL);
-  const struct tm *now_info = localtime(&now);
-  const bool is_nighttime = now_info->tm_hour < 6 || now_info->tm_hour >= 18;
-
-  // Mascot banner
-  graphics_context_set_fill_color(ctx, is_nighttime ? GColorBlack : GColorWhite);
-  const uint8_t skyline_y = scl_y(160);
-  const GRect skyline_rect = GRect(0, 0, PS_DISP_W - ACTION_BAR_W, skyline_y);
-  graphics_fill_rect(ctx, skyline_rect, 0, GCornerNone);
 
   // Mascot
   if (s_mascot_bitmap != NULL) {
     bitmaps_destroy_ptr(s_mascot_bitmap);
     s_mascot_bitmap = NULL;
   }
-  uint32_t mascot_res_id = get_mascot_res_id(is_nighttime);
-  s_mascot_bitmap = bitmaps_get(
-    mascot_res_id
-  );
+  s_mascot_bitmap = bitmaps_get(util_get_mascot_res_id(s_is_enabled, is_night));
   graphics_draw_bitmap_in_rect(
     ctx,
     s_mascot_bitmap,
@@ -314,58 +304,8 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
 
   // Blink Muninn's eye
   if (s_is_blinking) {
-    graphics_context_set_fill_color(ctx, is_nighttime ? GColorWhite : GColorBlack);
+    graphics_context_set_fill_color(ctx, is_night ? GColorWhite : GColorBlack);
     graphics_fill_rect(ctx, EYE_RECT, 0, GCornerNone);
-  }
-
-  // Decorate mascot banner
-  if (is_nighttime) {
-    graphics_context_set_fill_color(ctx, GColorWhite);
-    // Draw a couple of stars in black
-    const GPoint stars[] = {
-      GPoint(scl_x(40), scl_y(50)),
-      GPoint(scl_x(90), scl_y(110)),
-      GPoint(scl_x(300), scl_y(80)),
-      GPoint(scl_x(200), scl_y(50)),
-      GPoint(scl_x(800), scl_y(70)),
-      GPoint(scl_x(720), scl_y(90)),
-      GPoint(scl_x(610), scl_y(30)),
-      GPoint(scl_x(880), scl_y(110))
-    };
-    const uint8_t num_stars = 8;
-    const uint8_t star_max_size = scl_x(15);
-    for (int i = 0; i < num_stars; i++) {
-      const uint8_t size = (i % star_max_size) + 1;
-      graphics_fill_rect(ctx, GRect(stars[i].x, stars[i].y, size, size), 0, GCornerNone);
-    }
-
-    // Skyline below mascot
-    graphics_context_set_stroke_color(ctx, GColorWhite);
-    graphics_context_set_stroke_width(ctx, 1);
-    graphics_draw_line(
-      ctx,
-      GPoint(0, skyline_y),
-      GPoint(PS_DISP_W - ACTION_BAR_W - 1, skyline_y)
-    );
-  } else {
-    // Clouds and Huginn
-    graphics_draw_bitmap_in_rect(
-      ctx,
-      bitmaps_get(RESOURCE_ID_CLOUD),
-      GRect(scl_x_pp({.o = 60, .c = 240, .e = 80}), scl_y(20), CLOUD_SIZE.w, CLOUD_SIZE.h)
-    );
-    graphics_draw_bitmap_in_rect(
-      ctx,
-      bitmaps_get(RESOURCE_ID_CLOUD),
-      GRect(scl_x(680), scl_y(50), CLOUD_SIZE.w, CLOUD_SIZE.h)
-    );
-#if !defined(PBL_PLATFORM_CHALK)
-    graphics_draw_bitmap_in_rect(
-      ctx,
-      bitmaps_get(RESOURCE_ID_BIRD),
-      GRect(scl_x(270), scl_y(30), 16, 16)
-    );
-#endif
   }
 
   BatteryChargeState state = battery_state_service_peek();
@@ -498,7 +438,7 @@ static void window_load(Window *window) {
   layer_add_child(root_layer, text_layer_get_layer(s_desc_layer));
 
   // Row 1
-  int row_x = scl_x_pp({.o = 40, .c = 80, .e = 50});
+  int row_x = scl_x_pp({.o = 40, .c = 60, .e = 50});
   int row_y = scl_y_pp({.o = 350, .e = 365});
 #if defined(PBL_PLATFORM_APLITE)
   row_x += scl_x(100);

@@ -47,6 +47,8 @@
 //                                       //
 // #define TEST_TIMELINE_PIN true        //
 //                                       //
+// #define TEST_IS_NIGHT true               //
+//                                       //
 ///////////////////////////////////////////
 
 //////////////// Features //////////
@@ -72,8 +74,9 @@
 
 // Per-platform layout values
 #if defined(PBL_PLATFORM_EMERY)
-// Line width
-#define LINE_W 2
+  #define LINE_W 2
+  #define MASCOT_SIZE 30
 #else
-#define LINE_W 1
+  #define LINE_W 1
+  #define MASCOT_SIZE 24
 #endif

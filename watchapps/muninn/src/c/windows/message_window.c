@@ -6,21 +6,39 @@
   #define BRAID_H 14
 #endif
 
+#if defined(PBL_PLATFORM_APLITE)
+  #define BRAID_Y 0
+#else
+  #define BRAID_Y scl_y(150)
+#endif
+
 static Window *s_window;
 static ScrollLayer *s_scroll_layer;
 static TextLayer *s_text_layer;
-static Layer *s_braid_layer;
-#if !defined(PBL_PLATFORM_APLITE)
-static BitmapLayer *s_image_layer;
-static GBitmap *s_image_bitmap;
-#endif
+static Layer *s_canvas_layer;
 
 static char *s_text_ptr;
 
 static void braid_update_proc(Layer *layer, GContext *ctx) {
   GRect bounds = layer_get_bounds(layer);
 
-  GRect braid_rect = GRect(0, 0, bounds.size.w, bounds.size.h);
+#if !defined(PBL_PLATFORM_APLITE)
+  const bool is_night = util_get_is_night();
+  util_draw_skyline(ctx, is_night);
+
+  graphics_draw_bitmap_in_rect(
+    ctx,
+    bitmaps_get(util_get_mascot_res_id(true, is_night)),
+    GRect(
+      scl_x_pp({.o = 400, .c = 430, .e = 400}),
+      scl_y_pp({.o = 20, .c = 25, .e = 25}),
+      MASCOT_SIZE,
+      MASCOT_SIZE
+    )
+  );
+#endif
+
+  GRect braid_rect = GRect(0, BRAID_Y, bounds.size.w, BRAID_H);
   util_draw_braid(ctx, braid_rect);
 }
 
@@ -28,23 +46,9 @@ static void window_load(Window *window) {
   Layer *root_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(root_layer);
 
-#if !defined(PBL_PLATFORM_APLITE)
-  s_image_bitmap = bitmaps_get(RESOURCE_ID_AWAKE_HEAD);
-  s_image_layer = bitmap_layer_create(scl_grect(0, 10, 1000, 150));
-  bitmap_layer_set_alignment(s_image_layer, GAlignCenter);
-  bitmap_layer_set_compositing_mode(s_image_layer, GCompOpSet);
-  bitmap_layer_set_bitmap(s_image_layer, s_image_bitmap);
-  layer_add_child(root_layer, bitmap_layer_get_layer(s_image_layer));
-#endif
-
-#if !defined(PBL_PLATFORM_APLITE)
-  const int braid_y = scl_y(150);
-#else
-  const int braid_y = 0;
-#endif
-  s_braid_layer = layer_create(GRect(0, braid_y, PS_DISP_W, BRAID_H));
-  layer_set_update_proc(s_braid_layer, braid_update_proc);
-  layer_add_child(root_layer, s_braid_layer);
+  s_canvas_layer = layer_create(GRect(0, 0, PS_DISP_W, bounds.size.h));
+  layer_set_update_proc(s_canvas_layer, braid_update_proc);
+  layer_add_child(root_layer, s_canvas_layer);
 
   // Code from devsite to try and fit text inside a TextLayer inside a ScrollLayer
   const int margin = PBL_IF_ROUND_ELSE(8, 4);
@@ -69,7 +73,7 @@ static void window_load(Window *window) {
   );
   text_layer_set_text(s_text_layer, s_text_ptr);
   
-  const int scroll_y = braid_y + BRAID_H;
+  const int scroll_y = BRAID_Y + BRAID_H;
   s_scroll_layer = scroll_layer_create(
     GRect(0, scroll_y, bounds.size.w, bounds.size.h - scroll_y)
   );
@@ -82,10 +86,7 @@ static void window_load(Window *window) {
 static void window_unload(Window *window) {
   scroll_layer_destroy(s_scroll_layer);
   text_layer_destroy(s_text_layer);
-#if !defined(PBL_PLATFORM_APLITE)
-  bitmap_layer_destroy(s_image_layer);
-#endif
-  layer_destroy(s_braid_layer);
+  layer_destroy(s_canvas_layer);
 
   window_destroy(s_window);
   s_window = NULL;

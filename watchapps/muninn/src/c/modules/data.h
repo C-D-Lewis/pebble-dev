@@ -88,6 +88,7 @@ void data_log_state();
 void data_push_sample(int charge_perc, int last_sample_time, int last_charge_perc, int time_diff, int charge_diff, int result);
 int data_calculate_avg_discharge_rate(bool ignore_no_change);
 int data_calculate_days_remaining();
+int data_calculate_days_remaining_mult();
 void data_cycle_custom_alert_level();
 bool data_get_rate_is_elevated();
 time_t data_get_next_charge_time();

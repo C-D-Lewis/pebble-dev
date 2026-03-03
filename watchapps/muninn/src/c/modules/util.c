@@ -1,5 +1,13 @@
 #include "util.h"
 
+#if defined(PBL_PLATFORM_EMERY)
+  #define CLOUD_SIZE GSize(30, 19)
+#elif defined(PBL_PLATFORM_CHALK)
+  #define CLOUD_SIZE GSize(24, 15)
+#else
+  #define CLOUD_SIZE GSize(24, 15)
+#endif
+
 TextLayer* util_make_text_layer(GRect frame, GFont font) {
   TextLayer *this = text_layer_create(frame);
   text_layer_set_font(this, font);
@@ -228,6 +236,81 @@ void util_draw_button_hints(GContext *ctx, bool hints[3]) {
     graphics_context_set_fill_color(ctx, GColorBlack);
     graphics_fill_rect(ctx, GRect(hint_x, bottom_y, HINT_W, HINT_H), 3, GCornersAll);
   }
+}
+
+void util_draw_skyline(GContext *ctx, bool is_nighttime) {
+  // Mascot banner
+  graphics_context_set_fill_color(ctx, is_nighttime ? GColorBlack : GColorWhite);
+  const uint8_t skyline_y = scl_y(160);
+  const GRect skyline_rect = GRect(0, 0, PS_DISP_W, skyline_y);
+  graphics_fill_rect(ctx, skyline_rect, 0, GCornerNone);
+
+  if (is_nighttime) {
+    graphics_context_set_fill_color(ctx, GColorWhite);
+    // Draw a couple of stars in black
+    const GPoint stars[] = {
+      GPoint(scl_x(40), scl_y(50)),
+      GPoint(scl_x(90), scl_y(110)),
+      GPoint(scl_x(300), scl_y(80)),
+      GPoint(scl_x(200), scl_y(50)),
+      GPoint(scl_x(800), scl_y(70)),
+      GPoint(scl_x(720), scl_y(90)),
+      GPoint(scl_x(610), scl_y(30)),
+      GPoint(scl_x(880), scl_y(110))
+    };
+    const uint8_t num_stars = 8;
+    const uint8_t star_max_size = scl_x(15);
+    for (int i = 0; i < num_stars; i++) {
+      const uint8_t size = (i % star_max_size) + 1;
+      graphics_fill_rect(ctx, GRect(stars[i].x, stars[i].y, size, size), 0, GCornerNone);
+    }
+
+    // Skyline below mascot
+    graphics_context_set_stroke_color(ctx, GColorWhite);
+    graphics_context_set_stroke_width(ctx, 1);
+    graphics_draw_line(
+      ctx,
+      GPoint(0, skyline_y),
+      GPoint(PS_DISP_W - ACTION_BAR_W - 1, skyline_y)
+    );
+  } else {
+    // Clouds and Huginn
+    graphics_draw_bitmap_in_rect(
+      ctx,
+      bitmaps_get(RESOURCE_ID_CLOUD),
+      GRect(scl_x_pp({.o = 60, .c = 240, .e = 80}), scl_y(20), CLOUD_SIZE.w, CLOUD_SIZE.h)
+    );
+    graphics_draw_bitmap_in_rect(
+      ctx,
+      bitmaps_get(RESOURCE_ID_CLOUD),
+      GRect(scl_x(680), scl_y(50), CLOUD_SIZE.w, CLOUD_SIZE.h)
+    );
+#if !defined(PBL_PLATFORM_CHALK)
+    graphics_draw_bitmap_in_rect(
+      ctx,
+      bitmaps_get(RESOURCE_ID_BIRD),
+      GRect(scl_x(270), scl_y(30), 16, 16)
+    );
+#endif
+  }
+}
+
+bool util_get_is_night() {
+#ifdef TEST_IS_NIGHT
+  return true;
+#else
+  const time_t now = time(NULL);
+  const struct tm *now_info = localtime(&now);
+  return now_info->tm_hour < 6 || now_info->tm_hour >= 18;
+#endif
+}
+
+uint32_t util_get_mascot_res_id(bool is_enabled, bool is_night) {
+  if (is_night) {
+    return is_enabled ? RESOURCE_ID_AWAKE_HEAD_INV : RESOURCE_ID_ASLEEP_HEAD_INV;
+  }
+
+  return is_enabled ? RESOURCE_ID_AWAKE_HEAD : RESOURCE_ID_ASLEEP_HEAD;
 }
 
 ////////////////////////////////////////// Animation Utils /////////////////////////////////////////

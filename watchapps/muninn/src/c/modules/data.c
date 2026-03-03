@@ -88,13 +88,13 @@ static void test_data_generator() {
   // const int changes[NUM_SAMPLES] = {0, 2, 2, 2, 2, 2, 2, -1, -1, -1, -1, -1, -1, -1, -1, -1};
   //
   // 2 - Test case: Should show 10 days at 8% per day (from 80%)
-  // const int changes[NUM_SAMPLES] = {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
+  const int changes[NUM_SAMPLES] = {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
   //
   // 3 - Test case: Should show 11 days at 7% (two other events are ignored)
   //     Note: includes the two special statuses
   // const int changes[NUM_SAMPLES] = {-20, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
   //
-  // 4 - Test case: Should show 6 days at 12% per day (from 80%)
+  // 4 - Test case: Should show 6.6 days at 12% per day (from 80%)
   // const int changes[NUM_SAMPLES] = {3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
   //
   // 5 - Test case: Should await 2 samples if both taken are 'no change'
@@ -110,7 +110,7 @@ static void test_data_generator() {
   // const int changes[NUM_SAMPLES] = {0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0};
   //
   // 7 - Test case: Big charge half way through
-  const int changes[NUM_SAMPLES] = {3, 0, 3, 3, 0, 3, 3, 3, -30, 3, 3, 3, 3, 3, 3, 3};
+  // const int changes[NUM_SAMPLES] = {3, 0, 3, 3, 0, 3, 3, 3, -30, 3, 3, 3, 3, 3, 3, 3};
   //
   // 8 - Test case: Should show graph with minimum points
   // const int changes[NUM_SAMPLES] = {3, 1, 2, 3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
@@ -379,6 +379,14 @@ int data_calculate_days_remaining() {
   if (rate <= 0) return STATUS_EMPTY;
 
   return current_level / rate;
+}
+
+int data_calculate_days_remaining_mult() {
+  // Get a value like '5.8' days remaining, and multiply up so it can be rounded later
+  const BatteryChargeState state = battery_state_service_peek();
+  const int current_level = state.charge_percent;
+  const int rate = data_calculate_avg_discharge_rate(false);
+  return current_level * 10 / rate;
 }
 
 bool data_get_rate_is_elevated() {
