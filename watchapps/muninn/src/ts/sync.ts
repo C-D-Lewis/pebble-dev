@@ -115,7 +115,10 @@ const calculateNumCharges = (history: HistoryItem[]): number =>
  * Calculate mean time between charge events, in days.
  */
 const calculateMeanTimeBetweenCharges = (history: HistoryItem[]): number => {
-  if (calculateNumCharges(history) < 2) return STATUS_EMPTY;
+  if (calculateNumCharges(history) < 2) {
+    console.log(`num charges < 2: ${calculateNumCharges(history)}`) ;
+    return STATUS_EMPTY;
+  }
 
   // Get timestamps of charge events
   const chargeTimes = history
@@ -134,6 +137,11 @@ const calculateMeanTimeBetweenCharges = (history: HistoryItem[]): number => {
     timeDiffs.push(diff);
   }
 
+  if (timeDiffs.length === 0) {
+    console.log(`WARN: Not enough timeDiffs (${JSON.stringify({ chargeTimes, timeDiffs })})`);
+    return STATUS_EMPTY;
+  }
+
   // Calculate mean time between charges (in days)
   const meanTimeS = timeDiffs.reduce((acc, p) => acc + p, 0) / timeDiffs.length;
   const meanDays = meanTimeS / SECONDS_PER_DAY;
@@ -147,6 +155,7 @@ const calculateMeanTimeBetweenCharges = (history: HistoryItem[]): number => {
  */
 export const handleGetSyncInfo = async () => {
   const history = loadHistory();
+  console.log(JSON.stringify(history));
 
   let lastTs = STATUS_EMPTY;
   if (history.length > 0) {

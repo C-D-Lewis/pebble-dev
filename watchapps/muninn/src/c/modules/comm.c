@@ -125,19 +125,45 @@ void inbox_received_handler(DictionaryIterator *iter, void *context) {
     app_state->sync_count = sync_count;
 
     t = dict_find(iter, MESSAGE_KEY_STAT_TOTAL_DAYS);
-    app_state->stat_total_days = t->value->int32;
+    if (t) {
+      app_state->stat_total_days = t->value->int32;
+    } else {
+      APP_LOG(APP_LOG_LEVEL_INFO, "s df f 0");
+      app_state->stat_total_days = STATUS_EMPTY;
+    }
 
     t = dict_find(iter, MESSAGE_KEY_STAT_ALL_TIME_RATE);
-    app_state->stat_all_time_rate = t->value->int32;
+    if (t) {
+      app_state->stat_all_time_rate = t->value->int32;
+    } else {
+      APP_LOG(APP_LOG_LEVEL_INFO, "s df f 1");
+      app_state->stat_all_time_rate = STATUS_EMPTY;
+    }
 
     t = dict_find(iter, MESSAGE_KEY_STAT_LAST_WEEK_RATE);
-    app_state->stat_last_week_rate = t->value->int32;
+    if (t) {
+      app_state->stat_last_week_rate = t->value->int32;
+    } else {
+      APP_LOG(APP_LOG_LEVEL_INFO, "s df f 2");
+      app_state->stat_last_week_rate = STATUS_EMPTY;
+    }
 
     t = dict_find(iter, MESSAGE_KEY_STAT_NUM_CHARGES);
-    app_state->stat_num_charges = t->value->int32;
+    if (t) {
+      app_state->stat_num_charges = t->value->int32;
+    } else {
+      APP_LOG(APP_LOG_LEVEL_INFO, "s df f 3");
+      app_state->stat_num_charges = STATUS_EMPTY;
+    }
 
     t = dict_find(iter, MESSAGE_KEY_STAT_MTBC);
-    app_state->stat_mtbc = t->value->int32;
+    if (t) {
+      app_state->stat_mtbc = t->value->int32;
+    } else {
+      APP_LOG(APP_LOG_LEVEL_INFO, "s df f 4");
+      app_state->stat_mtbc = STATUS_EMPTY;
+    }
+    APP_LOG(APP_LOG_LEVEL_INFO, "MTBC: %d", app_state->stat_mtbc);
 
     // TODO: Non-looping way to update the UI when sync progresses
     settings_window_reload();
