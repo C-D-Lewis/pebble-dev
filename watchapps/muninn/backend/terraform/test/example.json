@@ -1,0 +1,130 @@
+[
+  {
+    "timestamp": 1772798405,
+    "chargePerc": 80,
+    "timeDiff": 21600,
+    "chargeDiff": 2,
+    "rate": 8,
+    "result": 8
+  },
+  {
+    "timestamp": 1772776805,
+    "chargePerc": 82,
+    "timeDiff": 21600,
+    "chargeDiff": 2,
+    "rate": 8,
+    "result": 8
+  },
+  {
+    "timestamp": 1772755205,
+    "chargePerc": 84,
+    "timeDiff": 21600,
+    "chargeDiff": 2,
+    "rate": 8,
+    "result": 8
+  },
+  {
+    "timestamp": 1772733605,
+    "chargePerc": 86,
+    "timeDiff": 21600,
+    "chargeDiff": 2,
+    "rate": 8,
+    "result": 8
+  },
+  {
+    "timestamp": 1772712005,
+    "chargePerc": 88,
+    "timeDiff": 21600,
+    "chargeDiff": 2,
+    "rate": 8,
+    "result": 8
+  },
+  {
+    "timestamp": 1772690405,
+    "chargePerc": 90,
+    "timeDiff": 21600,
+    "chargeDiff": 2,
+    "rate": 8,
+    "result": 8
+  },
+  {
+    "timestamp": 1772668805,
+    "chargePerc": 92,
+    "timeDiff": 21600,
+    "chargeDiff": 2,
+    "rate": 8,
+    "result": 8
+  },
+  {
+    "timestamp": 1772647205,
+    "chargePerc": 94,
+    "timeDiff": 21600,
+    "chargeDiff": 2,
+    "rate": 8,
+    "result": 8
+  },
+  {
+    "timestamp": 1772625605,
+    "chargePerc": 96,
+    "timeDiff": 21600,
+    "chargeDiff": 2,
+    "rate": 8,
+    "result": 8
+  },
+  {
+    "timestamp": 1772604005,
+    "chargePerc": 98,
+    "timeDiff": 21600,
+    "chargeDiff": 2,
+    "rate": 8,
+    "result": 8
+  },
+  {
+    "timestamp": 1772582405,
+    "chargePerc": 100,
+    "timeDiff": 21600,
+    "chargeDiff": 2,
+    "rate": 8,
+    "result": 8
+  },
+  {
+    "timestamp": 1772560805,
+    "chargePerc": 102,
+    "timeDiff": 21600,
+    "chargeDiff": 2,
+    "rate": 8,
+    "result": 8
+  },
+  {
+    "timestamp": 1772539205,
+    "chargePerc": 104,
+    "timeDiff": 21600,
+    "chargeDiff": 2,
+    "rate": 8,
+    "result": 8
+  },
+  {
+    "timestamp": 1772517605,
+    "chargePerc": 106,
+    "timeDiff": 21600,
+    "chargeDiff": 2,
+    "rate": 8,
+    "result": 8
+  },
+  {
+    "timestamp": 1772496005,
+    "chargePerc": 108,
+    "timeDiff": 21600,
+    "chargeDiff": 2,
+    "rate": 8,
+    "result": 8
+  },
+  {
+    "timestamp": 1772474405,
+    "chargePerc": 110,
+    "timeDiff": 21600,
+    "chargeDiff": 2,
+    "rate": 8,
+    "result": 8
+  }
+]
