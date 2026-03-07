@@ -47,7 +47,7 @@
 //                                       //
 // #define TEST_TIMELINE_PIN true        //
 //                                       //
-// #define TEST_IS_NIGHT true               //
+// #define TEST_IS_NIGHT true            //
 //                                       //
 ///////////////////////////////////////////
 
@@ -70,7 +70,7 @@
 // Action bar hint height
 #define HINT_H scl_y_pp({.o = 200, .c = 80, .e = 200})
 // Header inset
-#define HEADER_INSET scl_y(110)
+#define HEADER_INSET scl_y(115)
 
 // Per-platform layout values
 #if defined(PBL_PLATFORM_EMERY)
