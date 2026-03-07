@@ -5,7 +5,8 @@ set -eu
 # 32 chars random
 ID=$1
 HISTORY_FILE=${2:-./test/example.json}
-API_URL=$(terraform output api_gateway_url | tr -d '"')
+
+API_URL=https://muninn-api.chrislewis.me.uk
 
 echo "URL $API_URL with history: $HISTORY_FILE"
 

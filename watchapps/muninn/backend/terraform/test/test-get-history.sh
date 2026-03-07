@@ -2,9 +2,9 @@
 
 set -eu
 
-# 32 chars random
 ID=$1
-API_URL=$(terraform output api_gateway_url | tr -d '"')
+
+API_URL=https://muninn-api.chrislewis.me.uk
 
 echo "URL $API_URL with id: $ID"
 

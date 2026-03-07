@@ -4,7 +4,7 @@ set -eu
 
 # 32 chars random
 WATCH_TOKEN=${1:-$(openssl rand -hex 16)}
-API_URL=$(terraform output api_gateway_url | tr -d '"')
+API_URL=https://muninn-api.chrislewis.me.uk
 
 echo "URL $API_URL with watchToken: $WATCH_TOKEN"
 

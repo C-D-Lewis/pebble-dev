@@ -15,7 +15,7 @@ resource "aws_apigatewayv2_domain_name" "domain_name" {
 # }
 
 resource "aws_apigatewayv2_api_mapping" "api" {
-  domain_name = "muninn-api.${var.domain_name}"
+  domain_name = aws_apigatewayv2_domain_name.domain_name.id
   api_id      = aws_apigatewayv2_api.history_api.id
   stage       = aws_apigatewayv2_stage.default.id
 }
