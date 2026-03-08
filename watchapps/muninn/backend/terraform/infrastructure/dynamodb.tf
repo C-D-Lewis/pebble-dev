@@ -1,8 +1,8 @@
 resource "aws_dynamodb_table" "ids_table" {
   name                        = "ids"
   billing_mode                = "PROVISIONED"
-  read_capacity               = 1
-  write_capacity              = 1
+  read_capacity               = 5
+  write_capacity              = 5
   hash_key                    = "id"
   deletion_protection_enabled = var.deletion_protection
 
@@ -19,8 +19,8 @@ resource "aws_dynamodb_table" "ids_table" {
   global_secondary_index {
     name            = "WatchTokenIndex"
     projection_type = "ALL"
-    read_capacity   = 1
-    write_capacity  = 1
+    read_capacity   = 5
+    write_capacity  = 5
 
     key_schema {
       attribute_name = "watchToken"
