@@ -1,4 +1,4 @@
-import { handleGetSyncInfo, handleSync } from './sync';
+import { handleGetSyncInfo, handleSync, uploadHistory } from './sync';
 import { handlePushTimelinePin } from './timeline';
 
 /**
@@ -26,6 +26,7 @@ Pebble.addEventListener('appmessage', async (e) => {
     if (dict.GET_SYNC_INFO) await handleGetSyncInfo();
     if (dict.SYNC_SAMPLE) await handleSync(dict);
     if (dict.SYNC_DELETE) await deleteAll();
+    if (dict.UPLOAD_HISTORY) await uploadHistory();
   } catch (e) {
     console.log('Failed to handle message');
     console.log(e);

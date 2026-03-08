@@ -12,52 +12,54 @@ typedef enum {
   MI_LAST_WEEK_RATE,
   MI_NUM_CHARGES,
   MI_MTBC,
+  MI_UPLOAD,
 
   MI_MAX,
 } MenuItems;
+
+static char s_upload_buff[32];
 
 static uint16_t get_num_rows_callback(MenuLayer *menu_layer, uint16_t section_index, void *context) {
   return MI_MAX;
 }
 
 static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_index, void *context) {
-  PersistData *persist_data = data_get_persist_data();
   AppState *app_state = data_get_app_state();
-
-  if (!util_is_not_status(app_state->stat_total_days)) {
-    util_menu_cell_draw(
-      ctx,
-      cell_layer,
-      "Loading...",
-      NULL
-    );
-    return;
-  }
 
   // Format buffers
   static char s_t_d_buff[16];
   if (util_is_not_status(app_state->stat_total_days)) {
     snprintf(s_t_d_buff, sizeof(s_t_d_buff), "%d days", app_state->stat_total_days);
+  } else {
+    snprintf(s_t_d_buff, sizeof(s_t_d_buff), "-");
   }
 
   static char s_a_t_r_buff[16];
   if (util_is_not_status(app_state->stat_all_time_rate)) {
     snprintf(s_a_t_r_buff, sizeof(s_a_t_r_buff), "%d%% per day", app_state->stat_all_time_rate);
+  } else {
+    snprintf(s_a_t_r_buff, sizeof(s_a_t_r_buff), "-");
   }
 
   static char s_l_w_r_buff[16];
   if (util_is_not_status(app_state->stat_last_week_rate)) {
     snprintf(s_l_w_r_buff, sizeof(s_l_w_r_buff), "%d%% per day", app_state->stat_last_week_rate);
+  } else {
+    snprintf(s_l_w_r_buff, sizeof(s_l_w_r_buff), "-");
   }
 
   static char s_n_c_buff[12];
   if (util_is_not_status(app_state->stat_num_charges)) {
     snprintf(s_n_c_buff, sizeof(s_n_c_buff), "%d", app_state->stat_num_charges);
+  } else {
+    snprintf(s_n_c_buff, sizeof(s_n_c_buff), "-");
   }
 
   static char s_mtbc_buff[12];
   if (util_is_not_status(app_state->stat_mtbc)) {
     snprintf(s_mtbc_buff, sizeof(s_mtbc_buff), "%d days", app_state->stat_mtbc);
+  } else {
+    snprintf(s_mtbc_buff, sizeof(s_mtbc_buff), "-");
   }
 
   switch(cell_index->row) {
@@ -101,6 +103,14 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
         s_mtbc_buff
       );
       break;
+    case MI_UPLOAD:
+      util_menu_cell_draw(
+        ctx,
+        cell_layer,
+        "View in web UI",
+        s_upload_buff
+      );
+      break;
     default: break;
   }
 }
@@ -110,7 +120,13 @@ static int16_t get_cell_height_callback(struct MenuLayer *menu_layer, MenuIndex 
 }
 
 static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) {
-  // TODO: Option to upload to web
+  switch(cell_index->row) {
+    case MI_UPLOAD:
+      snprintf(s_upload_buff, sizeof(s_upload_buff), "Uploading...");
+      comm_upload_history();
+      break;
+    default: break;
+  }
 
   menu_layer_reload_data(s_menu_layer);
 }
@@ -118,6 +134,8 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
 static void window_load(Window *window) {
   Layer *root_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(root_layer);
+
+  snprintf(s_upload_buff, sizeof(s_upload_buff), "Confirm to upload");
 
   s_header_layer = util_create_header_layer(PBL_IF_ROUND_ELSE("Historical", "Historical stats"), 32);
   layer_add_child(root_layer, s_header_layer);
@@ -156,8 +174,11 @@ void stats_window_push() {
 void stats_window_reload() {
   if (!s_window) return;
   
-  // Update MenuLayer
-  // layer_mark_dirty(s_canvas_layer);
+  menu_layer_reload_data(s_menu_layer);
 }
 
+void stats_window_set_upload_status(const char *status) {
+  snprintf(s_upload_buff, sizeof(s_upload_buff), "%s", status);
+  menu_layer_reload_data(s_menu_layer);
+}
 #endif

@@ -30,21 +30,23 @@ const handlePostId = async (body) => {
   const { watchToken } = body;
   if (!watchToken || watchToken.length !== 32) return badRequest('Invalid watchToken');
 
-  // Check if the watch token is already used (regardless of id)
+  // Check if the watch token is already has an ID
   const items = await docClient.send(
     new QueryCommand({
       TableName: IDS_TABLE_NAME,
       IndexName: 'WatchTokenIndex',
       KeyConditionExpression: 'watchToken = :token',
       ExpressionAttributeValues: { ':token': watchToken },
-    })
+    }),
   );
-  if (items.Items.length > 0) return badRequest('watchToken already exists');
+  if (items.Items.length > 0) {
+    return success({ id: items.Items[0].id });
+  }
 
   // Check in ids DynamoDB table if it is already used
   let id = generateId();
   let existing = await docClient.send(
-    new GetCommand({ TableName: IDS_TABLE_NAME, Key: { id } })
+    new GetCommand({ TableName: IDS_TABLE_NAME, Key: { id } }),
   );
   let attempts = 100;
   while (existing.Item && attempts > 0) {
@@ -57,7 +59,7 @@ const handlePostId = async (body) => {
   // Store it in DynamoDB with the watch token
   try {
     await docClient.send(
-      new PutCommand({ TableName: IDS_TABLE_NAME, Item: { id, watchToken } })
+      new PutCommand({ TableName: IDS_TABLE_NAME, Item: { id, watchToken } }),
     );
   } catch (e) {
     console.error(e);
