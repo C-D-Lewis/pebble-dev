@@ -13,14 +13,8 @@
 #endif
 
 static Window *s_window;
-static Layer *s_canvas_layer;
-static TextLayer *s_header_layer;
+static Layer *s_header_layer;
 static MenuLayer *s_menu_layer;
-
-static void canvas_update_proc(Layer *layer, GContext *ctx) {
-  // Title underline
-  graphics_fill_rect(ctx, GRect(0, scl_y(110), PS_DISP_W, LINE_W), 0, GCornerNone);
-}
 
 static void draw_changes(GContext *ctx, const GRect bounds, const Sample *s) {
   // Adjust timestamp back by a minute so it's within the interval
@@ -167,13 +161,8 @@ static void main_window_load(Window *window) {
   Layer *root_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(root_layer);
 
-  s_header_layer = util_make_text_layer(
-    GRect(0, scl_y_pp({-30, .c = -20, .e = -25}), PS_DISP_W, 100),
-    scl_get_font(SFI_Small)
-  );
-  text_layer_set_text(s_header_layer, PBL_IF_ROUND_ELSE("History", "Recent samples"));
-  text_layer_set_text_alignment(s_header_layer, GTextAlignmentCenter);
-  layer_add_child(root_layer, text_layer_get_layer(s_header_layer));
+  s_header_layer = util_create_header_layer(PBL_IF_ROUND_ELSE("History", "Recent samples"), 32);
+  layer_add_child(root_layer, s_header_layer);
 
   s_menu_layer = menu_layer_create(grect_inset(bounds, GEdgeInsets(HEADER_INSET, 0, 0, 0)));
   menu_layer_set_click_config_onto_window(s_menu_layer, window);
@@ -183,15 +172,10 @@ static void main_window_load(Window *window) {
     .get_cell_height = (MenuLayerGetCellHeightCallback)get_cell_height_callback
   });
   layer_add_child(root_layer, menu_layer_get_layer(s_menu_layer));
-
-  s_canvas_layer = layer_create(bounds);
-  layer_set_update_proc(s_canvas_layer, canvas_update_proc);
-  layer_add_child(root_layer, s_canvas_layer);
 }
 
 static void window_unload(Window *window) {
-  layer_destroy(s_canvas_layer);
-  text_layer_destroy(s_header_layer);
+  layer_destroy(s_header_layer);
   menu_layer_destroy(s_menu_layer);
 
   window_destroy(window);

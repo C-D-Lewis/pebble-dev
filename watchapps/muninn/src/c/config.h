@@ -17,7 +17,7 @@
 // ! Check Aplite works before releasing
 // ! Comment out INFO logs
 // ! Check TS test flags
-#define VERSION "1.24.0"
+#define VERSION "1.25.0"
 // Minimum samples before providing estimations
 #define MIN_SAMPLES 2
 // Min samples before graph is shown
@@ -33,11 +33,11 @@
 
 ///////////// Testing area ////////////////
 //                                       //
-// #define USE_TEST_DATA true            //
+#define USE_TEST_DATA true            //
 //                                       //
 // #define SAVE_TEST_DATA true           //
 //                                       //
-// #define SYNC_TEST_DATA true           //
+#define SYNC_TEST_DATA true           //
 //                                       //
 // #define LOG_STATE true                //
 //                                       //
@@ -47,7 +47,7 @@
 //                                       //
 // #define TEST_TIMELINE_PIN true        //
 //                                       //
-// #define TEST_IS_NIGHT true               //
+// #define TEST_IS_NIGHT true            //
 //                                       //
 ///////////////////////////////////////////
 
@@ -70,7 +70,7 @@
 // Action bar hint height
 #define HINT_H scl_y_pp({.o = 200, .c = 80, .e = 200})
 // Header inset
-#define HEADER_INSET scl_y(110)
+#define HEADER_INSET scl_y(115)
 
 // Per-platform layout values
 #if defined(PBL_PLATFORM_EMERY)

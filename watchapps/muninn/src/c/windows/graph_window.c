@@ -14,8 +14,8 @@
 #endif
 
 static Window *s_window;
-static TextLayer *s_header_layer, *s_desc_layer;
-static Layer *s_canvas_layer;
+static TextLayer *s_desc_layer;
+static Layer *s_canvas_layer, *s_header_layer;
 
 static int s_selection = 0;
 #ifdef FEATURE_ANIMATIONS
@@ -49,14 +49,6 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
 
   graphics_context_set_fill_color(ctx, GColorBlack);
   graphics_context_set_text_color(ctx, GColorBlack);
-
-  // Title underline
-  graphics_fill_rect(
-    ctx,
-    GRect(0, scl_y(110), PS_DISP_W - ACTION_BAR_W, LINE_W),
-    0,
-    GCornerNone
-  );
 
   const int log_len = data_get_log_length();
 #ifdef FEATURE_ANIMATIONS
@@ -306,18 +298,8 @@ static void main_window_load(Window *window) {
   Layer *root_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(root_layer);
 
-  s_header_layer = util_make_text_layer(
-    GRect(
-      0,
-      scl_y_pp({-30, .c = -20, .e = -25}),
-      PS_DISP_W - PBL_IF_ROUND_ELSE(0, ACTION_BAR_W),
-      100
-    ),
-    scl_get_font(SFI_Small)
-  );
-  text_layer_set_text(s_header_layer, PBL_IF_ROUND_ELSE("Graph", "Change over time"));
-  text_layer_set_text_alignment(s_header_layer, GTextAlignmentCenter);
-  layer_add_child(root_layer, text_layer_get_layer(s_header_layer));
+  s_header_layer = util_create_header_layer(PBL_IF_ROUND_ELSE("Graph", "Change over time"), 32);
+  layer_add_child(root_layer, s_header_layer);
 
   s_canvas_layer = layer_create(
     GRect(0, 0, PS_DISP_W, bounds.size.h)
@@ -353,7 +335,7 @@ static void main_window_load(Window *window) {
 }
 
 static void window_unload(Window *window) {
-  text_layer_destroy(s_header_layer);
+  layer_destroy(s_header_layer);
   text_layer_destroy(s_desc_layer);
   layer_destroy(s_canvas_layer);
 

@@ -17,4 +17,6 @@ void comm_deinit();
 void comm_request_deletion();
 
 void comm_request_sync_stats();
+
+void comm_upload_history();
 #endif

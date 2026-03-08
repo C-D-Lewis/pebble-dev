@@ -1,4 +1,5 @@
 import {
+  LS_KEY_UPLOAD_ID,
   MAX_SYNC_ITEMS,
   MIN_CHARGE_AMOUNT,
   SECONDS_PER_DAY,
@@ -6,6 +7,8 @@ import {
   STATUS_EMPTY,
   STATUS_NO_CHANGE,
   TEST_SAMPLE_DATA,
+  UPLOAD_API_URL,
+  UPLOAD_ID_EMPTY,
 } from './constants';
 import { HistoryItem } from './types';
 import { generateTestData } from './util';
@@ -151,6 +154,33 @@ const calculateMeanTimeBetweenCharges = (history: HistoryItem[]): number => {
 };
 
 /**
+ * Get upload ID from the API, if possible.
+ *
+ * @returns Upload ID, or constant indicating no ID available. 
+ */
+const getUploadId = async (): Promise<string> => {
+  const watchToken = Pebble.getWatchToken();
+  if (!watchToken || watchToken.length === 0) {
+    console.log('WARN: No watchToken was returned');
+    return UPLOAD_ID_EMPTY;
+  }
+
+  const res = await fetch(`${UPLOAD_API_URL}/id`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ watchToken }),
+  });
+  if (res.status !== 200) {
+    console.log(`Failed to get upload id`);
+    console.log(await res.text());
+    return UPLOAD_ID_EMPTY;
+  }
+  
+  const { id = UPLOAD_ID_EMPTY } = await res.json();
+  return id;
+}
+
+/**
  * Send the watch the last seen timestamp so updates can be incremental.
  */
 export const handleGetSyncInfo = async () => {
@@ -162,6 +192,13 @@ export const handleGetSyncInfo = async () => {
     lastTs = history[0].timestamp;
   }
 
+  // Pre-fetch upload ID for this watchToken
+  let uploadId = localStorage.getItem(LS_KEY_UPLOAD_ID);
+  if (!uploadId || uploadId === UPLOAD_ID_EMPTY) {
+    uploadId = await getUploadId();
+  }
+  localStorage.setItem(LS_KEY_UPLOAD_ID, uploadId);
+
   const res = {
     SYNC_TIMESTAMP: lastTs,
     SYNC_COUNT: history.length,
@@ -170,6 +207,7 @@ export const handleGetSyncInfo = async () => {
     STAT_LAST_WEEK_RATE: calculateLastWeekRate(history),
     STAT_NUM_CHARGES: calculateNumCharges(history),
     STAT_MTBC: calculateMeanTimeBetweenCharges(history),
+    UPLOAD_ID: uploadId,
   };
   console.log(JSON.stringify(res));
   await PebbleTS.sendAppMessage(res);
@@ -220,4 +258,29 @@ export const handleSync = async (dict: Record<string, any>) => {
  */
 export const deleteWatchHistory = () => {
   localStorage.removeItem(buildHistoryKey());
+};
+
+export const uploadHistory = async () => {
+  const id = localStorage.getItem(LS_KEY_UPLOAD_ID);
+  if (!id || id === UPLOAD_ID_EMPTY) {
+    console.log('WARN: No upload ID, cannot upload');
+    await PebbleTS.sendAppMessage({ UPLOAD_STATUS: 0 });
+    return;
+  }
+
+  const history = loadHistory();
+  const res = await fetch(`${UPLOAD_API_URL}/history`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id, history }),
+  });
+  if (res.status !== 200) {
+    console.log(`WARN: Failed to upload history`);
+    console.log(await res.text());
+    await PebbleTS.sendAppMessage({ UPLOAD_STATUS: 0 });
+    return;
+  }
+
+  console.log(`Uploaded ${history.length} history items`);
+  await PebbleTS.sendAppMessage({ UPLOAD_STATUS: 1 });
 };

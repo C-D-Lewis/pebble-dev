@@ -1,7 +1,7 @@
 {
   "name": "muninn",
   "author": "Chris Lewis",
-  "version": "1.24.0",
+  "version": "1.25.0",
   "_note": "Checklist in config.h!",
   "private": true,
   "keywords": [
@@ -139,7 +139,10 @@
       "STAT_ALL_TIME_RATE",
       "STAT_LAST_WEEK_RATE",
       "STAT_NUM_CHARGES",
-      "STAT_MTBC"
+      "STAT_MTBC",
+      "UPLOAD_ID",
+      "UPLOAD_HISTORY",
+      "UPLOAD_STATUS"
     ]
   },
   "dependencies": {

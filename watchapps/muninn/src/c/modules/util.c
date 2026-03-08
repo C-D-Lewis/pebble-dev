@@ -313,6 +313,32 @@ uint32_t util_get_mascot_res_id(bool is_enabled, bool is_night) {
   return is_enabled ? RESOURCE_ID_AWAKE_HEAD : RESOURCE_ID_ASLEEP_HEAD;
 }
 
+static void underline_update_proc(Layer *layer, GContext *ctx) {
+  // Title underline
+  graphics_context_set_fill_color(ctx, GColorBlack);
+  graphics_fill_rect(ctx, GRect(0, scl_y(110), PS_DISP_W, LINE_W), 0, GCornerNone);
+
+  // Draw title
+  graphics_context_set_text_color(ctx, GColorBlack);
+  char *title = (char*)layer_get_data(layer);
+  graphics_draw_text(
+    ctx,
+    title,
+    scl_get_font(SFI_Small),
+    GRect(0, scl_y_pp({-30, .c = -20, .e = -25}), PS_DISP_W, 100),
+    GTextOverflowModeWordWrap,
+    GTextAlignmentCenter,
+    NULL
+  );
+}
+
+Layer* util_create_header_layer(char *title, int title_size) {
+  Layer *l = layer_create_with_data(GRect(0, 0, PS_DISP_W, 100), title_size);
+  layer_set_update_proc(l, underline_update_proc);
+  snprintf((char*)layer_get_data(l), title_size, "%s", title);
+  return l;
+}
+
 ////////////////////////////////////////// Animation Utils /////////////////////////////////////////
 
 #ifdef FEATURE_ANIMATIONS

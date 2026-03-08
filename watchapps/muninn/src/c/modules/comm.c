@@ -179,6 +179,18 @@ void inbox_received_handler(DictionaryIterator *iter, void *context) {
 #endif
     return;
   }
+
+  // Response to upload request
+  t = dict_find(iter, MESSAGE_KEY_UPLOAD_STATUS);
+  if (t) {
+    const int success = (int)t->value->int32;
+    if (success) {
+      stats_window_set_upload_status("Upload successful");
+    } else {
+      stats_window_set_upload_status("Upload failed");
+    }
+    return;
+  }
 #endif
 }
 
@@ -207,5 +219,9 @@ void comm_request_deletion() {
 
 void comm_request_sync_stats() {
   send_int(MESSAGE_KEY_GET_STATS);
+}
+
+void comm_upload_history() {
+  send_int(MESSAGE_KEY_UPLOAD_HISTORY);
 }
 #endif
