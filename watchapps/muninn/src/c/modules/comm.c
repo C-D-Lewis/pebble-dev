@@ -101,11 +101,11 @@ void inbox_received_handler(DictionaryIterator *iter, void *context) {
   // We can only respond with one AppMessage at a time it seems
   Tuple *t = dict_find(iter, MESSAGE_KEY_READY);
   if (t) {
-    DictionaryIterator *iter;
-    app_message_outbox_begin(&iter);
-    if (persist_data->push_timeline_pins) add_push_pin_data(iter);
+    DictionaryIterator *out;
+    app_message_outbox_begin(&out);
+    if (persist_data->push_timeline_pins) add_push_pin_data(out);
 #if defined(FEATURE_SYNC)
-    add_get_sync_info_data(iter);
+    add_get_sync_info_data(out);
 #endif
     app_message_outbox_send();
     return;
