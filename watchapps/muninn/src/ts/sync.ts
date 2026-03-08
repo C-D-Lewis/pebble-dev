@@ -192,7 +192,7 @@ export const handleGetSyncInfo = async () => {
     lastTs = history[0].timestamp;
   }
 
-  // Pre-fetch upload ID for this watchToken
+  // Pre-fetch upload ID for this watchToken for display
   let uploadId = localStorage.getItem(LS_KEY_UPLOAD_ID);
   if (!uploadId || uploadId === UPLOAD_ID_EMPTY) {
     uploadId = await getUploadId();

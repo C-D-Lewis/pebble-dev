@@ -107,7 +107,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
       util_menu_cell_draw(
         ctx,
         cell_layer,
-        "View in web UI",
+        "View on web",
         s_upload_buff
       );
       break;
