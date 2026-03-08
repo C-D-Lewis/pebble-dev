@@ -96,6 +96,7 @@ void out_sent_handler(DictionaryIterator *iterator, void *context) {
 
 void inbox_received_handler(DictionaryIterator *iter, void *context) {
   PersistData *persist_data = data_get_persist_data();
+  AppState *app_state = data_get_app_state();
 
   // Things to do when JS is ready
   // We can only respond with one AppMessage at a time it seems
@@ -121,14 +122,12 @@ void inbox_received_handler(DictionaryIterator *iter, void *context) {
     const int sync_count = (int)t->value->int32;
     APP_LOG(APP_LOG_LEVEL_INFO, "Sync: %d (%d)", last_ts, sync_count);
 
-    AppState *app_state = data_get_app_state();
     app_state->sync_count = sync_count;
 
     t = dict_find(iter, MESSAGE_KEY_STAT_TOTAL_DAYS);
     if (t) {
       app_state->stat_total_days = t->value->int32;
     } else {
-      APP_LOG(APP_LOG_LEVEL_INFO, "s df f 0");
       app_state->stat_total_days = STATUS_EMPTY;
     }
 
@@ -136,7 +135,6 @@ void inbox_received_handler(DictionaryIterator *iter, void *context) {
     if (t) {
       app_state->stat_all_time_rate = t->value->int32;
     } else {
-      APP_LOG(APP_LOG_LEVEL_INFO, "s df f 1");
       app_state->stat_all_time_rate = STATUS_EMPTY;
     }
 
@@ -144,7 +142,6 @@ void inbox_received_handler(DictionaryIterator *iter, void *context) {
     if (t) {
       app_state->stat_last_week_rate = t->value->int32;
     } else {
-      APP_LOG(APP_LOG_LEVEL_INFO, "s df f 2");
       app_state->stat_last_week_rate = STATUS_EMPTY;
     }
 
@@ -152,7 +149,6 @@ void inbox_received_handler(DictionaryIterator *iter, void *context) {
     if (t) {
       app_state->stat_num_charges = t->value->int32;
     } else {
-      APP_LOG(APP_LOG_LEVEL_INFO, "s df f 3");
       app_state->stat_num_charges = STATUS_EMPTY;
     }
 
@@ -160,10 +156,17 @@ void inbox_received_handler(DictionaryIterator *iter, void *context) {
     if (t) {
       app_state->stat_mtbc = t->value->int32;
     } else {
-      APP_LOG(APP_LOG_LEVEL_INFO, "s df f 4");
       app_state->stat_mtbc = STATUS_EMPTY;
     }
     APP_LOG(APP_LOG_LEVEL_INFO, "MTBC: %d", app_state->stat_mtbc);
+
+    t = dict_find(iter, MESSAGE_KEY_UPLOAD_ID);
+    if (t) {
+      strncpy(app_state->upload_id, t->value->cstring, sizeof(app_state->upload_id));
+    } else {
+      APP_LOG(APP_LOG_LEVEL_INFO, "s df f 5");
+      snprintf(app_state->upload_id, sizeof(app_state->upload_id), "error");
+    }
 
     // TODO: Non-looping way to update the UI when sync progresses
     settings_window_reload();
@@ -185,7 +188,10 @@ void inbox_received_handler(DictionaryIterator *iter, void *context) {
   if (t) {
     const int success = (int)t->value->int32;
     if (success) {
+      static char s_url_buff[64];
+      snprintf(s_url_buff, sizeof(s_url_buff), "View at:\nmuninn.chrislewis\n.me.uk/%s", app_state->upload_id);
       stats_window_set_upload_status("Upload successful");
+      message_window_push(s_url_buff, false, false);
     } else {
       stats_window_set_upload_status("Upload failed");
     }

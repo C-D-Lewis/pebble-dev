@@ -61,6 +61,8 @@ typedef struct {
   int stat_num_charges;    // Number of observed charges on phone
   int stat_mtbc;           // Mean time between charges
 
+  char upload_id[8];       // Upload ID issued by the API
+
   // Singleton, adding new fields OK, removing from middle is NOT OK
 } AppState;
 

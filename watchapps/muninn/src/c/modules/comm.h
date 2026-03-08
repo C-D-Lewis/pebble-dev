@@ -8,6 +8,7 @@
 
 #include "../windows/stats_window.h"
 #include "../windows/settings_window.h"
+#include "../windows/message_window.h"
 
 void comm_init();
 
