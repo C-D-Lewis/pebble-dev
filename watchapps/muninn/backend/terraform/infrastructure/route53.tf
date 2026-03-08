@@ -1,5 +1,5 @@
 resource "aws_apigatewayv2_domain_name" "domain_name" {
-  domain_name              = "muninn-api.${var.domain_name}"
+  domain_name = "muninn-api.${var.domain_name}"
 
   domain_name_configuration {
     certificate_arn = var.acm_certificate_arn
