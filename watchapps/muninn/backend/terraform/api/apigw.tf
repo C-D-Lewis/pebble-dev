@@ -28,6 +28,12 @@ resource "aws_apigatewayv2_route" "get_history" {
   target    = "integrations/${aws_apigatewayv2_integration.integration.id}"
 }
 
+resource "aws_apigatewayv2_route" "get_stats" {
+  api_id    = aws_apigatewayv2_api.history_api.id
+  route_key = "GET /stats"
+  target    = "integrations/${aws_apigatewayv2_integration.integration.id}"
+}
+
 resource "aws_apigatewayv2_stage" "default" {
   api_id      = aws_apigatewayv2_api.history_api.id
   name        = "$default"

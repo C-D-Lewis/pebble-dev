@@ -188,10 +188,8 @@ void inbox_received_handler(DictionaryIterator *iter, void *context) {
   if (t) {
     const int success = (int)t->value->int32;
     if (success) {
-      static char s_url_buff[64];
-      snprintf(s_url_buff, sizeof(s_url_buff), "See your data at:\nmuninn.chrislewis\n.me.uk/%s", app_state->upload_id);
       stats_window_set_upload_status("Upload successful");
-      message_window_push(s_url_buff, false, false);
+      qr_window_push();
     } else {
       stats_window_set_upload_status("Upload failed");
     }

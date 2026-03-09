@@ -29,7 +29,8 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
   // Format buffers
   static char s_t_d_buff[16];
   if (util_is_not_status(app_state->stat_total_days)) {
-    snprintf(s_t_d_buff, sizeof(s_t_d_buff), "%d days", app_state->stat_total_days);
+    const int sync_perc = (app_state->sync_count * 100) / MAX_SYNC_ITEMS;
+    snprintf(s_t_d_buff, sizeof(s_t_d_buff), "%d days (%d%%)", app_state->stat_total_days, sync_perc);
   } else {
     snprintf(s_t_d_buff, sizeof(s_t_d_buff), "-");
   }
@@ -67,7 +68,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
       util_menu_cell_draw(
         ctx,
         cell_layer,
-        "Total sync time",
+        "Total Sync'd Time",
         s_t_d_buff
       );
       break;
@@ -75,7 +76,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
       util_menu_cell_draw(
         ctx,
         cell_layer,
-        "Avg. drain rate",
+        "Avg. Drain Rate",
         s_a_t_r_buff
       );
       break;
@@ -83,7 +84,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
       util_menu_cell_draw(
         ctx,
         cell_layer,
-        "Last week avg.",
+        "Last Week Avg.",
         s_l_w_r_buff
       );
       break;
@@ -91,7 +92,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
       util_menu_cell_draw(
         ctx,
         cell_layer,
-        "Charge events",
+        "Charge Events",
         s_n_c_buff
       );
       break;
@@ -99,7 +100,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
       util_menu_cell_draw(
         ctx,
         cell_layer,
-        "Charge interval",
+        "Avg. Charge Gap",
         s_mtbc_buff
       );
       break;
@@ -107,7 +108,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
       util_menu_cell_draw(
         ctx,
         cell_layer,
-        "View on web",
+        "View in Web UI",
         s_upload_buff
       );
       break;

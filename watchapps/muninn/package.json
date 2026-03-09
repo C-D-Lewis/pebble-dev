@@ -112,6 +112,11 @@
           "file": "images/bird.png"
         },
         {
+          "type": "png",
+          "name": "QR_CODE",
+          "file": "images/qr.png"
+        },
+        {
           "type": "font",
           "name": "GOTCHA_GOTHIC_30",
           "file": "fonts/Gotcha-Gothic.ttf"
@@ -149,7 +154,9 @@
     "pebble-scalable": "^2.0.0"
   },
   "devDependencies": {
-    "pkts": "^0.3.0-beta.1"
+    "pkts": "^0.3.0-beta.1",
+    "tsc": "^2.0.4",
+    "typescript": "^5.9.3"
   },
   "scripts": {
     "build": "pkts build"

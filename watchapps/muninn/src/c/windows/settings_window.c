@@ -49,8 +49,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
     if (sync_count == 0) {
       snprintf(s_sync_buff, sizeof(s_sync_buff), "Syncing soon");
     } else {
-      const int sync_perc = (sync_count * 100) / MAX_SYNC_ITEMS;
-      snprintf(s_sync_buff, sizeof(s_sync_buff), "%d samples (%d%%)", sync_count, sync_perc);
+      snprintf(s_sync_buff, sizeof(s_sync_buff), "%d samples", sync_count);
     }
   }
 
@@ -100,7 +99,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
       util_menu_cell_draw(
         ctx,
         cell_layer,
-        "Sync to Phone",
+        "Historical Stats",
         s_sync_buff
       );
       break;

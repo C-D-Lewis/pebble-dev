@@ -119,7 +119,7 @@ const calculateNumCharges = (history: HistoryItem[]): number =>
  */
 const calculateMeanTimeBetweenCharges = (history: HistoryItem[]): number => {
   if (calculateNumCharges(history) < 2) {
-    console.log(`num charges < 2: ${calculateNumCharges(history)}`) ;
+    console.log(`WARN: num charges < 2: ${calculateNumCharges(history)}`) ;
     return STATUS_EMPTY;
   }
 
@@ -185,7 +185,7 @@ const getUploadId = async (): Promise<string> => {
  */
 export const handleGetSyncInfo = async () => {
   const history = loadHistory();
-  console.log(JSON.stringify(history));
+  // console.log(JSON.stringify(history));
 
   let lastTs = STATUS_EMPTY;
   if (history.length > 0) {
@@ -260,6 +260,14 @@ export const deleteWatchHistory = () => {
   localStorage.removeItem(buildHistoryKey());
 };
 
+const filterHistory = (history: HistoryItem[]): Partial<HistoryItem>[] =>
+  history.map(p => ({
+    timestamp: p.timestamp,
+    chargePerc: p.chargePerc,
+    rate: p.rate,
+    result: p.result,
+  }));
+
 export const uploadHistory = async () => {
   const id = localStorage.getItem(LS_KEY_UPLOAD_ID);
   if (!id || id === UPLOAD_ID_EMPTY) {
@@ -268,19 +276,33 @@ export const uploadHistory = async () => {
     return;
   }
 
+  const watchInfo = Pebble.getActiveWatchInfo();
+  const platform = watchInfo.platform || 'unknown';
+  const model = watchInfo.model || 'unknown';
+  const firmware = !watchInfo.firmware
+    ? 'unknown'
+    : `${watchInfo.firmware.major}.${watchInfo.firmware.minor}.${watchInfo.firmware.patch}`;
+
   const history = loadHistory();
   const res = await fetch(`${UPLOAD_API_URL}/history`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ id, history }),
+    body: JSON.stringify({
+      id,
+      history: filterHistory(history),
+      platform,
+      model,
+      firmware,
+    }),
   });
   if (res.status !== 200) {
     console.log(`WARN: Failed to upload history`);
     console.log(await res.text());
     await PebbleTS.sendAppMessage({ UPLOAD_STATUS: 0 });
 
-    // In case the DB was erased, next time get it again
-    localStorage.removeItem(LS_KEY_UPLOAD_ID);
+    // In case the DB was erased, get it again
+    const uploadId = await getUploadId();
+    localStorage.setItem(LS_KEY_UPLOAD_ID, uploadId);
     return;
   }
 

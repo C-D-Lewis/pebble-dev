@@ -1,0 +1,20 @@
+{
+  "name": "muninn-lambda",
+  "version": "1.0.0",
+  "description": "API Lambda for Muninn backend",
+  "type": "module",
+  "scripts": {
+    "build": "tsc --noEmit && esbuild src/index.ts --bundle --minify --platform=node --target=node24 --outfile=dist/index.js"
+  },
+  "keywords": [],
+  "author": "C-D-Lewis",
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.161",
+    "esbuild": "^0.27.3",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.1005.0",
+    "@aws-sdk/lib-dynamodb": "^3.1005.0"
+  }
+}
