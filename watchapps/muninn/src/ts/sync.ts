@@ -278,6 +278,9 @@ export const uploadHistory = async () => {
     console.log(`WARN: Failed to upload history`);
     console.log(await res.text());
     await PebbleTS.sendAppMessage({ UPLOAD_STATUS: 0 });
+
+    // In case the DB was erased, next time get it again
+    localStorage.removeItem(LS_KEY_UPLOAD_ID);
     return;
   }
 
