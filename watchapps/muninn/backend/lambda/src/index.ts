@@ -6,10 +6,10 @@ import {
   QueryCommand,
   ScanCommand,
 } from '@aws-sdk/lib-dynamodb';
-import { generateId, badRequest, error, success, validatePostHistoryBody } from './util.js';
+import { generateId, badRequest, error, success, validatePostHistoryBody, buildCorsHeaders } from './util.js';
 import type {
   GetHistoryResponse,
-  GetStatsResponse,
+  GetGlobalStatsResponse,
   LambdaEvent,
   PostHistoryBody,
   PostIdBody
@@ -30,7 +30,7 @@ const handlePostId = async (body: PostIdBody) => {
   if (!watchToken || watchToken.length !== 32) return badRequest('Invalid watchToken');
 
   // Check if the watch token is already has an ID
-  const items = await docClient.send(
+  const found = await docClient.send(
     new QueryCommand({
       TableName: IDS_TABLE_NAME,
       IndexName: 'WatchTokenIndex',
@@ -38,11 +38,11 @@ const handlePostId = async (body: PostIdBody) => {
       ExpressionAttributeValues: { ':token': watchToken },
     }),
   );
-  if (items.Items && items.Items.length > 0) {
-    return success({ id: items.Items[0]?.id });
+  if (found.Items && found.Items.length > 0) {
+    return success({ id: found.Items[0]?.id });
   }
 
-  // Check in ids DynamoDB table if it is already used
+  // Re-roll IDs until a new one is generated
   let id = generateId();
   let existing = await docClient.send(
     new GetCommand({ TableName: IDS_TABLE_NAME, Key: { id } }),
@@ -54,18 +54,18 @@ const handlePostId = async (body: PostIdBody) => {
     attempts--;
   }
   if (attempts === 0) return error('Failed to generate unique ID');
+  console.log(`Generated ID ${id} with ${attempts} attempts remaining`);
 
   // Store it in DynamoDB with the watch token
   try {
     await docClient.send(
       new PutCommand({ TableName: IDS_TABLE_NAME, Item: { id, watchToken } }),
     );
+    return success({ id });
   } catch (e) {
     console.error(e);
     return error('Failed to store ID');
   }
-
-  return success({ id });
 };
 
 /**
@@ -76,6 +76,7 @@ const handlePostId = async (body: PostIdBody) => {
  */
 const handlePostHistory = async (body: PostHistoryBody) => {
   const { id, history, platform, model, firmware, stats } = body;
+
   if (!validatePostHistoryBody(body)) return badRequest('Invalid request body');
 
   // Check if the ID exists in DynamoDB
@@ -106,7 +107,7 @@ const handlePostHistory = async (body: PostHistoryBody) => {
  * @param {string} id - ID from the path parameters.
  * @returns {Promise<{ history: HistoryItem[] }>} - Response with the history data.
  */
-const handleGetHistory = async (event: LambdaEvent, id?: string) => {
+const handleGetHistoryById = async (event: LambdaEvent, id?: string) => {
   if (!id) return badRequest('id is required');
 
   // Check if the ID exists in DynamoDB
@@ -126,9 +127,6 @@ const handleGetHistory = async (event: LambdaEvent, id?: string) => {
     //   platform, model, firmware, history GRAPH points for x/y
     // Unless we want to show the same prediction info, but it's less useful long-term
 
-    const origin = event.headers.origin || '';
-    const responseHeader = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[1];
-
     const body: GetHistoryResponse = {
       history: found.Item.history,
       platform: found.Item.platform,
@@ -136,10 +134,8 @@ const handleGetHistory = async (event: LambdaEvent, id?: string) => {
       firmware: found.Item.firmware,
       stats: found.Item.stats,
     };
-    return success(
-      body,
-      { 'Access-Control-Allow-Origin': responseHeader },
-    );
+
+    return success(body, buildCorsHeaders(event));
   } catch (e) {
     console.error(e);
     return error('Failed to get history');
@@ -147,30 +143,27 @@ const handleGetHistory = async (event: LambdaEvent, id?: string) => {
 }
 
 /**
- * Handle GET /stats route.
+ * Handle GET /globalStats route.
  *
- * @returns {Promise<GetStatsResponse>} - Response with the stats data.
+ * @param {LambdaEvent} event - Lambda event.
+ * @returns {Promise<GetGlobalStatsResponse>} - Response with the stats data.
  */
-const handleGetStats = async () => {
+const handleGetGlobalStats = async (event: LambdaEvent) => {
   try {
-    const idsData = await docClient.send(
-      new ScanCommand({
-        TableName: IDS_TABLE_NAME,
-        Select: 'COUNT',
-      }),
-    );
-    const historyData = await docClient.send(
+    const historyRows = await docClient.send(
       new ScanCommand({
         TableName: HISTORY_TABLE_NAME,
         Select: 'COUNT',
       }),
     );
 
-    const body: GetStatsResponse = {
-      totalIds: idsData.Count || -1,
-      totalUploads: historyData.Count || -1,
+    const body: GetGlobalStatsResponse = {
+      totalUploads: historyRows.Count || -1,
+
+      // Leaderboard?
+      // Averages per model / FW?
     };
-    return success(body);
+    return success(body, buildCorsHeaders(event));
   } catch (e) {
     console.error(e);
     return error('Failed to get stats');
@@ -195,16 +188,16 @@ export const handler = async (event: LambdaEvent) => {
     if (route === 'POST /id') return handlePostId(body);
 
     // Store history data for a given ID previously exchanged
-    // { id, history } -> { success: true }
+    // { id, history, platform, model, firmware, stats } -> { success: true }
     if (route === 'POST /history') return handlePostHistory(body);
 
     // Get history data for a given ID
-    // -> { history }
-    if (route === 'GET /history/{id}') return handleGetHistory(event, id);
+    // -> { history, platform, model, firmware, stats }
+    if (route === 'GET /history/{id}') return handleGetHistoryById(event, id);
 
     // Get stats about the data population
     // -> { totalIds, totalUploads }
-    if (route === 'GET /stats') return handleGetStats();
+    if (route === 'GET /globalStats') return handleGetGlobalStats(event);
 
     throw new Error('Route not found');
   } catch (e) {

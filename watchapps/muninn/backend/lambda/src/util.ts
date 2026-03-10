@@ -1,5 +1,5 @@
-import { DEFAULT_RES_HEADERS } from './constants.js';
-import type { HistoryItem, PostHistoryBody, Stats } from './types.js';
+import { ALLOWED_ORIGINS, DEFAULT_RES_HEADERS } from './constants.js';
+import type { HistoryItem, LambdaEvent, PostHistoryBody, Stats } from './types.js';
 
 /**
  * Generate a random 6-character hexadecimal ID.
@@ -91,4 +91,11 @@ export const validatePostHistoryBody = (body: PostHistoryBody) => {
   if (!validateStats(stats)) return false;
 
   return true;
+};
+
+export const buildCorsHeaders = (event: LambdaEvent) => {
+  const origin = event.headers.origin || '';
+  const acaoHeader = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[1];
+
+  return { 'Access-Control-Allow-Origin': acaoHeader };
 };

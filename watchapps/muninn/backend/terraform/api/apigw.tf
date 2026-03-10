@@ -30,7 +30,7 @@ resource "aws_apigatewayv2_route" "get_history" {
 
 resource "aws_apigatewayv2_route" "get_stats" {
   api_id    = aws_apigatewayv2_api.history_api.id
-  route_key = "GET /stats"
+  route_key = "GET /globalStats"
   target    = "integrations/${aws_apigatewayv2_integration.integration.id}"
 }
 

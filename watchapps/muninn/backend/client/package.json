@@ -1,0 +1,49 @@
+{
+  "name": "muninn-client",
+  "version": "1.0.0",
+  "description": "Site to view Muninn watch history",
+  "type": "module",
+  "scripts": {
+    "clean": "rm -rf ./dist",
+    "build": "npm run clean && vite build",
+    "start": "vite"
+  },
+  "author": "Chris Lewis",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "chart.js": "^4.5.1",
+    "chartjs-plugin-zoom": "^2.2.0",
+    "fabricate.js": "^3.8.1"
+  },
+  "eslintConfig": {
+    "extends": [
+      "@chris-lewis/eslint-config",
+      "plugin:@typescript-eslint/eslint-recommended",
+      "plugin:@typescript-eslint/recommended"
+    ],
+    "parser": "@typescript-eslint/parser",
+    "plugins": [
+      "@typescript-eslint"
+    ],
+    "settings": {
+      "import/resolver": {
+        "typescript": {}
+      }
+    },
+    "rules": {
+      "import/extensions": 0,
+      "no-param-reassign": 0,
+      "import/prefer-default-export": 0
+    }
+  },
+  "devDependencies": {
+    "@chris-lewis/eslint-config": "^1.0.3",
+    "@typescript-eslint/eslint-plugin": "^6.3.0",
+    "@typescript-eslint/parser": "^6.3.0",
+    "eslint-import-resolver-typescript": "^3.5.5",
+    "ts-loader": "^9.4.2",
+    "typescript": "^5.0.2",
+    "vite": "^5.4.11",
+    "vite-plugin-static-copy": "^2.1.0"
+  }
+}

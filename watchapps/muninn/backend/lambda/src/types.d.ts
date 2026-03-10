@@ -47,8 +47,7 @@ export type GetHistoryResponse = {
   stats: Stats;
 };
 
-export type GetStatsResponse = {
-  totalIds: number;
+export type GetGlobalStatsResponse = {
   totalUploads: number;
 };
 
