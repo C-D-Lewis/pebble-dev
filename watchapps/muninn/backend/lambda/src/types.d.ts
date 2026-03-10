@@ -1,8 +1,8 @@
 export type HistoryItem = {
-  timestamp: number;
-  chargePerc: number;
-  rate: number;
-  result: number;
+  ts: number;
+  cp: number;
+  r: number;
+  res: number;
 };
 
 export type LambdaEvent = {
@@ -17,6 +17,15 @@ export type LambdaEvent = {
   };
 };
 
+export type Stats = {
+  count: number;
+  totalDays: number;
+  allTimeRate: number;
+  lastWeekRate: number;
+  numCharges: number;
+  mtbc: number;
+};
+
 export type PostIdBody = {
   watchToken: string;
 };
@@ -27,6 +36,7 @@ export type PostHistoryBody = {
   platform: string;
   model: string;
   firmware: string;
+  stats: Stats;
 };
 
 export type GetHistoryResponse = {
@@ -34,6 +44,7 @@ export type GetHistoryResponse = {
   platform: string;
   model: string;
   firmware: string;
+  stats: Stats;
 };
 
 export type GetStatsResponse = {

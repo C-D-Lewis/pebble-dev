@@ -1,5 +1,5 @@
 import { DEFAULT_RES_HEADERS } from './constants.js';
-import type { HistoryItem } from './types.js';
+import type { HistoryItem, PostHistoryBody, Stats } from './types.js';
 
 /**
  * Generate a random 6-character hexadecimal ID.
@@ -55,11 +55,40 @@ export const success = (data: any, headers: any = {}) => ({
  * @param {HistoryItem[]} history - The history data to validate.
  * @returns {boolean} - True if valid, false otherwise.
  */
-export const validateHistory = (history: HistoryItem[]) => {
+const validateHistory = (history: HistoryItem[]) => {
   return history.every(p => {
-    return typeof p.timestamp === 'number' &&
-      typeof p.chargePerc === 'number' &&
-      typeof p.rate === 'number' &&
-      typeof p.result === 'number';
+    return typeof p.ts === 'number' &&
+      typeof p.cp === 'number' &&
+      typeof p.r === 'number' &&
+      typeof p.res === 'number';
   });
+};
+
+/**
+ * Validate the stats data format.
+ *   Should sync with JS and client.
+ *
+ * @param {Stats} stats - The stats data to validate.
+ * @returns {boolean} - True if valid, false otherwise.
+ */
+const validateStats = (stats: Stats) => {
+  return typeof stats.count === 'number' &&
+    typeof stats.totalDays === 'number' &&
+    typeof stats.allTimeRate === 'number' &&
+    typeof stats.lastWeekRate === 'number' &&
+    typeof stats.numCharges === 'number' &&
+    typeof stats.mtbc === 'number';
+};
+
+export const validatePostHistoryBody = (body: PostHistoryBody) => {
+  const { id, history, platform, model, firmware, stats } = body;
+
+  if (!id || typeof id !== 'string' || id.length !== 6) return false;
+  if (!platform || typeof platform !== 'string') return false;
+  if (!model || typeof model !== 'string') return false;
+  if (!firmware || typeof firmware !== 'string') return false;
+  if (!validateHistory(history)) return false;
+  if (!validateStats(stats)) return false;
+
+  return true;
 };

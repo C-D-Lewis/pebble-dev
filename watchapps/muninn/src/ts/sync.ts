@@ -10,7 +10,7 @@ import {
   UPLOAD_API_URL,
   UPLOAD_ID_EMPTY,
 } from './constants';
-import { HistoryItem } from './types';
+import { HistoryItem, UploadHistoryItem } from './types';
 import { generateTestData } from './util';
 
 /** LocalStorage key - data history on a per-watch basis */
@@ -260,12 +260,12 @@ export const deleteWatchHistory = () => {
   localStorage.removeItem(buildHistoryKey());
 };
 
-const filterHistory = (history: HistoryItem[]): Partial<HistoryItem>[] =>
+const mapHistoryForDisplay = (history: HistoryItem[]): UploadHistoryItem[] =>
   history.map(p => ({
-    timestamp: p.timestamp,
-    chargePerc: p.chargePerc,
-    rate: p.rate,
-    result: p.result,
+    ts: p.timestamp,
+    cp: p.chargePerc,
+    r: p.rate,
+    res: p.result,
   }));
 
 export const uploadHistory = async () => {
@@ -284,15 +284,26 @@ export const uploadHistory = async () => {
     : `${watchInfo.firmware.major}.${watchInfo.firmware.minor}.${watchInfo.firmware.patch}`;
 
   const history = loadHistory();
+
+  const stats = {
+    count: history.length,
+    totalDays: Math.floor(history.length / 4),
+    allTimeRate: calculateDischargeRate(history),
+    lastWeekRate: calculateLastWeekRate(history),
+    numCharges: calculateNumCharges(history),
+    mtbc: calculateMeanTimeBetweenCharges(history),
+  };
+
   const res = await fetch(`${UPLOAD_API_URL}/history`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       id,
-      history: filterHistory(history),
+      history: mapHistoryForDisplay(history),
       platform,
       model,
       firmware,
+      stats,
     }),
   });
   if (res.status !== 200) {

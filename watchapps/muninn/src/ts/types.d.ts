@@ -8,3 +8,10 @@ export type HistoryItem = {
   chargeDiff: number;
   rate: number;
 };
+
+export type UploadHistoryItem = {
+  ts: number;
+  res: number;
+  cp: number;
+  r: number;
+};

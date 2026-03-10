@@ -6,7 +6,7 @@ import {
   QueryCommand,
   ScanCommand,
 } from '@aws-sdk/lib-dynamodb';
-import { generateId, badRequest, error, success, validateHistory } from './util.js';
+import { generateId, badRequest, error, success, validatePostHistoryBody } from './util.js';
 import type {
   GetHistoryResponse,
   GetStatsResponse,
@@ -75,13 +75,8 @@ const handlePostId = async (body: PostIdBody) => {
  * @returns {Promise<{ success: boolean }>} - Response with the success status.
  */
 const handlePostHistory = async (body: PostHistoryBody) => {
-  const { id, history, platform, model, firmware } = body;
-  if (!id) return badRequest('id is required');
-  if (!platform) return badRequest('platform is required');
-  if (!model) return badRequest('model is required');
-  if (!firmware) return badRequest('firmware is required');
-  if (!history || !Array.isArray(history) || !validateHistory(history))
-    return badRequest('Invalid history');
+  const { id, history, platform, model, firmware, stats } = body;
+  if (!validatePostHistoryBody(body)) return badRequest('Invalid request body');
 
   // Check if the ID exists in DynamoDB
   const existing = await docClient.send(
@@ -94,7 +89,7 @@ const handlePostHistory = async (body: PostHistoryBody) => {
     await docClient.send(
       new PutCommand({
         TableName: HISTORY_TABLE_NAME,
-        Item: { id, history, platform, model, firmware },
+        Item: { id, history, platform, model, firmware, stats },
       }),
     );
     return success({ success: true });
@@ -139,6 +134,7 @@ const handleGetHistory = async (event: LambdaEvent, id?: string) => {
       platform: found.Item.platform,
       model: found.Item.model,
       firmware: found.Item.firmware,
+      stats: found.Item.stats,
     };
     return success(
       body,
