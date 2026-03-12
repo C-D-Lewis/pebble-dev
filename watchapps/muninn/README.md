@@ -5,7 +5,7 @@ _Odin tasked Muninn with memory of the land... Over time, he will provide you wi
 <table>
   <tr>
     <td><img src="screenshots/diorite.png" /></td>
-    <td><img src="screenshots/diorite-menu.png" /></td>
+    <td><img src="screenshots/diorite-graph.png" /></td>
     <td><img src="screenshots/diorite-log.png" /></td>
   </tr>
 </table>
@@ -60,4 +60,3 @@ from 2016) and what kind of anomalous behavior you encountered.
 ## TODO:
 
 - [ ] Import data from JS? Could be invalid/stale
-- [ ] Simpler Chalk layouts
