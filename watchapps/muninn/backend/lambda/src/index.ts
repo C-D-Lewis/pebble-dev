@@ -6,7 +6,7 @@ import {
   QueryCommand,
   ScanCommand,
 } from '@aws-sdk/lib-dynamodb';
-import { generateId, badRequest, error, success, validatePostHistoryBody, buildCorsHeaders } from './util.js';
+import { generateId, badRequest, error, success, validatePostHistoryBody, buildCorsHeaders, notFound } from './util.js';
 import type {
   GetHistoryResponse,
   GetGlobalStatsResponse,
@@ -14,7 +14,7 @@ import type {
   PostHistoryBody,
   PostIdBody
 } from './types.js';
-import { IDS_TABLE_NAME, HISTORY_TABLE_NAME, ALLOWED_ORIGINS } from './constants.js';
+import { IDS_TABLE_NAME, HISTORY_TABLE_NAME } from './constants.js';
 
 const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
@@ -114,14 +114,17 @@ const handleGetHistoryById = async (event: LambdaEvent, id?: string) => {
   const existing = await docClient.send(
     new GetCommand({ TableName: IDS_TABLE_NAME, Key: { id } })
   );
-  if (!existing.Item) return badRequest('id not found');
+  if (!existing.Item) return notFound('id not found', buildCorsHeaders(event));
 
   // Get the history data from DynamoDB
   try {
     const found = await docClient.send(
       new GetCommand({ TableName: HISTORY_TABLE_NAME, Key: { id } })
     );
-    if (!found.Item) return badRequest('history not found for this id');
+    if (!found.Item) return notFound(
+      'history not found for this id',
+      buildCorsHeaders(event),
+    );
 
     // TODO: Distill down to only data the client needs:
     //   platform, model, firmware, history GRAPH points for x/y

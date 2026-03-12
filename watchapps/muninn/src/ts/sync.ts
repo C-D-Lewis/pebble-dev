@@ -181,6 +181,18 @@ const getUploadId = async (): Promise<string> => {
 }
 
 /**
+ * Ensure the upload ID is ready if possible.
+ */
+export const ensureUploadId = async () => {
+  let uploadId = localStorage.getItem(LS_KEY_UPLOAD_ID);
+  if (!uploadId || uploadId === UPLOAD_ID_EMPTY) {
+    uploadId = await getUploadId();
+  }
+  localStorage.setItem(LS_KEY_UPLOAD_ID, uploadId);
+  return uploadId;
+};
+
+/**
  * Send the watch the last seen timestamp so updates can be incremental.
  */
 export const handleGetSyncInfo = async () => {
@@ -192,12 +204,7 @@ export const handleGetSyncInfo = async () => {
     lastTs = history[0].timestamp;
   }
 
-  // Pre-fetch upload ID for this watchToken for display
-  let uploadId = localStorage.getItem(LS_KEY_UPLOAD_ID);
-  if (!uploadId || uploadId === UPLOAD_ID_EMPTY) {
-    uploadId = await getUploadId();
-  }
-  localStorage.setItem(LS_KEY_UPLOAD_ID, uploadId);
+  const uploadId = await ensureUploadId();
 
   const res = {
     SYNC_TIMESTAMP: lastTs,

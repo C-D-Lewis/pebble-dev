@@ -13,6 +13,4 @@
 void stats_window_push();
 
 void stats_window_reload();
-
-void stats_window_set_upload_status(const char *status);
 #endif

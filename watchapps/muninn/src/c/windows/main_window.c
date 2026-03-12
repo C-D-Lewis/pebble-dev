@@ -403,7 +403,7 @@ static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
 #ifdef FEATURE_ANIMATIONS
   if (!util_is_animating())
 #endif
-    settings_window_push();
+    menu_window_push();
 }
 
 static void down_click_handler(ClickRecognizerRef recognizer, void *context) {

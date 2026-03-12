@@ -188,10 +188,17 @@ void inbox_received_handler(DictionaryIterator *iter, void *context) {
   if (t) {
     const int success = (int)t->value->int32;
     if (success) {
-      stats_window_set_upload_status("Upload successful");
-      qr_window_push();
+      menu_window_set_upload_status("Upload successful");
+      static char s_upload_buff[128];
+      snprintf(
+        s_upload_buff,
+        sizeof(s_upload_buff),
+        "Success! Open the settings for Muninn in the Pebble app to see your full history. (code %s)",
+        app_state->upload_id
+      );
+      message_window_push(s_upload_buff, false, false);
     } else {
-      stats_window_set_upload_status("Upload failed");
+      menu_window_set_upload_status("Upload failed");
     }
     return;
   }

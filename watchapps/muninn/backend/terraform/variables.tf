@@ -7,7 +7,7 @@ variable "region" {
 variable "deletion_protection" {
   type        = string
   description = "Whether DynamoDB deletion protection is enabled"
-  default = false
+  default = true
 }
 
 variable "hosted_zone_id" {

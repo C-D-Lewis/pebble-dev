@@ -1,4 +1,5 @@
-import { handleGetSyncInfo, handleSync, uploadHistory } from './sync';
+import { LS_KEY_UPLOAD_ID } from './constants';
+import { ensureUploadId, handleGetSyncInfo, handleSync, uploadHistory } from './sync';
 import { handlePushTimelinePin } from './timeline';
 
 /**
@@ -12,6 +13,9 @@ const deleteAll = () => {
 Pebble.addEventListener('ready', async (e) => {
   // !!! TEST ONLY
   // deleteAll();
+
+  // Prevent display issues by getting this as early as possible
+  await ensureUploadId();
   
   console.log('PebbleKit JS ready!');
   await PebbleTS.sendAppMessage({ READY: 1 });
@@ -31,4 +35,9 @@ Pebble.addEventListener('appmessage', async (e) => {
     console.log('Failed to handle message');
     console.log(e);
   }
+});
+
+Pebble.addEventListener('showConfiguration', async () => {
+  const id = await ensureUploadId();
+  Pebble.openURL(`https://muninn.chrislewis.me.uk?id=${id}`);
 });

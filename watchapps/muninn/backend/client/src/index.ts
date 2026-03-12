@@ -1,9 +1,11 @@
 import { Fabricate, FabricateComponent } from 'fabricate.js';
 import {
   AppNavBar, Footer, HistoryCard, LoginCard, Braid,
+  NotFoundCard,
 } from './components.ts';
 import { AppState } from './types.ts';
 import Theme from './theme.ts';
+import { fetchWatchHistory } from './api.ts';
 
 declare const fabricate: Fabricate<AppState>;
 
@@ -22,12 +24,12 @@ const AppContent = () => fabricate('Column')
   })
   .setChildren([
     fabricate.conditional(
-      (state) => !state.loading && state.history.length === 0,
+      (state) => !state.loading && state.history.length === 0 && !state.notFound,
       LoginCard,
     ),
     // Save this until it's more useful
     // fabricate.conditional(
-    //   (state) => !state.loading && state.history.length === 0,
+    //   (state) => !state.loading && state.history.length === 0 && !state.notFound,
     //   GlobalStatsCard,
     // ),
     fabricate.conditional(
@@ -43,6 +45,10 @@ const AppContent = () => fabricate('Column')
     fabricate.conditional(
       (state) => !state.loading && state.history.length > 0,
       HistoryCard,
+    ),
+    fabricate.conditional(
+      (state) => !state.loading && state.notFound,
+      NotFoundCard,
     ),
   ]);
 
@@ -61,7 +67,14 @@ const App = () => fabricate('Column')
     AppContent(),
     Braid(),
     Footer(),
-  ]);
+  ])
+  .onCreate(() => {
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('id');
+    if (!id) return;
+
+    fetchWatchHistory(id.toUpperCase());
+  });
 
 // If in the path, use it
 const path = new URL(window.location.href).pathname;
@@ -69,6 +82,7 @@ const id = path.length > 1 ? path.slice(1) : '';
 
 const initialState: AppState = {
   loading: false,
+  notFound: false,
   id,
   history: [],
   platform: '',

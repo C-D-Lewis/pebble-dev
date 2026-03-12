@@ -25,6 +25,17 @@ export const badRequest = (message: string) => {
 };
 
 /**
+ * Create a not found response.
+ *
+ * @param {string} message - The error message (logged only).
+ * @return {object} The response object.
+ */
+export const notFound = (message: string, headers: any = {}) => {
+  console.log(`Not found: ${message}`);
+  return { statusCode: 404, headers };
+};
+
+/**
  * Create an error response.
  *
  * @param {string} message - The error message (logged only).

@@ -6,7 +6,7 @@ const Theme = {
     text: 'white',
     grey: (v: number) => `#${String(v).repeat(3)}`,
     primary: '#7d2725',
-    secondary: '#460f0f',
+    secondary: '#aa2724',
   },
 };
 

@@ -12,12 +12,9 @@ typedef enum {
   MI_LAST_WEEK_RATE,
   MI_NUM_CHARGES,
   MI_MTBC,
-  MI_UPLOAD,
 
   MI_MAX,
 } MenuItems;
-
-static char s_upload_buff[32];
 
 static uint16_t get_num_rows_callback(MenuLayer *menu_layer, uint16_t section_index, void *context) {
   return MI_MAX;
@@ -104,14 +101,6 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
         s_mtbc_buff
       );
       break;
-    case MI_UPLOAD:
-      util_menu_cell_draw(
-        ctx,
-        cell_layer,
-        "View in Web UI",
-        s_upload_buff
-      );
-      break;
     default: break;
   }
 }
@@ -120,23 +109,17 @@ static int16_t get_cell_height_callback(struct MenuLayer *menu_layer, MenuIndex 
   return ROW_HEIGHT_LARGE;
 }
 
-static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) {
-  switch(cell_index->row) {
-    case MI_UPLOAD:
-      snprintf(s_upload_buff, sizeof(s_upload_buff), "Uploading...");
-      comm_upload_history();
-      break;
-    default: break;
-  }
+// static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) {
+//   switch(cell_index->row) {
+//     default: break;
+//   }
 
-  menu_layer_reload_data(s_menu_layer);
-}
+//   menu_layer_reload_data(s_menu_layer);
+// }
 
 static void window_load(Window *window) {
   Layer *root_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(root_layer);
-
-  snprintf(s_upload_buff, sizeof(s_upload_buff), "Confirm to upload");
 
   s_header_layer = util_create_header_layer(PBL_IF_ROUND_ELSE("Historical", "Historical stats"), 32);
   layer_add_child(root_layer, s_header_layer);
@@ -147,7 +130,7 @@ static void window_load(Window *window) {
     .get_num_rows = (MenuLayerGetNumberOfRowsInSectionsCallback)get_num_rows_callback,
     .draw_row = (MenuLayerDrawRowCallback)draw_row_callback,
     .get_cell_height = (MenuLayerGetCellHeightCallback)get_cell_height_callback,
-    .select_click = (MenuLayerSelectCallback)select_callback,
+    // .select_click = (MenuLayerSelectCallback)select_callback,
   });
   layer_add_child(root_layer, menu_layer_get_layer(s_menu_layer));
 }
@@ -175,11 +158,6 @@ void stats_window_push() {
 void stats_window_reload() {
   if (!s_window) return;
   
-  menu_layer_reload_data(s_menu_layer);
-}
-
-void stats_window_set_upload_status(const char *status) {
-  snprintf(s_upload_buff, sizeof(s_upload_buff), "%s", status);
   menu_layer_reload_data(s_menu_layer);
 }
 #endif

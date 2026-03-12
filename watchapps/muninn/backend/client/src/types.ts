@@ -23,6 +23,7 @@ export type GlobalStats = {
 /** State of the fabricate.js app */
 export type AppState = {
   loading: boolean;
+  notFound: boolean;
   id: string;
   history: HistoryItem[];
   platform: string;

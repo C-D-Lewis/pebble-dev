@@ -4,6 +4,7 @@ import zoomPlugin from 'chartjs-plugin-zoom';
 import { AppState } from './types.ts';
 import { fetchGlobalStats, fetchWatchHistory } from './api.ts';
 import Theme from './theme.ts';
+import { STATUS_EMPTY, UI_URL } from './constants.ts';
 
 declare const fabricate: Fabricate<AppState>;
 
@@ -21,6 +22,14 @@ export const Subtitle = () => fabricate('Text')
     textAlign: 'center',
     cursor: 'default',
   });
+
+/**
+ * Text component.
+ *
+ * @returns {FabricateComponent} Fabricate component.
+ */
+export const Text = () => fabricate('Text')
+  .setStyles({ color: 'white', textAlign: 'center' });
 
 /**
  * Annotation component.
@@ -44,7 +53,7 @@ export const Annotation = () => fabricate('Text')
 export const AppNavBar = () => fabricate('Row')
   .setStyles(({ palette }) => ({
     padding: '10px',
-    backgroundColor: palette.secondary,
+    backgroundColor: palette.primary,
     alignItems: 'center',
   }))
   .setChildren([
@@ -117,7 +126,9 @@ export const SearchBox = () => fabricate('Input')
   .onChange(async (el) => {
     const input = el as unknown as HTMLInputElement;
 
-    fabricate.update({ id: input.value });
+    const id = input.value.toUpperCase();
+    input.value = id;
+    fabricate.update({ id });
   });
 
 /**
@@ -136,14 +147,7 @@ export const SubmitButton = () => fabricate('Button')
   .onClick(async (el, { id }) => {
     if (id.length !== 6) return;
 
-    fabricate.update({ loading: true });
-    try {
-      await fetchWatchHistory(id);
-    } catch (err) {
-      alert('Failed to load data. Please check the code and try again.');
-    } finally {
-      fabricate.update({ loading: false });
-    }
+    fetchWatchHistory(id);
   });
 
 /**
@@ -199,7 +203,7 @@ const StatView = ({ label, value }: { label: string, value: string }) => fabrica
   .setStyles(({ palette }) => ({
     backgroundColor: palette.grey(4),
     borderRadius: '5px',
-    padding: '4px',
+    padding: '8px 4px 12px 4px',
     margin: '3px',
     flex: '1',
   }))
@@ -214,7 +218,7 @@ const StatView = ({ label, value }: { label: string, value: string }) => fabrica
     fabricate('Text')
       .setStyles({
         color: 'white',
-        fontSize: '1.1rem',
+        fontSize: '1.2rem',
         textAlign: 'center',
         margin: '0px',
         fontWeight: 'bold',
@@ -239,6 +243,10 @@ const StatsList = () => fabricate('Column')
       mtbc,
     } = stats;
 
+    // Could be empty if not much data
+    const lvarValue = lastWeekRate !== STATUS_EMPTY ? `${lastWeekRate}% per day` : '-';
+    const mtbcValue = mtbc !== STATUS_EMPTY ? `${mtbc} days` : '-';
+
     el.setChildren([
       fabricate('Row')
         .setChildren([
@@ -248,12 +256,12 @@ const StatsList = () => fabricate('Column')
       fabricate('Row')
         .setChildren([
           StatView({ label: 'All-Time Avg. Rate', value: `${allTimeRate}% per day` }),
-          StatView({ label: 'Last Week Avg. Rate', value: `${lastWeekRate}% per day` }),
+          StatView({ label: 'Last Week Avg. Rate', value: lvarValue }),
         ]),
       fabricate('Row')
         .setChildren([
           StatView({ label: 'Charge Events', value: `${numCharges} events` }),
-          StatView({ label: 'Avg. Charge Interval', value: `${mtbc} days` }),
+          StatView({ label: 'Avg. Charge Interval', value: mtbcValue }),
         ]),
     ]);
   });
@@ -265,17 +273,21 @@ const StatsList = () => fabricate('Column')
  */
 const InfoChips = () => fabricate('Column')
   .onCreate((el, state) => {
-    const { model, firmware, platform } = state;
+    const {
+      id,
+      model,
+      firmware,
+      platform,
+    } = state;
 
     el.setChildren([
       fabricate('Row')
+        .setStyles({ flexWrap: 'wrap' })
         .setChildren([
           InfoChip({ label: 'Model', value: model }),
-        ]),
-      fabricate('Row')
-        .setChildren([
           InfoChip({ label: 'Firmware', value: firmware }),
           InfoChip({ label: 'Platform', value: platform }),
+          InfoChip({ label: 'Muninn ID', value: id }),
         ]),
     ]);
   });
@@ -285,84 +297,89 @@ const InfoChips = () => fabricate('Column')
  *
  * @returns {FabricateComponent} Fabricate component.
  */
-const HistoryChart = () => fabricate('div')
-  .setStyles(({ palette }) => ({
-    maxWidth: '100%',
-    maxHeight: '500px',
-    borderRadius: '5px',
-    backgroundColor: palette.grey(2),
-    padding: '4px',
-  }))
-  .onCreate((el, state) => {
-    const canvas = fabricate('canvas')
-      .setStyles({ width: '100%', height: '100%' });
-    el.setChildren([canvas]);
+const HistoryChart = () => {
+  // TODO: Use to filter data on this week / last two charges / all time
+  let chartRef;
 
-    // @ts-expect-error - Chart.js types problem
-    Chart.register(zoomPlugin);
+  return fabricate('div')
+    .setStyles(({ palette }) => ({
+      maxWidth: '100%',
+      maxHeight: '500px',
+      borderRadius: '5px',
+      backgroundColor: palette.grey(2),
+      padding: '4px',
+    }))
+    .onCreate((el, state) => {
+      const canvas = fabricate('canvas')
+        .setStyles({ width: '100%', height: '100%' });
+      el.setChildren([canvas]);
 
-    // Using chart.js
-    const opts: ChartConfiguration = {
-      type: 'line',
-      data: {
-        labels: state.history.map((entry) => {
-          const d = new Date(entry.ts * 1000);
-          return d.toLocaleString('en-GB', { day: 'numeric', month: 'short' });
-        }),
-        datasets: [
-          {
-            label: 'Battery Level',
-            data: state.history.map((entry) => entry.cp),
-            borderColor: Theme.palette.primary,
-            backgroundColor: 'transparent',
-            tension: 0.1,
-            clip: false,
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          x: {
-            ticks: {
-              maxTicksLimit: 10,
+      // @ts-expect-error - Chart.js types problem
+      Chart.register(zoomPlugin);
+
+      // Using chart.js
+      const opts: ChartConfiguration = {
+        type: 'line',
+        data: {
+          labels: state.history.map((entry) => {
+            const d = new Date(entry.ts * 1000);
+            return d.toLocaleString('en-GB', { day: 'numeric', month: 'short' });
+          }),
+          datasets: [
+            {
+              label: 'Battery Level',
+              data: state.history.map((entry) => entry.cp),
+              borderColor: Theme.palette.secondary,
+              backgroundColor: 'transparent',
+              tension: 0.1,
+              clip: false,
             },
-          },
-          y: {
-            beginAtZero: true,
-            max: 100,
-            grace: '5%',
-          },
+          ],
         },
-        plugins: {
-          legend: {
-            display: false,
-            position: 'bottom',
-            align: 'center',
-            labels: {
-              color: Theme.palette.primary,
-              font: {
-                size: 14,
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: {
+              ticks: {
+                maxTicksLimit: 10,
               },
-              usePointStyle: true,
-              pointStyle: 'rounded',
+            },
+            y: {
+              beginAtZero: true,
+              max: 100,
+              grace: '5%',
             },
           },
-          zoom: {
-            zoom: {
-              wheel: { enabled: true },
-              pinch: { enabled: true },
-              mode: 'x',
+          plugins: {
+            legend: {
+              display: false,
+              position: 'bottom',
+              align: 'center',
+              labels: {
+                color: Theme.palette.primary,
+                font: {
+                  size: 14,
+                },
+                usePointStyle: true,
+                pointStyle: 'rounded',
+              },
             },
-            pan: { enabled: true, mode: 'x' },
+            zoom: {
+              zoom: {
+                wheel: { enabled: true },
+                pinch: { enabled: true },
+                mode: 'x',
+              },
+              pan: { enabled: true, mode: 'x' },
+            },
           },
         },
-      },
-    };
-    // eslint-disable-next-line no-new
-    new Chart(canvas as unknown as HTMLCanvasElement, opts);
-  });
+      };
+      // eslint-disable-next-line no-new
+      chartRef = new Chart(canvas as unknown as HTMLCanvasElement, opts);
+    });
+};
 
 /**
  * GlobalStatsList component.
@@ -388,6 +405,20 @@ const GlobalStatsList = () => fabricate('Column')
         ]),
     ]);
   }, ['globalStats']);
+
+/**
+ * ShareLink component.
+ *
+ * @returns {FabricateComponent} Fabricate component.
+ */
+const ShareLink = () => fabricate('a')
+  .setStyles({ color: 'white', textAlign: 'center' })
+  .onCreate((el, { id }) => {
+    const shareUrl = `${UI_URL}?id=${id}`;
+
+    el.setAttributes({ href: shareUrl, target: '_blank' });
+    el.setText(shareUrl);
+  });
 
 /**
  * AppCard component.
@@ -419,9 +450,7 @@ export const LoginCard = () => AppCard()
   .setChildren([
     Subtitle()
       .setText('Welcome!'),
-    fabricate('Text')
-      .setStyles({ color: 'white', textAlign: 'center' })
-      .setText('Please enter the six digit code shown on your watch:'),
+    Text().setText('Please enter the six digit code shown on your watch:'),
     fabricate('Row')
       .setStyles({ marginTop: '10px', alignItems: 'center', justifyContent: 'center' })
       .setChildren([
@@ -438,9 +467,7 @@ export const LoginCard = () => AppCard()
 export const HistoryCard = () => AppCard()
   .setChildren([
     Subtitle().setText('Your History'),
-    fabricate('Text')
-      .setStyles({ color: 'white', textAlign: 'center' })
-      .setText('Below is the complete battery history as uploaded from Muninn.'),
+    Text().setText('Below is the complete battery history as uploaded from Muninn.'),
     Separator(),
     Subtitle().setText('All-time Graph'),
     HistoryChart(),
@@ -451,6 +478,9 @@ export const HistoryCard = () => AppCard()
     Separator(),
     Subtitle().setText('Watch Info'),
     InfoChips(),
+    Separator(),
+    Subtitle().setText('Share'),
+    ShareLink(),
     Separator(),
     Annotation().setText('That\'s all we know - thanks for using Muninn!'),
   ]);
@@ -465,6 +495,22 @@ export const GlobalStatsCard = () => AppCard()
   .setChildren([
     Subtitle().setText('Global Stats'),
     GlobalStatsList(),
+  ]);
+
+/**
+ * NotFoundCard component.
+ *
+ * @returns {FabricateComponent} Fabricate component.
+ */
+export const NotFoundCard = () => AppCard()
+  .setStyles({ marginTop: '25px' })
+  .setChildren([
+    fabricate('Image', { src: 'assets/images/not-found.png' })
+      .setStyles({ width: '96px', height: '96px', margin: 'auto' }),
+    Subtitle().setText('Not Found'),
+    Text()
+      .setStyles({ maxWidth: '350px' })
+      .setText('No data was found for this code.\n\nUse the upload option in the watchapp to start seeing data here.'),
   ]);
 
 /**

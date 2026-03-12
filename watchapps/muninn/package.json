@@ -18,7 +18,7 @@
       "flint"
     ],
     "enableMultiJS": true,
-    "capabilities": [],
+    "capabilities": ["configurable"],
     "projectType": "native",
     "displayName": "Muninn",
     "uuid": "d008a08a-6e34-4cc4-98dc-bae02ce5e087",
@@ -110,11 +110,6 @@
           "type": "png",
           "name": "BIRD",
           "file": "images/bird.png"
-        },
-        {
-          "type": "png",
-          "name": "QR_CODE",
-          "file": "images/qr.png"
         },
         {
           "type": "font",

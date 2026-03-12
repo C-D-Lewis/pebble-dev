@@ -6,10 +6,9 @@
 
 #include "data.h"
 
-#include "../windows/stats_window.h"
+#include "../windows/menu_window.h"
 #include "../windows/settings_window.h"
 #include "../windows/message_window.h"
-#include "../windows/qr_window.h"
 
 void comm_init();
 

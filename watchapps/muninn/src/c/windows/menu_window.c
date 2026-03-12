@@ -4,19 +4,21 @@ static Window *s_window;
 static MenuLayer *s_menu_layer;
 static Layer *s_header_layer;
 
-static bool s_reset_confirm;
-
 typedef enum {
-  MI_VIBE_ON_SAMPLE,
-  MI_CUSTOM_ALERT_LEVEL,
-  MI_PUSH_TIMELINE_PINS,
-  MI_ELEVATED_RATE_ALERT,
-  MI_ONE_DAY_ALERT,
-
-  MI_DELETE_ALL_DATA,
+  MI_SETTINGS,
+#ifdef FEATURE_SYNC
+  MI_SYNC_INFO,
+  MI_UPLOAD,
+#endif
+  MI_BATTERY_TIPS,
+  MI_VERSION,
 
   MI_MAX,
 } MenuItems;
+
+#ifdef FEATURE_SYNC
+static char s_upload_buff[32];
+#endif
 
 static uint16_t get_num_rows_callback(MenuLayer *menu_layer, uint16_t section_index, void *context) {
   return MI_MAX;
@@ -26,77 +28,68 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
   PersistData *persist_data = data_get_persist_data();
   AppState *app_state = data_get_app_state();
 
-  // Alert level detail
-  const int alert_level = persist_data->custom_alert_level;
-  const bool alert_disabled = alert_level == AL_OFF;
-  static char s_alert_buff[24];
-  if (!alert_disabled) {
-    snprintf(s_alert_buff, sizeof(s_alert_buff), "Notify near %d%%", alert_level);
+  // Sync status
+  static char s_sync_buff[20];
+  const int sync_count = app_state->sync_count;
+  if (sync_count == STATUS_EMPTY) {
+    snprintf(s_sync_buff, sizeof(s_sync_buff), "Loading...");
+  } else {
+    // None yet, or first sync is in progress
+    if (sync_count == 0) {
+      snprintf(s_sync_buff, sizeof(s_sync_buff), "Syncing soon");
+    } else {
+      snprintf(s_sync_buff, sizeof(s_sync_buff), "%d samples", sync_count);
+    }
   }
 
   switch(cell_index->row) {
-    case MI_VIBE_ON_SAMPLE:
+    case MI_SETTINGS:
+      util_menu_cell_draw(ctx, cell_layer, "Settings", NULL);
+      break;
+#ifdef FEATURE_SYNC
+    case MI_SYNC_INFO:
       util_menu_cell_draw(
         ctx,
         cell_layer,
-        "Vibrate on Sample",
-        persist_data->vibe_on_sample ? "Enabled" : "Disabled"
+        "Historical Stats",
+        s_sync_buff
       );
       break;
-    case MI_CUSTOM_ALERT_LEVEL:
+    case MI_UPLOAD:
       util_menu_cell_draw(
         ctx,
         cell_layer,
-        "Custom Alert",
-        alert_disabled ? "Disabled" : s_alert_buff
+        "View All on Web",
+        s_upload_buff
       );
       break;
-    case MI_PUSH_TIMELINE_PINS:
+#endif
+    case MI_BATTERY_TIPS:
+      util_menu_cell_draw(ctx, cell_layer, "Battery tips", NULL);
+      break;
+    case MI_VERSION: {
+      static char s_v_buff[16];
+      snprintf(s_v_buff, sizeof(s_v_buff), "Version %s", VERSION);
       util_menu_cell_draw(
         ctx,
         cell_layer,
-        "Timeline Pins",
-        persist_data->push_timeline_pins ? "Enabled" : "Disabled"
+        "About Muninn",
+        s_v_buff
       );
       break;
-    case MI_ELEVATED_RATE_ALERT:
-      util_menu_cell_draw(
-        ctx,
-        cell_layer,
-        "High Drain Alert",
-        persist_data->elevated_rate_alert ? "Enabled" : "Disabled"
-      );
-      break;
-    case MI_ONE_DAY_ALERT:
-      util_menu_cell_draw(
-        ctx,
-        cell_layer,
-        "One Day Left Alert",
-        persist_data->one_day_alert ? "Enabled" : "Disabled"
-      );
-      break;
-    case MI_DELETE_ALL_DATA:
-      util_menu_cell_draw(
-        ctx,
-        cell_layer,
-        "Delete All Data",
-        s_reset_confirm ? "Tap again to confirm" : NULL
-      );
-      break;
+    }
     default: break;
   }
 }
 
 static int16_t get_cell_height_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) {
   switch(cell_index->row) {
-    case MI_VIBE_ON_SAMPLE:
-    case MI_CUSTOM_ALERT_LEVEL:
-    case MI_PUSH_TIMELINE_PINS:
-    case MI_ELEVATED_RATE_ALERT:
-    case MI_ONE_DAY_ALERT:
+#ifdef FEATURE_SYNC
+    case MI_SYNC_INFO:
+    case MI_UPLOAD:
+#endif
+    case MI_VERSION:
       return ROW_HEIGHT_LARGE;
-    case MI_DELETE_ALL_DATA:
-      return s_reset_confirm ? ROW_HEIGHT_LARGE : ROW_HEIGHT_SMALL;
     default:
       return ROW_HEIGHT_SMALL;
   }
@@ -106,36 +99,24 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
   PersistData *persist_data = data_get_persist_data();
 
   switch(cell_index->row) {
-    // Options
-    case MI_VIBE_ON_SAMPLE:
-      persist_data->vibe_on_sample = !persist_data->vibe_on_sample;
+    case MI_SETTINGS:
+      settings_window_push();
       break;
-    case MI_CUSTOM_ALERT_LEVEL:
-      data_cycle_custom_alert_level();
-      break;
-    case MI_PUSH_TIMELINE_PINS:
-      persist_data->push_timeline_pins = !persist_data->push_timeline_pins;
-      break;
-    case MI_ELEVATED_RATE_ALERT:
-      persist_data->elevated_rate_alert = !persist_data->elevated_rate_alert;
-      break;
-    case MI_ONE_DAY_ALERT:
-      persist_data->one_day_alert = !persist_data->one_day_alert;
-      break;
-
-    case MI_DELETE_ALL_DATA:
-      if (s_reset_confirm) {
 #ifdef FEATURE_SYNC
-        comm_request_deletion();
+    case MI_SYNC_INFO: {
+      AppState *app_state = data_get_app_state();
+      if (app_state->sync_count > 0) stats_window_push();
+    } break;
+    case MI_UPLOAD:
+      snprintf(s_upload_buff, sizeof(s_upload_buff), "Uploading...");
+      comm_upload_history();
+      break;
 #endif
-        data_reset_all();
-        vibes_double_pulse();
-        window_stack_pop_all(true);
-      } else {
-        vibes_long_pulse();
-      }
-
-      s_reset_confirm = !s_reset_confirm;
+    case MI_BATTERY_TIPS:
+      message_window_push(MSG_TIPS, false, false);
+      break;
+    case MI_VERSION:
+      message_window_push(MSG_INFORMATION, false, false);
       break;
     default: break;
   }
@@ -165,13 +146,11 @@ static void window_unload(Window *window) {
   menu_layer_destroy(s_menu_layer);
   layer_destroy(s_header_layer);
 
-  s_reset_confirm = false;
-
   window_destroy(window);
   s_window = NULL;
 }
 
-void settings_window_push() {
+void menu_window_push() {
   if (!s_window) {
     s_window = window_create();
     window_set_window_handlers(s_window, (WindowHandlers) {
@@ -180,11 +159,22 @@ void settings_window_push() {
     });
   }
 
+#ifdef FEATURE_SYNC
+  snprintf(s_upload_buff, sizeof(s_upload_buff), "Press to share");
+#endif
+
   window_stack_push(s_window, true);
 }
 
-void settings_window_reload() {
+void menu_window_reload() {
   if(!s_window) return;
   
   menu_layer_reload_data(s_menu_layer);
 }
+
+#ifdef FEATURE_SYNC
+void menu_window_set_upload_status(const char *status) {
+  snprintf(s_upload_buff, sizeof(s_upload_buff), "%s", status);
+  menu_layer_reload_data(s_menu_layer);
+}
+#endif
