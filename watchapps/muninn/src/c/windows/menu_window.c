@@ -96,8 +96,6 @@ static int16_t get_cell_height_callback(struct MenuLayer *menu_layer, MenuIndex 
 }
 
 static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) {
-  PersistData *persist_data = data_get_persist_data();
-
   switch(cell_index->row) {
     case MI_SETTINGS:
       settings_window_push();
@@ -107,10 +105,12 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
       AppState *app_state = data_get_app_state();
       if (app_state->sync_count > 0) stats_window_push();
     } break;
-    case MI_UPLOAD:
+    case MI_UPLOAD: {
+      if (data_get_log_length() < MIN_SAMPLES_FOR_GRAPH) return;
+
       snprintf(s_upload_buff, sizeof(s_upload_buff), "Uploading...");
       comm_upload_history();
-      break;
+    } break;
 #endif
     case MI_BATTERY_TIPS:
       message_window_push(MSG_TIPS, false, false);
@@ -160,7 +160,11 @@ void menu_window_push() {
   }
 
 #ifdef FEATURE_SYNC
-  snprintf(s_upload_buff, sizeof(s_upload_buff), "Press to share");
+  if (data_get_log_length() < MIN_SAMPLES_FOR_GRAPH) {
+    snprintf(s_upload_buff, sizeof(s_upload_buff), "Not enough samples");
+  } else {
+    snprintf(s_upload_buff, sizeof(s_upload_buff), "Press to share");
+  }
 #endif
 
   window_stack_push(s_window, true);
