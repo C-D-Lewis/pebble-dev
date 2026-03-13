@@ -37,7 +37,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
   } else {
     // Not enough yet, or first sync is in progress
     if (sync_count < MIN_SAMPLES_FOR_GRAPH) {
-      snprintf(s_sync_buff, sizeof(s_sync_buff), "Available soon");
+      snprintf(s_sync_buff, sizeof(s_sync_buff), "Awaiting samples...");
     } else {
       snprintf(s_sync_buff, sizeof(s_sync_buff), "%d samples", sync_count);
     }
@@ -50,7 +50,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
     snprintf(
       s_upload_buff,
       sizeof(s_upload_buff),
-      data_get_log_length() < MIN_SAMPLES_FOR_GRAPH ? "Available soon" : "Press to share"
+      data_get_log_length() < MIN_SAMPLES_FOR_GRAPH ? "Awaiting samples..." : "Press to share"
     );
   }
 #endif
@@ -64,7 +64,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
       util_menu_cell_draw(
         ctx,
         cell_layer,
-        "Historical Stats",
+        "Extended Stats",
         s_sync_buff
       );
       break;
@@ -72,7 +72,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
       util_menu_cell_draw(
         ctx,
         cell_layer,
-        "View All on Web",
+        "View More on Web",
         s_upload_buff
       );
       break;

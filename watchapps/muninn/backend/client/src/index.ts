@@ -2,6 +2,7 @@ import { Fabricate, FabricateComponent } from 'fabricate.js';
 import {
   AppNavBar, Footer, HistoryCard, LoginCard, Braid,
   NotFoundCard,
+  AppLoader,
 } from './components.ts';
 import { AppState } from './types.ts';
 import Theme from './theme.ts';
@@ -34,13 +35,7 @@ const AppContent = () => fabricate('Column')
     // ),
     fabricate.conditional(
       (state) => state.loading && state.history.length === 0,
-      () => fabricate('Loader', {
-        size: 48,
-        lineWidth: 5,
-        color: Theme.palette.primary,
-        backgroundColor: Theme.palette.grey(4),
-      })
-        .setStyles({ margin: 'auto', marginTop: '15px' }),
+      AppLoader,
     ),
     fabricate.conditional(
       (state) => !state.loading && state.history.length > 0,
@@ -83,6 +78,8 @@ const id = path.length > 1 ? path.slice(1) : '';
 const initialState: AppState = {
   loading: false,
   notFound: false,
+  chartMode: 'all',
+
   id,
   history: [],
   platform: '',
@@ -96,6 +93,7 @@ const initialState: AppState = {
     numCharges: 0,
     mtbc: 0,
   },
+
   globalStats: {
     totalUploads: 0,
   },

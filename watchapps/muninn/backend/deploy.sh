@@ -19,12 +19,6 @@ cd client
 
 printf "\n\n>>> Building site\n\n"
 npm run build
-  
-# Check no changes resulted
-if [[ ! -z $(git status -s) ]]; then
-  echo "There are uncommitted changes after build!"
-  exit 1
-fi
 
 ############################################ Push site #############################################
 

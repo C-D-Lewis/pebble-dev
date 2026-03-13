@@ -34,10 +34,16 @@ is:
 Install:
 
 * AWS CLI
-* Terraform via `tfswitch` or similar
+* Terraform
 
 Setup AWS credentials that can manage the DynamoDB, Lambda, API Gateway, S3,
 CloudFront, and Route53 APIs required.
+
+Install dependencies in the `client` and `lambda` directories:
+
+```shell
+npm install
+```
 
 Finally, run the deploy script - Terraform manages the Lambda TypeScript build,
 and the static site assets are built with Vite and uploaded to S3.

@@ -16,19 +16,29 @@ export type Stats = {
   mtbc: number;
 };
 
+/** Global API data */
 export type GlobalStats = {
   totalUploads: number;
-}
+};
+
+/** Chart modes */
+export type ChartMode = 'all' | 'lastWeek' | 'lastMonth';
 
 /** State of the fabricate.js app */
 export type AppState = {
+  // App state
   loading: boolean;
   notFound: boolean;
+  chartMode: ChartMode;
+
+  // User API data
   id: string;
   history: HistoryItem[];
   platform: string;
   model: string;
   firmware: string;
   stats: Stats;
+
+  // Global API data
   globalStats: GlobalStats;
 };

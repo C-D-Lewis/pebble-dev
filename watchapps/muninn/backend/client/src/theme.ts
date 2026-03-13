@@ -5,7 +5,7 @@ const Theme = {
   palette: {
     text: 'white',
     grey: (v: number) => `#${String(v).repeat(3)}`,
-    primary: '#7d2725',
+    primary: '#900427',
     secondary: '#aa2724',
   },
 };

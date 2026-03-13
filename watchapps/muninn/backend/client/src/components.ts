@@ -1,10 +1,15 @@
 import { Fabricate, FabricateComponent } from 'fabricate.js';
 import Chart, { ChartConfiguration } from 'chart.js/auto';
 import zoomPlugin from 'chartjs-plugin-zoom';
-import { AppState } from './types.ts';
+import { AppState, ChartMode, HistoryItem } from './types.ts';
 import { fetchGlobalStats, fetchWatchHistory } from './api.ts';
 import Theme from './theme.ts';
-import { STATUS_EMPTY, UI_URL } from './constants.ts';
+import {
+  ONE_MONTH_AGO,
+  ONE_WEEK_AGO,
+  STATUS_EMPTY,
+  UI_URL,
+} from './constants.ts';
 
 declare const fabricate: Fabricate<AppState>;
 
@@ -52,7 +57,7 @@ export const Annotation = () => fabricate('Text')
  */
 export const AppNavBar = () => fabricate('Row')
   .setStyles(({ palette }) => ({
-    padding: '10px',
+    padding: '2px 10px',
     backgroundColor: palette.primary,
     alignItems: 'center',
   }))
@@ -60,8 +65,8 @@ export const AppNavBar = () => fabricate('Row')
     fabricate('Image')
       .setAttributes({ src: 'assets/images/icon.png' })
       .setStyles({
-        width: '40px',
-        height: '40px',
+        width: '48px',
+        height: '48px',
         margin: '0px 10px',
         borderRadius: '50px',
       }),
@@ -132,17 +137,24 @@ export const SearchBox = () => fabricate('Input')
   });
 
 /**
+ * AppButton component.
+ *
+ * @returns {FabricateComponent} Fabricate component.
+ */
+const AppButton = () => fabricate('Button')
+  .setStyles(({ palette }) => ({
+    padding: '9px',
+    backgroundColor: palette.primary,
+    color: 'white',
+  }));
+
+/**
  * SubmitButton component.
  *
  * @returns {FabricateComponent} Fabricate component.
  */
-export const SubmitButton = () => fabricate('Button')
-  .setStyles(({ palette }) => ({
-    marginLeft: '10px',
-    padding: '9px 4px',
-    backgroundColor: palette.primary,
-    color: 'white',
-  }))
+export const SubmitButton = () => AppButton()
+  .setStyles({ marginLeft: '10px' })
   .setText('Search')
   .onClick(async (el, { id }) => {
     if (id.length !== 6) return;
@@ -164,6 +176,19 @@ const Separator = () => fabricate('div')
   }));
 
 /**
+ * AppLoader component.
+ *
+ * @returns {FabricateComponent} Fabricate component.
+ */
+export const AppLoader = () => fabricate('Loader', {
+  size: 48,
+  lineWidth: 5,
+  color: Theme.palette.primary,
+  backgroundColor: Theme.palette.grey(4),
+})
+  .setStyles({ margin: 'auto', marginTop: '15px' });
+
+/**
  * InfoChip component.
  *
  * @param {object} props - Component props.
@@ -175,7 +200,6 @@ const InfoChip = ({ label, value }: { label: string, value: string }) => fabrica
   .setStyles(({ palette }) => ({
     backgroundColor: palette.grey(4),
     borderRadius: '5px',
-    padding: '4px',
     margin: '3px',
     alignItems: 'center',
   }))
@@ -247,6 +271,11 @@ const StatsList = () => fabricate('Column')
     const lvarValue = lastWeekRate !== STATUS_EMPTY ? `${lastWeekRate}% per day` : '-';
     const mtbcValue = mtbc !== STATUS_EMPTY ? `${mtbc} days` : '-';
 
+    const atelValue = Math.round(100 / allTimeRate);
+    const lwelValue = lastWeekRate !== STATUS_EMPTY
+      ? `${Math.round(100 / lastWeekRate)} days`
+      : '-';
+
     el.setChildren([
       fabricate('Row')
         .setChildren([
@@ -255,13 +284,18 @@ const StatsList = () => fabricate('Column')
         ]),
       fabricate('Row')
         .setChildren([
-          StatView({ label: 'All-Time Avg. Rate', value: `${allTimeRate}% per day` }),
+          StatView({ label: 'Avg. Discharge Rate', value: `${allTimeRate}% per day` }),
           StatView({ label: 'Last Week Avg. Rate', value: lvarValue }),
         ]),
       fabricate('Row')
         .setChildren([
           StatView({ label: 'Charge Events', value: `${numCharges} events` }),
           StatView({ label: 'Avg. Charge Interval', value: mtbcValue }),
+        ]),
+      fabricate('Row')
+        .setChildren([
+          StatView({ label: 'Est. Battery Life', value: `${atelValue} days` }),
+          StatView({ label: 'Last Week Est. Life', value: lwelValue }),
         ]),
     ]);
   });
@@ -299,7 +333,52 @@ const InfoChips = () => fabricate('Column')
  */
 const HistoryChart = () => {
   // TODO: Use to filter data on this week / last two charges / all time
-  let chartRef;
+  let chartRef: Chart;
+
+  /**
+   * Filter a HistoryItem using current mode.
+   *
+   * @param {HistoryItem} item - Item to filter.
+   * @param {ChartMode} mode - Current chart mode.
+   * @returns {boolean} true if should be included.
+   */
+  const filterHistoryItem = (item: HistoryItem, mode: ChartMode) => {
+    const date = new Date(item.ts * 1000);
+    console.log(JSON.stringify({
+      date,
+      ONE_MONTH_AGO,
+      ONE_WEEK_AGO,
+      now: Date.now(),
+    }));
+    if (mode === 'lastWeek') return date.getTime() >= ONE_WEEK_AGO;
+    if (mode === 'lastMonth') return date.getTime() >= ONE_MONTH_AGO;
+    return true;
+  };
+
+  /**
+   * Create labels with a mode and history to filter.
+   *
+   * @param {HistoryItem[]} history - History of samples to use.
+   * @param {ChartMode} mode - Chart mode to use.
+   * @returns {string[]} Labels to use.
+   */
+  const createLabels = (history: HistoryItem[], mode: ChartMode) => history
+    .filter((p) => filterHistoryItem(p, mode))
+    .map((item) => {
+      const d = new Date(item.ts * 1000);
+      return d.toLocaleString('en-GB', { day: 'numeric', month: 'short' });
+    });
+
+  /**
+   * Create history datapoints with a mode and history to filter.
+   *
+   * @param {HistoryItem[]} history - History of samples to use.
+   * @param {ChartMode} mode - Chart mode to use.
+   * @returns {string[]} Labels to use.
+   */
+  const createHistoryData = (history: HistoryItem[], mode: ChartMode) => history
+    .filter((p) => filterHistoryItem(p, mode))
+    .map((p) => p.cp);
 
   return fabricate('div')
     .setStyles(({ palette }) => ({
@@ -308,8 +387,9 @@ const HistoryChart = () => {
       borderRadius: '5px',
       backgroundColor: palette.grey(2),
       padding: '4px',
+      marginTop: '8px',
     }))
-    .onCreate((el, state) => {
+    .onCreate((el, { history, chartMode }) => {
       const canvas = fabricate('canvas')
         .setStyles({ width: '100%', height: '100%' });
       el.setChildren([canvas]);
@@ -321,14 +401,11 @@ const HistoryChart = () => {
       const opts: ChartConfiguration = {
         type: 'line',
         data: {
-          labels: state.history.map((entry) => {
-            const d = new Date(entry.ts * 1000);
-            return d.toLocaleString('en-GB', { day: 'numeric', month: 'short' });
-          }),
+          labels: createLabels(history, chartMode),
           datasets: [
             {
               label: 'Battery Level',
-              data: state.history.map((entry) => entry.cp),
+              data: createHistoryData(history, chartMode),
               borderColor: Theme.palette.secondary,
               backgroundColor: 'transparent',
               tension: 0.1,
@@ -378,7 +455,13 @@ const HistoryChart = () => {
       };
       // eslint-disable-next-line no-new
       chartRef = new Chart(canvas as unknown as HTMLCanvasElement, opts);
-    });
+    })
+    .onUpdate((el, { history, chartMode }) => {
+      chartRef.data.labels = createLabels(history, chartMode);
+      chartRef.data.datasets[0].data = createHistoryData(history, chartMode);
+
+      chartRef.update();
+    }, ['chartMode']);
 };
 
 /**
@@ -389,7 +472,7 @@ const HistoryChart = () => {
 const GlobalStatsList = () => fabricate('Column')
   .onCreate((el) => {
     el.setChildren([
-      fabricate('Loader'),
+      AppLoader(),
     ]);
 
     fetchGlobalStats();
@@ -419,6 +502,39 @@ const ShareLink = () => fabricate('a')
     el.setAttributes({ href: shareUrl, target: '_blank' });
     el.setText(shareUrl);
   });
+
+/**
+ * ChartModeButton component.
+ *
+ * @param {object} props - Component props.
+ * @param {string} props.label - Button label.
+ * @param {ChartMode} props.mode - Mode to set when pressed.
+ * @returns {FabricateComponent} Fabricate component.
+ */
+const ChartModeButton = ({ label, mode }: { label: string, mode: ChartMode }) => AppButton()
+  .setStyles({ padding: '4px', fontSize: '0.8rem' })
+  .setText(label)
+  .onClick(() => fabricate.update({ chartMode: mode }))
+  .onUpdate((el, { chartMode }) => {
+    const isMe = mode === chartMode;
+    el.setStyles(({ palette }) => ({
+      backgroundColor: isMe ? palette.primary : palette.grey(4),
+      fontWeight: isMe ? 'bold' : 'initial',
+    }));
+  }, [fabricate.StateKeys.Created, 'chartMode']);
+
+/**
+ * ChartModeBar component.
+ *
+ * @returns {FabricateComponent} Fabricate component.
+ */
+const ChartModeBar = () => fabricate('Row')
+  .setStyles({ justifyContent: 'center', marginTop: '10px' })
+  .setChildren([
+    ChartModeButton({ label: 'All', mode: 'all' }),
+    ChartModeButton({ label: 'Last Week', mode: 'lastWeek' }),
+    ChartModeButton({ label: 'Last Month', mode: 'lastMonth' }),
+  ]);
 
 /**
  * AppCard component.
@@ -471,6 +587,7 @@ export const HistoryCard = () => AppCard()
     Separator(),
     Subtitle().setText('All-time Graph'),
     HistoryChart(),
+    ChartModeBar(),
     Annotation().setText('Try zooming and panning to see more detail.'),
     Separator(),
     Subtitle().setText('All-time Stats'),

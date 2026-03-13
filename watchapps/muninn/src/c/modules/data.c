@@ -41,13 +41,13 @@ static void init_data_fields() {
   s_persist_data.wakeup_id = STATUS_EMPTY;
   s_persist_data.seen_first_launch = false;
   s_persist_data.vibe_on_sample = false;
-  s_persist_data.custom_alert_level = AL_OFF;
+  s_persist_data.custom_alert_level = AL_20;
   s_persist_data.ca_has_notified = false;
-  s_persist_data.push_timeline_pins = false;
-  s_persist_data.elevated_rate_alert = false;
-  s_persist_data.one_day_notified = false;
+  s_persist_data.push_timeline_pins = true;
+  s_persist_data.elevated_rate_alert = true;
   s_persist_data.last_charge_time = STATUS_EMPTY;
-  s_persist_data.one_day_alert = false;
+  s_persist_data.one_day_alert = true;
+  s_persist_data.one_day_notified = false;
 
   for (int i = 0; i < NUM_SAMPLES; i++) {
     Sample *s = &s_samples[i];
