@@ -17,6 +17,7 @@ typedef enum {
 } MenuItems;
 
 #ifdef FEATURE_SYNC
+static char s_sync_buff[20];
 static char s_upload_buff[32];
 #endif
 
@@ -28,19 +29,31 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
   PersistData *persist_data = data_get_persist_data();
   AppState *app_state = data_get_app_state();
 
+#ifdef FEATURE_SYNC
   // Sync status
-  static char s_sync_buff[20];
   const int sync_count = app_state->sync_count;
   if (sync_count == STATUS_EMPTY) {
     snprintf(s_sync_buff, sizeof(s_sync_buff), "Loading...");
   } else {
-    // None yet, or first sync is in progress
-    if (sync_count == 0) {
-      snprintf(s_sync_buff, sizeof(s_sync_buff), "Syncing soon");
+    // Not enough yet, or first sync is in progress
+    if (sync_count < MIN_SAMPLES_FOR_GRAPH) {
+      snprintf(s_sync_buff, sizeof(s_sync_buff), "Available soon");
     } else {
       snprintf(s_sync_buff, sizeof(s_sync_buff), "%d samples", sync_count);
     }
   }
+
+  // Upload status
+  if (strlen(app_state->upload_id) == 0) {
+    snprintf(s_upload_buff, sizeof(s_upload_buff), "Loading...");
+  } else {
+    snprintf(
+      s_upload_buff,
+      sizeof(s_upload_buff),
+      data_get_log_length() < MIN_SAMPLES_FOR_GRAPH ? "Available soon" : "Press to share"
+    );
+  }
+#endif
 
   switch(cell_index->row) {
     case MI_SETTINGS:
@@ -108,7 +121,6 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
     case MI_UPLOAD: {
       if (data_get_log_length() < MIN_SAMPLES_FOR_GRAPH) return;
 
-      snprintf(s_upload_buff, sizeof(s_upload_buff), "Uploading...");
       comm_upload_history();
     } break;
 #endif
@@ -159,14 +171,6 @@ void menu_window_push() {
     });
   }
 
-#ifdef FEATURE_SYNC
-  if (data_get_log_length() < MIN_SAMPLES_FOR_GRAPH) {
-    snprintf(s_upload_buff, sizeof(s_upload_buff), "Not enough samples");
-  } else {
-    snprintf(s_upload_buff, sizeof(s_upload_buff), "Press to share");
-  }
-#endif
-
   window_stack_push(s_window, true);
 }
 
@@ -175,10 +179,3 @@ void menu_window_reload() {
   
   menu_layer_reload_data(s_menu_layer);
 }
-
-#ifdef FEATURE_SYNC
-void menu_window_set_upload_status(const char *status) {
-  snprintf(s_upload_buff, sizeof(s_upload_buff), "%s", status);
-  menu_layer_reload_data(s_menu_layer);
-}
-#endif

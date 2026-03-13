@@ -1,5 +1,4 @@
 import {
-  LS_KEY_UPLOAD_ID,
   MAX_SYNC_ITEMS,
   MIN_CHARGE_AMOUNT,
   SECONDS_PER_DAY,
@@ -13,11 +12,22 @@ import {
 import { HistoryItem, UploadHistoryItem } from './types';
 import { generateTestData } from './util';
 
-/** LocalStorage key - data history on a per-watch basis */
+/**
+ * LocalStorage key - data history on a per-watch basis
+ */
 const buildHistoryKey = () => {
   const key = `history-${Pebble.getWatchToken()}`;
   console.log(JSON.stringify({ key }));
   return key;
+};
+
+/**
+ * LocalStorage key - upload ID on a per-watch basis
+ */
+const buildUploadKey = () => {
+  const uploadKey = `upload-${Pebble.getWatchToken()}`;
+  console.log(JSON.stringify({ uploadKey }));
+  return uploadKey;
 };
 
 /**
@@ -184,11 +194,11 @@ const getUploadId = async (): Promise<string> => {
  * Ensure the upload ID is ready if possible.
  */
 export const ensureUploadId = async () => {
-  let uploadId = localStorage.getItem(LS_KEY_UPLOAD_ID);
+  let uploadId = localStorage.getItem(buildUploadKey());
   if (!uploadId || uploadId === UPLOAD_ID_EMPTY) {
     uploadId = await getUploadId();
   }
-  localStorage.setItem(LS_KEY_UPLOAD_ID, uploadId);
+  localStorage.setItem(buildUploadKey(), uploadId);
   return uploadId;
 };
 
@@ -276,7 +286,7 @@ const mapHistoryForDisplay = (history: HistoryItem[]): UploadHistoryItem[] =>
   }));
 
 export const uploadHistory = async () => {
-  const id = localStorage.getItem(LS_KEY_UPLOAD_ID);
+  const id = localStorage.getItem(buildUploadKey());
   if (!id || id === UPLOAD_ID_EMPTY) {
     console.log('WARN: No upload ID, cannot upload');
     await PebbleTS.sendAppMessage({ UPLOAD_STATUS: 0 });
@@ -319,8 +329,7 @@ export const uploadHistory = async () => {
     await PebbleTS.sendAppMessage({ UPLOAD_STATUS: 0 });
 
     // In case the DB was erased, get it again
-    const uploadId = await getUploadId();
-    localStorage.setItem(LS_KEY_UPLOAD_ID, uploadId);
+    await ensureUploadId();
     return;
   }
 

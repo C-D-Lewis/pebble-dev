@@ -467,7 +467,7 @@ export const LoginCard = () => AppCard()
 export const HistoryCard = () => AppCard()
   .setChildren([
     Subtitle().setText('Your History'),
-    Text().setText('Below is the complete battery history as uploaded from Muninn.'),
+    Text().setText('Below is the complete battery history as uploaded from Muninn. It will be updated each time you share from the watchapp.'),
     Separator(),
     Subtitle().setText('All-time Graph'),
     HistoryChart(),

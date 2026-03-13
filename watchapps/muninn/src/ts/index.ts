@@ -1,4 +1,3 @@
-import { LS_KEY_UPLOAD_ID } from './constants';
 import { ensureUploadId, handleGetSyncInfo, handleSync, uploadHistory } from './sync';
 import { handlePushTimelinePin } from './timeline';
 

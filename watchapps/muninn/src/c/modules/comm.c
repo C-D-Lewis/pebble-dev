@@ -168,7 +168,6 @@ void inbox_received_handler(DictionaryIterator *iter, void *context) {
       snprintf(app_state->upload_id, sizeof(app_state->upload_id), "error");
     }
 
-    // TODO: Non-looping way to update the UI when sync progresses
     settings_window_reload();
     stats_window_reload();
 
@@ -188,7 +187,6 @@ void inbox_received_handler(DictionaryIterator *iter, void *context) {
   if (t) {
     const int success = (int)t->value->int32;
     if (success) {
-      menu_window_set_upload_status("Upload successful");
       static char s_upload_buff[128];
       snprintf(
         s_upload_buff,
@@ -198,7 +196,7 @@ void inbox_received_handler(DictionaryIterator *iter, void *context) {
       );
       message_window_push(s_upload_buff, false, false);
     } else {
-      menu_window_set_upload_status("Upload failed");
+      message_window_push("Upload failed :(\n\nTry later or after restarting Muninn.", false, false);
     }
     return;
   }

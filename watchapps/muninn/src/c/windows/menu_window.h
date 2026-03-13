@@ -16,7 +16,3 @@
 void menu_window_push();
 
 void menu_window_reload();
-
-#ifdef FEATURE_SYNC
-void menu_window_set_upload_status(const char *status);
-#endif
