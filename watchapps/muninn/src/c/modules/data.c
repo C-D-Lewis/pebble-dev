@@ -88,7 +88,7 @@ static void test_data_generator() {
   // const int changes[NUM_SAMPLES] = {0, 2, 2, 2, 2, 2, 2, -1, -1, -1, -1, -1, -1, -1, -1, -1};
   //
   // 2 - Test case: Should show 10 days at 8% per day (from 80%)
-  const int changes[NUM_SAMPLES] = {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
+  // const int changes[NUM_SAMPLES] = {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
   //
   // 3 - Test case: Should show 11 days at 7% (two other events are ignored)
   //     Note: includes the two special statuses
@@ -107,7 +107,7 @@ static void test_data_generator() {
   // const int changes[NUM_SAMPLES] = {2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
   //
   // 6 - Test case: Should show 4% at 20 days when the majority of events are 'no change' (extreme battery life)
-  // const int changes[NUM_SAMPLES] = {0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0};
+  const int changes[NUM_SAMPLES] = {0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0};
   //
   // 7 - Test case: Big charge half way through
   // const int changes[NUM_SAMPLES] = {3, 0, 3, 3, 0, 3, 3, 3, -30, 3, 3, 3, 3, 3, 3, 3};
@@ -357,10 +357,17 @@ int data_calculate_avg_discharge_rate(bool ignore_no_change) {
   if (total_x2 == 0) total_x2 = 1;
 
   const int rate = total_x2 / weight_x2;
-  if (rate < 2 && data_get_valid_samples_count() >= MIN_SAMPLES_FOR_GRAPH) {
+  if (
+    rate <= 2 &&
+    // data_get_valid_samples_count() >= MIN_SAMPLES_FOR_GRAPH &&
+    !ignore_no_change
+  ) {
     // Count again, but this time ignore 'no change' time periods
     return data_calculate_avg_discharge_rate(true);
   }
+
+  // Ignore extremely low estimates and hence extremely high battery life over-estimates
+  if (ignore_no_change && rate <= 2) return 3;
 
   return total_x2 / weight_x2;
 }
