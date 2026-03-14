@@ -40,6 +40,7 @@ export type PostHistoryBody = {
 };
 
 export type GetHistoryResponse = {
+  updatedAt: number;
   history: HistoryItem[];
   platform: string;
   model: string;

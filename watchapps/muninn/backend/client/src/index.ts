@@ -24,6 +24,7 @@ const AppContent = () => fabricate('Column')
     margin: 'auto',
   })
   .setChildren([
+    // TODO: Most of these are pages, use fabricate router
     fabricate.conditional(
       (state) => !state.loading && state.history.length === 0 && !state.notFound,
       LoginCard,
@@ -81,6 +82,7 @@ const initialState: AppState = {
   chartMode: 'all',
 
   id,
+  updatedAt: 0,
   history: [],
   platform: '',
   model: '',

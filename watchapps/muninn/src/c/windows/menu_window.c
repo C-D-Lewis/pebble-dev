@@ -37,7 +37,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
   } else {
     // Not enough yet, or first sync is in progress
     if (sync_count < MIN_SAMPLES_FOR_GRAPH) {
-      snprintf(s_sync_buff, sizeof(s_sync_buff), "Awaiting samples...");
+      snprintf(s_sync_buff, sizeof(s_sync_buff), "Not enough data");
     } else {
       snprintf(s_sync_buff, sizeof(s_sync_buff), "%d samples", sync_count);
     }
@@ -50,7 +50,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
     snprintf(
       s_upload_buff,
       sizeof(s_upload_buff),
-      data_get_log_length() < MIN_SAMPLES_FOR_GRAPH ? "Awaiting samples..." : "Press to share"
+      data_get_log_length() < MIN_SAMPLES_FOR_GRAPH ? "Not enough data" : "Press to share"
     );
   }
 #endif

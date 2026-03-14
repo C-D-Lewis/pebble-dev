@@ -33,6 +33,7 @@ export type AppState = {
 
   // User API data
   id: string;
+  updatedAt: number;
   history: HistoryItem[];
   platform: string;
   model: string;

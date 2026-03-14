@@ -584,6 +584,14 @@ export const HistoryCard = () => AppCard()
   .setChildren([
     Subtitle().setText('Your History'),
     Text().setText('Below is the complete battery history as uploaded from Muninn. It will be updated each time you share from the watchapp.'),
+    Text()
+      .setStyles(({ palette }) => ({ color: palette.grey(9) }))
+      .onCreate((el, { updatedAt }) => {
+        if (!updatedAt) return;
+
+        const date = new Date(updatedAt);
+        el.setText(`Last updated: ${date.toLocaleString()}`);
+      }),
     Separator(),
     Subtitle().setText('All-time Graph'),
     HistoryChart(),

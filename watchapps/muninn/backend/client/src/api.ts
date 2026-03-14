@@ -22,6 +22,7 @@ export const fetchWatchHistory = async (id: string) => {
     const data = await res.json();
     fabricate.update({
       id,
+      updatedAt: data.updatedAt,
       history: data.history.reverse(),
       platform: data.platform,
       model: data.model,

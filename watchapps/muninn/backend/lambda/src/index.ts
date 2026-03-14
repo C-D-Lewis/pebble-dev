@@ -6,7 +6,15 @@ import {
   QueryCommand,
   ScanCommand,
 } from '@aws-sdk/lib-dynamodb';
-import { generateId, badRequest, error, success, validatePostHistoryBody, buildCorsHeaders, notFound } from './util.js';
+import {
+  generateId,
+  badRequest,
+  error,
+  success,
+  validatePostHistoryBody,
+  buildCorsHeaders,
+  notFound,
+} from './util.js';
 import type {
   GetHistoryResponse,
   GetGlobalStatsResponse,
@@ -86,11 +94,12 @@ const handlePostHistory = async (body: PostHistoryBody) => {
   if (!existing.Item) return badRequest('id not found');
 
   // Store the history data in DynamoDB (replace previous for this ID)
+  const updatedAt = Date.now();
   try {
     await docClient.send(
       new PutCommand({
         TableName: HISTORY_TABLE_NAME,
-        Item: { id, history, platform, model, firmware, stats },
+        Item: { updatedAt, id, history, platform, model, firmware, stats },
       }),
     );
     return success({ success: true });
@@ -131,6 +140,7 @@ const handleGetHistoryById = async (event: LambdaEvent, id?: string) => {
     // Unless we want to show the same prediction info, but it's less useful long-term
 
     const body: GetHistoryResponse = {
+      updatedAt: found.Item.updatedAt,
       history: found.Item.history,
       platform: found.Item.platform,
       model: found.Item.model,
