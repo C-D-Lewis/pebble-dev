@@ -2,19 +2,23 @@
 
 #ifdef FEATURE_SYNC
 
-static Window *s_window;
-static MenuLayer *s_menu_layer;
-static Layer *s_header_layer;
-
 typedef enum {
   MI_TOTAL_DURATION,
   MI_ALL_TIME_RATE,
   MI_LAST_WEEK_RATE,
   MI_NUM_CHARGES,
   MI_MTBC,
+  MI_UPLOAD,
 
   MI_MAX,
 } MenuItems;
+
+static Window *s_window;
+static MenuLayer *s_menu_layer;
+static Layer *s_header_layer;
+
+static char s_upload_status_buff[32];
+static char s_result_buff[16];
 
 static uint16_t get_num_rows_callback(MenuLayer *menu_layer, uint16_t section_index, void *context) {
   return MI_MAX;
@@ -24,10 +28,10 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
   AppState *app_state = data_get_app_state();
 
   // Format buffers
-  static char s_t_d_buff[16];
+  static char s_t_d_buff[32];
   if (util_is_not_status(app_state->stat_total_days)) {
     const int sync_perc = (app_state->sync_count * 100) / MAX_SYNC_ITEMS;
-    snprintf(s_t_d_buff, sizeof(s_t_d_buff), "%d days (%d%%)", app_state->stat_total_days, sync_perc);
+    snprintf(s_t_d_buff, sizeof(s_t_d_buff), "%d days (%d%% used)", app_state->stat_total_days, sync_perc);
   } else {
     snprintf(s_t_d_buff, sizeof(s_t_d_buff), "-");
   }
@@ -60,12 +64,25 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
     snprintf(s_mtbc_buff, sizeof(s_mtbc_buff), "-");
   }
 
+  // Upload status
+  if (strlen(app_state->upload_id) == 0) {
+    snprintf(s_upload_status_buff, sizeof(s_upload_status_buff), "Loading...");
+  } else if (strlen(s_result_buff) > 1) {
+    snprintf(s_upload_status_buff, sizeof(s_upload_status_buff), "%s", s_result_buff);
+  } else {
+    snprintf(
+      s_upload_status_buff,
+      sizeof(s_upload_status_buff),
+      data_get_log_length() >= MIN_SAMPLES_FOR_WEB ? "Press to share" : "Not enough data"
+    );
+  }
+
   switch(cell_index->row) {
     case MI_TOTAL_DURATION:
       util_menu_cell_draw(
         ctx,
         cell_layer,
-        "Total Sync'd Time",
+        "Total Duration",
         s_t_d_buff
       );
       break;
@@ -101,6 +118,14 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
         s_mtbc_buff
       );
       break;
+    case MI_UPLOAD:
+      util_menu_cell_draw(
+        ctx,
+        cell_layer,
+        "View All (via Web)",
+        s_upload_status_buff
+      );
+      break;
     default: break;
   }
 }
@@ -109,19 +134,27 @@ static int16_t get_cell_height_callback(struct MenuLayer *menu_layer, MenuIndex 
   return ROW_HEIGHT_LARGE;
 }
 
-// static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) {
-//   switch(cell_index->row) {
-//     default: break;
-//   }
+static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) {
+  const bool enough_data = data_get_log_length() >= MIN_SAMPLES_FOR_WEB;
 
-//   menu_layer_reload_data(s_menu_layer);
-// }
+  switch(cell_index->row) {
+    case MI_UPLOAD: {
+      if (!enough_data) return;
+
+      snprintf(s_result_buff, sizeof(s_result_buff), " ");
+      comm_upload_history();
+    } break;
+    default: break;
+  }
+
+  menu_layer_reload_data(s_menu_layer);
+}
 
 static void window_load(Window *window) {
   Layer *root_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(root_layer);
 
-  s_header_layer = util_create_header_layer(PBL_IF_ROUND_ELSE("Extended", "Extended Stats"), 32);
+  s_header_layer = util_create_header_layer(PBL_IF_ROUND_ELSE("Phone Stats", "Phone Sync Stats"), 32);
   layer_add_child(root_layer, s_header_layer);
 
   s_menu_layer = menu_layer_create(grect_inset(bounds, GEdgeInsets(HEADER_INSET, 0, 0, 0)));
@@ -130,7 +163,7 @@ static void window_load(Window *window) {
     .get_num_rows = (MenuLayerGetNumberOfRowsInSectionsCallback)get_num_rows_callback,
     .draw_row = (MenuLayerDrawRowCallback)draw_row_callback,
     .get_cell_height = (MenuLayerGetCellHeightCallback)get_cell_height_callback,
-    // .select_click = (MenuLayerSelectCallback)select_callback,
+    .select_click = (MenuLayerSelectCallback)select_callback,
   });
   layer_add_child(root_layer, menu_layer_get_layer(s_menu_layer));
 }
@@ -160,4 +193,9 @@ void stats_window_reload() {
   
   menu_layer_reload_data(s_menu_layer);
 }
+
+void stats_window_set_result(char *result) {
+  snprintf(s_result_buff, sizeof(s_result_buff), "%s", result);
+}
+
 #endif

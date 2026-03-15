@@ -22,6 +22,8 @@
 #define MIN_SAMPLES 2
 // Min samples before graph is shown
 #define MIN_SAMPLES_FOR_GRAPH 4
+// Min samples before web upload is ready
+#define MIN_SAMPLES_FOR_WEB 8
 // Maximum number of extra minutes if a collision
 #define WAKEUP_WINDOW_M 10
 // Multipler for elevated rate alarm

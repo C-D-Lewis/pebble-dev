@@ -13,4 +13,6 @@
 void stats_window_push();
 
 void stats_window_reload();
+
+void stats_window_set_result(char *result);
 #endif

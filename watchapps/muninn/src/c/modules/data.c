@@ -367,6 +367,7 @@ int data_calculate_avg_discharge_rate(bool ignore_no_change) {
   }
 
   // Ignore extremely low estimates and hence extremely high battery life over-estimates
+  // This will improve on day 2
   if (ignore_no_change && rate <= 2) return 3;
 
   return total_x2 / weight_x2;

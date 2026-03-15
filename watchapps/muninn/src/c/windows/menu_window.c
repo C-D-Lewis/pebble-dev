@@ -8,7 +8,6 @@ typedef enum {
   MI_SETTINGS,
 #ifdef FEATURE_SYNC
   MI_SYNC_INFO,
-  MI_UPLOAD,
 #endif
   MI_BATTERY_TIPS,
   MI_VERSION,
@@ -18,7 +17,6 @@ typedef enum {
 
 #ifdef FEATURE_SYNC
 static char s_sync_buff[20];
-static char s_upload_buff[32];
 #endif
 
 static uint16_t get_num_rows_callback(MenuLayer *menu_layer, uint16_t section_index, void *context) {
@@ -26,11 +24,10 @@ static uint16_t get_num_rows_callback(MenuLayer *menu_layer, uint16_t section_in
 }
 
 static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_index, void *context) {
-  PersistData *persist_data = data_get_persist_data();
-  AppState *app_state = data_get_app_state();
 
 #ifdef FEATURE_SYNC
   // Sync status
+  AppState *app_state = data_get_app_state();
   const int sync_count = app_state->sync_count;
   if (sync_count == STATUS_EMPTY) {
     snprintf(s_sync_buff, sizeof(s_sync_buff), "Loading...");
@@ -39,19 +36,8 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
     if (sync_count < MIN_SAMPLES_FOR_GRAPH) {
       snprintf(s_sync_buff, sizeof(s_sync_buff), "Not enough data");
     } else {
-      snprintf(s_sync_buff, sizeof(s_sync_buff), "%d samples", sync_count);
+      snprintf(s_sync_buff, sizeof(s_sync_buff), "%d samples saved", sync_count);
     }
-  }
-
-  // Upload status
-  if (strlen(app_state->upload_id) == 0) {
-    snprintf(s_upload_buff, sizeof(s_upload_buff), "Loading...");
-  } else {
-    snprintf(
-      s_upload_buff,
-      sizeof(s_upload_buff),
-      data_get_log_length() < MIN_SAMPLES_FOR_GRAPH ? "Not enough data" : "Press to share"
-    );
   }
 #endif
 
@@ -64,16 +50,8 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
       util_menu_cell_draw(
         ctx,
         cell_layer,
-        "Extended Stats",
+        "Phone Sync",
         s_sync_buff
-      );
-      break;
-    case MI_UPLOAD:
-      util_menu_cell_draw(
-        ctx,
-        cell_layer,
-        "View More on Web",
-        s_upload_buff
       );
       break;
 #endif
@@ -99,7 +77,6 @@ static int16_t get_cell_height_callback(struct MenuLayer *menu_layer, MenuIndex 
   switch(cell_index->row) {
 #ifdef FEATURE_SYNC
     case MI_SYNC_INFO:
-    case MI_UPLOAD:
 #endif
     case MI_VERSION:
       return ROW_HEIGHT_LARGE;
@@ -109,6 +86,7 @@ static int16_t get_cell_height_callback(struct MenuLayer *menu_layer, MenuIndex 
 }
 
 static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) {
+
   switch(cell_index->row) {
     case MI_SETTINGS:
       settings_window_push();
@@ -116,12 +94,8 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
 #ifdef FEATURE_SYNC
     case MI_SYNC_INFO: {
       AppState *app_state = data_get_app_state();
-      if (app_state->sync_count > 0) stats_window_push();
-    } break;
-    case MI_UPLOAD: {
-      if (data_get_log_length() < MIN_SAMPLES_FOR_GRAPH) return;
-
-      comm_upload_history();
+      const bool enough_data = data_get_log_length() >= MIN_SAMPLES_FOR_GRAPH;
+      if (enough_data && app_state->sync_count > 0) stats_window_push();
     } break;
 #endif
     case MI_BATTERY_TIPS:

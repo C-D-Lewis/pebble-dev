@@ -164,7 +164,6 @@ void inbox_received_handler(DictionaryIterator *iter, void *context) {
     if (t) {
       strncpy(app_state->upload_id, t->value->cstring, sizeof(app_state->upload_id));
     } else {
-      APP_LOG(APP_LOG_LEVEL_INFO, "s df f 5");
       snprintf(app_state->upload_id, sizeof(app_state->upload_id), "error");
     }
 
@@ -194,8 +193,10 @@ void inbox_received_handler(DictionaryIterator *iter, void *context) {
         "Success! Open the settings for Muninn in the Pebble app to see your full history. (code %s)",
         app_state->upload_id
       );
+      stats_window_set_result("Upload success");
       message_window_push(s_upload_buff, false, false);
     } else {
+      stats_window_set_result("Upload failed");
       message_window_push("Upload failed :(\n\nTry later or after restarting Muninn.", false, false);
     }
     return;
@@ -231,6 +232,7 @@ void comm_request_sync_stats() {
 }
 
 void comm_upload_history() {
+  stats_window_set_result("Uploading...");
   send_int(MESSAGE_KEY_UPLOAD_HISTORY);
 }
 #endif
