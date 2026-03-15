@@ -1,5 +1,5 @@
 import { ALLOWED_ORIGINS, DEFAULT_RES_HEADERS } from './constants.js';
-import type { HistoryItem, LambdaEvent, PostHistoryBody, Stats } from './types.js';
+import type { HistoryItem, LambdaEvent, PostHistoryBody, WatchStats } from './types.js';
 
 /**
  * Generate a random 6-character hexadecimal ID.
@@ -21,7 +21,11 @@ export const generateId = () =>
  */
 export const badRequest = (message: string) => {
   console.warn(`Bad request: ${message}`);
-  return { statusCode: 400 };
+  return {
+    statusCode: 400,
+    body: JSON.stringify({ error: 'Bad Request' }),
+    headers: DEFAULT_RES_HEADERS,
+  };
 };
 
 /**
@@ -32,7 +36,14 @@ export const badRequest = (message: string) => {
  */
 export const notFound = (message: string, headers: any = {}) => {
   console.log(`Not found: ${message}`);
-  return { statusCode: 404, headers };
+  return {
+    statusCode: 404,
+    headers: {
+      ...DEFAULT_RES_HEADERS,
+      ...headers,
+    },
+    body: JSON.stringify({ error: 'Not Found' }),
+  };
 };
 
 /**
@@ -43,7 +54,11 @@ export const notFound = (message: string, headers: any = {}) => {
  */
 export const error = (message: string) => {
   console.error(`Error: ${message}`);
-  return { statusCode: 500 };
+  return {
+    statusCode: 500,
+    headers: DEFAULT_RES_HEADERS,
+    body: JSON.stringify({ error: 'Unknown Error' }),
+  };
 };
 
 /**
@@ -79,10 +94,10 @@ const validateHistory = (history: HistoryItem[]) => {
  * Validate the stats data format.
  *   Should sync with JS and client.
  *
- * @param {Stats} stats - The stats data to validate.
+ * @param {WatchStats} stats - The stats data to validate.
  * @returns {boolean} - True if valid, false otherwise.
  */
-const validateStats = (stats: Stats) => {
+const validateWatchStats = (stats: WatchStats) => {
   return typeof stats.count === 'number' &&
     typeof stats.totalDays === 'number' &&
     typeof stats.allTimeRate === 'number' &&
@@ -99,7 +114,7 @@ export const validatePostHistoryBody = (body: PostHistoryBody) => {
   if (!model || typeof model !== 'string') return false;
   if (!firmware || typeof firmware !== 'string') return false;
   if (!validateHistory(history)) return false;
-  if (!validateStats(stats)) return false;
+  if (!validateWatchStats(stats)) return false;
 
   return true;
 };

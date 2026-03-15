@@ -49,7 +49,7 @@ Finally, run the deploy script - Terraform manages the Lambda TypeScript build,
 and the static site assets are built with Vite and uploaded to S3.
 
 ```shell
-./deploy.sh
+./scripts/deploy.sh
 ```
 
 ## TODO

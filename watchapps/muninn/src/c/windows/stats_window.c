@@ -73,7 +73,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
     snprintf(
       s_upload_status_buff,
       sizeof(s_upload_status_buff),
-      "(Need %d samples)",
+      "(Min. %d samples)",
       MIN_SAMPLES_FOR_WEB
     );
   } else {

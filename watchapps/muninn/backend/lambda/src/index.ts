@@ -20,7 +20,8 @@ import type {
   GetGlobalStatsResponse,
   LambdaEvent,
   PostHistoryBody,
-  PostIdBody
+  PostIdBody,
+  DbDocument
 } from './types.js';
 import { IDS_TABLE_NAME, HISTORY_TABLE_NAME } from './constants.js';
 
@@ -65,15 +66,10 @@ const handlePostId = async (body: PostIdBody) => {
   console.log(`Generated ID ${id} with ${attempts} attempts remaining`);
 
   // Store it in DynamoDB with the watch token
-  try {
-    await docClient.send(
-      new PutCommand({ TableName: IDS_TABLE_NAME, Item: { id, watchToken } }),
-    );
-    return success({ id });
-  } catch (e) {
-    console.error(e);
-    return error('Failed to store ID');
-  }
+  await docClient.send(
+    new PutCommand({ TableName: IDS_TABLE_NAME, Item: { id, watchToken } }),
+  );
+  return success({ id });
 };
 
 /**
@@ -91,22 +87,26 @@ const handlePostHistory = async (body: PostHistoryBody) => {
   const existing = await docClient.send(
     new GetCommand({ TableName: IDS_TABLE_NAME, Key: { id } })
   );
-  if (!existing.Item) return badRequest('id not found');
+  if (!existing.Item) return notFound('id not found');
 
   // Store the history data in DynamoDB (replace previous for this ID)
   const updatedAt = Date.now();
-  try {
-    await docClient.send(
-      new PutCommand({
-        TableName: HISTORY_TABLE_NAME,
-        Item: { updatedAt, id, history, platform, model, firmware, stats },
-      }),
-    );
-    return success({ success: true });
-  } catch (e) {
-    console.error(e);
-    return error('Failed to store history');
-  }
+  const doc: DbDocument = {
+    updatedAt,
+    id,
+    history,
+    platform,
+    model,
+    firmware,
+    stats,
+  };
+  await docClient.send(
+    new PutCommand({
+      TableName: HISTORY_TABLE_NAME,
+      Item: doc,
+    }),
+  );
+  return success({ success: true });
 };
 
 /**
@@ -126,33 +126,28 @@ const handleGetHistoryById = async (event: LambdaEvent, id?: string) => {
   if (!existing.Item) return notFound('id not found', buildCorsHeaders(event));
 
   // Get the history data from DynamoDB
-  try {
-    const found = await docClient.send(
-      new GetCommand({ TableName: HISTORY_TABLE_NAME, Key: { id } })
-    );
-    if (!found.Item) return notFound(
-      'history not found for this id',
-      buildCorsHeaders(event),
-    );
+  const found = await docClient.send(
+    new GetCommand({ TableName: HISTORY_TABLE_NAME, Key: { id } })
+  );
+  if (!found.Item || found.Item.history.length === 0) return notFound(
+    'history not found for this id',
+    buildCorsHeaders(event),
+  );
 
-    // TODO: Distill down to only data the client needs:
-    //   platform, model, firmware, history GRAPH points for x/y
-    // Unless we want to show the same prediction info, but it's less useful long-term
+  // TODO: Distill down to only data the client needs:
+  //   platform, model, firmware, history GRAPH points for x/y
+  // Unless we want to show the same prediction info, but it's less useful long-term
 
-    const body: GetHistoryResponse = {
-      updatedAt: found.Item.updatedAt,
-      history: found.Item.history,
-      platform: found.Item.platform,
-      model: found.Item.model,
-      firmware: found.Item.firmware,
-      stats: found.Item.stats,
-    };
+  const body: GetHistoryResponse = {
+    updatedAt: found.Item.updatedAt,
+    history: found.Item.history,
+    platform: found.Item.platform,
+    model: found.Item.model,
+    firmware: found.Item.firmware,
+    stats: found.Item.stats,
+  };
 
-    return success(body, buildCorsHeaders(event));
-  } catch (e) {
-    console.error(e);
-    return error('Failed to get history');
-  }
+  return success(body, buildCorsHeaders(event));
 }
 
 /**
@@ -162,26 +157,19 @@ const handleGetHistoryById = async (event: LambdaEvent, id?: string) => {
  * @returns {Promise<GetGlobalStatsResponse>} - Response with the stats data.
  */
 const handleGetGlobalStats = async (event: LambdaEvent) => {
-  try {
-    const historyRows = await docClient.send(
-      new ScanCommand({
-        TableName: HISTORY_TABLE_NAME,
-        Select: 'COUNT',
-      }),
-    );
+  const historyRows = await docClient.send(
+    new ScanCommand({ TableName: HISTORY_TABLE_NAME, Select: 'COUNT' }),
+  );
 
-    const body: GetGlobalStatsResponse = {
-      totalUploads: historyRows.Count || -1,
+  const body: GetGlobalStatsResponse = {
+    totalUploads: historyRows.Count || -1,
 
-      // Leaderboard?
-      // Averages per model / FW?
-    };
-    return success(body, buildCorsHeaders(event));
-  } catch (e) {
-    console.error(e);
-    return error('Failed to get stats');
-  }
-}
+    // Leaderboard?
+
+    // Averages per model / FW?
+  };
+  return success(body, buildCorsHeaders(event));
+};
 
 /**
  * Main Lambda handler function.

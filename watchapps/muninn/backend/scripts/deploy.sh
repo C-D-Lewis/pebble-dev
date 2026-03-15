@@ -30,6 +30,8 @@ aws s3 sync assets $BUCKET/assets || true
 
 cd -
 
+########################################## Update infra ############################################
+
 printf "\n\n>>> Updating infrastructure\n\n"
 
 cd terraform
@@ -37,6 +39,15 @@ terraform init
 terraform apply -auto-approve
 
 cd -
+
+############################################ Test API ##############################################
+
+cd lambda
+npm test
+
+cd -
+
+########################################## Invalidate ##############################################
 
 printf "\n\n>>> Invalidating CloudFront\n\n"
 

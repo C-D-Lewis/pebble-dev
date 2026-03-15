@@ -17,7 +17,7 @@ export type LambdaEvent = {
   };
 };
 
-export type Stats = {
+export type WatchStats = {
   count: number;
   totalDays: number;
   allTimeRate: number;
@@ -26,27 +26,31 @@ export type Stats = {
   mtbc: number;
 };
 
+/** Data from a single watch */
+export type WatchData = {
+  history: HistoryItem[];
+  platform: string;
+  model: string;
+  firmware: string;
+  stats: WatchStats;
+};
+
+export type DbDocument = {
+  id: string;
+  updatedAt: number;
+} & WatchData;
+
 export type PostIdBody = {
   watchToken: string;
 };
 
 export type PostHistoryBody = {
   id: string;
-  history: HistoryItem[];
-  platform: string;
-  model: string;
-  firmware: string;
-  stats: Stats;
-};
+} & WatchData;
 
 export type GetHistoryResponse = {
   updatedAt: number;
-  history: HistoryItem[];
-  platform: string;
-  model: string;
-  firmware: string;
-  stats: Stats;
-};
+} & WatchData;
 
 export type GetGlobalStatsResponse = {
   totalUploads: number;

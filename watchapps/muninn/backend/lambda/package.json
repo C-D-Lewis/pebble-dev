@@ -4,13 +4,17 @@
   "description": "API Lambda for Muninn backend",
   "type": "module",
   "scripts": {
-    "build": "tsc --noEmit && esbuild src/index.ts --bundle --minify --platform=node --target=node24 --outfile=dist/index.js"
+    "build": "tsc --noEmit && esbuild src/index.ts --bundle --minify --platform=node --target=node24 --outfile=dist/index.js",
+    "test": "npx mocha"
   },
   "keywords": [],
   "author": "C-D-Lewis",
   "devDependencies": {
     "@types/aws-lambda": "^8.10.161",
+    "chai": "^6.2.2",
     "esbuild": "^0.27.3",
+    "mocha": "^11.7.5",
+    "node-fetch": "^2.7.0",
     "typescript": "^5.9.3"
   },
   "dependencies": {
