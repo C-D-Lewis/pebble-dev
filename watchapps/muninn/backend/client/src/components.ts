@@ -636,6 +636,7 @@ export const NotFoundCard = () => AppCard()
     Text()
       .setStyles({ maxWidth: '350px' })
       .setText('No data was found for this code.\n\nUse the upload option in the watchapp to start seeing data here.'),
+    Annotation().setText('(not available for original Pebble due to memory constraints)'),
   ]);
 
 /**
