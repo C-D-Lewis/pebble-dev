@@ -494,8 +494,16 @@ const GlobalStatsList = () => fabricate('Column')
  *
  * @returns {FabricateComponent} Fabricate component.
  */
-const ShareLink = () => fabricate('a')
-  .setStyles({ color: 'white', textAlign: 'center' })
+const ShareLink = () => fabricate('Text')
+  .setStyles(({ palette }) => ({
+    color: 'white',
+    textAlign: 'center',
+    textDecoration: 'underline',
+    padding: '8px',
+    margin: '5px auto',
+    backgroundColor: palette.grey(2),
+    borderRadius: '5px',
+  }))
   .onCreate((el, { id }) => {
     const shareUrl = `${UI_URL}?id=${id}`;
 
@@ -605,6 +613,7 @@ export const HistoryCard = () => AppCard()
     InfoChips(),
     Separator(),
     Subtitle().setText('Share'),
+    Text().setText('Copy the link below to share your battery stats:'),
     ShareLink(),
     Separator(),
     Annotation().setText('That\'s all we know - thanks for using Muninn!'),
