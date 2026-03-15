@@ -521,7 +521,7 @@ static void window_load(Window *window) {
 
   update_data();
 
-  APP_LOG(APP_LOG_LEVEL_INFO, "Heap %d", heap_bytes_free());
+  // APP_LOG(APP_LOG_LEVEL_INFO, "Heap %d", heap_bytes_free());
 }
 
 static void window_unload(Window *window) {
@@ -548,8 +548,8 @@ static void window_disappear(Window *window) {
   s_mascot_bitmap = NULL;
   s_batt_bitmap = NULL;
 
-  APP_LOG(APP_LOG_LEVEL_INFO, "wd %d B", heap_bytes_free());
-  bitmap_log_allocated_count();
+  // APP_LOG(APP_LOG_LEVEL_INFO, "wd %d B", heap_bytes_free());
+  // bitmap_log_allocated_count();
 }
 
 void main_window_push() {
@@ -566,4 +566,10 @@ void main_window_push() {
   }
 
   window_stack_push(s_window, true);
+
+  data_assume_last_charge_time();
+}
+
+void main_window_update() {
+  update_data();
 }

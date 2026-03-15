@@ -24,7 +24,6 @@ static uint16_t get_num_rows_callback(MenuLayer *menu_layer, uint16_t section_in
 
 static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_index, void *context) {
   PersistData *persist_data = data_get_persist_data();
-  AppState *app_state = data_get_app_state();
 
   // Alert level detail
   const int alert_level = persist_data->custom_alert_level;

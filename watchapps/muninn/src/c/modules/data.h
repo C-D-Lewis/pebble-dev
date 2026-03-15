@@ -4,6 +4,7 @@
 
 #include "../config.h"
 
+#include "../windows/main_window.h"
 #include "../windows/message_window.h"
 
 // If there is no data yet for this value - can't change, already in persist
@@ -98,6 +99,7 @@ int data_calculate_accuracy();
 int data_calculate_days_remaining_accuracy();
 int data_get_valid_samples_count();
 int data_get_log_length();
+void data_assume_last_charge_time();
 
 // Interface getters/setters
 void data_set_error(char *err);

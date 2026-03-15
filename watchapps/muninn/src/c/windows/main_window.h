@@ -13,3 +13,5 @@
 #include "graph_window.h"
 
 void main_window_push();
+
+void main_window_update();

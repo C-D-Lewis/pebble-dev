@@ -596,6 +596,28 @@ int data_get_log_length() {
   return count;
 }
 
+void data_assume_last_charge_time() {
+  // If awake and there's no last charge time but the battery is very full
+  // choose to use it as first chage
+  BatteryChargeState state = battery_state_service_peek();
+  const int charge_perc = state.charge_percent;
+  if (
+    util_is_not_status(s_persist_data.wakeup_id) &&
+    !util_is_not_status(s_persist_data.last_charge_time) &&
+    charge_perc >= 90
+  ) {
+    s_persist_data.last_charge_time = time(NULL);
+    s_persist_data.last_charge_perc = charge_perc;
+
+    message_window_push(
+      "The battery is nearly full - Muninn will use this as the first charge time.",
+      false,
+      false
+    );
+    main_window_update();
+  }
+}
+
 ///////////////////////////////////////// Getters / Setters ////////////////////////////////////////
 
 void data_set_error(char *err) {

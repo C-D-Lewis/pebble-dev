@@ -34,7 +34,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
   } else {
     // Not enough yet, or first sync is in progress
     if (sync_count < MIN_SAMPLES_FOR_GRAPH) {
-      snprintf(s_sync_buff, sizeof(s_sync_buff), "Not enough data");
+      snprintf(s_sync_buff, sizeof(s_sync_buff), "(Need %d samples)", MIN_SAMPLES_FOR_GRAPH);
     } else {
       snprintf(s_sync_buff, sizeof(s_sync_buff), "%d samples saved", sync_count);
     }

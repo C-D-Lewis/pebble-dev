@@ -69,12 +69,15 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
     snprintf(s_upload_status_buff, sizeof(s_upload_status_buff), "Loading...");
   } else if (strlen(s_result_buff) > 1) {
     snprintf(s_upload_status_buff, sizeof(s_upload_status_buff), "%s", s_result_buff);
-  } else {
+  } else if (data_get_log_length() < MIN_SAMPLES_FOR_WEB) {
     snprintf(
       s_upload_status_buff,
       sizeof(s_upload_status_buff),
-      data_get_log_length() >= MIN_SAMPLES_FOR_WEB ? "Press to share" : "Not enough data"
+      "(Need %d samples)",
+      MIN_SAMPLES_FOR_WEB
     );
+  } else {
+    snprintf(s_upload_status_buff, sizeof(s_upload_status_buff), "Press to share");
   }
 
   switch(cell_index->row) {
