@@ -17,7 +17,7 @@ import { generateTestData } from './util';
  */
 const buildHistoryKey = () => {
   const key = `history-${Pebble.getWatchToken()}`;
-  console.log(JSON.stringify({ key }));
+  // console.log(JSON.stringify({ key }));
   return key;
 };
 
@@ -26,7 +26,7 @@ const buildHistoryKey = () => {
  */
 const buildUploadKey = () => {
   const uploadKey = `upload-${Pebble.getWatchToken()}`;
-  console.log(JSON.stringify({ uploadKey }));
+  // console.log(JSON.stringify({ uploadKey }));
   return uploadKey;
 };
 

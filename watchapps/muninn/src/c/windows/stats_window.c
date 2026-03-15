@@ -31,10 +31,11 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
   static char s_t_d_buff[32];
   if (util_is_not_status(app_state->stat_total_days)) {
     const int sync_perc = (app_state->sync_count * 100) / MAX_SYNC_ITEMS;
-    snprintf(s_t_d_buff, sizeof(s_t_d_buff), "%d days (%d%% used)", app_state->stat_total_days, sync_perc);
+    snprintf(s_t_d_buff, sizeof(s_t_d_buff), "%d days (%d%%)", app_state->stat_total_days, sync_perc);
   } else {
     snprintf(s_t_d_buff, sizeof(s_t_d_buff), "-");
   }
+  // snprintf(s_t_d_buff, sizeof(s_t_d_buff), "16 days (4%%)");
 
   static char s_a_t_r_buff[16];
   if (util_is_not_status(app_state->stat_all_time_rate)) {
@@ -42,6 +43,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
   } else {
     snprintf(s_a_t_r_buff, sizeof(s_a_t_r_buff), "-");
   }
+  // snprintf(s_a_t_r_buff, sizeof(s_a_t_r_buff), "5%% per day");
 
   static char s_l_w_r_buff[16];
   if (util_is_not_status(app_state->stat_last_week_rate)) {
@@ -49,6 +51,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
   } else {
     snprintf(s_l_w_r_buff, sizeof(s_l_w_r_buff), "-");
   }
+  // snprintf(s_l_w_r_buff, sizeof(s_l_w_r_buff), "8%% per day");
 
   static char s_n_c_buff[12];
   if (util_is_not_status(app_state->stat_num_charges)) {
@@ -56,6 +59,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
   } else {
     snprintf(s_n_c_buff, sizeof(s_n_c_buff), "-");
   }
+  // snprintf(s_n_c_buff, sizeof(s_n_c_buff), "3");
 
   static char s_mtbc_buff[12];
   if (util_is_not_status(app_state->stat_mtbc)) {
@@ -63,6 +67,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
   } else {
     snprintf(s_mtbc_buff, sizeof(s_mtbc_buff), "-");
   }
+  // snprintf(s_mtbc_buff, sizeof(s_mtbc_buff), "12 days");
 
   // Upload status
   if (strlen(app_state->upload_id) == 0) {
@@ -73,7 +78,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
     snprintf(
       s_upload_status_buff,
       sizeof(s_upload_status_buff),
-      "(Min. %d samples)",
+      "Min. %d samples",
       MIN_SAMPLES_FOR_WEB
     );
   } else {
