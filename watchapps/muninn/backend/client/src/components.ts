@@ -498,7 +498,6 @@ const ShareLink = () => fabricate('Text')
   .setStyles(({ palette }) => ({
     color: 'white',
     textAlign: 'center',
-    textDecoration: 'underline',
     padding: '8px',
     margin: '5px auto',
     backgroundColor: palette.grey(2),
