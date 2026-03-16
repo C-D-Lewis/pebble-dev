@@ -44,6 +44,14 @@ six-hourly interval, the app must be launched to allow wakeups to be resumed.
 If the first period is less than six hours, the initial estimate may be an
 overestimate but will smooth out soon. Any missed wakeups will be ignored.
 
+## Backend
+
+For Basalt and above, the extended sample history saved in JS-side storage can
+be uploaded to the backend, which assigns a 6-character short code for each
+watch token, and allows viewing of all the data with charts and longer-term
+statistics. It's built with TypeScript, Vite, and deployed with Terraform. See
+[backend](./backend/) for more information.
+
 ## Challenges:
 
 - Detecting charging: charge level goes up or is constant
