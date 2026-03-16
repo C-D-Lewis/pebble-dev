@@ -184,7 +184,7 @@ export const AppLoader = () => fabricate('Loader', {
   size: 48,
   lineWidth: 5,
   color: Theme.palette.primary,
-  backgroundColor: Theme.palette.grey(4),
+  backgroundColor: Theme.palette.grey(7),
 })
   .setStyles({ margin: 'auto', marginTop: '15px' });
 
@@ -550,7 +550,7 @@ const ChartModeBar = () => fabricate('Row')
  */
 const AppCard = () => fabricate('Card')
   .setStyles(({ palette }) => ({
-    padding: '8px',
+    padding: '16px',
     backgroundColor: palette.grey(3),
     boxShadow: 'none',
     margin: '15px auto',
