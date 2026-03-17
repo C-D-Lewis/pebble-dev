@@ -344,12 +344,6 @@ const HistoryChart = () => {
    */
   const filterHistoryItem = (item: HistoryItem, mode: ChartMode) => {
     const date = new Date(item.ts * 1000);
-    console.log(JSON.stringify({
-      date,
-      ONE_MONTH_AGO,
-      ONE_WEEK_AGO,
-      now: Date.now(),
-    }));
     if (mode === 'lastWeek') return date.getTime() >= ONE_WEEK_AGO;
     if (mode === 'lastMonth') return date.getTime() >= ONE_MONTH_AGO;
     return true;
@@ -383,15 +377,14 @@ const HistoryChart = () => {
   return fabricate('div')
     .setStyles(({ palette }) => ({
       maxWidth: '100%',
-      maxHeight: '500px',
+      height: '230px',
       borderRadius: '5px',
       backgroundColor: palette.grey(2),
       padding: '4px',
       marginTop: '8px',
     }))
     .onCreate((el, { history, chartMode }) => {
-      const canvas = fabricate('canvas')
-        .setStyles({ width: '100%', height: '100%' });
+      const canvas = fabricate('canvas');
       el.setChildren([canvas]);
 
       // @ts-expect-error - Chart.js types problem
@@ -654,7 +647,7 @@ export const NotFoundCard = () => AppCard()
  */
 export const Braid = () => fabricate('div')
   .setStyles({
-    height: '16px',
+    height: '18px',
     width: 'auto',
     backgroundImage: "url('assets/images/braid.png')",
     backgroundRepeat: 'repeat-x',

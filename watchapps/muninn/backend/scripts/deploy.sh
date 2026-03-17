@@ -51,12 +51,14 @@ cd -
 
 printf "\n\n>>> Invalidating CloudFront\n\n"
 
-CF_DIST_ID=$(aws cloudfront list-distributions | jq -r ".DistributionList.Items[] | select(.Aliases.Items | tostring | contains(\"$SITE_DOMAIN\")) | .Id")
+cd terraform
+CF_DIST_ID=$(terraform output -raw distribution_id)
 RES=$(aws cloudfront create-invalidation --distribution-id $CF_DIST_ID --paths "/*")
 INVALIDATION_ID=$(echo $RES | jq -r '.Invalidation.Id')
 
-# Wait for invalidation complete
 echo "Waiting for invalidation-completed for $INVALIDATION_ID..."
 aws cloudfront wait invalidation-completed --distribution-id $CF_DIST_ID --id $INVALIDATION_ID
+
+cd -
 
 printf "\n\n>>> Deployment complete!\n\n"
