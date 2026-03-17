@@ -495,6 +495,8 @@ const ShareLink = () => fabricate('Text')
     margin: '5px auto',
     backgroundColor: palette.grey(2),
     borderRadius: '5px',
+    fontFamily: 'monospace',
+    fontSize: '0.85rem',
   }))
   .onCreate((el, { id }) => {
     const shareUrl = `${UI_URL}?id=${id}`;
