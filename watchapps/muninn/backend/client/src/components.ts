@@ -34,7 +34,11 @@ export const Subtitle = () => fabricate('Text')
  * @returns {FabricateComponent} Fabricate component.
  */
 export const Text = () => fabricate('Text')
-  .setStyles({ color: 'white', textAlign: 'center' });
+  .setStyles({
+    color: 'white',
+    textAlign: 'center',
+    fontSize: '0.9rem',
+  });
 
 /**
  * Annotation component.
@@ -172,7 +176,7 @@ const Separator = () => fabricate('div')
     backgroundColor: palette.grey(5),
     height: '2px',
     width: '90%',
-    margin: '16px auto',
+    margin: '12px auto',
   }));
 
 /**
@@ -256,6 +260,7 @@ const StatView = ({ label, value }: { label: string, value: string }) => fabrica
  * @returns {FabricateComponent} Fabricate component.
  */
 const StatsList = () => fabricate('Column')
+  .setStyles({ marginTop: '8px' })
   .onCreate((el, state) => {
     const { stats } = state;
     const {
@@ -306,6 +311,7 @@ const StatsList = () => fabricate('Column')
  * @returns {FabricateComponent} Fabricate component.
  */
 const InfoChips = () => fabricate('Column')
+  .setStyles({ marginTop: '8px' })
   .onCreate((el, state) => {
     const {
       id,
@@ -549,7 +555,7 @@ const AppCard = () => fabricate('Card')
     backgroundColor: palette.grey(3),
     boxShadow: 'none',
     margin: '15px auto',
-    width: 'auto',
+    width: '90%',
     transition: '0.5s',
     opacity: '0',
   }))
@@ -578,14 +584,15 @@ export const LoginCard = () => AppCard()
   ]);
 
 /**
- * HistoryCard component.
+ * SummaryCard component.
  *
  * @returns {FabricateComponent} Fabricate component.
  */
-export const HistoryCard = () => AppCard()
+const SummaryCard = () => AppCard()
   .setChildren([
     Subtitle().setText('Your History'),
-    Text().setText('Below is the complete battery history as uploaded from Muninn. It will be updated each time you share from the watchapp.'),
+    Text()
+      .setText('Below is the complete battery history as uploaded from Muninn. It will be updated each time you share from the watchapp.'),
     Text()
       .setStyles(({ palette }) => ({ color: palette.grey(9) }))
       .onCreate((el, { updatedAt }) => {
@@ -594,23 +601,75 @@ export const HistoryCard = () => AppCard()
         const date = new Date(updatedAt);
         el.setText(`Last updated: ${date.toLocaleString()}`);
       }),
-    Separator(),
-    Subtitle().setText('All-time Graph'),
+  ]);
+
+/**
+ * ChartCard component.
+ *
+ * @returns {FabricateComponent} Fabricate component.
+ */
+const ChartCard = () => AppCard()
+  .setChildren([
+    Subtitle().setText('Graph'),
     HistoryChart(),
     ChartModeBar(),
-    Annotation().setText('Try zooming and panning to see more detail.'),
     Separator(),
-    Subtitle().setText('All-time Stats'),
+    Annotation().setText('Try zooming and panning to see more detail.'),
+  ]);
+
+/**
+ * StatsCard component.
+ *
+ * @returns {FabricateComponent} Fabricate component.
+ */
+const StatsCard = () => AppCard()
+  .setChildren([
+    Subtitle().setText('Statistics'),
     StatsList(),
     Separator(),
-    Subtitle().setText('Watch Info'),
+    Annotation().setText('If some stats aren\'t ready yet, check back in a few more days.'),
+  ]);
+
+/**
+ * InfoCard component.
+ *
+ * @returns {FabricateComponent} Fabricate component.
+ */
+const InfoCard = () => AppCard()
+  .setChildren([
+    Subtitle().setText('Watch Data'),
+    Text().setText('Simple metadata about this Pebble watch:'),
     InfoChips(),
     Separator(),
+    Annotation().setText('Hopefully soon it will be possible to compare firmwares and models to see even more insight into Pebble watch performance.'),
+  ]);
+
+/**
+ * ShareCard component.
+ *
+ * @returns {FabricateComponent} Fabricate component.
+ */
+const ShareCard = () => AppCard()
+  .setChildren([
     Subtitle().setText('Share'),
     Text().setText('Copy the link below to share your battery stats:'),
     ShareLink(),
     Separator(),
     Annotation().setText('That\'s all we know - thanks for using Muninn!'),
+  ]);
+
+/**
+ * HistoryCardList component.
+ *
+ * @returns {FabricateComponent} Fabricate component.
+ */
+export const HistoryCardList = () => fabricate('Column')
+  .setChildren([
+    SummaryCard(),
+    ChartCard(),
+    StatsCard(),
+    InfoCard(),
+    ShareCard(),
   ]);
 
 /**

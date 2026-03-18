@@ -1,6 +1,6 @@
 import { Fabricate, FabricateComponent } from 'fabricate.js';
 import {
-  AppNavBar, Footer, HistoryCard, LoginCard, Braid,
+  AppNavBar, Footer, HistoryCardList, LoginCard, Braid,
   NotFoundCard,
   AppLoader,
 } from './components.ts';
@@ -40,7 +40,7 @@ const AppContent = () => fabricate('Column')
     ),
     fabricate.conditional(
       (state) => !state.loading && state.history.length > 0,
-      HistoryCard,
+      HistoryCardList,
     ),
     fabricate.conditional(
       (state) => !state.loading && state.notFound,
