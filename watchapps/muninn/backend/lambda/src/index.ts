@@ -25,16 +25,9 @@ export const handler = async (event: LambdaEvent) => {
   console.log({ route, body, id });
 
   try {
-    // Send watch token, get unique short ID
     if (route === 'POST /id') return handlePostId(docClient, body);
-
-    // Store history data for a given ID previously exchanged
     if (route === 'POST /history') return handlePostHistory(docClient, body);
-
-    // Get history data for a given ID
     if (route === 'GET /history/{id}') return handleGetHistoryById(docClient, event, id);
-
-    // Get stats about the data population
     if (route === 'GET /globalStats') return handleGetGlobalStats(docClient, event);
 
     throw new Error('Route not found');
