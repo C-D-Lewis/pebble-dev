@@ -1,5 +1,5 @@
-import { ALLOWED_ORIGINS, DEFAULT_RES_HEADERS } from './constants.js';
-import type { HistoryItem, LambdaEvent, PostHistoryBody, WatchStats } from './types.js';
+import { ALLOWED_ORIGINS, DEFAULT_RES_HEADERS } from './constants.ts';
+import type { HistoryItem, LambdaEvent, PostHistoryBody, WatchStats } from './types.ts';
 
 /**
  * Generate a random 6-character hexadecimal ID.
@@ -20,7 +20,7 @@ export const generateId = () =>
  * @return {object} The response object.
  */
 export const badRequest = (message: string) => {
-  console.warn(`Bad request: ${message}`);
+  if (!process.env.NODE_ENV) console.warn(`Bad request: ${message}`);
   return {
     statusCode: 400,
     body: JSON.stringify({ error: 'Bad Request' }),
@@ -35,7 +35,7 @@ export const badRequest = (message: string) => {
  * @return {object} The response object.
  */
 export const notFound = (message: string, headers: any = {}) => {
-  console.log(`Not found: ${message}`);
+  if (!process.env.NODE_ENV) console.log(`Not found: ${message}`);
   return {
     statusCode: 404,
     headers: {
@@ -119,7 +119,7 @@ export const validatePostHistoryBody = (body: PostHistoryBody) => {
   return true;
 };
 
-export const buildCorsHeaders = (event: LambdaEvent) => {
+export const cors = (event: LambdaEvent) => {
   const origin = event.headers.origin || '';
   const acaoHeader = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[1];
 
