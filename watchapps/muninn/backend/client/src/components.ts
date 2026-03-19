@@ -232,7 +232,7 @@ const StatView = ({ label, value }: { label: string, value: string }) => fabrica
     backgroundColor: palette.grey(4),
     borderRadius: '5px',
     padding: '8px 4px 12px 4px',
-    margin: '3px',
+    margin: '8px',
     flex: '1',
   }))
   .setChildren([
@@ -260,7 +260,7 @@ const StatView = ({ label, value }: { label: string, value: string }) => fabrica
  * @returns {FabricateComponent} Fabricate component.
  */
 const StatsList = () => fabricate('Column')
-  .setStyles({ marginTop: '8px' })
+  .setStyles({ marginTop: '4px 8px' })
   .onCreate((el, state) => {
     const { stats } = state;
     const {
@@ -551,10 +551,10 @@ const ChartModeBar = () => fabricate('Row')
  */
 const AppCard = () => fabricate('Card')
   .setStyles(({ palette }) => ({
-    padding: '16px',
+    padding: '8px 14px',
     backgroundColor: palette.grey(3),
     boxShadow: 'none',
-    margin: '15px auto',
+    margin: '5px auto 10px auto',
     width: '90%',
     transition: '0.5s',
     opacity: '0',
