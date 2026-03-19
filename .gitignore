@@ -17,3 +17,6 @@ ts-build
 
 .terraform
 function.zip
+
+coverage
+.nyc_output

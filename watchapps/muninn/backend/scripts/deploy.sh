@@ -20,9 +20,21 @@ cd client
 printf "\n\n>>> Building site\n\n"
 npm run build
 
+cd -
+
+############################################ Test API ##############################################
+
+cd lambda
+
+npm run test:unit
+
+cd -
+
 ############################################ Push site #############################################
 
 printf "\n\n>>> Pushing client files\n\n"
+
+cd client
 
 aws s3 cp index.html $BUCKET
 aws s3 sync dist $BUCKET/dist || true
@@ -35,15 +47,17 @@ cd -
 printf "\n\n>>> Updating infrastructure\n\n"
 
 cd terraform
+
 terraform init
 terraform apply -auto-approve
 
 cd -
 
-############################################ Test API ##############################################
+########################################## E2E Test API ############################################
 
 cd lambda
-npm test
+
+npm run test:e2e
 
 cd -
 
@@ -52,6 +66,7 @@ cd -
 printf "\n\n>>> Invalidating CloudFront\n\n"
 
 cd terraform
+
 CF_DIST_ID=$(terraform output -raw distribution_id)
 RES=$(aws cloudfront create-invalidation --distribution-id $CF_DIST_ID --paths "/*")
 INVALIDATION_ID=$(echo $RES | jq -r '.Invalidation.Id')

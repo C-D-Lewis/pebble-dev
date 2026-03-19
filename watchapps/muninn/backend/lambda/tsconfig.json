@@ -7,7 +7,9 @@
     // Environment Settings
     "module": "nodenext",
     "target": "esnext",
-    "types": [],
+    "types": [
+      "node"
+    ],
 
     // Other Outputs
     "sourceMap": true,
@@ -25,5 +27,8 @@
     "noUncheckedSideEffectImports": true,
     "moduleDetection": "force",
     "skipLibCheck": true,
+
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
   }
 }
