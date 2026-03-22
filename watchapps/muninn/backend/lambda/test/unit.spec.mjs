@@ -204,4 +204,3 @@ describe('Unit tests', () => {
     });
   });
 });
-console.log(process.env)

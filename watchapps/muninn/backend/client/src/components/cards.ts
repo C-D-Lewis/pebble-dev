@@ -103,7 +103,7 @@ const ChartCard = () => AppCard()
     ChartModeBar(),
     Separator(),
     Annotation().setText('Try zooming and panning to see more detail.'),
-    DownloadGraphButton(),
+    // DownloadGraphButton(),  // Can't open this in config page view...
   ]);
 
 /**
