@@ -13,8 +13,9 @@ import {
   ShareLink,
   GlobalStatsList,
   ImageButton,
+  AppButton,
 } from './index.ts';
-import { downloadChartImage } from '../util.ts';
+import { downloadChartImage, downloadHistoryCsv } from '../util.ts';
 
 declare const fabricate: Fabricate<AppState>;
 
@@ -143,6 +144,20 @@ const ShareCard = () => AppCard()
     Subtitle().setText('Share'),
     Text().setText('Copy the link below to share your battery stats:'),
     ShareLink(),
+    Separator(),
+    Text().setText('If you are viewing in a full web browser, use the buttons below to export:'),
+    fabricate('Row')
+      .setStyles({ justifyContent: 'center' })
+      .setChildren([
+        AppButton()
+          .setStyles({ padding: '6px', fontSize: '0.9rem' })
+          .setText('Graph as PNG')
+          .onClick(downloadChartImage),
+        AppButton()
+          .setStyles({ padding: '6px', fontSize: '0.9rem' })
+          .setText('History as CSV')
+          .onClick(downloadHistoryCsv),
+      ]),
     Separator(),
     Annotation().setText('That\'s all we know - thanks for using Muninn!'),
   ]);

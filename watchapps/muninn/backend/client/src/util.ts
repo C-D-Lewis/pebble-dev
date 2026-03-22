@@ -1,4 +1,5 @@
 import { CANVAS_ID } from './constants.ts';
+import { HistoryItem } from './types.ts';
 
 /**
  * Trigger download of the chart as an image.
@@ -12,4 +13,8 @@ export const downloadChartImage = () => {
   a.href = imageURI;
 
   a.click();
+};
+
+export const downloadHistoryCsv = (history: HistoryItem[]) => {
+
 };
