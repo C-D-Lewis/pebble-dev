@@ -13,7 +13,7 @@ import {
 import type {
   GetHistoryResponse,
   GetGlobalStatsResponse,
-  LambdaEvent,
+  ApiGwEvent,
   PostHistoryBody,
   PostIdBody,
   DbDocument
@@ -88,13 +88,13 @@ export const handlePostHistory = async (docClient: DynamoDBDocumentClient, body:
  * Handle GET /history/{id} route.
  *
  * @param {DynamoDBDocumentClient} docClient - DynamoDB document client.
- * @param {LambdaEvent} event - Lambda event object.
+ * @param {ApiGwEvent} event - Lambda event object.
  * @param {string} id - ID from the path parameters.
  * @returns {Promise<{ history: HistoryItem[] }>} - Response with the history data.
  */
 export const handleGetHistoryById = async (
   docClient: DynamoDBDocumentClient,
-  event: LambdaEvent,
+  event: ApiGwEvent,
   id?: string,
 ) => {
   if (!id) return badRequest('id is required');
@@ -125,12 +125,12 @@ export const handleGetHistoryById = async (
  * Handle GET /globalStats route.
  *
  * @param {DynamoDBDocumentClient} docClient - DynamoDB document client.
- * @param {LambdaEvent} event - Lambda event.
+ * @param {ApiGwEvent} event - Lambda event.
  * @returns {Promise<GetGlobalStatsResponse>} - Response with the stats data.
  */
 export const handleGetGlobalStats = async (
   docClient: DynamoDBDocumentClient,
-  event: LambdaEvent,
+  event: ApiGwEvent,
 ) => {
   const historyRows = await getHistoryRows(docClient);
 

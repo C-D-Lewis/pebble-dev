@@ -5,7 +5,7 @@ export type HistoryItem = {
   res: number;
 };
 
-export type LambdaEvent = {
+export type ApiGwEvent = {
   httpMethod: 'POST' | 'GET';
   routeKey: string;
   body?: string;
@@ -15,6 +15,11 @@ export type LambdaEvent = {
   headers: {
     origin?: string;
   };
+};
+
+export type EventBridgeEvent = {
+  'detail-type': 'DailyAggregation';
+  source: 'aws.events';
 };
 
 export type WatchStats = {

@@ -1,5 +1,5 @@
 import { ALLOWED_ORIGINS, DEFAULT_RES_HEADERS } from './constants.ts';
-import type { HistoryItem, LambdaEvent, PostHistoryBody, WatchStats } from './types.ts';
+import type { HistoryItem, ApiGwEvent, PostHistoryBody, WatchStats } from './types.ts';
 
 /**
  * Generate a random 6-character hexadecimal ID.
@@ -119,7 +119,7 @@ export const validatePostHistoryBody = (body: PostHistoryBody) => {
   return true;
 };
 
-export const cors = (event: LambdaEvent) => {
+export const cors = (event: ApiGwEvent) => {
   const origin = event.headers.origin || '';
   const acaoHeader = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[1];
 

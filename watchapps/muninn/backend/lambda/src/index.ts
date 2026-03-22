@@ -1,7 +1,7 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
-import { error } from './util.ts';
-import type { LambdaEvent } from './types.ts';
+import { error, success } from './util.ts';
+import type { ApiGwEvent, EventBridgeEvent, LambdaResponse } from './types.ts';
 import {
   handlePostId,
   handlePostHistory,
@@ -10,12 +10,28 @@ import {
 } from './handlers.ts';
 
 /**
- * Main Lambda handler function.
+ * Determine if this is an API GW event.
  *
- * @param {LambdaEvent} event - Lambda event object.
- * @returns Promise<LambdaResponse> - Response object as required by API Gateway.
+ * @param {object} event - Input event.
+ * @returns {boolean} true if API GW event.
  */
-export const handler = async (event: LambdaEvent) => {
+const isApiGwEvent = (event: any): event is ApiGwEvent => !!event.routeKey;
+
+/**
+ * Determine if this is an EventBridge event.
+ *
+ * @param {object} event - Input event.
+ * @returns {boolean} true if EB event.
+ */
+const isEbEvent = (event: any): event is EventBridgeEvent => !!event['detail-type'];
+
+/**
+ * Handle trigger from API Gateway.
+ *
+ * @param {ApiGwEvent} event - Lambda event.
+ * @returns {Promise<LambdaResponse>} Response to the request.
+ */
+const handleApiRequest = async (event: ApiGwEvent) => {
   const client = new DynamoDBClient({});
   const docClient = DynamoDBDocumentClient.from(client);
 
@@ -24,13 +40,30 @@ export const handler = async (event: LambdaEvent) => {
   const { id } = event.pathParameters || {};
   console.log({ route, body, id });
 
-  try {
-    if (route === 'POST /id') return handlePostId(docClient, body);
-    if (route === 'POST /history') return handlePostHistory(docClient, body);
-    if (route === 'GET /history/{id}') return handleGetHistoryById(docClient, event, id);
-    if (route === 'GET /globalStats') return handleGetGlobalStats(docClient, event);
+  if (route === 'POST /id') return handlePostId(docClient, body);
+  if (route === 'POST /history') return handlePostHistory(docClient, body);
+  if (route === 'GET /history/{id}') return handleGetHistoryById(docClient, event, id);
+  if (route === 'GET /globalStats') return handleGetGlobalStats(docClient, event);
 
-    throw new Error('Route not found');
+  throw new Error('Route not found');
+};
+
+const handleEventBridgeEvent = async (event: EventBridgeEvent) => {
+  console.log(event);
+};
+
+/**
+ * Main Lambda handler function.
+ *
+ * @param {ApiGwEvent | EventBridgeEvent} event - Lambda event object.
+ * @returns Promise<LambdaResponse> - Response object as required by API Gateway or EventBridge.
+ */
+export const handler = async (event: ApiGwEvent | EventBridgeEvent) => {
+  try {
+    if (isApiGwEvent(event)) return handleApiRequest(event);
+    if (isEbEvent(event)) return handleEventBridgeEvent(event);
+    
+    throw new Error('Unknown trigger');
   } catch (e) {
     console.error(e);
     const errMsg = e instanceof Error ? e.message : 'Unknown error';
