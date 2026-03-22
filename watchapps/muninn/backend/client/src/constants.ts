@@ -12,3 +12,6 @@ export const MS_PER_DAY = 24 * 60 * 60 * 1000;
 export const ONE_WEEK_AGO = Date.now() - (7 * MS_PER_DAY);
 /** One month ago */
 export const ONE_MONTH_AGO = Date.now() - (30 * MS_PER_DAY);
+
+/** Canvas element ID */
+export const CANVAS_ID = 'history-canvas';

@@ -1,12 +1,14 @@
 import { Fabricate, FabricateComponent } from 'fabricate.js';
-import {
-  AppNavBar, Footer, HistoryCardList, LoginCard, Braid,
-  NotFoundCard,
-  AppLoader,
-} from './components.ts';
 import { AppState } from './types.ts';
 import Theme from './theme.ts';
 import { fetchWatchHistory } from './api.ts';
+import { LoginCard, HistoryCardList, NotFoundCard } from './components/cards.ts';
+import {
+  AppLoader,
+  AppNavBar,
+  Braid,
+  Footer,
+} from './components/index.ts';
 
 declare const fabricate: Fabricate<AppState>;
 
