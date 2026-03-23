@@ -9,6 +9,7 @@ import {
   Braid,
   Footer,
 } from './components/index.ts';
+import { getParam } from './util.ts';
 
 declare const fabricate: Fabricate<AppState>;
 
@@ -56,9 +57,7 @@ const AppContent = () => fabricate('Column')
  * @returns {FabricateComponent} Fabricate component.
  */
 const App = () => fabricate('Column')
-  .setStyles({
-    margin: fabricate.isNarrow() ? '0px' : '0px auto',
-  })
+  .setStyles({ margin: fabricate.isNarrow() ? '0px' : '0px auto' })
   .setChildren([
     AppNavBar(),
     Braid(),
@@ -67,23 +66,18 @@ const App = () => fabricate('Column')
     Footer(),
   ])
   .onCreate(() => {
-    const params = new URLSearchParams(window.location.search);
-    const id = params.get('id');
+    const id = getParam('id');
     if (!id) return;
 
     fetchWatchHistory(id.toUpperCase());
   });
-
-// If in the path, use it
-const path = new URL(window.location.href).pathname;
-const id = path.length > 1 ? path.slice(1) : '';
 
 const initialState: AppState = {
   loading: false,
   notFound: false,
   chartMode: 'all',
 
-  id,
+  id: '',
   updatedAt: 0,
   history: [],
   platform: '',

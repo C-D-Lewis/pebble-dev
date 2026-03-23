@@ -38,5 +38,7 @@ Pebble.addEventListener('appmessage', async (e) => {
 
 Pebble.addEventListener('showConfiguration', async () => {
   const id = await ensureUploadId();
-  Pebble.openURL(`https://muninn.chrislewis.me.uk?id=${id}`);
+
+  // isAppConfigPage hides some elements that can't be clicked in the config page webview
+  Pebble.openURL(`https://muninn.chrislewis.me.uk?id=${id}&isAppConfigPage=true`);
 });

@@ -12,10 +12,9 @@ import {
   InfoChips,
   ShareLink,
   GlobalStatsList,
-  ImageButton,
   AppButton,
 } from './index.ts';
-import { downloadChartImage, downloadHistoryCsv } from '../util.ts';
+import { downloadChartImage, downloadHistoryCsv, getParam } from '../util.ts';
 
 declare const fabricate: Fabricate<AppState>;
 
@@ -79,19 +78,6 @@ const SummaryCard = () => AppCard()
   ]);
 
 /**
- * DownloadGraphButton component.
- *
- * @returns {FabricateComponent} Fabricate component.
- */
-const DownloadGraphButton = () => ImageButton({ src: 'assets/images/download.png' })
-  .setStyles({
-    position: 'absolute',
-    top: '10px',
-    right: '16px',
-  })
-  .onClick(downloadChartImage);
-
-/**
  * ChartCard component.
  *
  * @returns {FabricateComponent} Fabricate component.
@@ -131,7 +117,7 @@ const InfoCard = () => AppCard()
     Text().setText('Simple metadata about this Pebble watch:'),
     InfoChips(),
     Separator(),
-    Annotation().setText('Hopefully soon it will be possible to compare firmwares and models to see even more insight into Pebble watch performance.'),
+    Annotation().setText('In the future it may be possible to compare watches to get even more insight.'),
   ]);
 
 /**
@@ -139,28 +125,36 @@ const InfoCard = () => AppCard()
  *
  * @returns {FabricateComponent} Fabricate component.
  */
-const ShareCard = () => AppCard()
-  .setChildren([
-    Subtitle().setText('Share'),
-    Text().setText('Copy the link below to share your battery stats:'),
-    ShareLink(),
-    Separator(),
-    Text().setText('If you are viewing in a full web browser, use the buttons below to export:'),
-    fabricate('Row')
-      .setStyles({ justifyContent: 'center' })
-      .setChildren([
-        AppButton()
-          .setStyles({ padding: '6px', fontSize: '0.9rem' })
-          .setText('Graph as PNG')
-          .onClick(downloadChartImage),
-        AppButton()
-          .setStyles({ padding: '6px', fontSize: '0.9rem' })
-          .setText('History as CSV')
-          .onClick(downloadHistoryCsv),
-      ]),
-    Separator(),
-    Annotation().setText('That\'s all we know - thanks for using Muninn!'),
-  ]);
+const ShareCard = () => {
+  const card = AppCard()
+    .setChildren([
+      Subtitle().setText('Share'),
+      Text().setText('Copy the link below to share your battery stats:'),
+      ShareLink(),
+    ]);
+
+  // Coreapp config page webview doesn't allow copying or opening save dialogs apparently
+  if (!getParam('isAppConfigPage')) {
+    card.addChildren([
+      Separator(),
+      Subtitle().setText('Export'),
+      fabricate('Row')
+        .setStyles({ justifyContent: 'center' })
+        .setChildren([
+          AppButton()
+            .setStyles({ padding: '6px', fontSize: '0.9rem' })
+            .setText('Graph (PNG)')
+            .onClick(downloadChartImage),
+          AppButton()
+            .setStyles({ padding: '6px', fontSize: '0.9rem' })
+            .setText('History (CSV)')
+            .onClick((el, { history }) => downloadHistoryCsv(history)),
+        ]),
+    ]);
+  }
+
+  return card;
+};
 
 /**
  * HistoryCardList component.
@@ -174,6 +168,9 @@ export const HistoryCardList = () => fabricate('Column')
     StatsCard(),
     InfoCard(),
     ShareCard(),
+    Text()
+      .setStyles({ marginTop: '16px' })
+      .setText('That\'s all we know - thanks for using Muninn!'),
   ]);
 
 /**
