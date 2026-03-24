@@ -3,6 +3,7 @@
 #include <pebble.h>
 
 #include "../modules/data.h"
+#include "../modules/comm.h"
 
 #include "../windows/message_window.h"
 

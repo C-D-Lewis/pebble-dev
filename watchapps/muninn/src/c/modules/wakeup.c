@@ -74,6 +74,13 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
     return;
   }
 
+#ifdef FEATURE_SYNC
+  // If mid-day and enabled, upload history for viewing in app config page
+  if (persist_data->upload_daily && now->tm_hour == 12) {
+    comm_upload_history();
+  }
+#endif
+
   const BatteryChargeState state = battery_state_service_peek();
   const int charge_percent = state.charge_percent;
   const int last_charge_perc = persist_data->last_charge_perc;

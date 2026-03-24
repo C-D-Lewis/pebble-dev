@@ -12,6 +12,9 @@ typedef enum {
   MI_PUSH_TIMELINE_PINS,
   MI_ELEVATED_RATE_ALERT,
   MI_ONE_DAY_ALERT,
+#ifdef FEATURE_SYNC
+  MI_UPLOAD_DAILY,
+#endif
 
   MI_DELETE_ALL_DATA,
 
@@ -74,6 +77,16 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
         persist_data->one_day_alert ? "Enabled" : "Disabled"
       );
       break;
+#ifdef FEATURE_SYNC
+    case MI_UPLOAD_DAILY:
+      util_menu_cell_draw(
+        ctx,
+        cell_layer,
+        "Upload Daily",
+        persist_data->upload_daily ? "Enabled" : "Disabled"
+      );
+      break;
+#endif
     case MI_DELETE_ALL_DATA:
       util_menu_cell_draw(
         ctx,
@@ -93,6 +106,9 @@ static int16_t get_cell_height_callback(struct MenuLayer *menu_layer, MenuIndex 
     case MI_PUSH_TIMELINE_PINS:
     case MI_ELEVATED_RATE_ALERT:
     case MI_ONE_DAY_ALERT:
+#ifdef FEATURE_SYNC
+    case MI_UPLOAD_DAILY:
+#endif
       return ROW_HEIGHT_LARGE;
     case MI_DELETE_ALL_DATA:
       return s_reset_confirm ? ROW_HEIGHT_LARGE : ROW_HEIGHT_SMALL;
@@ -121,7 +137,22 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
     case MI_ONE_DAY_ALERT:
       persist_data->one_day_alert = !persist_data->one_day_alert;
       break;
+#ifdef FEATURE_SYNC
+    case MI_UPLOAD_DAILY: {
+      const bool new_state = !persist_data->upload_daily;
+      persist_data->upload_daily = new_state;
 
+      if (new_state) {
+        message_window_push(
+          "If available, history will be uploaded for viewing in the app config page daily during the noon sample.",
+          false,
+          false
+        );
+      }
+    } break;
+#endif
+
+    // Other
     case MI_DELETE_ALL_DATA:
       if (s_reset_confirm) {
 #ifdef FEATURE_SYNC

@@ -82,7 +82,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
       MIN_SAMPLES_FOR_WEB
     );
   } else {
-    snprintf(s_upload_status_buff, sizeof(s_upload_status_buff), "Press to share");
+    snprintf(s_upload_status_buff, sizeof(s_upload_status_buff), "Press to upload");
   }
 
   switch(cell_index->row) {
