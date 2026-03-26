@@ -2,19 +2,21 @@ import { Fabricate, FabricateComponent } from 'fabricate.js';
 import { ChartModeBar, HistoryChart } from './chart.ts';
 import { AppState } from '../types.ts';
 import {
-  Subtitle,
+  CardTitle,
   SearchBox,
   SubmitButton,
   Annotation,
   Text,
   Separator,
   StatsList,
-  InfoChips,
   ShareLink,
-  GlobalStatsList,
+  GlobalStatsView,
   AppButton,
+  AppLoader,
+  InfoChips,
 } from './index.ts';
 import { downloadChartImage, downloadHistoryCsv, getParam } from '../util.ts';
+import { fetchGlobalStats } from '../api.ts';
 
 declare const fabricate: Fabricate<AppState>;
 
@@ -46,15 +48,17 @@ const AppCard = () => fabricate('Card')
 export const LoginCard = () => AppCard()
   .setStyles({ marginTop: '28px' })
   .setChildren([
-    Subtitle()
+    CardTitle()
       .setText('Welcome!'),
-    Text().setText('Please enter the six digit code shown on your watch:'),
+    Text().setText('Please enter the six digit code shown on your watch to see your full history:'),
     fabricate('Row')
       .setStyles({ marginTop: '10px', alignItems: 'center', justifyContent: 'center' })
       .setChildren([
         SearchBox(),
         SubmitButton(),
       ]),
+    Separator(),
+    Annotation().setText('(not available for original Pebble due to memory constraints)'),
   ]);
 
 /**
@@ -64,7 +68,7 @@ export const LoginCard = () => AppCard()
  */
 const SummaryCard = () => AppCard()
   .setChildren([
-    Subtitle().setText('Your History'),
+    CardTitle().setText('Your History'),
     Text()
       .setText('Below is the complete battery history as uploaded from Muninn. It will be updated each time you share from the watchapp.'),
     Text()
@@ -85,7 +89,7 @@ const SummaryCard = () => AppCard()
 const ChartCard = () => AppCard()
   .setStyles({ position: 'relative' })
   .setChildren([
-    Subtitle().setText('Graph'),
+    CardTitle().setText('Graph'),
     HistoryChart(),
     ChartModeBar(),
     Separator(),
@@ -100,24 +104,10 @@ const ChartCard = () => AppCard()
  */
 const StatsCard = () => AppCard()
   .setChildren([
-    Subtitle().setText('Statistics'),
+    CardTitle().setText('Statistics'),
     StatsList(),
     Separator(),
     Annotation().setText('If some stats aren\'t ready yet, check back in a few more days.'),
-  ]);
-
-/**
- * InfoCard component.
- *
- * @returns {FabricateComponent} Fabricate component.
- */
-const InfoCard = () => AppCard()
-  .setChildren([
-    Subtitle().setText('Watch Data'),
-    Text().setText('Simple metadata about this Pebble watch:'),
-    InfoChips(),
-    Separator(),
-    Annotation().setText('In the future it may be possible to compare watches to get even more insight.'),
   ]);
 
 /**
@@ -128,7 +118,7 @@ const InfoCard = () => AppCard()
 const ShareCard = () => {
   const card = AppCard()
     .setChildren([
-      Subtitle().setText('Share'),
+      CardTitle().setText('Share'),
       Text().setText('Copy the link below to share your battery stats:'),
       ShareLink(),
       Separator(),
@@ -137,7 +127,7 @@ const ShareCard = () => {
   // Coreapp config page webview doesn't allow copying or opening save dialogs apparently
   if (!getParam('isAppConfigPage')) {
     card.addChildren([
-      Subtitle().setText('Export'),
+      CardTitle().setText('Export'),
       fabricate('Row')
         .setStyles({ justifyContent: 'center' })
         .setChildren([
@@ -170,8 +160,8 @@ export const HistoryCardList = () => fabricate('Column')
     SummaryCard(),
     ChartCard(),
     StatsCard(),
-    InfoCard(),
     ShareCard(),
+    InfoChips(),
     Text()
       .setStyles({ marginTop: '16px' })
       .setText('That\'s all we know - thanks for using Muninn!'),
@@ -185,9 +175,23 @@ export const HistoryCardList = () => fabricate('Column')
 export const GlobalStatsCard = () => AppCard()
   .setStyles({ marginTop: '25px' })
   .setChildren([
-    Subtitle().setText('Global Stats'),
-    GlobalStatsList(),
-  ]);
+    CardTitle().setText('Global Stats'),
+    Text().setText('These insights are drawn from all Muninn users who opted to upload their history. Over time, more users will hopefully increase data accuracy.'),
+    Separator(),
+    fabricate.conditional(
+      (state) => state.globalStats.historyCount !== 0,
+      GlobalStatsView,
+    ),
+    fabricate.conditional(
+      (state) => state.globalStats.historyCount === 0,
+      AppLoader,
+    ),
+  ])
+  .onCreate((el, { globalStats }) => {
+    if (globalStats.historyCount !== 0) return;
+
+    fetchGlobalStats();
+  });
 
 /**
  * NotFoundCard component.
@@ -199,9 +203,8 @@ export const NotFoundCard = () => AppCard()
   .setChildren([
     fabricate('Image', { src: 'assets/images/not-found.png' })
       .setStyles({ width: '96px', height: '96px', margin: 'auto' }),
-    Subtitle().setText('Not Found'),
+    CardTitle().setText('Not Found'),
     Text()
       .setStyles({ maxWidth: '350px' })
       .setText('No data was found for this code.\n\nUse the upload option in the watchapp to start seeing data here.'),
-    Annotation().setText('(not available for original Pebble due to memory constraints)'),
   ]);

@@ -16,9 +16,20 @@ export type Stats = {
   mtbc: number;
 };
 
+/** Single stat item bucket */
+export type GlobalStatItem = {
+  name: string;
+  avgBatteryLife: number;
+  avgRate: number;
+  count: number;
+};
+
 /** Global API data */
-export type GlobalStats = {
+export type GetGlobalStatsResponse = {
   historyCount: number;
+  models: GlobalStatItem[];
+  platforms: GlobalStatItem[];
+  updatedAt: number;
 };
 
 /** Chart modes */
@@ -41,5 +52,5 @@ export type AppState = {
   stats: Stats;
 
   // Global API data
-  globalStats: GlobalStats;
+  globalStats: GetGlobalStatsResponse;
 };

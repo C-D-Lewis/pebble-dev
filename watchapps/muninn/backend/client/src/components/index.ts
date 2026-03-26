@@ -1,13 +1,29 @@
 import { Fabricate, FabricateComponent } from 'fabricate.js';
 import { AppState } from '../types.ts';
-import { fetchGlobalStats, fetchWatchHistory } from '../api.ts';
+import { fetchWatchHistory } from '../api.ts';
 import Theme from '../theme.ts';
 import {
   STATUS_EMPTY,
   UI_URL,
 } from '../constants.ts';
+import { GlobalStatsTable } from './table.ts';
 
 declare const fabricate: Fabricate<AppState>;
+
+/**
+ * CardTitle component.
+ *
+ * @returns {FabricateComponent} Fabricate component.
+ */
+export const CardTitle = () => fabricate('Text')
+  .setStyles({
+    color: 'white',
+    fontSize: '1.2rem',
+    marginTop: '5px',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    cursor: 'default',
+  });
 
 /**
  * Subtitle component.
@@ -17,7 +33,7 @@ declare const fabricate: Fabricate<AppState>;
 export const Subtitle = () => fabricate('Text')
   .setStyles({
     color: 'white',
-    fontSize: '1.2rem',
+    fontSize: '1rem',
     marginTop: '5px',
     fontWeight: 'bold',
     textAlign: 'center',
@@ -81,10 +97,10 @@ export const AppNavBar = () => fabricate('Row')
     fabricate('Image')
       .setAttributes({ src: 'assets/images/icon.png' })
       .setStyles({
-        width: '48px',
-        height: '48px',
+        width: '36px',
+        height: '36px',
         margin: '0px 10px',
-        borderRadius: '50px',
+        padding: '8px',
       }),
     fabricate('Text')
       .setText('Muninn - Battery Wisdom')
@@ -223,11 +239,12 @@ const InfoChip = ({ label, value }: { label: string, value: string }) => fabrica
     fabricate('Text')
       .setStyles(({ palette }) => ({
         color: palette.grey(9),
-        fontSize: '0.9rem',
+        fontSize: '0.8rem',
+        margin: '2px 4px',
       }))
       .setText(label),
     fabricate('Text')
-      .setStyles({ color: 'white', fontSize: '0.9rem', fontFamily: 'monospace' })
+      .setStyles({ color: '#ccc', fontSize: '0.8rem', fontFamily: 'monospace' })
       .setText(value),
   ]);
 
@@ -323,7 +340,9 @@ export const StatsList = () => fabricate('Column')
  * @returns {FabricateComponent} Fabricate component.
  */
 export const InfoChips = () => fabricate('Column')
-  .setStyles({ marginTop: '8px' })
+  .setStyles({
+    padding: '4px',
+  })
   .onCreate((el, state) => {
     const {
       id,
@@ -345,29 +364,30 @@ export const InfoChips = () => fabricate('Column')
   });
 
 /**
- * GlobalStatsList component.
+ * GlobalStatsView component.
  *
  * @returns {FabricateComponent} Fabricate component.
  */
-export const GlobalStatsList = () => fabricate('Column')
-  .onCreate((el) => {
-    el.setChildren([
-      AppLoader(),
-    ]);
-
-    fetchGlobalStats();
-  })
+export const GlobalStatsView = () => fabricate('Column')
   .onUpdate(async (el, state) => {
     const { globalStats } = state;
-    const { historyCount } = globalStats;
+    const { historyCount, updatedAt  } = globalStats;
+
+    const date = new Date(updatedAt);
 
     el.setChildren([
-      fabricate('Row')
+      fabricate('Column')
         .setChildren([
-          StatView({ label: 'User Uploads', value: `${historyCount}` }),
+          Subtitle().setText('By Platform'),
+          GlobalStatsTable({ field: 'platforms' }),
+          Separator(),
+          Subtitle().setText('By Model Name'),
+          GlobalStatsTable({ field: 'models' }),
+          Separator(),
+          Annotation().setText(`From ${historyCount} users, last updated: ${date.toLocaleString()}`),
         ]),
     ]);
-  }, ['globalStats']);
+  }, [fabricate.StateKeys.Created, 'globalStats']);
 
 /**
  * ShareLink component.

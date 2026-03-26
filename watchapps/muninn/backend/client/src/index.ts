@@ -2,7 +2,11 @@ import { Fabricate, FabricateComponent } from 'fabricate.js';
 import { AppState } from './types.ts';
 import Theme from './theme.ts';
 import { fetchWatchHistory } from './api.ts';
-import { LoginCard, HistoryCardList, NotFoundCard } from './components/cards.ts';
+import {
+  LoginCard,
+  HistoryCardList,
+  NotFoundCard,
+} from './components/cards.ts';
 import {
   AppLoader,
   AppNavBar,
@@ -32,12 +36,6 @@ const AppContent = () => fabricate('Column')
       (state) => !state.loading && state.history.length === 0 && !state.notFound,
       LoginCard,
     ),
-    // Save this until it's more useful
-    // Note: Ensure aggregations are in place so API call doesn't hammer DB!
-    // fabricate.conditional(
-    //   (state) => !state.loading && state.history.length === 0 && !state.notFound,
-    //   GlobalStatsCard,
-    // ),
     fabricate.conditional(
       (state) => state.loading && state.history.length === 0,
       AppLoader,
@@ -46,6 +44,11 @@ const AppContent = () => fabricate('Column')
       (state) => !state.loading && state.history.length > 0,
       HistoryCardList,
     ),
+    // Keep disabled until meaningful and large gaps are handled
+    // fabricate.conditional(
+    //   (state) => !state.loading && !state.notFound,
+    //   GlobalStatsCard,
+    // ),
     fabricate.conditional(
       (state) => !state.loading && state.notFound,
       NotFoundCard,
@@ -95,6 +98,9 @@ const initialState: AppState = {
 
   globalStats: {
     historyCount: 0,
+    models: [],
+    platforms: [],
+    updatedAt: 0,
   },
 };
 
