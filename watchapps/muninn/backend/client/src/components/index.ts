@@ -359,12 +359,12 @@ export const GlobalStatsList = () => fabricate('Column')
   })
   .onUpdate(async (el, state) => {
     const { globalStats } = state;
-    const { totalUploads } = globalStats;
+    const { historyCount } = globalStats;
 
     el.setChildren([
       fabricate('Row')
         .setChildren([
-          StatView({ label: 'User Uploads', value: `${totalUploads}` }),
+          StatView({ label: 'User Uploads', value: `${historyCount}` }),
         ]),
     ]);
   }, ['globalStats']);

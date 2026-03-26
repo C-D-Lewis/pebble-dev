@@ -18,7 +18,7 @@ export type Stats = {
 
 /** Global API data */
 export type GlobalStats = {
-  totalUploads: number;
+  historyCount: number;
 };
 
 /** Chart modes */

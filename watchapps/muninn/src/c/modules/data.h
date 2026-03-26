@@ -49,7 +49,7 @@ typedef struct {
   bool one_day_notified;    // One day remaining alert has notified
   int last_charge_time;     // Timestamp of last charge
   bool one_day_alert;       // Show 'one day remaining' alert
-  bool upload_daily;    // If uploading history on schedule
+  bool auto_upload;         // If uploading history on schedule
 
   // Singleton, adding new fields OK, removing from middle is NOT OK
 } PersistData;

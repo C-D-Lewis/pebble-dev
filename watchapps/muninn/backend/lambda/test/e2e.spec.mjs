@@ -107,7 +107,10 @@ describe('API', () => {
       const { status, json } = await apiRequest('/globalStats', 'GET');
 
       expect(status).to.equal(200);
-      expect(json.totalUploads).to.be.a('number');
+      expect(json.historyCount).to.be.a('number');
+      expect(json.models).to.have.length.greaterThan(0);
+      expect(json.platforms).to.have.length.greaterThan(0);
+      expect(json.updatedAt).to.be.a('number').greaterThan(100000000);
     });
   });
 });

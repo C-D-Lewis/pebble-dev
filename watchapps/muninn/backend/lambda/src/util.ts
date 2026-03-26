@@ -125,3 +125,5 @@ export const cors = (event: ApiGwEvent) => {
 
   return { 'Access-Control-Allow-Origin': acaoHeader };
 };
+
+export const sortByCount = (a: any, b: any) => b.count - a.count;

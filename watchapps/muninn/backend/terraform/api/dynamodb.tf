@@ -42,3 +42,17 @@ resource "aws_dynamodb_table" "history_table" {
     type = "S"
   }
 }
+
+resource "aws_dynamodb_table" "metadata" {
+  name                        = "metadata"
+  billing_mode                = "PROVISIONED"
+  read_capacity               = 5
+  write_capacity              = 5
+  hash_key                    = "id"
+  deletion_protection_enabled = var.deletion_protection
+
+  attribute {
+    name = "id"
+    type = "S"
+  }
+}

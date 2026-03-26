@@ -50,13 +50,13 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
       util_menu_cell_draw(
         ctx,
         cell_layer,
-        "Phone Sync",
+        "Sync to Phone",
         s_sync_buff
       );
       break;
 #endif
     case MI_BATTERY_TIPS:
-      util_menu_cell_draw(ctx, cell_layer, "Battery tips", NULL);
+      util_menu_cell_draw(ctx, cell_layer, "Battery Tips", NULL);
       break;
     case MI_VERSION: {
       static char s_v_buff[16];

@@ -48,7 +48,7 @@ static void init_data_fields() {
   s_persist_data.last_charge_time = STATUS_EMPTY;
   s_persist_data.one_day_alert = true;
   s_persist_data.one_day_notified = false;
-  s_persist_data.upload_daily = false;
+  s_persist_data.auto_upload = false;
 
   for (int i = 0; i < NUM_SAMPLES; i++) {
     Sample *s = &s_samples[i];
@@ -140,7 +140,7 @@ static void test_data_generator() {
   s_persist_data.one_day_notified = false;
   s_persist_data.last_charge_time = base - (3 * SECONDS_PER_DAY);
   s_persist_data.one_day_alert = false;
-  s_persist_data.upload_daily = false;
+  s_persist_data.auto_upload = false;
 
   for (int i = 0; i < NUM_SAMPLES; i++) {
     Sample *s = &s_samples[i];

@@ -13,7 +13,7 @@ typedef enum {
   MI_ELEVATED_RATE_ALERT,
   MI_ONE_DAY_ALERT,
 #ifdef FEATURE_SYNC
-  MI_UPLOAD_DAILY,
+  MI_AUTO_UPLOAD,
 #endif
 
   MI_DELETE_ALL_DATA,
@@ -78,12 +78,12 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
       );
       break;
 #ifdef FEATURE_SYNC
-    case MI_UPLOAD_DAILY:
+    case MI_AUTO_UPLOAD:
       util_menu_cell_draw(
         ctx,
         cell_layer,
-        "Upload Daily",
-        persist_data->upload_daily ? "Enabled" : "Disabled"
+        "Auto Upload (Web)",
+        persist_data->auto_upload ? "Enabled" : "Disabled"
       );
       break;
 #endif
@@ -107,7 +107,7 @@ static int16_t get_cell_height_callback(struct MenuLayer *menu_layer, MenuIndex 
     case MI_ELEVATED_RATE_ALERT:
     case MI_ONE_DAY_ALERT:
 #ifdef FEATURE_SYNC
-    case MI_UPLOAD_DAILY:
+    case MI_AUTO_UPLOAD:
 #endif
       return ROW_HEIGHT_LARGE;
     case MI_DELETE_ALL_DATA:
@@ -138,9 +138,9 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
       persist_data->one_day_alert = !persist_data->one_day_alert;
       break;
 #ifdef FEATURE_SYNC
-    case MI_UPLOAD_DAILY: {
-      const bool new_state = !persist_data->upload_daily;
-      persist_data->upload_daily = new_state;
+    case MI_AUTO_UPLOAD: {
+      const bool new_state = !persist_data->auto_upload;
+      persist_data->auto_upload = new_state;
 
       if (new_state) {
         message_window_push(

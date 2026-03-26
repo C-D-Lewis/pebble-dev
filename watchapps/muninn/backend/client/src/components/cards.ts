@@ -131,12 +131,12 @@ const ShareCard = () => {
       Subtitle().setText('Share'),
       Text().setText('Copy the link below to share your battery stats:'),
       ShareLink(),
+      Separator(),
     ]);
 
   // Coreapp config page webview doesn't allow copying or opening save dialogs apparently
   if (!getParam('isAppConfigPage')) {
     card.addChildren([
-      Separator(),
       Subtitle().setText('Export'),
       fabricate('Row')
         .setStyles({ justifyContent: 'center' })
@@ -150,6 +150,10 @@ const ShareCard = () => {
             .setText('History (CSV)')
             .onClick((el, { history }) => downloadHistoryCsv(history)),
         ]),
+    ]);
+  } else {
+    card.addChildren([
+      Annotation().setText('View in a full browser for more export options.'),
     ]);
   }
 

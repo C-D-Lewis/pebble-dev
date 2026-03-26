@@ -76,7 +76,7 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
 
 #ifdef FEATURE_SYNC
   // If mid-day and enabled, upload history for viewing in app config page
-  if (persist_data->upload_daily && now->tm_hour == 12) {
+  if (persist_data->auto_upload && now->tm_hour == 12) {
     comm_upload_history();
   }
 #endif

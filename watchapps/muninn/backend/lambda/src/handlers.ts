@@ -12,13 +12,19 @@ import {
 } from './util.ts';
 import type {
   GetHistoryResponse,
-  GetGlobalStatsResponse,
   ApiGwEvent,
   PostHistoryBody,
   PostIdBody,
   DbDocument
 } from './types.ts';
-import { getId, getHistoryRows, getIfIdExists, saveId, saveHistory, getHistoryData } from './db.ts';
+import {
+  getId,
+  getIfIdExists,
+  saveId,
+  saveHistory,
+  getHistoryData,
+  getAggregations,
+} from './db.ts';
 
 /**
  * Handle POST /id route.
@@ -119,7 +125,7 @@ export const handleGetHistoryById = async (
     stats: found.stats,
   };
   return success(body, cors(event));
-}
+};
 
 /**
  * Handle GET /globalStats route.
@@ -132,14 +138,7 @@ export const handleGetGlobalStats = async (
   docClient: DynamoDBDocumentClient,
   event: ApiGwEvent,
 ) => {
-  const historyRows = await getHistoryRows(docClient);
+  const aggregations = await getAggregations(docClient);
 
-  const body: GetGlobalStatsResponse = {
-    totalUploads: historyRows.Count || -1,
-
-    // Leaderboard?
-
-    // Averages per model / FW?
-  };
-  return success(body, cors(event));
+  return success(aggregations, cors(event));
 };

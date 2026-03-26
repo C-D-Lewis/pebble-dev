@@ -41,6 +41,8 @@ export type WatchData = {
 };
 
 export type DbDocument = {
+  [key: string];
+
   id: string;
   updatedAt: number;
 } & WatchData;
@@ -57,8 +59,18 @@ export type GetHistoryResponse = {
   updatedAt: number;
 } & WatchData;
 
+export type GlobalStatItem = {
+  name: string;
+  avgBatteryLife: number;
+  avgRate: number;
+  count: number;
+}
+
 export type GetGlobalStatsResponse = {
-  totalUploads: number;
+  historyCount: number;
+  models: GlobalStatItem[];
+  platforms: GlobalStatItem[];
+  updatedAt: number;
 };
 
 export type LambdaResponse = {
@@ -66,3 +78,7 @@ export type LambdaResponse = {
   body: string;
   headers?: Record<string, string>;
 };
+
+export type MetadataDocument = {
+  id: AGGREGATION_DOC_ID;
+} & GetGlobalStatsResponse;

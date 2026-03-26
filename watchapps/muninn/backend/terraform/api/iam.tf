@@ -34,7 +34,8 @@ resource "aws_iam_policy" "lambda_dynamodb" {
       Resource = [
         aws_dynamodb_table.ids_table.arn,
         "${aws_dynamodb_table.ids_table.arn}/index/*",
-        aws_dynamodb_table.history_table.arn
+        aws_dynamodb_table.history_table.arn,
+        aws_dynamodb_table.metadata.arn
       ]
     }]
   })

@@ -33,6 +33,7 @@ const AppContent = () => fabricate('Column')
       LoginCard,
     ),
     // Save this until it's more useful
+    // Note: Ensure aggregations are in place so API call doesn't hammer DB!
     // fabricate.conditional(
     //   (state) => !state.loading && state.history.length === 0 && !state.notFound,
     //   GlobalStatsCard,
@@ -93,7 +94,7 @@ const initialState: AppState = {
   },
 
   globalStats: {
-    totalUploads: 0,
+    historyCount: 0,
   },
 };
 
