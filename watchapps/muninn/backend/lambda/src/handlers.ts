@@ -25,6 +25,7 @@ import {
   getHistoryData,
   getAggregations,
 } from './db.ts';
+import { updateAggregations } from './aggregations.ts';
 
 /**
  * Handle POST /id route.
@@ -141,4 +142,16 @@ export const handleGetGlobalStats = async (
   const aggregations = await getAggregations(docClient);
 
   return success(aggregations, cors(event));
+};
+
+/**
+ * Handle POST /recompute route.
+ *
+ * @param {DynamoDBDocumentClient} docClient - DynamoDB document client.
+ * @returns {Promise<object>} - Response.
+ */
+export const handlePostRecompute = async (docClient: DynamoDBDocumentClient) => {
+  await updateAggregations(docClient);
+
+  return success({ success: true });
 };

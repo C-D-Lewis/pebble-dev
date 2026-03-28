@@ -7,6 +7,7 @@ import {
   handlePostHistory,
   handleGetHistoryById,
   handleGetGlobalStats,
+  handlePostRecompute,
 } from './handlers.ts';
 import { updateAggregations } from './aggregations.ts';
 
@@ -43,6 +44,7 @@ const handleApiRequest = async (event: ApiGwEvent, docClient: DynamoDBDocumentCl
   if (route === 'POST /history') return handlePostHistory(docClient, body);
   if (route === 'GET /history/{id}') return handleGetHistoryById(docClient, event, id);
   if (route === 'GET /globalStats') return handleGetGlobalStats(docClient, event);
+  if (route === 'POST /recompute') return handlePostRecompute(docClient);
 
   throw new Error('Route not found');
 };

@@ -61,6 +61,7 @@ export type GetHistoryResponse = {
 
 export type GlobalStatItem = {
   name: string;
+  rawName: string;
   avgBatteryLife: number;
   avgRate: number;
   count: number;

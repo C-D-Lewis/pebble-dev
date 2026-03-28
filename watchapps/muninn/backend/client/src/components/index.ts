@@ -2,10 +2,7 @@ import { Fabricate, FabricateComponent } from 'fabricate.js';
 import { AppState } from '../types.ts';
 import { fetchWatchHistory } from '../api.ts';
 import Theme from '../theme.ts';
-import {
-  STATUS_EMPTY,
-  UI_URL,
-} from '../constants.ts';
+import { STATUS_EMPTY, UI_URL } from '../constants.ts';
 import { GlobalStatsTable } from './table.ts';
 
 declare const fabricate: Fabricate<AppState>;
@@ -79,7 +76,7 @@ export const Annotation = () => fabricate('Text')
     textAlign: 'center',
     fontSize: '0.8rem',
     fontStyle: 'italic',
-    marginTop: '8px',
+    marginTop: '4px',
   }));
 
 /**
@@ -254,34 +251,44 @@ const InfoChip = ({ label, value }: { label: string, value: string }) => fabrica
  * @param {object} props - Component props.
  * @param {string} props.label - Stat label.
  * @param {string} props.value - Stat value.
+ * @param {string} [props.note] - Note if needed.
  * @returns {FabricateComponent} Fabricate component.
  */
-const StatView = ({ label, value }: { label: string, value: string }) => fabricate('Column')
-  .setStyles(({ palette }) => ({
-    backgroundColor: palette.grey(4),
-    borderRadius: '5px',
-    padding: '8px 4px 12px 4px',
-    margin: '8px',
-    flex: '1',
-  }))
-  .setChildren([
-    fabricate('Text')
-      .setStyles(({ palette }) => ({
-        color: palette.grey(9),
-        fontSize: '0.9rem',
-        textAlign: 'center',
-      }))
-      .setText(label),
-    fabricate('Text')
-      .setStyles({
-        color: 'white',
-        fontSize: '1.2rem',
-        textAlign: 'center',
-        margin: '0px',
-        fontWeight: 'bold',
-      })
-      .setText(value),
-  ]);
+const StatView = (
+  { label, value, note }: { label: string, value: string, note?: string },
+) => {
+  const col = fabricate('Column')
+    .setStyles(({ palette }) => ({
+      backgroundColor: palette.grey(4),
+      borderRadius: '5px',
+      padding: '2px 4px 8px 4px',
+      margin: '8px',
+      flex: '1',
+      height: 'fit-content',
+    }))
+    .setChildren([
+      fabricate('Text')
+        .setStyles(({ palette }) => ({
+          color: palette.grey(9),
+          fontSize: '0.9rem',
+          textAlign: 'center',
+        }))
+        .setText(label),
+      fabricate('Text')
+        .setStyles({
+          color: 'white',
+          fontSize: '1.2rem',
+          textAlign: 'center',
+          margin: '0px',
+          fontWeight: 'bold',
+        })
+        .setText(value),
+    ]);
+
+  if (note) col.addChildren([Annotation().setText(note)]);
+
+  return col;
+};
 
 /**
  * StatsList component.
@@ -290,8 +297,8 @@ const StatView = ({ label, value }: { label: string, value: string }) => fabrica
  */
 export const StatsList = () => fabricate('Column')
   .setStyles({ marginTop: '4px 8px' })
-  .onCreate((el, state) => {
-    const { stats } = state;
+  .onUpdate((el, state) => {
+    const { stats, model, globalStats } = state;
     const {
       count,
       totalDays,
@@ -305,10 +312,24 @@ export const StatsList = () => fabricate('Column')
     const lvarValue = lastWeekRate !== STATUS_EMPTY ? `${lastWeekRate}% per day` : '-';
     const mtbcValue = mtbc !== STATUS_EMPTY ? `${mtbc} days` : '-';
 
-    const atelValue = Math.round(100 / allTimeRate);
+    const batteryDays = Math.round(100 / allTimeRate);
     const lwelValue = lastWeekRate !== STATUS_EMPTY
       ? `${Math.round(100 / lastWeekRate)} days`
       : '-';
+
+    // Compare battery life against all users with this model
+    const modelStats = globalStats.models.find((p) => p.rawName === model);
+    let compareDaysStr = '-';
+    let compareRateStr = '-';
+    if (modelStats) {
+      const diffDays = batteryDays - modelStats.avgBatteryLife;
+      let operator = diffDays >= 0 ? 'more' : 'fewer';
+      compareDaysStr = `${diffDays} ${operator} than average for this model`;
+
+      const diffRate = allTimeRate - modelStats.avgRate;
+      operator = diffRate >= 0 ? 'faster' : 'slower';
+      compareRateStr = `${Math.abs(diffRate)}% ${operator} than average for this model`;
+    }
 
     el.setChildren([
       fabricate('Row')
@@ -318,7 +339,20 @@ export const StatsList = () => fabricate('Column')
         ]),
       fabricate('Row')
         .setChildren([
-          StatView({ label: 'Avg. Discharge Rate', value: `${allTimeRate}% per day` }),
+          StatView({
+            label: 'Est. Battery Life',
+            value: `${batteryDays} days`,
+            note: compareDaysStr,
+          }),
+          StatView({
+            label: 'Avg. Discharge Rate',
+            value: `${allTimeRate}% per day`,
+            note: compareRateStr,
+          }),
+        ]),
+      fabricate('Row')
+        .setChildren([
+          StatView({ label: 'Last Week Est. Life', value: lwelValue }),
           StatView({ label: 'Last Week Avg. Rate', value: lvarValue }),
         ]),
       fabricate('Row')
@@ -326,13 +360,8 @@ export const StatsList = () => fabricate('Column')
           StatView({ label: 'Charge Events', value: `${numCharges} events` }),
           StatView({ label: 'Avg. Charge Interval', value: mtbcValue }),
         ]),
-      fabricate('Row')
-        .setChildren([
-          StatView({ label: 'Est. Battery Life', value: `${atelValue} days` }),
-          StatView({ label: 'Last Week Est. Life', value: lwelValue }),
-        ]),
     ]);
-  });
+  }, [fabricate.StateKeys.Created, 'globalStats']);
 
 /**
  * InfoChips component.

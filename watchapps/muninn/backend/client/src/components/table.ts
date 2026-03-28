@@ -16,7 +16,6 @@ const TableHeader = ({ textAlign }: { textAlign: string }) => fabricate('th')
     fontSize: '0.9rem',
     fontWeight: 'bold',
     textAlign,
-    borderBottom: 'solid 1px #ddd',
   });
 
 /**

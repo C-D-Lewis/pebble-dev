@@ -6,6 +6,7 @@ import {
   LoginCard,
   HistoryCardList,
   NotFoundCard,
+  GlobalStatsCard,
 } from './components/cards.ts';
 import {
   AppLoader,
@@ -45,10 +46,10 @@ const AppContent = () => fabricate('Column')
       HistoryCardList,
     ),
     // Keep disabled until meaningful and large gaps are handled
-    // fabricate.conditional(
-    //   (state) => !state.loading && !state.notFound,
-    //   GlobalStatsCard,
-    // ),
+    fabricate.conditional(
+      (state) => !state.loading && !state.notFound,
+      GlobalStatsCard,
+    ),
     fabricate.conditional(
       (state) => !state.loading && state.notFound,
       NotFoundCard,

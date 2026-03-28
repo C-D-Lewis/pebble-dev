@@ -262,13 +262,15 @@ describe('Unit tests', () => {
 
         const expected = [
           {
-            name: 'pebble_time_2',
+            name: 'Pebble Time 2',
+            rawName: 'pebble_time_2',
             count: 1,
             avgBatteryLife: 10,
             avgRate: 10,
           },
           {
-            name: 'pebble_time_steel',
+            name: 'Pebble Time Steel',
+            rawName: 'pebble_time_steel',
             count: 2,
             avgBatteryLife: 4,
             avgRate: 30,
@@ -298,12 +300,14 @@ describe('Unit tests', () => {
         const expected = [
           {
             name: 'basalt',
+            rawName: 'basalt',
             count: 1,
             avgBatteryLife: 10,
             avgRate: 10,
           },
           {
             name: 'emery',
+            rawName: 'emery',
             count: 2,
             avgBatteryLife: 4,
             avgRate: 30,

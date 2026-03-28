@@ -71,14 +71,12 @@ const SummaryCard = () => AppCard()
     CardTitle().setText('Your History'),
     Text()
       .setText('Below is the complete battery history as uploaded from Muninn. It will be updated each time you share from the watchapp.'),
-    Text()
-      .setStyles(({ palette }) => ({ color: palette.grey(9) }))
-      .onCreate((el, { updatedAt }) => {
-        if (!updatedAt) return;
+    Annotation().onCreate((el, { updatedAt }) => {
+      if (!updatedAt) return;
 
-        const date = new Date(updatedAt);
-        el.setText(`Last updated: ${date.toLocaleString()}`);
-      }),
+      const date = new Date(updatedAt);
+      el.setText(`Last updated: ${date.toLocaleString()}`);
+    }),
   ]);
 
 /**
@@ -127,7 +125,7 @@ const ShareCard = () => {
   // Coreapp config page webview doesn't allow copying or opening save dialogs apparently
   if (!getParam('isAppConfigPage')) {
     card.addChildren([
-      CardTitle().setText('Export'),
+      CardTitle().setText('Export Data'),
       fabricate('Row')
         .setStyles({ justifyContent: 'center' })
         .setChildren([
@@ -176,7 +174,7 @@ export const GlobalStatsCard = () => AppCard()
   .setStyles({ marginTop: '25px' })
   .setChildren([
     CardTitle().setText('Global Stats'),
-    Text().setText('These insights are drawn from all Muninn users who opted to upload their history. Over time, more users will hopefully increase data accuracy.'),
+    Text().setText('These averages are derived from all Muninn users who opted to upload their history. Over time, more users will hopefully increase data accuracy.'),
     Separator(),
     fabricate.conditional(
       (state) => state.globalStats.historyCount !== 0,

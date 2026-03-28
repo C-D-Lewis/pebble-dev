@@ -1,12 +1,12 @@
 import { PutCommand, type DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
-import { getHistoryCount } from './db.ts';
 import { ScanCommand } from '@aws-sdk/lib-dynamodb';
 import { AGGREGATION_DOC_ID, HISTORY_TABLE_NAME, METADATA_TABLE_NAME } from './constants.ts';
 import type { DbDocument, GlobalStatItem, MetadataDocument } from './types.js';
-import { sortByCount } from './util.ts';
+import { sortByName } from './util.ts';
 
 type AggregateItem = {
   name: string;
+  rawName: string;
   totalBatteryLife: number;
   totalRate: number;
   count: number;
@@ -26,6 +26,25 @@ const getBatteryLife = (row: DbDocument) => {
 };
 
 /**
+ * Groups: pebble_2, pebble_time_steel, pebble_time_2, pebble_time_round, pebble_time
+ *
+ * @param {string} name - Name to map and group.
+ * @returns {string} Mapped group name
+ */
+const mapModelName = (name: string): string => {
+  // Regex to match the core model name prefixes
+  const pattern = /^(pebble_time_steel|pebble_time_round|pebble_time_2|pebble_2|pebble_time)/i;
+  const match = name.match(pattern);
+
+  // If no match, return original; otherwise use the matched prefix in title case
+  const finalName = match ? match[0] : name;
+  return finalName
+    .split('_')
+    .map(p => p.charAt(0).toUpperCase() + p.slice(1).toLowerCase())
+    .join(' ');
+};
+
+/**
  * Main aggregation function.
  *
  * @param {DbDocument[]} rows - All DB rows, representing all watches.
@@ -36,22 +55,24 @@ export const aggregateAllByKey = (rows: DbDocument[], key: keyof DbDocument) => 
   const buckets: Record<string, AggregateItem> = {};
   
   for (const row of rows) {
-    const name = String(row[key]);
+    const name = (row[key] ?? '').toString().trim() || 'Unknown';
+    const mappedName = name.includes('pebble_') ? mapModelName(name) : name;
 
     // Have we already seen this value of the key?
-    if (!buckets[name]) {
+    if (!buckets[mappedName]) {
       // This is a new one
-      buckets[name] = {
-        name,
+      buckets[mappedName] = {
+        name: mappedName,
+        rawName: name,
         totalBatteryLife: getBatteryLife(row) || 0,
-        totalRate: row.stats.allTimeRate || 0,
+        totalRate: row.stats?.allTimeRate || 0,
         count: 1
       };
     } else {
       // Update current aggregate
-      const b = buckets[name];
+      const b = buckets[mappedName];
       b.totalBatteryLife += getBatteryLife(row) || 0;
-      b.totalRate += row.stats.allTimeRate || 0;
+      b.totalRate += row.stats?.allTimeRate || 0;
       b.count++;
     }
   }
@@ -65,6 +86,7 @@ export const aggregateAllByKey = (rows: DbDocument[], key: keyof DbDocument) => 
 
       return {
         name: b.name,
+        rawName: b.rawName,
         count: b.count,
         avgBatteryLife,
         avgRate
@@ -96,7 +118,6 @@ export const updateAggregations = async (docClient: DynamoDBDocumentClient) => {
     return !(ignores.some((q) => p.model.includes(q) || p.platform.includes(q)))
   });
 
-  const historyCount = await getHistoryCount(docClient) || 0;
   const models: GlobalStatItem[] = aggregateAllByKey(rows, 'model');
   const platforms: GlobalStatItem[] = aggregateAllByKey(rows, 'platform');
   // top IDs?
@@ -105,9 +126,9 @@ export const updateAggregations = async (docClient: DynamoDBDocumentClient) => {
   // Save all
   const doc: MetadataDocument = {
     id: AGGREGATION_DOC_ID,
-    historyCount,
-    models: models.sort(sortByCount),
-    platforms: platforms.sort(sortByCount),
+    historyCount: rows.length,
+    models: models.sort(sortByName),
+    platforms: platforms.sort(sortByName),
     updatedAt: Date.now(),
   };
   await docClient.send(

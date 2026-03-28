@@ -1,5 +1,5 @@
 import { ALLOWED_ORIGINS, DEFAULT_RES_HEADERS } from './constants.ts';
-import type { HistoryItem, ApiGwEvent, PostHistoryBody, WatchStats } from './types.ts';
+import type { HistoryItem, ApiGwEvent, PostHistoryBody, WatchStats, GlobalStatItem } from './types.ts';
 
 /**
  * Generate a random 6-character hexadecimal ID.
@@ -126,4 +126,6 @@ export const cors = (event: ApiGwEvent) => {
   return { 'Access-Control-Allow-Origin': acaoHeader };
 };
 
-export const sortByCount = (a: any, b: any) => b.count - a.count;
+export const sortByCount = (a: GlobalStatItem, b: GlobalStatItem) => b.count - a.count;
+
+export const sortByName = (a: GlobalStatItem, b: GlobalStatItem) => a.name.localeCompare(b.name);
