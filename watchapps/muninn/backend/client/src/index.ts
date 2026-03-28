@@ -45,11 +45,10 @@ const AppContent = () => fabricate('Column')
       (state) => !state.loading && state.history.length > 0,
       HistoryCardList,
     ),
-    // Keep disabled until meaningful and large gaps are handled
-    fabricate.conditional(
-      (state) => !state.loading && !state.notFound,
-      GlobalStatsCard,
-    ),
+    // fabricate.conditional(
+    //   (state) => !state.loading && !state.notFound,
+    //   GlobalStatsCard,
+    // ),
     fabricate.conditional(
       (state) => !state.loading && state.notFound,
       NotFoundCard,
