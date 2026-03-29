@@ -1,4 +1,4 @@
-import { PutCommand, type DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
+import { GetCommand, PutCommand, type DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
 import { ScanCommand } from '@aws-sdk/lib-dynamodb';
 import { AGGREGATION_DOC_ID, HISTORY_TABLE_NAME, METADATA_TABLE_NAME } from './constants.ts';
 import type { DbDocument, GlobalStatItem, MetadataDocument } from './types.js';
@@ -101,6 +101,17 @@ export const aggregateAllByKey = (rows: DbDocument[], key: keyof DbDocument): Gl
  */
 export const updateAggregations = async (docClient: DynamoDBDocumentClient) => {
   const start = Date.now();
+
+  // Limit how often this can be called
+  const metaRes = await docClient.send(
+    new GetCommand({ TableName: METADATA_TABLE_NAME, Key: { id: AGGREGATION_DOC_ID } }),
+  );
+  const lastUpdated = metaRes.Item?.updatedAt ?? 0;
+  const fiveMins = 5 * 60 * 1000;
+  if (start - lastUpdated < fiveMins) {
+    console.log('Aggregations were updated recently, skipping update.');
+    return;
+  }
 
   // Get all uploaded records
   const res = await docClient.send(

@@ -306,57 +306,43 @@ describe('Unit tests', () => {
           avgRate: 10,
           count: 1,
           groupName: 'Pebble 2 Duo',
-          names: [
-            'pebble_2_duo_black'
-          ],
+          names: ['pebble_2_duo_black],
         }, {
           avgBatteryLife: 10,
           avgRate: 10,
           count: 1,
           groupName: 'Pebble 2 HR',
-          names: [
-            'pebble_2_hr_charcoal_red',
-          ]
+          names: ['pebble_2_hr_charcoal_red' ]
         }, {
           avgBatteryLife: 10,
           avgRate: 10,
           count: 1,
           groupName: 'Pebble 2',
-          names: [
-            'pebble_2_se_black_charcoal',
-          ]
+          names: ['pebble_2_se_black_charcoal' ]
         }, {
           avgBatteryLife: 10,
           avgRate: 10,
           count: 1,
           groupName: 'Pebble Time',
-          names: [
-            'pebble_time_red',
-          ],
+          names: ['pebble_time_red'],
         }, {
           avgBatteryLife: 10,
           avgRate: 10,
           count: 1,
           groupName: 'Pebble Time 2',
-          names: [
-            'pebble_time_2_black_gray',
-          ],
+          names: ['pebble_time_2_black_gray'],
         }, {
           avgBatteryLife: 3,
           avgRate: 40,
           count: 1,
           groupName: 'Pebble Time Round',
-          names: [
-            'pebble_time_round_silver_20',
-          ],
+          names: ['pebble_time_round_silver_20'],
         }, {
           avgBatteryLife: 5,
           avgRate: 20,
           count: 1,
           groupName: 'Pebble Time Steel',
-          names: [
-            'pebble_time_steel_silver',
-          ],
+          names: ['pebble_time_steel_silver'],
         }];
         
         expect(res).to.deep.equal(expected);

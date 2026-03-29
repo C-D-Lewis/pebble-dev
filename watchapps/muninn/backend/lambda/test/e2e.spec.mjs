@@ -113,4 +113,13 @@ describe('API', () => {
       expect(json.updatedAt).to.be.a('number').greaterThan(100000000);
     });
   });
+
+  describe('POST /recompute', () => {
+    it('should return 200', async () => {
+      const { status, json } = await apiRequest('/recompute', 'POST');
+
+      expect(status).to.equal(200);
+      expect(json.success).to.equal(true);
+    });
+  });
 });
