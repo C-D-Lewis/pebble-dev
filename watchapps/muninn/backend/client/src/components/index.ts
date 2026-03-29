@@ -342,12 +342,12 @@ export const StatsList = () => fabricate('Column')
           StatView({
             label: 'Est. Battery Life',
             value: `${batteryDays} days`,
-            note: compareDaysStr,
+            // note: compareDaysStr,
           }),
           StatView({
             label: 'Avg. Discharge Rate',
             value: `${allTimeRate}% per day`,
-            note: compareRateStr,
+            // note: compareRateStr,
           }),
         ]),
       fabricate('Row')

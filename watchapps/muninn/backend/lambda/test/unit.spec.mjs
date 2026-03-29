@@ -244,42 +244,109 @@ describe('Unit tests', () => {
   describe('Aggregations', () => {
     describe('aggregateAllByKey', () => {
       it('should aggregate some example data by model field', async () => {
-        const mockRows = [
-          {
-            stats: { allTimeRate: 10 },
-            model: 'pebble_time_2_red',
-          },
-          {
-            stats: { allTimeRate: 10 },
-            model: 'pebble_time_2_black',
-          },
-          {
-            stats: { allTimeRate: 20 },
-            model: 'pebble_time_steel',
-          },
-          {
-            stats: { allTimeRate: 40 },
-            model: 'pebble_time_steel',
-          },
-        ];
+        const mockRows = [{
+          stats: { allTimeRate: 10 },
+          model: 'pebble_time_2_silver_blue',
+        }, {
+          stats: { allTimeRate: 10 },
+          model: 'pebble_time_2_black_gray',
+        }, {
+          stats: { allTimeRate: 20 },
+          model: 'pebble_time_steel_silver',
+        }, {
+          stats: { allTimeRate: 40 },
+          model: 'pebble_time_steel_silver',
+        }];
         const res = aggregateAllByKey(mockRows, 'model');
 
-        const expected = [
-          {
-            groupName: 'Pebble Time 2',
-            names: ['pebble_time_2_red', 'pebble_time_2_black'],
-            count: 2,
-            avgBatteryLife: 10,
-            avgRate: 10,
-          },
-          {
-            groupName: 'Pebble Time Steel',
-            names: ['pebble_time_steel'],
-            count: 2,
-            avgBatteryLife: 4,
-            avgRate: 30,
-          },
-        ];
+        const expected = [{
+          groupName: 'Pebble Time 2',
+          names: ['pebble_time_2_silver_blue', 'pebble_time_2_black_gray'],
+          count: 2,
+          avgBatteryLife: 10,
+          avgRate: 10,
+        }, {
+          groupName: 'Pebble Time Steel',
+          names: ['pebble_time_steel_silver'],
+          count: 2,
+          avgBatteryLife: 4,
+          avgRate: 30,
+        }];
+        
+        expect(res).to.deep.equal(expected);
+      });
+
+      it('should aggregate all models correctly', async () => {
+        const mockRows = [{
+          stats: { allTimeRate: 10 },
+          model: 'pebble_2_duo_black',
+        }, {
+          stats: { allTimeRate: 10 },
+          model: 'pebble_2_hr_charcoal_red',
+        }, {
+          stats: { allTimeRate: 10 },
+          model: 'pebble_time_red',
+        }, {
+          stats: { allTimeRate: 10 },
+          model: 'pebble_time_2_black_gray',
+        }, {
+          stats: { allTimeRate: 40 },
+          model: 'pebble_time_round_silver_20',
+        }, {
+          stats: { allTimeRate: 20 },
+          model: 'pebble_time_steel_silver',
+        }];
+        const res = await aggregateAllByKey(mockRows, 'model');
+
+        const expected = [{
+          avgBatteryLife: 10,
+          avgRate: 10,
+          count: 1,
+          groupName: 'Pebble 2 Duo',
+          names: [
+            'pebble_2_duo_black'
+          ],
+        }, {
+          avgBatteryLife: 10,
+          avgRate: 10,
+          count: 1,
+          groupName: 'Pebble 2',
+          names: [
+            'pebble_2_hr_charcoal_red',
+          ]
+        }, {
+          avgBatteryLife: 10,
+          avgRate: 10,
+          count: 1,
+          groupName: 'Pebble Time',
+          names: [
+            'pebble_time_red',
+          ],
+        }, {
+          avgBatteryLife: 10,
+          avgRate: 10,
+          count: 1,
+          groupName: 'Pebble Time 2',
+          names: [
+            'pebble_time_2_black_gray',
+          ],
+        }, {
+          avgBatteryLife: 3,
+          avgRate: 40,
+          count: 1,
+          groupName: 'Pebble Time Round',
+          names: [
+            'pebble_time_round_silver_20',
+          ],
+        }, {
+          avgBatteryLife: 5,
+          avgRate: 20,
+          count: 1,
+          groupName: 'Pebble Time Steel',
+          names: [
+            'pebble_time_steel_silver',
+          ],
+        }];
         
         expect(res).to.deep.equal(expected);
       });

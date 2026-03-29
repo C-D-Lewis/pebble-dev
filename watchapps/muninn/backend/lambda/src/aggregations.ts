@@ -26,23 +26,20 @@ const getBatteryLife = (row: DbDocument) => {
 };
 
 /**
- * Groups: pebble_2, pebble_time_steel, pebble_time_2, pebble_time_round, pebble_time
+ * Groups: pebble_2_duo, pebble_2, pebble_time_steel, pebble_time_2, pebble_time_round, pebble_time
  *
  * @param {string} name - Name to map and group.
  * @returns {string} Mapped group name
  */
 const getGroupName = (name: string): string => {
-  // Regex to match the core model name prefixes
-  needs to delineate pebble 2 from pebble 2 duo
-  const pattern = /^(pebble_time_steel|pebble_time_round|pebble_time_2|pebble_2|pebble_time)/i;
-  const match = name.match(pattern);
+  if (name.includes('pebble_2_duo')) return 'Pebble 2 Duo';
+  if (name.includes('pebble_2')) return 'Pebble 2';
+  if (name.includes('pebble_time_steel')) return 'Pebble Time Steel';
+  if (name.includes('pebble_time_2')) return 'Pebble Time 2';
+  if (name.includes('pebble_time_round')) return 'Pebble Time Round';
+  if (name.includes('pebble_time')) return 'Pebble Time';
 
-  // If no match, return original; otherwise use the matched prefix in title case
-  const finalName = match ? match[0] : name;
-  return finalName
-    .split('_')
-    .map(p => p.charAt(0).toUpperCase() + p.slice(1).toLowerCase())
-    .join(' ');
+  return name;
 };
 
 /**
