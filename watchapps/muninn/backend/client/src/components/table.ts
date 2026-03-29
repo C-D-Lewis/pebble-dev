@@ -60,7 +60,7 @@ export const GlobalStatsTable = (
       el.addChildren(
         data.map((item: GlobalStatItem) => fabricate('tr')
           .setChildren([
-            TableCell({ textAlign: 'left' }).setText(item.name),
+            TableCell({ textAlign: 'left' }).setText(item.groupName),
             TableCell({ textAlign: 'center' }).setText(String(item.count)),
             TableCell({ textAlign: 'center' }).setText(`${item.avgBatteryLife} days`),
             TableCell({ textAlign: 'center' }).setText(`${item.avgRate}%`),

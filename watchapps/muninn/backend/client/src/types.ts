@@ -18,8 +18,8 @@ export type Stats = {
 
 /** Single stat item bucket */
 export type GlobalStatItem = {
-  name: string;
-  rawName: string;
+  groupName: string;
+  names: string[];
   avgBatteryLife: number;
   avgRate: number;
   count: number;

@@ -5,8 +5,8 @@ import type { DbDocument, GlobalStatItem, MetadataDocument } from './types.js';
 import { sortByName } from './util.ts';
 
 type AggregateItem = {
-  name: string;
-  rawName: string;
+  groupName: string;
+  names: string[];
   totalBatteryLife: number;
   totalRate: number;
   count: number;
@@ -31,8 +31,9 @@ const getBatteryLife = (row: DbDocument) => {
  * @param {string} name - Name to map and group.
  * @returns {string} Mapped group name
  */
-const mapModelName = (name: string): string => {
+const getGroupName = (name: string): string => {
   // Regex to match the core model name prefixes
+  needs to delineate pebble 2 from pebble 2 duo
   const pattern = /^(pebble_time_steel|pebble_time_round|pebble_time_2|pebble_2|pebble_time)/i;
   const match = name.match(pattern);
 
@@ -51,29 +52,30 @@ const mapModelName = (name: string): string => {
  * @param {string} key - Key in DbDocument to aggregate on.
  * @returns {GlobalStatItem[]} List of results.
  */
-export const aggregateAllByKey = (rows: DbDocument[], key: keyof DbDocument) => {
+export const aggregateAllByKey = (rows: DbDocument[], key: keyof DbDocument): GlobalStatItem[] => {
   const buckets: Record<string, AggregateItem> = {};
   
   for (const row of rows) {
     const name = (row[key] ?? '').toString().trim() || 'Unknown';
-    const mappedName = name.includes('pebble_') ? mapModelName(name) : name;
+    const groupName = name.includes('pebble_') ? getGroupName(name) : name;
 
     // Have we already seen this value of the key?
-    if (!buckets[mappedName]) {
+    if (!buckets[groupName]) {
       // This is a new one
-      buckets[mappedName] = {
-        name: mappedName,
-        rawName: name,
+      buckets[groupName] = {
+        groupName,
+        names: [name],
         totalBatteryLife: getBatteryLife(row) || 0,
         totalRate: row.stats?.allTimeRate || 0,
         count: 1
       };
     } else {
       // Update current aggregate
-      const b = buckets[mappedName];
+      const b = buckets[groupName];
       b.totalBatteryLife += getBatteryLife(row) || 0;
       b.totalRate += row.stats?.allTimeRate || 0;
       b.count++;
+      if (!b.names.includes(name)) b.names.push(name);
     }
   }
 
@@ -85,8 +87,8 @@ export const aggregateAllByKey = (rows: DbDocument[], key: keyof DbDocument) => 
       const avgRate = Math.round(b.totalRate / b.count);
 
       return {
-        name: b.name,
-        rawName: b.rawName,
+        groupName: b.groupName,
+        names: b.names,
         count: b.count,
         avgBatteryLife,
         avgRate

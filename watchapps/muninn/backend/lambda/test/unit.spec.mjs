@@ -247,7 +247,11 @@ describe('Unit tests', () => {
         const mockRows = [
           {
             stats: { allTimeRate: 10 },
-            model: 'pebble_time_2',
+            model: 'pebble_time_2_red',
+          },
+          {
+            stats: { allTimeRate: 10 },
+            model: 'pebble_time_2_black',
           },
           {
             stats: { allTimeRate: 20 },
@@ -258,19 +262,19 @@ describe('Unit tests', () => {
             model: 'pebble_time_steel',
           },
         ];
-        const res = await aggregateAllByKey(mockRows, 'model');
+        const res = aggregateAllByKey(mockRows, 'model');
 
         const expected = [
           {
-            name: 'Pebble Time 2',
-            rawName: 'pebble_time_2',
-            count: 1,
+            groupName: 'Pebble Time 2',
+            names: ['pebble_time_2_red', 'pebble_time_2_black'],
+            count: 2,
             avgBatteryLife: 10,
             avgRate: 10,
           },
           {
-            name: 'Pebble Time Steel',
-            rawName: 'pebble_time_steel',
+            groupName: 'Pebble Time Steel',
+            names: ['pebble_time_steel'],
             count: 2,
             avgBatteryLife: 4,
             avgRate: 30,
@@ -295,19 +299,19 @@ describe('Unit tests', () => {
             platform: 'emery',
           },
         ];
-        const res = await aggregateAllByKey(mockRows, 'platform');
+        const res = aggregateAllByKey(mockRows, 'platform');
 
         const expected = [
           {
-            name: 'basalt',
-            rawName: 'basalt',
+            groupName: 'basalt',
+            names: ['basalt'],
             count: 1,
             avgBatteryLife: 10,
             avgRate: 10,
           },
           {
-            name: 'emery',
-            rawName: 'emery',
+            groupName: 'emery',
+            names: ['emery'],
             count: 2,
             avgBatteryLife: 4,
             avgRate: 30,

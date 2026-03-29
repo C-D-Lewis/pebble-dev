@@ -318,7 +318,7 @@ export const StatsList = () => fabricate('Column')
       : '-';
 
     // Compare battery life against all users with this model
-    const modelStats = globalStats.models.find((p) => p.rawName === model);
+    const modelStats = globalStats.models.find((p) => p.names.includes(model));
     let compareDaysStr = '-';
     let compareRateStr = '-';
     if (modelStats) {
@@ -342,12 +342,12 @@ export const StatsList = () => fabricate('Column')
           StatView({
             label: 'Est. Battery Life',
             value: `${batteryDays} days`,
-            // note: compareDaysStr,
+            note: compareDaysStr,
           }),
           StatView({
             label: 'Avg. Discharge Rate',
             value: `${allTimeRate}% per day`,
-            // note: compareRateStr,
+            note: compareRateStr,
           }),
         ]),
       fabricate('Row')

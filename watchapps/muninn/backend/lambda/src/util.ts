@@ -128,4 +128,4 @@ export const cors = (event: ApiGwEvent) => {
 
 export const sortByCount = (a: GlobalStatItem, b: GlobalStatItem) => b.count - a.count;
 
-export const sortByName = (a: GlobalStatItem, b: GlobalStatItem) => a.name.localeCompare(b.name);
+export const sortByName = (a: GlobalStatItem, b: GlobalStatItem) => a.groupName.localeCompare(b.groupName);
