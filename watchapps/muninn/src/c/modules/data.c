@@ -359,11 +359,7 @@ int data_calculate_avg_discharge_rate(bool ignore_no_change) {
   if (total_x2 == 0) total_x2 = 1;
 
   const int rate = total_x2 / weight_x2;
-  if (
-    rate <= 2 &&
-    // data_get_valid_samples_count() >= MIN_SAMPLES_FOR_GRAPH &&
-    !ignore_no_change
-  ) {
+  if (rate <= 2 && !ignore_no_change) {
     // Count again, but this time ignore 'no change' time periods
     return data_calculate_avg_discharge_rate(true);
   }
@@ -372,7 +368,7 @@ int data_calculate_avg_discharge_rate(bool ignore_no_change) {
   // This will improve on day 2
   if (ignore_no_change && rate <= 2) return 3;
 
-  return total_x2 / weight_x2;
+  return rate;
 }
 
 int data_calculate_days_remaining() {
