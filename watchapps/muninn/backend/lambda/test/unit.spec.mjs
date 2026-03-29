@@ -306,19 +306,19 @@ describe('Unit tests', () => {
           avgRate: 10,
           count: 1,
           groupName: 'Pebble 2 Duo',
-          names: ['pebble_2_duo_black],
+          names: ['pebble_2_duo_black'],
         }, {
           avgBatteryLife: 10,
           avgRate: 10,
           count: 1,
           groupName: 'Pebble 2 HR',
-          names: ['pebble_2_hr_charcoal_red' ]
+          names: ['pebble_2_hr_charcoal_red'],
         }, {
           avgBatteryLife: 10,
           avgRate: 10,
           count: 1,
           groupName: 'Pebble 2',
-          names: ['pebble_2_se_black_charcoal' ]
+          names: ['pebble_2_se_black_charcoal'],
         }, {
           avgBatteryLife: 10,
           avgRate: 10,
