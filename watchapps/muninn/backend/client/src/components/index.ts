@@ -323,12 +323,12 @@ export const StatsList = () => fabricate('Column')
     let compareRateStr = '-';
     if (modelStats) {
       const diffDays = batteryDays - modelStats.avgBatteryLife;
-      let operator = diffDays >= 0 ? 'more' : 'fewer';
-      compareDaysStr = `${diffDays} ${operator} than average for this model`;
+      let operator = diffDays >= 0 ? 'above' : 'below';
+      compareDaysStr = `${diffDays} ${operator} average for this model`;
 
       const diffRate = allTimeRate - modelStats.avgRate;
-      operator = diffRate >= 0 ? 'faster' : 'slower';
-      compareRateStr = `${Math.abs(diffRate)}% ${operator} than average for this model`;
+      operator = diffRate >= 0 ? 'above' : 'below';
+      compareRateStr = `${Math.abs(diffRate)}% ${operator} average for this model`;
     }
 
     el.setChildren([
@@ -342,12 +342,12 @@ export const StatsList = () => fabricate('Column')
           StatView({
             label: 'Est. Battery Life',
             value: `${batteryDays} days`,
-            // note: compareDaysStr,
+            note: compareDaysStr,
           }),
           StatView({
             label: 'Avg. Discharge Rate',
             value: `${allTimeRate}% per day`,
-            // note: compareRateStr,
+            note: compareRateStr,
           }),
         ]),
       fabricate('Row')
@@ -407,11 +407,11 @@ export const GlobalStatsView = () => fabricate('Column')
     el.setChildren([
       fabricate('Column')
         .setChildren([
-          Subtitle().setText('By Platform'),
-          GlobalStatsTable({ field: 'platforms' }),
-          Separator(),
           Subtitle().setText('By Model Name'),
           GlobalStatsTable({ field: 'models' }),
+          Separator(),
+          Subtitle().setText('By Platform'),
+          GlobalStatsTable({ field: 'platforms' }),
           Separator(),
           Annotation().setText(`From ${historyCount} users, last updated: ${date.toLocaleString()}`),
         ]),

@@ -285,6 +285,9 @@ describe('Unit tests', () => {
           model: 'pebble_2_hr_charcoal_red',
         }, {
           stats: { allTimeRate: 10 },
+          model: 'pebble_2_se_black_charcoal',
+        }, {
+          stats: { allTimeRate: 10 },
           model: 'pebble_time_red',
         }, {
           stats: { allTimeRate: 10 },
@@ -310,9 +313,17 @@ describe('Unit tests', () => {
           avgBatteryLife: 10,
           avgRate: 10,
           count: 1,
-          groupName: 'Pebble 2',
+          groupName: 'Pebble 2 HR',
           names: [
             'pebble_2_hr_charcoal_red',
+          ]
+        }, {
+          avgBatteryLife: 10,
+          avgRate: 10,
+          count: 1,
+          groupName: 'Pebble 2',
+          names: [
+            'pebble_2_se_black_charcoal',
           ]
         }, {
           avgBatteryLife: 10,

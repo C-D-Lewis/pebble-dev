@@ -33,6 +33,7 @@ const getBatteryLife = (row: DbDocument) => {
  */
 const getGroupName = (name: string): string => {
   if (name.includes('pebble_2_duo')) return 'Pebble 2 Duo';
+  if (name.includes('pebble_2_hr')) return 'Pebble 2 HR';
   if (name.includes('pebble_2')) return 'Pebble 2';
   if (name.includes('pebble_time_steel')) return 'Pebble Time Steel';
   if (name.includes('pebble_time_2')) return 'Pebble Time 2';
