@@ -2,4 +2,6 @@
 
 #include <pebble.h>
 
+#include "../modules/scalable.h"
+
 void main_window_push();
