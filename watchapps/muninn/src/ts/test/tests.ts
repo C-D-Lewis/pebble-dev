@@ -1,5 +1,5 @@
 import { SECONDS_PER_DAY, STATUS_CHARGED, STATUS_EMPTY, STATUS_NO_CHANGE, TEST_LOG_OK_TESTS } from '../constants';
-import { SAMPLE_DATA } from './sample-data';
+import { MULTI_CHARGE_SAMPLE_DATA, SAMPLE_DATA } from './sample-data';
 import { calculateDischargeRate, calculateLastWeekRate, calculateMeanTimeBetweenCharges, calculateNumCharges, isChargeEvent } from '../stats';
 import { HistoryItem } from '../types';
 
@@ -209,12 +209,9 @@ const testCalculateLastWeekRate = () => {
 };
 
 const testCalculateMeanTimeBetweenCharges = () => {
-  // Charge, bunch of discharges, another charge
-  const history = [{
-    use data AE1C4C
-  ];
-
-  return [calculateMeanTimeBetweenCharges(history), 3];
+  test('calculateMeanTimeBetweenCharges > correct with example data', () => {
+    return [calculateMeanTimeBetweenCharges(MULTI_CHARGE_SAMPLE_DATA), 4];
+  });
 };
 
 export const testStats = () => {
