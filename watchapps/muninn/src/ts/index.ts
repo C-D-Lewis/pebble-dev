@@ -1,3 +1,4 @@
+import { testStats } from './test/tests';
 import { ensureUploadId, handleGetSyncInfo, handleSync, uploadHistory } from './sync';
 import { handlePushTimelinePin } from './timeline';
 
@@ -12,6 +13,7 @@ const deleteAll = () => {
 Pebble.addEventListener('ready', async (e) => {
   // !!! TEST ONLY
   // deleteAll();
+  testStats();
 
   // Prevent display issues by getting this as early as possible
   await ensureUploadId();

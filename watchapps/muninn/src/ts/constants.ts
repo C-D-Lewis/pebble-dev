@@ -12,10 +12,15 @@ export const UPLOAD_API_URL = 'https://muninn-api.chrislewis.me.uk';
 
 /** Maximum synced items - 120 days / 4 months (must match config.h) */
 export const MAX_SYNC_ITEMS = 480;
+/** Seconds in an hour */
+export const SECONDS_PER_HOUR = 60 * 60;
 /** Seconds in a day */
-export const SECONDS_PER_DAY = 60 * 60 * 24;
+export const SECONDS_PER_DAY = SECONDS_PER_HOUR * 24;
+
 /** Minimum charge amount to count */
 export const MIN_CHARGE_AMOUNT = 20;
 
 /** Whether to use test data */
 export const TEST_SAMPLE_DATA = false;
+/** Whether to log successful TS tests */
+export const TEST_LOG_OK_TESTS = false;

@@ -1,14 +1,16 @@
 import {
   MAX_SYNC_ITEMS,
-  MIN_CHARGE_AMOUNT,
-  SECONDS_PER_DAY,
-  STATUS_CHARGED,
   STATUS_EMPTY,
-  STATUS_NO_CHANGE,
   TEST_SAMPLE_DATA,
   UPLOAD_API_URL,
   UPLOAD_ID_EMPTY,
 } from './constants';
+import {
+  calculateDischargeRate,
+  calculateLastWeekRate,
+  calculateNumCharges,
+  calculateMeanTimeBetweenCharges,
+} from './stats';
 import { HistoryItem, UploadHistoryItem } from './types';
 import { generateTestData } from './util';
 
@@ -58,109 +60,6 @@ const loadHistory = (): HistoryItem[] => {
     // Can't load JSON, user can't fix. Reset it.
     return [];
   }
-};
-
-/**
- * Average discharge rate using all history samples.
- */
-const calculateDischargeRate = (history: HistoryItem[]): number => {
-  if (history.length === 0) return STATUS_EMPTY;
-
-  let count = 0;
-  let rateSum = 0;
-  history.forEach((p) => {
-    const { rate, result } = p;
-
-    if ([STATUS_EMPTY, STATUS_CHARGED].includes(result)) return;
-    // No change, but time still elapsed
-    if (result === STATUS_NO_CHANGE) {
-      count++;
-      return;
-    }
-
-    // FIXME: Why/is this happening?
-    if (!rate) {
-      console.log(`WARN: HistoryItem had no rate: ${JSON.stringify(p)}`);
-      return;
-    }
-
-    // Discharged, count it
-    count++;
-    rateSum += rate;
-  });
-  const result = count > 0 ? Math.round(rateSum / count) : STATUS_EMPTY;
-  // console.log(JSON.stringify({ rateSum, count, result }));
-  return result;
-};
-
-/**
- * Calculate the average discharge rate for the last week only.
- */
-const calculateLastWeekRate = (history: HistoryItem[]): number => {
-  // Assumes 4 samples per day, we need a whole week's worth to start
-  if (history.length < 28) return STATUS_EMPTY;
-
-  // Use a subset of items for the last week only
-  const now = new Date().getTime();
-  const subset = history.filter((p) => {
-    const itemDate = new Date(p.timestamp * 1000).getTime();
-    const diffD = (now - itemDate) / (SECONDS_PER_DAY * 1000);
-    // console.log({ itemDate, diffD, now });
-    return diffD <= 7;
-  });
-
-  return calculateDischargeRate(subset);
-};
-
-/**
- * Determine if a history item is a valid charge event.
- */
-const isChargeEvent = (item: HistoryItem) =>
-  item.result === STATUS_CHARGED && item.chargeDiff <= (-MIN_CHARGE_AMOUNT);
-
-/**
- * Calculate the number of significant charge events.
- */
-const calculateNumCharges = (history: HistoryItem[]): number =>
-  history.filter(isChargeEvent).length;
-
-/**
- * Calculate mean time between charge events, in days.
- */
-const calculateMeanTimeBetweenCharges = (history: HistoryItem[]): number => {
-  if (calculateNumCharges(history) < 2) {
-    console.log(`WARN: num charges < 2: ${calculateNumCharges(history)}`) ;
-    return STATUS_EMPTY;
-  }
-
-  // Get timestamps of charge events
-  const chargeTimes = history
-    .filter(isChargeEvent)
-    .map(p => p.timestamp)
-    .sort((a, b) => a - b);
-
-  // Calculate time differences between consecutive charges
-  const timeDiffs = [];
-  for (let i = 1; i < chargeTimes.length; i++) {
-    const diff = chargeTimes[i] - chargeTimes[i - 1];
-    if (diff < SECONDS_PER_DAY) {
-      console.log(`WARN: Ignoring <1d diff (${i} ${i - 1} ${diff}s)`);
-      continue;
-    }
-    timeDiffs.push(diff);
-  }
-
-  if (timeDiffs.length === 0) {
-    console.log(`WARN: Not enough timeDiffs (${JSON.stringify({ chargeTimes, timeDiffs })})`);
-    return STATUS_EMPTY;
-  }
-
-  // Calculate mean time between charges (in days)
-  const meanTimeS = timeDiffs.reduce((acc, p) => acc + p, 0) / timeDiffs.length;
-  const meanDays = meanTimeS / SECONDS_PER_DAY;
-  console.log({ chargeTimes, timeDiffs, meanTimeS, meanDays });
-
-  return Math.round(meanDays);
 };
 
 /**

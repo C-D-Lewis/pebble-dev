@@ -1,0 +1,533 @@
+import { HistoryItem } from '../types';
+
+// Sampled from my PT2 ~16 days worth
+export const SAMPLE_DATA: HistoryItem[] = [
+  {
+    timestamp: 1774846807,
+    chargePerc: 90,
+    timeDiff: 21589,
+    chargeDiff: 1,
+    rate: 6,
+    result: 4
+  },
+  {
+    timestamp: 1774825218,
+    chargePerc: 91,
+    timeDiff: 21604,
+    chargeDiff: 3,
+    rate: 5,
+    result: 11
+  },
+  {
+    timestamp: 1774803614,
+    chargePerc: 94,
+    timeDiff: 21614,
+    chargeDiff: 2,
+    rate: 5,
+    result: 7
+  },
+  {
+    timestamp: 1774782000,
+    chargePerc: 96,
+    timeDiff: 17984,
+    chargeDiff: 1,
+    rate: 5,
+    result: 4
+  },
+  {
+    timestamp: 1774764016,
+    chargePerc: 97,
+    timeDiff: 21578,
+    chargeDiff: 0,
+    rate: -1,
+    result: -102
+  },
+  {
+    timestamp: 1774742438,
+    chargePerc: 97,
+    timeDiff: 21628,
+    chargeDiff: 2,
+    rate: 6,
+    result: 7
+  },
+  {
+    timestamp: 1774720810,
+    chargePerc: 99,
+    timeDiff: 21610,
+    chargeDiff: 1,
+    rate: 6,
+    result: 3
+  },
+  {
+    timestamp: 1774699200,
+    chargePerc: 100,
+    timeDiff: 21594,
+    chargeDiff: 0,
+    rate: -1,
+    result: -102
+  },
+  {
+    timestamp: 1774677606,
+    chargePerc: 100,
+    timeDiff: 21591,
+    chargeDiff: 0,
+    rate: -1,
+    result: -102
+  },
+  {
+    timestamp: 1774656015,
+    chargePerc: 100,
+    timeDiff: 21608,
+    chargeDiff: -83,
+    rate: -1,
+    result: -103
+  },
+  {
+    timestamp: 1774634407,
+    chargePerc: 17,
+    timeDiff: 21594,
+    chargeDiff: 3,
+    rate: 7,
+    result: 12
+  },
+  {
+    timestamp: 1774612813,
+    chargePerc: 20,
+    timeDiff: 21610,
+    chargeDiff: 3,
+    rate: 7,
+    result: 11
+  },
+  {
+    timestamp: 1774591203,
+    chargePerc: 23,
+    timeDiff: 21603,
+    chargeDiff: 1,
+    rate: 7,
+    result: 3
+  },
+  {
+    timestamp: 1774569600,
+    chargePerc: 24,
+    timeDiff: 21561,
+    chargeDiff: 1,
+    rate: 7,
+    result: 4
+  },
+  {
+    timestamp: 1774548039,
+    chargePerc: 25,
+    timeDiff: 21617,
+    chargeDiff: 5,
+    rate: 7,
+    result: 19
+  },
+  {
+    timestamp: 1774526422,
+    chargePerc: 30,
+    timeDiff: 21609,
+    chargeDiff: 2,
+    rate: 6,
+    result: 7
+  },
+  {
+    timestamp: 1774504813,
+    chargePerc: 32,
+    timeDiff: 21593,
+    chargeDiff: 0,
+    rate: -1,
+    result: -102
+  },
+  {
+    timestamp: 1774483220,
+    chargePerc: 32,
+    timeDiff: 21575,
+    chargeDiff: 3,
+    rate: 6,
+    result: 12
+  },
+  {
+    timestamp: 1774461645,
+    chargePerc: 35,
+    timeDiff: 21611,
+    chargeDiff: 3,
+    rate: 6,
+    result: 11
+  },
+  {
+    timestamp: 1774440034,
+    chargePerc: 38,
+    timeDiff: 21631,
+    chargeDiff: 3,
+    rate: 5,
+    result: 11
+  },
+  {
+    timestamp: 1774418403,
+    chargePerc: 41,
+    timeDiff: 21537,
+    chargeDiff: 1,
+    rate: 5,
+    result: 4
+  },
+  {
+    timestamp: 1774396866,
+    chargePerc: 42,
+    timeDiff: 21639,
+    chargeDiff: 2,
+    rate: 5,
+    result: 7
+  },
+  {
+    timestamp: 1774375227,
+    chargePerc: 44,
+    timeDiff: 21606,
+    chargeDiff: 2,
+    rate: 5,
+    result: 7
+  },
+  {
+    timestamp: 1774353621,
+    chargePerc: 46,
+    timeDiff: 21606,
+    chargeDiff: 2,
+    rate: 5,
+    result: 7
+  },
+  {
+    timestamp: 1774332015,
+    chargePerc: 48,
+    timeDiff: 21585,
+    chargeDiff: 1,
+    rate: 5,
+    result: 4
+  },
+  {
+    timestamp: 1774310430,
+    chargePerc: 49,
+    timeDiff: 21630,
+    chargeDiff: 2,
+    rate: 4,
+    result: 7
+  },
+  {
+    timestamp: 1774288800,
+    chargePerc: 51,
+    timeDiff: 21589,
+    chargeDiff: 2,
+    rate: 4,
+    result: 8
+  },
+  {
+    timestamp: 1774267211,
+    chargePerc: 53,
+    timeDiff: 21607,
+    chargeDiff: 1,
+    rate: 4,
+    result: 3
+  },
+  {
+    timestamp: 1774245604,
+    chargePerc: 54,
+    timeDiff: 21581,
+    chargeDiff: 1,
+    rate: 4,
+    result: 4
+  },
+  {
+    timestamp: 1774224023,
+    chargePerc: 55,
+    timeDiff: 21544,
+    chargeDiff: 1,
+    rate: 3,
+    result: 4
+  },
+  {
+    timestamp: 1774202479,
+    chargePerc: 56,
+    timeDiff: 21674,
+    chargeDiff: 1,
+    rate: 3,
+    result: 3
+  },
+  {
+    timestamp: 1774180805,
+    chargePerc: 57,
+    timeDiff: 21604,
+    chargeDiff: 1,
+    rate: 3,
+    result: 3
+  },
+  {
+    timestamp: 1774159201,
+    chargePerc: 58,
+    timeDiff: 21599,
+    chargeDiff: 1,
+    rate: 4,
+    result: 4
+  },
+  {
+    timestamp: 1774137602,
+    chargePerc: 59,
+    timeDiff: 21563,
+    chargeDiff: 1,
+    rate: 4,
+    result: 4
+  },
+  {
+    timestamp: 1774116039,
+    chargePerc: 60,
+    timeDiff: 21631,
+    chargeDiff: 1,
+    rate: 4,
+    result: 3
+  },
+  {
+    timestamp: 1774094408,
+    chargePerc: 61,
+    timeDiff: 21597,
+    chargeDiff: 1,
+    rate: 5,
+    result: 4
+  },
+  {
+    timestamp: 1774072811,
+    chargePerc: 62,
+    timeDiff: 21610,
+    chargeDiff: 1,
+    rate: 5,
+    result: 3
+  },
+  {
+    timestamp: 1774051201,
+    chargePerc: 63,
+    timeDiff: 21564,
+    chargeDiff: 3,
+    rate: 5,
+    result: 12
+  },
+  {
+    timestamp: 1774029637,
+    chargePerc: 66,
+    timeDiff: 21636,
+    chargeDiff: 3,
+    rate: 4,
+    result: 11
+  },
+  {
+    timestamp: 1774008001,
+    chargePerc: 69,
+    timeDiff: 21587,
+    chargeDiff: 1,
+    rate: 3,
+    result: 4
+  },
+  {
+    timestamp: 1773986414,
+    chargePerc: 70,
+    timeDiff: 21559,
+    chargeDiff: 0,
+    rate: -1,
+    result: -102
+  },
+  {
+    timestamp: 1773964855,
+    chargePerc: 70,
+    timeDiff: 21604,
+    chargeDiff: 1,
+    rate: 3,
+    result: 3
+  },
+  {
+    timestamp: 1773943251,
+    chargePerc: 71,
+    timeDiff: 21630,
+    chargeDiff: 1,
+    rate: 3,
+    result: 3
+  },
+  {
+    timestamp: 1773921621,
+    chargePerc: 72,
+    timeDiff: 21606,
+    chargeDiff: 1,
+    rate: 4,
+    result: 3
+  },
+  {
+    timestamp: 1773900015,
+    chargePerc: 73,
+    timeDiff: 21583,
+    chargeDiff: 0,
+    rate: -1,
+    result: -102
+  },
+  {
+    timestamp: 1773878432,
+    chargePerc: 73,
+    timeDiff: 21632,
+    chargeDiff: 1,
+    rate: 4,
+    result: 3
+  },
+  {
+    timestamp: 1773856800,
+    chargePerc: 74,
+    timeDiff: 21599,
+    chargeDiff: 1,
+    rate: 4,
+    result: 4
+  },
+  {
+    timestamp: 1773835201,
+    chargePerc: 75,
+    timeDiff: 21594,
+    chargeDiff: 1,
+    rate: 5,
+    result: 4
+  },
+  {
+    timestamp: 1773813607,
+    chargePerc: 76,
+    timeDiff: 21569,
+    chargeDiff: 2,
+    rate: 5,
+    result: 8
+  },
+  {
+    timestamp: 1773792038,
+    chargePerc: 78,
+    timeDiff: 21574,
+    chargeDiff: 1,
+    rate: 4,
+    result: 4
+  },
+  {
+    timestamp: 1773770464,
+    chargePerc: 79,
+    timeDiff: 21652,
+    chargeDiff: 2,
+    rate: 4,
+    result: 7
+  },
+  {
+    timestamp: 1773748812,
+    chargePerc: 81,
+    timeDiff: 21600,
+    chargeDiff: 1,
+    rate: 4,
+    result: 4
+  },
+  {
+    timestamp: 1773727212,
+    chargePerc: 82,
+    timeDiff: 21565,
+    chargeDiff: 1,
+    rate: 4,
+    result: 4
+  },
+  {
+    timestamp: 1773705647,
+    chargePerc: 83,
+    timeDiff: 21592,
+    chargeDiff: 1,
+    rate: 4,
+    result: 4
+  },
+  {
+    timestamp: 1773684055,
+    chargePerc: 84,
+    timeDiff: 21634,
+    chargeDiff: 1,
+    rate: 4,
+    result: 3
+  },
+  {
+    timestamp: 1773662421,
+    chargePerc: 85,
+    timeDiff: 21613,
+    chargeDiff: 1,
+    rate: 5,
+    result: 3
+  },
+  {
+    timestamp: 1773640808,
+    chargePerc: 86,
+    timeDiff: 21564,
+    chargeDiff: 1,
+    rate: 5,
+    result: 4
+  },
+  {
+    timestamp: 1773619244,
+    chargePerc: 87,
+    timeDiff: 21553,
+    chargeDiff: 2,
+    rate: 5,
+    result: 8
+  },
+  {
+    timestamp: 1773597691,
+    chargePerc: 89,
+    timeDiff: 21663,
+    chargeDiff: 3,
+    rate: 4,
+    result: 11
+  },
+  {
+    timestamp: 1773576028,
+    chargePerc: 92,
+    timeDiff: 21622,
+    chargeDiff: 1,
+    rate: 3,
+    result: 3
+  },
+  {
+    timestamp: 1773554406,
+    chargePerc: 94,
+    timeDiff: 21605,
+    chargeDiff: 1,
+    rate: 4,
+    result: 3
+  },
+  {
+    timestamp: 1773532801,
+    chargePerc: 95,
+    timeDiff: 21546,
+    chargeDiff: 1,
+    rate: 4,
+    result: 4
+  },
+  {
+    timestamp: 1773511255,
+    chargePerc: 96,
+    timeDiff: 21649,
+    chargeDiff: 2,
+    rate: 3,
+    result: 7
+  },
+  {
+    timestamp: 1773489606,
+    chargePerc: 98,
+    timeDiff: 21600,
+    chargeDiff: 1,
+    rate: 4,
+    result: 4
+  },
+  {
+    timestamp: 1773468006,
+    chargePerc: 99,
+    timeDiff: 21579,
+    chargeDiff: 1,
+    rate: 2,
+    result: 4
+  },
+  {
+    timestamp: 1773446427,
+    chargePerc: 100,
+    timeDiff: 21620,
+    chargeDiff: 0,
+    rate: -1,
+    result: -102
+  }
+];
