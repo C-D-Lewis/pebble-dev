@@ -368,7 +368,8 @@ int data_calculate_avg_discharge_rate(bool ignore_no_change) {
   // This will improve on day 2
   if (ignore_no_change && rate <= 2) return 3;
 
-  return rate;
+  // In case of rounding, err on the side of caution
+  return rate + 1;
 }
 
 int data_calculate_days_remaining(bool tenx) {
