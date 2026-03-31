@@ -4,7 +4,7 @@
 void glance_handler(AppGlanceReloadSession *session, size_t limit, void *context) {
   if (limit < 1) return;
 
-  const int days_remaining = data_calculate_days_remaining();
+  const int days_remaining = data_calculate_days_remaining(false);
 
   static char s_buffer[32];
   if (!util_is_not_status(days_remaining)) {

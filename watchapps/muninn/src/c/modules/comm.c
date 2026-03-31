@@ -15,7 +15,7 @@ static void add_push_pin_data(DictionaryIterator *iter) {
   const int days = 1;
   const int rate = 4;
 #else
-  const int days = data_calculate_days_remaining();
+  const int days = data_calculate_days_remaining(false);
   const int rate = data_calculate_avg_discharge_rate(false);
 #endif
 

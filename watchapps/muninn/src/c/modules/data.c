@@ -88,7 +88,7 @@ static void test_data_generator() {
   // 1 - Arbitrary scenario
   // const int changes[NUM_SAMPLES] = {0, 2, 2, 2, 2, 2, 2, -1, -1, -1, -1, -1, -1, -1, -1, -1};
   //
-  // 2 - Test case: Should show 10 days at 8% per day (from 80%)
+  // 2 - Test case: Should show 9.6 days at 8% per day (from 80%)
   // const int changes[NUM_SAMPLES] = {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
   //
   // 3 - Test case: Should show 11 days at 7% (two other events are ignored)
@@ -108,7 +108,7 @@ static void test_data_generator() {
   // const int changes[NUM_SAMPLES] = {2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
   //
   // 6 - Test case: Should show 4% at 20 days when the majority of events are 'no change' (extreme battery life)
-  const int changes[NUM_SAMPLES] = {0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0};
+  // const int changes[NUM_SAMPLES] = {0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0};
   //
   // 7 - Test case: Big charge half way through
   // const int changes[NUM_SAMPLES] = {3, 0, 3, 3, 0, 3, 3, 3, -30, 3, 3, 3, 3, 3, 3, 3};
@@ -301,7 +301,7 @@ void data_push_sample(int charge_perc, int last_sample_time, int last_charge_per
   s->charge_diff = charge_diff;
   s->result = result;
   if (util_is_not_status(result)) {
-    s->days_remaining = data_calculate_days_remaining();
+    s->days_remaining = data_calculate_days_remaining(false);
     s->rate = data_calculate_avg_discharge_rate(false);
   } else {
     s->days_remaining = STATUS_EMPTY;
@@ -371,7 +371,7 @@ int data_calculate_avg_discharge_rate(bool ignore_no_change) {
   return rate;
 }
 
-int data_calculate_days_remaining() {
+int data_calculate_days_remaining(bool tenx) {
   // Use live battery level, not last reading
   const BatteryChargeState state = battery_state_service_peek();
   const int current_level = state.charge_percent;
@@ -384,15 +384,7 @@ int data_calculate_days_remaining() {
   // Only ever charged, or rate is zero ('return 1' above should prevent this)
   if (rate <= 0) return STATUS_EMPTY;
 
-  return current_level / rate;
-}
-
-int data_calculate_days_remaining_mult() {
-  // Get a value like '5.8' days remaining, and multiply up so it can be rounded later
-  const BatteryChargeState state = battery_state_service_peek();
-  const int current_level = state.charge_percent;
-  const int rate = data_calculate_avg_discharge_rate(false);
-  return current_level * 10 / rate;
+  return (current_level * (tenx ? 10 : 1)) / rate;
 }
 
 bool data_get_rate_is_elevated() {
@@ -429,7 +421,7 @@ void data_cycle_custom_alert_level() {
 
 time_t data_get_next_charge_time() {
   const time_t now = time(NULL);
-  const int days_remaining = data_calculate_days_remaining();
+  const int days_remaining = data_calculate_days_remaining(false);
   if (!util_is_not_status(days_remaining)) return STATUS_EMPTY;
 
   return now + (days_remaining * SECONDS_PER_DAY);

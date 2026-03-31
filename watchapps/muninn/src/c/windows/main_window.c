@@ -60,14 +60,14 @@ static void update_anim_text() {
   const int days = animating ? s_anim_days : s_days_remaining;
   const int rate = animating ? s_anim_rate : s_rate;
 
-  const int mult = data_calculate_days_remaining_mult();
-  const int tens = mult / 10;
+  const int days_10x = data_calculate_days_remaining(true);
+  const int tens = days_10x / 10;
   static char s_remaining_buff[8];
   if (animating || tens >= 10) {
     snprintf(s_remaining_buff, sizeof(s_remaining_buff), "%d", days);
   } else {
     // Show with more precision if not animating and less than 10 days remaining
-    const int units = mult % 10;
+    const int units = days_10x % 10;
     snprintf(s_remaining_buff, sizeof(s_remaining_buff), "%d.%d", tens, units);
   }
   text_layer_set_text(s_remaining_layer, s_remaining_buff);
@@ -168,7 +168,7 @@ static void update_data() {
     schedule_blink();
 
     // Days remaining
-    s_days_remaining = data_calculate_days_remaining();
+    s_days_remaining = data_calculate_days_remaining(false);
     if (util_is_not_status(s_days_remaining)) {
 #ifdef FEATURE_ANIMATIONS
       // Handled in animation
