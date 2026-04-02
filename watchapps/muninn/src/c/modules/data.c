@@ -83,37 +83,40 @@ static int result_from_gap(int gap) {
 
 static void test_data_generator() {
   //
-  // Test data scenarios
+  // Test data scenarios - all at 80% battery
   //
   // 1 - Arbitrary scenario
   // const int changes[NUM_SAMPLES] = {0, 2, 2, 2, 2, 2, 2, -1, -1, -1, -1, -1, -1, -1, -1, -1};
   //
-  // 2 - Test case: Should show 9.6 days at 8% per day (from 80%)
+  // 2 - Should show 10 days at 8% per day
   // const int changes[NUM_SAMPLES] = {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
   //
-  // 3 - Test case: Should show 11 days at 7% (two other events are ignored)
+  // 3 - Should show 11 days at 7% (two other events are ignored)
   //     Note: includes the two special statuses
-  const int changes[NUM_SAMPLES] = {-20, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
+  // const int changes[NUM_SAMPLES] = {-20, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
   //
-  // 4 - Test case: Should show 6.6 days at 12% per day (from 80%)
+  // 4 - Should result in 4.4% per day to test change from 4 -> 5 having large impact
+  const int changes[NUM_SAMPLES] = {2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+  //
+  // 4 - Should show 6.7 days at 12% per day
   // const int changes[NUM_SAMPLES] = {3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
   //
-  // 5 - Test case: Should await 2 samples if both taken are 'no change'
+  // 5 - Should await 2 samples if both taken are 'no change'
   // const int changes[NUM_SAMPLES] = {0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
-  //            or: Should allow one discharge and one 'no change'
+  //     or: Should allow one discharge and one 'no change'
   // const int changes[NUM_SAMPLES] = {2, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
-  //            or: Should await 2 samples if charged and 'no change'
+  //     or: Should await 2 samples if charged and 'no change'
   // const int changes[NUM_SAMPLES] = {0, -10, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
-  //            or: Should await 1 sample
+  //     or: Should await 1 sample
   // const int changes[NUM_SAMPLES] = {2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
   //
-  // 6 - Test case: Should show 4% at 20 days when the majority of events are 'no change' (extreme battery life)
+  // 6 - Should show 20 days at 4% when the majority of events are 'no change' (extreme battery life)
   // const int changes[NUM_SAMPLES] = {0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0};
   //
-  // 7 - Test case: Big charge half way through
+  // 7 - Big charge half way through
   // const int changes[NUM_SAMPLES] = {3, 0, 3, 3, 0, 3, 3, 3, -30, 3, 3, 3, 3, 3, 3, 3};
   //
-  // 8 - Test case: Should show graph with minimum points
+  // 8 - Should show graph with minimum points
   // const int changes[NUM_SAMPLES] = {3, 1, 2, 3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
 
   const int interval_s = WAKEUP_MOD_H * SECONDS_PER_HOUR;
@@ -301,8 +304,9 @@ void data_push_sample(int charge_perc, int last_sample_time, int last_charge_per
   s->charge_diff = charge_diff;
   s->result = result;
   if (util_is_not_status(result)) {
+    // These must stay as integers
     s->days_remaining = data_calculate_days_remaining(false);
-    s->rate = data_calculate_avg_discharge_rate(false);
+    s->rate = data_calculate_avg_discharge_rate_x100(false) / 100;
   } else {
     s->days_remaining = STATUS_EMPTY;
     s->rate = STATUS_EMPTY;
@@ -314,8 +318,10 @@ void data_push_sample(int charge_perc, int last_sample_time, int last_charge_per
  * so recent changes in watchface or activity are more quickly reflected.
  *
  * Important: count all time periods in the log, not just those with a drop!
+ *
+ * Returns value * 100 for FP maths.
  */
-int data_calculate_avg_discharge_rate(bool ignore_no_change) {
+int data_calculate_avg_discharge_rate_x100(bool ignore_no_change) {
   const int total = data_get_valid_samples_count();
   if (total < MIN_SAMPLES) return STATUS_EMPTY;
 
@@ -358,38 +364,42 @@ int data_calculate_avg_discharge_rate(bool ignore_no_change) {
   // This case is a problem: 90% charge becomes 90 days at 1% rate...
   if (total_x2 == 0) total_x2 = 1;
 
-  const int rate = total_x2 / weight_x2;
-  if (rate <= 2 && !ignore_no_change) {
+  const int rate_100x = (total_x2 * 100) / weight_x2;
+  if (rate_100x <= 200 && !ignore_no_change) {
     // Count again, but this time ignore 'no change' time periods
-    return data_calculate_avg_discharge_rate(true);
+    return data_calculate_avg_discharge_rate_x100(true);
   }
 
   // Ignore extremely low estimates and hence extremely high battery life over-estimates
   // This will improve on day 2
-  if (ignore_no_change && rate <= 2) return 3;
+  if (ignore_no_change && rate_100x <= 200) return 300;
 
-  return rate;
+  return rate_100x;
 }
 
 int data_calculate_days_remaining(bool tenx) {
   // Use live battery level, not last reading
   const BatteryChargeState state = battery_state_service_peek();
   const int current_level = state.charge_percent;
-  const int rate = data_calculate_avg_discharge_rate(false);
+  const int rate_100x = data_calculate_avg_discharge_rate_x100(false);
 
   // If not enough data
   if (data_get_valid_samples_count() < MIN_SAMPLES) return STATUS_EMPTY;
   // Data not available yet
-  if (!util_is_not_status(rate)) return STATUS_EMPTY;
+  if (!util_is_not_status(rate_100x)) return STATUS_EMPTY;
   // Only ever charged, or rate is zero ('return 1' above should prevent this)
-  if (rate <= 0) return STATUS_EMPTY;
+  if (rate_100x <= 0) return STATUS_EMPTY;
 
-  return (current_level * (tenx ? 10 : 1)) / rate;
+  // Multiply by 100 for FP maths and x10 if tenx for decimal display
+  const int level = current_level * (tenx ? 1000 : 100);
+
+  // Rounding using half the divisor for the nearest whole day
+  return (level + (rate_100x / 2)) / rate_100x;
 }
 
 bool data_get_rate_is_elevated() {
   // Return true if the most recent value is much higher than usual
-  const int avg = data_calculate_avg_discharge_rate(false);
+  const int avg = data_calculate_avg_discharge_rate_x100(false) / 100;
   const int last = s_samples[0].result;
 
   // Last value wasn't a significant one of discharge

@@ -1,6 +1,7 @@
 import { testStats } from './test/tests';
-import { ensureUploadId, handleGetSyncInfo, handleSync, uploadHistory } from './sync';
+import { handleGetSyncInfo, handleSync } from './sync';
 import { handlePushTimelinePin } from './timeline';
+import { ensureUploadId, uploadHistory } from './upload';
 
 /**
  * Clear all data phone-side for this watch.
@@ -40,6 +41,9 @@ Pebble.addEventListener('appmessage', async (e) => {
 
 Pebble.addEventListener('showConfiguration', async () => {
   const id = await ensureUploadId();
+
+  // Try and upload freshest data for the user
+  await uploadHistory();
 
   // isAppConfigPage hides some elements that can't be clicked in the config page webview
   Pebble.openURL(`https://muninn.chrislewis.me.uk?id=${id}&isAppConfigPage=true`);

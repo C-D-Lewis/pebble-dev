@@ -29,3 +29,21 @@ export const generateTestData = (): HistoryItem[] => {
   }
   return items;
 };
+
+/**
+ * LocalStorage key - data history on a per-watch basis
+ */
+export const buildHistoryKey = () => {
+  const key = `history-${Pebble.getWatchToken()}`;
+  // console.log(JSON.stringify({ key }));
+  return key;
+};
+
+/**
+ * LocalStorage key - upload ID on a per-watch basis
+ */
+export const buildUploadKey = () => {
+  const uploadKey = `upload-${Pebble.getWatchToken()}`;
+  // console.log(JSON.stringify({ uploadKey }));
+  return uploadKey;
+};

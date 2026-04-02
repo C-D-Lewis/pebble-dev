@@ -60,20 +60,26 @@ static void update_anim_text() {
   const int days = animating ? s_anim_days : s_days_remaining;
   const int rate = animating ? s_anim_rate : s_rate;
 
+  // Separate tens and units for decimal point display
   const int days_10x = data_calculate_days_remaining(true);
-  const int tens = days_10x / 10;
+  int tens = days_10x / 10;
   static char s_remaining_buff[8];
   if (animating || tens >= 10) {
     snprintf(s_remaining_buff, sizeof(s_remaining_buff), "%d", days);
   } else {
     // Show with more precision if not animating and less than 10 days remaining
-    const int units = days_10x % 10;
-    snprintf(s_remaining_buff, sizeof(s_remaining_buff), "%d.%d", tens, units);
+    snprintf(s_remaining_buff, sizeof(s_remaining_buff), "%d.%d", tens, days_10x % 10);
   }
   text_layer_set_text(s_remaining_layer, s_remaining_buff);
 
+  const int rate_100x = data_calculate_avg_discharge_rate_x100(false);
+  tens = rate_100x / 100;
   static char s_rate_buff[8];
-  snprintf(s_rate_buff, sizeof(s_rate_buff), rate < 10 ? "0%d" : "%d", rate);
+  if (animating || tens >= 10) {
+    snprintf(s_rate_buff, sizeof(s_rate_buff), "%d", rate);
+  } else {
+    snprintf(s_rate_buff, sizeof(s_rate_buff), "%d.%d", tens, (rate_100x % 100) / 10);
+  }
   text_layer_set_text(s_rate_layer, s_rate_buff);
 }
 
@@ -184,7 +190,7 @@ static void update_data() {
     update_subtitle(s_days_remaining);
 
     // Rate per day
-    s_rate = data_calculate_avg_discharge_rate(false);
+    s_rate = data_calculate_avg_discharge_rate_x100(false) / 100;
     if (util_is_not_status(s_rate)) {
 #ifdef FEATURE_ANIMATIONS
       text_layer_set_text(s_rate_layer, "--");
@@ -228,7 +234,7 @@ static void update_data() {
   }
 
 #ifdef FEATURE_ANIMATIONS
-  if (data_calculate_avg_discharge_rate(false) != STATUS_EMPTY) {
+  if (data_calculate_avg_discharge_rate_x100(false) != STATUS_EMPTY) {
     // If data to show, begin smooth animation
     static AnimationImplementation anim_implementation = {
       .update = anim_update,

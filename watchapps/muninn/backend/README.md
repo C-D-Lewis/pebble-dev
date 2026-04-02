@@ -51,7 +51,3 @@ and the static site assets are built with Vite and uploaded to S3.
 ```shell
 ./scripts/deploy.sh
 ```
-
-## TODO
-
-* If possible and sample size is large enough, show some stats per-model or age.

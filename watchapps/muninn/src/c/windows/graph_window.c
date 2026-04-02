@@ -141,7 +141,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     if (!s || !util_is_not_status(s->charge_perc)) continue;
 
     const Sample *oldest_s = data_get_sample(count - 1);
-    if (!oldest_s) continue; // TODO: Can we do better here?
+    if (!oldest_s) continue;
     const int oldest_ts = oldest_s->timestamp;
 
     // Find it's percentage x of the total based on timestamp more than oldest ts

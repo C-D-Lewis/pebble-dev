@@ -308,14 +308,8 @@ export const StatsList = () => fabricate('Column')
       mtbc,
     } = stats;
 
-    // Could be empty if not much data
-    const lvarValue = lastWeekRate !== STATUS_EMPTY ? `${lastWeekRate}% per day` : '-';
-    const mtbcValue = mtbc !== STATUS_EMPTY ? `${mtbc} days` : '-';
-
-    const batteryDays = Math.round(100 / allTimeRate);
-    const lwelValue = lastWeekRate !== STATUS_EMPTY
-      ? `${Math.round(100 / lastWeekRate)} days`
-      : '-';
+    const batteryDays = Math.floor(100 / allTimeRate);
+    const lastWeekBatteryDays = Math.floor(100 / lastWeekRate);
 
     // Compare battery life against all users with this model
     const modelStats = globalStats.models.find((p) => p.names.includes(model));
@@ -324,12 +318,19 @@ export const StatsList = () => fabricate('Column')
     if (modelStats) {
       const diffDays = batteryDays - modelStats.avgBatteryLife;
       let operator = diffDays >= 0 ? 'above' : 'below';
-      compareDaysStr = `${diffDays} ${operator} average for this model`;
+      compareDaysStr = `${Math.abs(diffDays)} ${operator} average for this model`;
 
       const diffRate = allTimeRate - modelStats.avgRate;
       operator = diffRate >= 0 ? 'above' : 'below';
       compareRateStr = `${Math.abs(diffRate)}% ${operator} average for this model`;
     }
+
+    // Could be empty if not much data
+    const lvarValue = lastWeekRate !== STATUS_EMPTY ? `${lastWeekRate}% per day` : '-';
+    const mtbcValue = mtbc !== STATUS_EMPTY ? `${mtbc} days` : '-';
+    const lwelValue = lastWeekRate !== STATUS_EMPTY
+      ? `${lastWeekBatteryDays} days`
+      : '-';
 
     el.setChildren([
       fabricate('Row')
@@ -369,9 +370,7 @@ export const StatsList = () => fabricate('Column')
  * @returns {FabricateComponent} Fabricate component.
  */
 export const InfoChips = () => fabricate('Column')
-  .setStyles({
-    padding: '4px',
-  })
+  .setStyles({ padding: '4px' })
   .onCreate((el, state) => {
     const {
       id,

@@ -65,6 +65,6 @@ statistics. It's built with TypeScript, Vite, and deployed with Terraform. See
 Please report bugs including - watch model and age (i.e.: Pebble Time Steel, 
 from 2016) and what kind of anomalous behavior you encountered.
 
-## TODO:
+## TODO
 
 - [ ] Import data from JS? Could be invalid/stale
