@@ -268,11 +268,11 @@ const StatView = (
     }))
     .setChildren([
       fabricate('Text')
-        .setStyles(({ palette }) => ({
-          color: palette.grey(9),
+        .setStyles({
+          color: '#ccc',
           fontSize: '0.9rem',
           textAlign: 'center',
-        }))
+        })
         .setText(label),
       fabricate('Text')
         .setStyles({
