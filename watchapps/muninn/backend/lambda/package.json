@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc --noEmit && esbuild src/index.ts --bundle --minify --platform=node --target=node24 --outfile=dist/index.js",
     "test:unit": "NODE_ENV=test npx c8 --reporter=html --reporter=text mocha test/unit.spec.mjs",
-    "test:e2e": "npx mocha test/e2e.spec.mjs"
+    "test:e2e": "npx mocha --timeout 5000  test/e2e.spec.mjs"
   },
   "keywords": [],
   "author": "C-D-Lewis",
