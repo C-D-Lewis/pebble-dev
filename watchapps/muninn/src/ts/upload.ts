@@ -21,7 +21,7 @@ const mapHistoryForDisplay = (history: HistoryItem[]): UploadHistoryItem[] =>
 /**
  * Get upload ID from the API, if possible.
  *
- * @returns Upload ID, or constant indicating no ID available. 
+ * @returns Upload ID, or constant indicating no ID available.
  */
 const getUploadId = async (): Promise<string> => {
   const watchToken = Pebble.getWatchToken();
@@ -40,7 +40,7 @@ const getUploadId = async (): Promise<string> => {
     console.log(await res.text());
     return UPLOAD_ID_EMPTY;
   }
-  
+
   const { id = UPLOAD_ID_EMPTY } = await res.json();
   return id;
 };
