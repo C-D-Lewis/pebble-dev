@@ -33,6 +33,7 @@ working_projects=$(cat <<EOF
 ./watchfaces/isotime-appstore/
 ./watchfaces/kitty-watchface/
 ./watchfaces/morndas/
+./watchfaces/patchwork/
 ./watchfaces/past-present-future/
 ./watchfaces/potential-divider/
 ./watchfaces/pseudotime/

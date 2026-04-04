@@ -23,13 +23,25 @@
         },
         {
           "type": "font",
-          "name": "FORCED_SQUARE_80",
+          "name": "FORCED_SQUARE_24",
           "file": "fonts/FORCED_SQUARE.ttf",
           "characterRegex": "[:0-9A-Za-z]"
         },
         {
           "type": "font",
           "name": "FORCED_SQUARE_36",
+          "file": "fonts/FORCED_SQUARE.ttf",
+          "characterRegex": "[:0-9A-Za-z]"
+        },
+        {
+          "type": "font",
+          "name": "FORCED_SQUARE_60",
+          "file": "fonts/FORCED_SQUARE.ttf",
+          "characterRegex": "[:0-9A-Za-z]"
+        },
+        {
+          "type": "font",
+          "name": "FORCED_SQUARE_80",
           "file": "fonts/FORCED_SQUARE.ttf",
           "characterRegex": "[:0-9A-Za-z]"
         }
@@ -48,6 +60,8 @@
       "watchface": true
     },
     "targetPlatforms": [
+      "basalt",
+      "chalk",
       "emery",
       "gabbro"
     ],

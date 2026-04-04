@@ -36,6 +36,7 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `isotime-appstore`    | ![](watchfaces/isotime-appstore/screenshots/yellow.png)    | `A - E` `(F - G)`     | ✅    | [pbw](pbw/isotime-appstore.pbw)             |
 | `kitty-watchface`     | ![](watchfaces/kitty-watchface/screenshots/aplite.png)     | `A` `B` `D`             |      | [pbw](pbw/kitty-watchface.pbw)     |
 | `morndas`             | ![](watchfaces/morndas/screenshots/basalt.png)             | `A` `B` `D` `E` `F`            |      | [pbw](pbw/morndas.pbw)             |
+| `patchwork`           | ![](watchfaces/patchwork/screenshots/basalt-ocean.png)     | `B` `C` `E` `G`      |      | [pbw](pbw/patchwork.pbw)             |
 | `past-present-future` | ![](watchfaces/past-present-future/screenshots/aplite.png) | `A` `B` `D`             |      | [pbw](pbw/past-present-future.pbw) |
 | `potential-divider`   | ![](watchfaces/potential-divider/screenshots/aplite.png)   | `A` `B` `D`             | ✅    | [pbw](pbw/potential-divider.pbw)   |
 | `pseudotime`          | ![](watchfaces/pseudotime/screenshots/basalt.png)          | `A - F` |      | [pbw](pbw/pseudotime.pbw)          |

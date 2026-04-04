@@ -1,17 +1,8 @@
 #include "main_window.h"
 
-static Window *s_window;
-static Layer *s_canvas_layer;
-
-static GFont s_font_36, s_font_80;
-
-/*********************************** Drawing **********************************/
-
 static GColor s_palette_pastel[] = {
   GColorVividCerulean,
-  GColorElectricBlue,
   GColorMalachite,
-  GColorBrightGreen,
   GColorYellow,
   GColorOrange,
   GColorRed,
@@ -25,8 +16,6 @@ static GColor s_palette_greyscale[] = {
   GColorDarkGray,
   GColorLightGray,
   GColorWhite,
-  GColorDarkGray,
-  GColorLightGray
 };
 
 static GColor s_palette_synthwave[] = {
@@ -36,27 +25,21 @@ static GColor s_palette_synthwave[] = {
   GColorMagenta,
   GColorFashionMagenta,
   GColorShockingPink,
-  GColorCyan,
-  GColorElectricBlue
 };
 
 static GColor s_palette_pride[] = {
   GColorRed,
   GColorOrange,
   GColorYellow,
-  GColorBrightGreen,
   GColorVividCerulean,
   GColorIndigo,
-  GColorPurple,
   GColorMagenta
 };
 
 static GColor s_palette_forest[] = {
-  GColorMidnightGreen,
   GColorDarkGreen,
   GColorJaegerGreen,
   GColorMayGreen,
-  GColorSpringBud,
   GColorIslamicGreen,
   GColorWindsorTan,
   GColorArmyGreen
@@ -66,12 +49,17 @@ static GColor s_palette_ocean[] = {
   GColorOxfordBlue,
   GColorDukeBlue,
   GColorCobaltBlue,
-  GColorVividCerulean,
   GColorPictonBlue,
-  GColorCyan,
   GColorElectricBlue,
   GColorWhite
 };
+
+static Window *s_window;
+static Layer *s_canvas_layer;
+
+static bool s_is_connected;
+
+/*********************************** Drawing **********************************/
 
 static GColor* get_current_palette() {
   char* palette_name = data_get_palette();
@@ -80,7 +68,7 @@ static GColor* get_current_palette() {
   if (strcmp(palette_name, "synthwave") == 0) return s_palette_synthwave;
   if (strcmp(palette_name, "pride") == 0)     return s_palette_pride;
   if (strcmp(palette_name, "forest") == 0)    return s_palette_forest;
-  if (strcmp(palette_name, "ocean") == 0)    return s_palette_ocean;
+  if (strcmp(palette_name, "ocean") == 0)     return s_palette_ocean;
 
   return s_palette_pastel;
 }
@@ -94,6 +82,9 @@ static void canvas_layer_update_proc(Layer *layer, GContext *ctx) {
   isometric_set_projection_offset(PROJECTION_OFFSET);
 
   GColor* palette = get_current_palette();
+  if (!s_is_connected) {
+    palette = s_palette_greyscale;
+  }
 
   // Draw grid
   for (int y = 0; y < GRID_SIZE; y++) {
@@ -110,13 +101,13 @@ static void canvas_layer_update_proc(Layer *layer, GContext *ctx) {
   static char s_time_buff[6];
   strftime(s_time_buff, sizeof(s_time_buff), "%H:%M", tick_time);
   graphics_context_set_text_color(ctx, GColorBlack);
-  int x = scl_x_pp({.e = 25, .g = 20});
-  int y = scl_y_pp({.e = 180, .g = 210});
+  int x = scl_x_pp({.o = 20, .e = 25, .g = 20});
+  int y = scl_y_pp({.o = 180, .e = 180, .g = 210});
   graphics_draw_text(
     ctx,
     s_time_buff,
-    s_font_80,
-    GRect(x - 3, y - 3, PS_DISP_W, PS_DISP_H),
+    scl_get_font(SFI_Large),
+    GRect(x + 3, y + 3, PS_DISP_W, PS_DISP_H),
     GTextOverflowModeWordWrap,
     GTextAlignmentCenter,
     NULL
@@ -125,7 +116,7 @@ static void canvas_layer_update_proc(Layer *layer, GContext *ctx) {
   graphics_draw_text(
     ctx,
     s_time_buff,
-    s_font_80,
+    scl_get_font(SFI_Large),
     GRect(x, y, PS_DISP_W, PS_DISP_H),
     GTextOverflowModeWordWrap,
     GTextAlignmentCenter,
@@ -136,14 +127,14 @@ static void canvas_layer_update_proc(Layer *layer, GContext *ctx) {
   static char s_date_buff[20];
   strftime(s_date_buff, sizeof(s_date_buff), "%e %b %Y", tick_time);
 
-  x = scl_x_pp({.e = -5, .g = -5});
-  y = scl_y_pp({.e = 550, .g = 530});
+  x = scl_x_pp({.o = -10, .e = -10, .g = -5});
+  y = scl_y_pp({.o = 550, .c = 530, .e = 550, .g = 530});
   graphics_context_set_text_color(ctx, GColorBlack);
   graphics_draw_text(
     ctx,
     s_date_buff,
-    s_font_36,
-    GRect(x - 2, y - 2, PS_DISP_W, PS_DISP_H),
+    scl_get_font(SFI_Small),
+    GRect(x + 2, y + 2, PS_DISP_W, PS_DISP_H),
     GTextOverflowModeWordWrap,
     GTextAlignmentCenter,
     NULL
@@ -152,7 +143,7 @@ static void canvas_layer_update_proc(Layer *layer, GContext *ctx) {
   graphics_draw_text(
     ctx,
     s_date_buff,
-    s_font_36,
+    scl_get_font(SFI_Small),
     GRect(x, y, PS_DISP_W, PS_DISP_H),
     GTextOverflowModeWordWrap,
     GTextAlignmentCenter,
@@ -164,14 +155,19 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
   layer_mark_dirty(s_canvas_layer);
 }
 
+static void bt_handler(bool connected) {
+  s_is_connected = connected;
+
+  if (!connected) vibes_double_pulse();
+
+  layer_mark_dirty(s_canvas_layer);
+}
+
 /************************************ Window **********************************/
 
 static void window_load(Window *window) {
   Layer *window_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(window_layer);
-
-  s_font_36 = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FORCED_SQUARE_36));
-  s_font_80 = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FORCED_SQUARE_80));
 
   s_canvas_layer = layer_create(bounds);
   layer_set_update_proc(s_canvas_layer, canvas_layer_update_proc);
@@ -202,6 +198,9 @@ void main_window_push() {
   window_stack_push(s_window, true);
 
   tick_timer_service_subscribe(MINUTE_UNIT, tick_handler);
+
+  bluetooth_connection_service_subscribe(bt_handler);
+  bt_handler(bluetooth_connection_service_peek());
 }
 
 void main_window_reload() {
