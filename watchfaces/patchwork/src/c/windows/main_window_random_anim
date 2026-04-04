@@ -1,0 +1,186 @@
+#include "main_window.h"
+
+static Window *s_window;
+static Layer *s_canvas_layer;
+
+static GColor s_palette[] = {
+  GColorVividCerulean,
+  GColorElectricBlue,
+  GColorMalachite,
+  GColorBrightGreen,
+  GColorYellow,
+  GColorOrange,
+  GColorRed,
+  GColorVividViolet
+};
+
+static GFont s_font_80;
+static bool s_tapped, s_animating;
+static time_t s_tap_time;
+static int s_anim_perc;
+static int s_rand_off;
+
+/*********************************** Drawing **********************************/
+
+static void canvas_layer_update_proc(Layer *layer, GContext *ctx) {
+  struct tm *tick_time;
+  time_t t = time(NULL);
+  tick_time = localtime(&t);
+
+  isometric_begin(ctx);
+  isometric_set_projection_offset(PROJECTION_OFFSET);
+
+  // Draw grid
+  for (int y = 0; y < GRID_SIZE; y++) {
+    for (int x = 0; x < GRID_SIZE; x++) {
+      // Derive color index based on x and y that appears random
+      const int a = 31337;
+      const int b = 7193;
+      int val = (x ^ (y * m1)) ^ s_rand_off;
+      GColor color = s_palette[abs(index * a) % NUM_COLORS];
+      // Derive some fixed z_max with based on x and y that appears random
+      const int z_max = ((x + 1) * (y + 1)) % Z_MOD;
+
+      int z_now = 0;
+      if (s_tapped && !s_animating) {
+        // Stand out when tapped
+        z_now = z_max;
+      } else {
+        // Ease back while animating to zero
+        z_now = (s_animating) ? (z_max * (100 - s_anim_perc)) / 100 : 0;
+      }
+      drawing_draw_square(Vec3(x * B_W, y * B_W, z_now), color);
+    }
+  }
+
+  isometric_finish(ctx);
+
+  // Draw time
+  static char s_time_buff[6];
+  strftime(s_time_buff, sizeof(s_time_buff), "%H:%M", tick_time);
+  graphics_context_set_text_color(ctx, GColorBlack);
+  int x = 0;
+  int y = scl_y(240);
+  graphics_draw_text(
+    ctx,
+    s_time_buff,
+    s_font_80,
+    GRect(x, y, PS_DISP_W, PS_DISP_H),
+    GTextOverflowModeFill,
+    GTextAlignmentCenter,
+    NULL
+  );
+  graphics_context_set_text_color(ctx, GColorWhite);
+  graphics_draw_text(
+    ctx,
+    s_time_buff,
+    s_font_80,
+    GRect(x + 3, y + 3, PS_DISP_W, PS_DISP_H),
+    GTextOverflowModeFill,
+    GTextAlignmentCenter,
+    NULL
+  );
+
+  // Date?
+}
+
+/********************************* Animations *********************************/
+
+static int anim_percentage(AnimationProgress dist_normalized, int max) {
+  return (max * dist_normalized) / ANIMATION_NORMALIZED_MAX;
+}
+
+static void animation_started(Animation *anim, void *context) {
+  s_animating = true;
+  s_tapped = false;
+}
+
+static void animation_stopped(Animation *anim, bool stopped, void *context) {
+  s_animating = false;
+}
+
+static void animate(int duration, int delay, AnimationImplementation *implementation) {
+  Animation *anim = animation_create();
+  if (anim) {
+    animation_set_duration(anim, duration);
+    animation_set_delay(anim, delay);
+    animation_set_curve(anim, AnimationCurveEaseInOut);
+    animation_set_implementation(anim, implementation);
+    animation_set_handlers(anim, (AnimationHandlers) {
+      .started = animation_started,
+      .stopped = animation_stopped
+    }, NULL);
+    animation_schedule(anim);
+  }
+}
+
+static void anim_update(Animation *anim, AnimationProgress dist_normalized) {
+  s_anim_perc = anim_percentage(dist_normalized, 100);
+
+  layer_mark_dirty(s_canvas_layer);
+}
+
+static void start_animation() {
+  static AnimationImplementation anim_implementation = { .update = anim_update };
+  animate(800, 1000, &anim_implementation);
+}
+
+/********************************** Handlers **********************************/
+
+static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
+  // Use minute as stable seed
+  srand(tick_time->tm_hour + tick_time->tm_min);
+  s_rand_off = rand();
+
+  layer_mark_dirty(s_canvas_layer);
+}
+
+static void accel_tap_handler(AccelAxisType axis, int32_t direction) {
+  // Prevent multiple taps in a short time
+  time_t now = time(NULL);
+  if (now - s_tap_time < 5) return;
+  
+  // Move now
+  s_tapped = true;
+  s_tap_time = now;
+  s_anim_perc = 0;
+  layer_mark_dirty(s_canvas_layer);
+
+  // Delay easing back to normal
+  start_animation();
+}
+
+/************************************ Window **********************************/
+
+static void window_load(Window *window) {
+  Layer *window_layer = window_get_root_layer(window);
+  GRect bounds = layer_get_bounds(window_layer);
+
+  s_font_80 = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FORCED_SQUARE_80));
+
+  s_canvas_layer = layer_create(bounds);
+  layer_set_update_proc(s_canvas_layer, canvas_layer_update_proc);
+  layer_add_child(window_layer, s_canvas_layer);
+}
+
+static void window_unload(Window *window) {
+  layer_destroy(s_canvas_layer);
+
+  window_destroy(s_window);
+  s_window = NULL;
+}
+
+void main_window_push() {
+  if (!s_window) {
+    s_window = window_create();
+    window_set_background_color(s_window, GColorBlack);
+    window_set_window_handlers(s_window, (WindowHandlers) {
+      .load = window_load,
+      .unload = window_unload,
+    });
+  }
+  window_stack_push(s_window, true);
+
+  tick_timer_service_subscribe(MINUTE_UNIT, tick_handler);
+  accel_tap_service_subscribe(accel_tap_handler);
+}

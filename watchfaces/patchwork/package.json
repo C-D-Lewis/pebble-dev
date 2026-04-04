@@ -23,6 +23,11 @@
           "type": "font",
           "name": "FORCED_SQUARE_80",
           "file": "fonts/FORCED_SQUARE.ttf"
+        },
+        {
+          "type": "font",
+          "name": "FORCED_SQUARE_36",
+          "file": "fonts/FORCED_SQUARE.ttf"
         }
       ]
     },
