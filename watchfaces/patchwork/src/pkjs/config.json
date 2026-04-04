@@ -28,9 +28,17 @@
             "label": "Synthwave",
             "value": "synthwave"
           },
-          { 
+          {
             "label": "Pride",
-            "value": "pride" 
+            "value": "pride"
+          },
+          {
+            "label": "Forest",
+            "value": "forest"
+          },
+          {
+            "label": "Ocean",
+            "value": "ocean"
           }
         ]
       }

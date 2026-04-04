@@ -51,6 +51,40 @@ static GColor s_palette_pride[] = {
   GColorMagenta
 };
 
+static GColor s_palette_forest[] = {
+  GColorMidnightGreen,
+  GColorDarkGreen,
+  GColorJaegerGreen,
+  GColorMayGreen,
+  GColorSpringBud,
+  GColorIslamicGreen,
+  GColorWindsorTan,
+  GColorArmyGreen
+};
+
+static GColor s_palette_ocean[] = {
+  GColorOxfordBlue,
+  GColorDukeBlue,
+  GColorCobaltBlue,
+  GColorVividCerulean,
+  GColorPictonBlue,
+  GColorCyan,
+  GColorElectricBlue,
+  GColorWhite
+};
+
+static GColor* get_current_palette() {
+  char* palette_name = data_get_palette();
+  if (strcmp(palette_name, "pastel") == 0)    return s_palette_pastel;
+  if (strcmp(palette_name, "greyscale") == 0) return s_palette_greyscale;
+  if (strcmp(palette_name, "synthwave") == 0) return s_palette_synthwave;
+  if (strcmp(palette_name, "pride") == 0)     return s_palette_pride;
+  if (strcmp(palette_name, "forest") == 0)    return s_palette_forest;
+  if (strcmp(palette_name, "ocean") == 0)    return s_palette_ocean;
+
+  return s_palette_pastel;
+}
+
 static void canvas_layer_update_proc(Layer *layer, GContext *ctx) {
   struct tm *tick_time;
   time_t t = time(NULL);
@@ -59,20 +93,7 @@ static void canvas_layer_update_proc(Layer *layer, GContext *ctx) {
   isometric_begin(ctx);
   isometric_set_projection_offset(PROJECTION_OFFSET);
 
-  // Get palette
-  char* palette_name = data_get_palette();
-  GColor* palette;
-  if (strcmp(palette_name, "pastel") == 0) {
-    palette = (GColor*)s_palette_pastel;
-  } else if (strcmp(palette_name, "greyscale") == 0) {
-    palette = (GColor*)s_palette_greyscale;
-  } else if (strcmp(palette_name, "synthwave") == 0) {
-    palette = (GColor*)s_palette_synthwave;
-  } else if (strcmp(palette_name, "pride") == 0) {
-    palette = (GColor*)s_palette_pride;
-  } else {
-    palette = (GColor*)s_palette_pastel;
-  }
+  GColor* palette = get_current_palette();
 
   // Draw grid
   for (int y = 0; y < GRID_SIZE; y++) {
@@ -140,9 +161,6 @@ static void canvas_layer_update_proc(Layer *layer, GContext *ctx) {
 }
 
 static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
-  // Use minute as stable seed
-  srand(tick_time->tm_hour + tick_time->tm_min);
-
   layer_mark_dirty(s_canvas_layer);
 }
 
@@ -168,6 +186,11 @@ static void window_unload(Window *window) {
 }
 
 void main_window_push() {
+  struct tm *tick_time;
+  time_t t = time(NULL);
+  tick_time = localtime(&t);
+  srand(tick_time->tm_hour + tick_time->tm_min);
+
   if (!s_window) {
     s_window = window_create();
     window_set_background_color(s_window, GColorBlack);
