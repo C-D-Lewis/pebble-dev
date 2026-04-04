@@ -122,6 +122,17 @@ void inbox_received_handler(DictionaryIterator *iter, void *context) {
     const int sync_count = (int)t->value->int32;
     APP_LOG(APP_LOG_LEVEL_INFO, "Sync: %d (%d)", last_ts, sync_count);
 
+    // Test compare with last seen value
+    // const int temp_key = 5000;
+    // if (persist_exists(temp_key)) {
+    //   int last_count = persist_read_int(temp_key);
+    //   // some value was saved
+    //   if (sync_count > 0 && sync_count < last_count) {
+    //     message_window_push("Phone count is less than watch count!", true, false);
+    //   }
+    // }
+    // persist_write_int(temp_key, sync_count);
+
     app_state->sync_count = sync_count;
 
     t = dict_find(iter, MESSAGE_KEY_STAT_TOTAL_DAYS);
