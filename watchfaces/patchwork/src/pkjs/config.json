@@ -1,0 +1,43 @@
+[
+  {
+    "type": "heading",
+    "defaultValue": "Patchwork Configuration"
+  },
+  {
+    "type": "section",
+    "items": [
+      {
+        "type": "heading",
+        "defaultValue": "Color Palettes"
+      },
+      {
+        "type": "select",
+        "messageKey": "PALETTE",
+        "defaultValue": "pastel",
+        "label": "Palette",
+        "options": [
+          {
+            "label": "Pastel",
+            "value": "pastel"
+          },
+          {
+            "label": "Greyscale",
+            "value": "greyscale"
+          },
+          {
+            "label": "Synthwave",
+            "value": "synthwave"
+          },
+          { 
+            "label": "Pride",
+            "value": "pride" 
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "submit",
+    "defaultValue": "Save"
+  }
+]

@@ -6,6 +6,9 @@
 
 #include "../config.h"
 
+#include "../modules/data.h"
 #include "../modules/drawing.h"
 
 void main_window_push();
+
+void main_window_reload();

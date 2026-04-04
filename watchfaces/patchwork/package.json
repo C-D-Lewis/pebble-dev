@@ -3,7 +3,9 @@
   "author": "Chris Lewis",
   "private": true,
   "dependencies": {
+    "@rebble/clay": "^1.0.8",
     "pebble-isometric": "^1.5.0",
+    "pebble-packet": "^1.6.0",
     "pebble-scalable": "^2.2.0"
   },
   "keywords": [
@@ -22,20 +24,22 @@
         {
           "type": "font",
           "name": "FORCED_SQUARE_80",
-          "file": "fonts/FORCED_SQUARE.ttf"
+          "file": "fonts/FORCED_SQUARE.ttf",
+          "characterRegex": "[:0-9A-Za-z]"
         },
         {
           "type": "font",
           "name": "FORCED_SQUARE_36",
-          "file": "fonts/FORCED_SQUARE.ttf"
+          "file": "fonts/FORCED_SQUARE.ttf",
+          "characterRegex": "[:0-9A-Za-z]"
         }
       ]
     },
     "projectType": "native",
     "uuid": "bad6aea9-ef84-45fd-b86c-0507ef9d593c",
-    "messageKeys": {
-      "dummy": 0
-    },
+    "messageKeys": [
+      "PALETTE"
+    ],
     "enableMultiJS": true,
     "displayName": "patchwork",
     "watchapp": {
@@ -47,7 +51,9 @@
       "emery",
       "gabbro"
     ],
-    "capabilities": []
+    "capabilities": [
+      "configurable"
+    ]
   },
   "name": "patchwork"
 }

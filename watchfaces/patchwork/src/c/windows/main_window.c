@@ -3,7 +3,11 @@
 static Window *s_window;
 static Layer *s_canvas_layer;
 
-static GColor s_palette[] = {
+static GFont s_font_36, s_font_80;
+
+/*********************************** Drawing **********************************/
+
+static GColor s_palette_pastel[] = {
   GColorVividCerulean,
   GColorElectricBlue,
   GColorMalachite,
@@ -14,9 +18,38 @@ static GColor s_palette[] = {
   GColorVividViolet
 };
 
-static GFont s_font_36, s_font_80;
+static GColor s_palette_greyscale[] = {
+  GColorDarkGray,
+  GColorLightGray,
+  GColorWhite,
+  GColorDarkGray,
+  GColorLightGray,
+  GColorWhite,
+  GColorDarkGray,
+  GColorLightGray
+};
 
-/*********************************** Drawing **********************************/
+static GColor s_palette_synthwave[] = {
+  GColorOxfordBlue,
+  GColorImperialPurple,
+  GColorPurple,
+  GColorMagenta,
+  GColorFashionMagenta,
+  GColorShockingPink,
+  GColorCyan,
+  GColorElectricBlue
+};
+
+static GColor s_palette_pride[] = {
+  GColorRed,
+  GColorOrange,
+  GColorYellow,
+  GColorBrightGreen,
+  GColorVividCerulean,
+  GColorIndigo,
+  GColorPurple,
+  GColorMagenta
+};
 
 static void canvas_layer_update_proc(Layer *layer, GContext *ctx) {
   struct tm *tick_time;
@@ -26,10 +59,25 @@ static void canvas_layer_update_proc(Layer *layer, GContext *ctx) {
   isometric_begin(ctx);
   isometric_set_projection_offset(PROJECTION_OFFSET);
 
+  // Get palette
+  char* palette_name = data_get_palette();
+  GColor* palette;
+  if (strcmp(palette_name, "pastel") == 0) {
+    palette = (GColor*)s_palette_pastel;
+  } else if (strcmp(palette_name, "greyscale") == 0) {
+    palette = (GColor*)s_palette_greyscale;
+  } else if (strcmp(palette_name, "synthwave") == 0) {
+    palette = (GColor*)s_palette_synthwave;
+  } else if (strcmp(palette_name, "pride") == 0) {
+    palette = (GColor*)s_palette_pride;
+  } else {
+    palette = (GColor*)s_palette_pastel;
+  }
+
   // Draw grid
   for (int y = 0; y < GRID_SIZE; y++) {
     for (int x = 0; x < GRID_SIZE; x++) {
-      GColor color = s_palette[rand() % NUM_COLORS];
+      GColor color = palette[rand() % NUM_COLORS];
       int z_now = rand() % Z_MOD;
       drawing_draw_square(Vec3(x * B_W, y * B_W, z_now), color);
     }
@@ -63,9 +111,9 @@ static void canvas_layer_update_proc(Layer *layer, GContext *ctx) {
     NULL
   );
 
-  // Date
+  // Date format '4 Apr 2026'
   static char s_date_buff[20];
-  strftime(s_date_buff, sizeof(s_date_buff), "%e %B %Y", tick_time);
+  strftime(s_date_buff, sizeof(s_date_buff), "%e %b %Y", tick_time);
 
   x = scl_x_pp({.e = -5, .g = -5});
   y = scl_y_pp({.e = 550, .g = 530});
@@ -131,4 +179,8 @@ void main_window_push() {
   window_stack_push(s_window, true);
 
   tick_timer_service_subscribe(MINUTE_UNIT, tick_handler);
+}
+
+void main_window_reload() {
+  layer_mark_dirty(s_canvas_layer);
 }
