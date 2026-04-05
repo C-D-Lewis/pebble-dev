@@ -1,0 +1,10 @@
+#include <pebble.h>
+
+#pragma once
+
+#define OUTER_RING_W 3
+#define OUTER_RING_INSET 16
+#define BATTERY_RING_W 4
+#define BATTERY_RING_INSET (OUTER_RING_INSET + OUTER_RING_W)
+#define INNER_RING_W 2
+#define INNER_RING_INSET (BATTERY_RING_INSET + BATTERY_RING_W)
