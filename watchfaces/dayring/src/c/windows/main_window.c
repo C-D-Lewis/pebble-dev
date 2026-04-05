@@ -1,14 +1,14 @@
 #include "main_window.h"
 
-#define Y_ROOT PBL_IF_ROUND_ELSE(scalable_y(330), scalable_y(300))
-#define GRECT_HOUR_LAYER GRect(0, Y_ROOT + 3, DISPLAY_W, DISPLAY_H)
-#define ARC_RADIUS scalable_x(380)
-#define ARC_WIDTH scalable_x(80)
+#define Y_ROOT PBL_IF_ROUND_ELSE(scl_y(330), scl_y(300))
+#define GRECT_HOUR_LAYER GRect(0, Y_ROOT + 3, PS_DISP_W, PS_DISP_H)
+#define ARC_RADIUS scl_x(380)
+#define ARC_WIDTH scl_x(80)
 #define ARC_COLOR_DAY PBL_IF_COLOR_ELSE(GColorYellow, GColorWhite)
 #define ARC_COLOR_NIGHT PBL_IF_COLOR_ELSE(GColorBlue, GColorWhite)
 #define ARC_BG_COLOR PBL_IF_COLOR_ELSE(GColorDarkGray, GColorBlack)
-#define ARC_X ((DISPLAY_W - (ARC_RADIUS * 2)) / 2)
-#define ARC_Y ((DISPLAY_H - (ARC_RADIUS * 2)) / 2)
+#define ARC_X ((PS_DISP_W - (ARC_RADIUS * 2)) / 2)
+#define ARC_Y ((PS_DISP_H - (ARC_RADIUS * 2)) / 2)
 
 static Window *s_window;
 static TextLayer *s_hour_layer;
@@ -104,7 +104,7 @@ static void window_load(Window *window) {
   text_layer_set_text_alignment(s_hour_layer, GTextAlignmentCenter);
   text_layer_set_background_color(s_hour_layer, GColorClear);
   text_layer_set_text_color(s_hour_layer, GColorWhite);
-  text_layer_set_font(s_hour_layer, scalable_get_font(SFI_Regular));
+  text_layer_set_font(s_hour_layer, scl_get_font(SFI_Regular));
   layer_add_child(window_layer, text_layer_get_layer(s_hour_layer));
 
   s_ring_layer = layer_create(bounds);
