@@ -1,5 +1,5 @@
 {
-  "version": "1.17.0",
+  "version": "1.18.0",
   "author": "Chris Lewis",
   "private": true,
   "dependencies": {
@@ -19,6 +19,11 @@
           "type": "bitmap",
           "name": "MENU_ICON",
           "file": "images/menu_icon.png"
+        },
+        {
+          "type": "font",
+          "name": "GOTCHA_GOTHIC_32",
+          "file": "fonts/Gotcha-Gothic.ttf"
         }
       ]
     },

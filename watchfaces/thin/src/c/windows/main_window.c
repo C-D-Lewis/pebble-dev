@@ -294,16 +294,24 @@ static void window_load(Window *window) {
   GColor month_day_color = data_get_color(MESSAGE_KEY_ColorMonthDay);
   GColor date_color = data_get_color(MESSAGE_KEY_ColorDate);
 
-  s_weekday_layer = text_layer_create(GRect(x_offset, y_offset + scl_y(35), text_s, text_s));
+  s_weekday_layer = text_layer_create(
+    GRect(x_offset, y_offset + scl_y_pp({.o = 35, .g = 30}), text_s, text_s)
+  );
   text_layer_set_font(s_weekday_layer, scl_get_font(SFI_SmallBold));
   text_layer_set_text_color(s_weekday_layer, date_color);
   text_layer_set_background_color(s_weekday_layer, GColorClear);
 
   s_day_in_month_layer = text_layer_create(
-    GRect(x_offset + scl_x(10), y_offset + scl_y_pp({.o = 105, .e = 120, .g = 120}), text_s, text_s)
+    GRect(
+      x_offset - scl_x_pp({.o = 20, .e = 10, .g = -5}),
+      y_offset + scl_y_pp({.o = 105, .e = 120, .g = 130}),
+      28,
+      text_s
+    )
   );
   text_layer_set_font(s_day_in_month_layer, scl_get_font(SFI_MediumBold));
   text_layer_set_text_color(s_day_in_month_layer, month_day_color);
+  text_layer_set_text_alignment(s_day_in_month_layer, GTextAlignmentCenter);
   text_layer_set_background_color(s_day_in_month_layer, GColorClear);
 
   s_month_layer = text_layer_create(
