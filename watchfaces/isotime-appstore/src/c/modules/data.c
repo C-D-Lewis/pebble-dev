@@ -59,11 +59,7 @@ void data_set_animations(bool value) {
 }
 
 bool data_get_animations() {
-#if defined(PBL_ROUND)
-  return false; // Crashes on PTR for unknown reasons
-#else
   return s_animations;
-#endif
 }
 
 void data_set_bluetooth_alert(bool value) {
