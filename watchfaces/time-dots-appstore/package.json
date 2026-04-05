@@ -1,6 +1,6 @@
 {
   "name": "time-dots",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "author": "Chris Lewis",
   "private": true,
   "keywords": [
@@ -34,15 +34,16 @@
       "chalk",
       "diorite",
       "emery",
-      "flint"
+      "flint",
+      "gabbro"
     ],
     "capabilities": [
       "configurable"
     ]
   },
   "dependencies": {
-    "@rebble/clay": "^1.0.3",
-    "pebble-packet": "^1.5.0",
-    "pebble-scalable": "^1.6.0"
+    "@rebble/clay": "^1.0.8",
+    "pebble-packet": "^1.6.0",
+    "pebble-scalable": "^2.2.0"
   }
 }

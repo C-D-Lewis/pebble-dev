@@ -1,7 +1,7 @@
 #include "main_window.h"
 
-#define HOURS_RADIUS scalable_x(20)
-#define MINS_RADIUS_INSET scalable_x(130)
+#define HOURS_RADIUS scl_x(20)
+#define MINS_RADIUS_INSET scl_x_pp({.o = 125, .c = 135, .g = 120})
 
 static Window *s_window;
 static Layer *s_canvas;
@@ -25,7 +25,7 @@ static void draw_dot(GContext *ctx, int i, GRect frame) {
 static void layer_update_proc(Layer *layer, GContext *ctx) {
   GRect bounds = layer_get_bounds(layer);
 
-  const int inset = PBL_IF_ROUND_ELSE(scalable_x(20), scalable_x(20));
+  const int inset = PBL_IF_ROUND_ELSE(scl_x(20), scl_x(20));
   GRect frame = grect_inset(bounds, GEdgeInsets(4 * inset));
 
   // 12 hours only, with a minimum size
