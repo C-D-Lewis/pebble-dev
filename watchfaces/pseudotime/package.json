@@ -1,9 +1,9 @@
 {
-  "version": "1.2.0",
+  "version": "1.3.0",
   "author": "Chris Lewis",
   "private": true,
   "dependencies": {
-    "pebble-scalable": "^1.5.1"
+    "pebble-scalable": "^2.2.0"
   },
   "keywords": [
     "pebble-app"
@@ -31,7 +31,8 @@
       "chalk",
       "diorite",
       "emery",
-      "flint"
+      "flint",
+      "gabbro"
     ],
     "capabilities": []
   },

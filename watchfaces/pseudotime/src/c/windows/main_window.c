@@ -1,11 +1,11 @@
 #include "main_window.h"
 
-#define MARGIN scalable_x(130)
-#define BAR_WIDTH (DISPLAY_W - (MARGIN * 2))
-#define BAR_HEIGHT scalable_y(50)
-#define BAR_SPACING scalable_y(70)
+#define MARGIN scl_x(130)
+#define BAR_WIDTH (PS_DISP_W - (MARGIN * 2))
+#define BAR_HEIGHT scl_y(50)
+#define BAR_SPACING scl_y(70)
 #define BARS_TOTAL_HEIGHT ((BAR_HEIGHT * 3) + (BAR_SPACING * 2))
-#define BARS_Y_OFFSET ((DISPLAY_H - BARS_TOTAL_HEIGHT) / 2)
+#define BARS_Y_OFFSET ((PS_DISP_H - BARS_TOTAL_HEIGHT) / 2)
 
 // TODO: Dithered grey for monochrome displays
 #define BAR_COLOR_HOUR PBL_IF_COLOR_ELSE(GColorRed, GColorLightGray)

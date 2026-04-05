@@ -39,7 +39,7 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `patchwork`           | ![](watchfaces/patchwork/screenshots/basalt-ocean.png)     | `B` `C` `E` `G`      |      | [pbw](pbw/patchwork.pbw)             |
 | `past-present-future` | ![](watchfaces/past-present-future/screenshots/aplite.png) | `A` `B` `D`             |      | [pbw](pbw/past-present-future.pbw) |
 | `potential-divider`   | ![](watchfaces/potential-divider/screenshots/aplite.png)   | `A` `B` `D`             | ✅    | [pbw](pbw/potential-divider.pbw)   |
-| `pseudotime`          | ![](watchfaces/pseudotime/screenshots/basalt.png)          | `A - F` |      | [pbw](pbw/pseudotime.pbw)          |
+| `pseudotime`          | ![](watchfaces/pseudotime/screenshots/basalt.png)          | `A - G` |      | [pbw](pbw/pseudotime.pbw)          |
 | `split-horizon`       | ![](watchfaces/split-horizon/screenshots/diorite.png)      | `A` `B` `D`             | ✅    | [pbw](pbw/split-horizon.pbw)       |
 | `starfield-demo`      | ![](watchfaces/starfield-demo/screenshots/aplite.png)      | `A - D`         |      | [pbw](pbw/starfield-demo.pbw)      |
 | `starfield-smooth`    | ![](watchfaces/starfield-smooth/screenshots/aplite.png)    | `A` `B` `C`             | ✅    | [pbw](pbw/starfield-smooth.pbw)    |
