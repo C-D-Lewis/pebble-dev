@@ -6,10 +6,41 @@ static Layer *s_canvas_layer;
 static void canvas_update_proc(Layer *layer, GContext *ctx) {
   GRect bounds = layer_get_bounds(layer);
 
-  // Conditions chunks
+  // Conditions chunks outside outer arc according to weather conditions
+  for (int i = 0; i < 24; i++) {
+    const int code = data_get_hour_weather_code(i);
+    const GColor color = data_get_weather_color(code);
+    
+    graphics_context_set_fill_color(ctx, color);
+    const int chunk_start_angle = (TRIG_MAX_ANGLE * i) / 24;
+    const int chunk_end_angle = (TRIG_MAX_ANGLE * (i + 1)) / 24;
+    graphics_fill_radial(
+      ctx,
+      bounds,
+      GOvalScaleModeFitCircle,
+      OUTER_RING_INSET - 1,
+      chunk_start_angle,
+      chunk_end_angle + 100
+    );
+  }
+
+  // Fill between arcs as progress through the day
+  time_t temp = time(NULL);
+  struct tm *t = localtime(&temp);
+  const int day_progress = (((t->tm_hour * 60) + t->tm_min) * 100) / (24 * 60);
+  const int day_progress_angle = (TRIG_MAX_ANGLE * day_progress) / 100;
+  graphics_context_set_fill_color(ctx, GColorWhite);
+  graphics_fill_radial(
+    ctx,
+    grect_inset(bounds, GEdgeInsets(DAY_RING_INSET)),
+    GOvalScaleModeFitCircle,
+    DAY_RING_W,
+    0,
+    day_progress_angle + 100
+  );
 
   // Thicker outer arc with margin for conditions
-  graphics_context_set_stroke_color(ctx, GColorWhite);
+  graphics_context_set_stroke_color(ctx, GColorLightGray);
   graphics_context_set_stroke_width(ctx, OUTER_RING_W);
   graphics_draw_arc(
     ctx,
@@ -19,44 +50,47 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     TRIG_MAX_ANGLE
   );
 
-  // Battery fills between
-  const BatteryChargeState state = battery_state_service_peek();
-  const int charge_angle = (int)((TRIG_MAX_ANGLE * state.charge_percent) / 100);
-  graphics_context_set_stroke_color(ctx, GColorGreen);
-  graphics_context_set_stroke_width(ctx, BATTERY_RING_W);
-  graphics_draw_arc(
+  // Precip chunks
+
+  // Line from center to inner arc for day progress
+  const int progress_line_angle = (TRIG_MAX_ANGLE * day_progress) / 100;
+  const int line_length = (bounds.size.w / 2) - INNER_RING_INSET;
+  const int line_end_x = (bounds.size.w / 2) + (line_length * sin_lookup(progress_line_angle)) / TRIG_MAX_RATIO;
+  const int line_end_y = (bounds.size.h / 2) - (line_length * cos_lookup(progress_line_angle)) / TRIG_MAX_RATIO;
+  graphics_context_set_stroke_color(ctx, GColorDarkGray);
+  graphics_context_set_stroke_width(ctx, OUTER_RING_W);
+  graphics_draw_line(
     ctx,
-    grect_inset(bounds, GEdgeInsets(BATTERY_RING_INSET)),
-    GOvalScaleModeFitCircle,
-    0,
-    charge_angle
+    GPoint(bounds.size.w / 2, bounds.size.h / 2),
+    GPoint(line_end_x, line_end_y)
   );
 
   // Thinner inner arc
-  graphics_context_set_stroke_color(ctx, GColorWhite);
-  graphics_context_set_stroke_width(ctx, INNER_RING_W);
+  graphics_context_set_stroke_color(ctx, GColorDarkGray);
+  graphics_context_set_stroke_width(ctx, OUTER_RING_W);
   graphics_draw_arc(
     ctx,
     grect_inset(bounds, GEdgeInsets(INNER_RING_INSET)),
     GOvalScaleModeFitCircle,
     0,
-    TRIG_MAX_ANGLE
+    progress_line_angle
   );
 
-  // Precip chunks
-
   // Time
-  time_t temp = time(NULL);
-  struct tm *t = localtime(&temp);
   static char time_buff[6];
   strftime(time_buff, sizeof(time_buff), "%H:%M", t);
-  const GRect time_bounds = GRect(0, scl_y(230), bounds.size.w, 100);
+  const GRect time_bounds = GRect(
+    0,
+    scl_y_pp({.c = 240, .e = 280, .g = 240}),
+    bounds.size.w,
+    100
+  );
   graphics_context_set_text_color(ctx, GColorDarkGray);
   graphics_draw_text(
     ctx,
     time_buff,
     scl_get_font(SFI_Large),
-    grect_inset(time_bounds, GEdgeInsets(5, 0, 0, 0)),
+    grect_inset(time_bounds, GEdgeInsets(3, 0, 0, 0)),
     GTextOverflowModeWordWrap,
     GTextAlignmentCenter,
     NULL
@@ -72,28 +106,34 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     NULL
   );
 
-  // Separator
-  const int sep_y = scl_y(500);
-  graphics_context_set_stroke_color(ctx, GColorDarkGray);
-  graphics_context_set_stroke_width(ctx, OUTER_RING_W);
-  graphics_draw_line(
+  // Separator rect
+  const int sep_y = scl_y_pp({.c = 490, .e = 490, .g = 495});
+  graphics_context_set_fill_color(ctx, GColorDarkGray);
+  graphics_fill_rect(
     ctx,
-    GPoint(bounds.size.w / 4, sep_y), GPoint((3 * bounds.size.w) / 4, sep_y)
+    GRect(bounds.size.w / 4, sep_y, bounds.size.w / 2, SEP_H),
+    0,
+    GCornersAll
+  );
+
+  // Battery fills separator rect
+  const BatteryChargeState state = battery_state_service_peek();
+  graphics_context_set_fill_color(ctx, GColorGreen);
+  graphics_fill_rect(
+    ctx,
+    GRect(bounds.size.w / 4, sep_y, (bounds.size.w / 2) * state.charge_percent / 100, SEP_H),
+    0,
+    GCornersAll
   );
 
   // Date
   static char date_buff[12];
   strftime(date_buff, sizeof(date_buff), "%d %b %Y", t);
-  const GRect date_bounds = GRect(0, scl_y(510), bounds.size.w, 50);
-  graphics_context_set_text_color(ctx, GColorDarkGray);
-  graphics_draw_text(
-    ctx,
-    date_buff,
-    scl_get_font(SFI_Regular),
-    grect_inset(date_bounds, GEdgeInsets(3, 0, 0, 0)),
-    GTextOverflowModeWordWrap,
-    GTextAlignmentCenter,
-    NULL
+  const GRect date_bounds = GRect(
+    0,
+    scl_y_pp({.c = 510, .e = 525, .g = 520}),
+    bounds.size.w,
+    50
   );
   graphics_context_set_text_color(ctx, GColorWhite);
   graphics_draw_text(

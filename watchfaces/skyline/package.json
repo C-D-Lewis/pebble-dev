@@ -15,9 +15,21 @@
       "media": [
         {
           "type": "font",
+          "name": "OXANIUM_18",
+          "file": "fonts/Oxanium-Medium.ttf",
+          "characterRegex": "[0-9a-zA-Z ]"
+        },
+        {
+          "type": "font",
           "name": "OXANIUM_24",
           "file": "fonts/Oxanium-Medium.ttf",
           "characterRegex": "[0-9a-zA-Z ]"
+        },
+        {
+          "type": "font",
+          "name": "OXANIUM_38",
+          "file": "fonts/Oxanium-Bold.ttf",
+          "characterRegex": "[0-9:]"
         },
         {
           "type": "font",
@@ -37,13 +49,15 @@
       "CODE_ARR"
     ],
     "enableMultiJS": true,
-    "displayName": "skyline",
+    "displayName": "Skyline",
     "watchapp": {
       "onlyShownOnCommunication": false,
       "hiddenApp": false,
       "watchface": true
     },
     "targetPlatforms": [
+      "chalk",
+      "emery",
       "gabbro"
     ],
     "capabilities": []

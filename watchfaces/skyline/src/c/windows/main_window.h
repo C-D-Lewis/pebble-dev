@@ -4,6 +4,7 @@
 
 #include "../config.h"
 
+#include "../modules/data.h"
 #include "../modules/scalable.h"
 
 void main_window_push();

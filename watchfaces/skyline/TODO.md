@@ -7,13 +7,13 @@ Delete me when done
 - [x] Large clear time in interesting clean font
 - [x] Smaller date display
 - [x] Dual arcs:
-  - [ ] Outer: general weather (clear, sunny, cloudy)
+  - [x] Outer: general weather (clear, sunny, cloudy)
   - [ ] Inner: rain amount (0, 25, 50, 75, 100)
-  - [ ] Battery fills in between
+- [x] Battery fills in separator
 - [ ] Disconnect feature
 - [ ] Quickview feature
 - [ ] Current temp display
 - [ ] Design details (backgrounds, notches, etc.)
 - [ ] Launcher icon
-- [ ] Scale to display width for square watches
+- [x] Scale to display width for square watches
 - [ ] Animations
