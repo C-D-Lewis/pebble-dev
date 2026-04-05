@@ -4,10 +4,10 @@
   "name": "isotime",
   "dependencies": {
     "@rebble/clay": "^1.0.8",
-    "pebble-isometric": "^1.5.0",
+    "pebble-isometric": "^1.6.0",
     "pebble-packet": "^1.6.0",
     "pebble-pge-simple": "^1.1.0",
-    "pebble-universal-fb": "^1.10.0"
+    "pebble-universal-fb": "^1.11.0"
   },
   "private": true,
   "keywords": [

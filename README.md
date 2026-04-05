@@ -33,7 +33,7 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `events`              | ![](watchfaces/events/screenshots/aplite.png)              | `A` `B` `D` `E`         | ✅    | [pbw](pbw/events.pbw)              |
 | `hollywatch`          | ![](watchfaces/hollywatch/screenshots/basalt.png)          | `A - D`         |      | [pbw](pbw/hollywatch.pbw)          |
 | `index`               | ![](watchfaces/index/screenshots/aplite.png)               | `A - D`         |      | [pbw](pbw/index.pbw)               |
-| `isotime-appstore`    | ![](watchfaces/isotime-appstore/screenshots/yellow.png)    | `A - E` `(F - G)`     | ✅    | [pbw](pbw/isotime-appstore.pbw)             |
+| `isotime-appstore`    | ![](watchfaces/isotime-appstore/screenshots/yellow.png)    | `A - G`     | ✅    | [pbw](pbw/isotime-appstore.pbw)             |
 | `kitty-watchface`     | ![](watchfaces/kitty-watchface/screenshots/aplite.png)     | `A` `B` `D`             |      | [pbw](pbw/kitty-watchface.pbw)     |
 | `morndas`             | ![](watchfaces/morndas/screenshots/basalt.png)             | `A` `B` `D` `E` `F`            |      | [pbw](pbw/morndas.pbw)             |
 | `patchwork`           | ![](watchfaces/patchwork/screenshots/basalt-ocean.png)     | `B` `C` `E` `G`      |      | [pbw](pbw/patchwork.pbw)             |
