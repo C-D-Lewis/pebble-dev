@@ -33,25 +33,26 @@ static void bresenham_line(GPoint start, GPoint finish, GColor color) {
   int e2;
 
   // Don't draw lines that won't appear on-screen
-  if ((start.y < 0 && finish.y < 0) || (start.y >= s_fb_size.h && finish.y >= s_fb_size.h)) {
-    return; 
-  }
+  if (
+    (start.y < 0 && finish.y < 0) ||
+    (start.y >= s_fb_size.h && finish.y >= s_fb_size.h)
+  ) return; 
   
-  #if PBL_ROUND
+#if PBL_ROUND
   // Chalk (and possibly Gabbro) really hate when you use
   // gbitmap_get_data_row_info() on a negative row number;
   // doing this causes a crash (on real hardware only).
   if (start.y >= 0) s_info = gbitmap_get_data_row_info(s_fb, start.y);
-  #else
+#else
   s_info = gbitmap_get_data_row_info(s_fb, start.y);
-  #endif
+#endif
   
   while (true) {
-    #if PBL_ROUND
+#if PBL_ROUND
     if (start.y >= 0) set_pixel(GPoint(start.x, start.y), color);
-    #else
+#else
     set_pixel(GPoint(start.x, start.y), color);
-    #endif
+#endif
     if (start.x == finish.x && start.y == finish.y) break;
 
     e2 = err;
@@ -63,11 +64,11 @@ static void bresenham_line(GPoint start, GPoint finish, GColor color) {
       err += dx;
       start.y += sy;
       
-      #if PBL_ROUND
+#if PBL_ROUND
       if (start.y >= 0) s_info = gbitmap_get_data_row_info(s_fb, start.y);
-      #else
+#else
       s_info = gbitmap_get_data_row_info(s_fb, start.y);
-      #endif
+#endif
     }
   }
 }

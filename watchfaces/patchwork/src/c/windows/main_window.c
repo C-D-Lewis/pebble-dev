@@ -156,6 +156,8 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
 }
 
 static void bt_handler(bool connected) {
+  if (connected == s_is_connected) return;
+
   s_is_connected = connected;
 
   if (!connected) vibes_double_pulse();
