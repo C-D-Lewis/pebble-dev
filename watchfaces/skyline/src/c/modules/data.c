@@ -6,7 +6,6 @@
 
 static int s_current_temp, s_current_code;
 static char s_temp_arr[STR_ARR_SIZE];
-static char s_precip_arr[STR_ARR_SIZE];
 static char s_code_arr[STR_ARR_SIZE];
 static int s_min_temp = INIT_MIN_TEMP, s_max_temp = INIT_MAX_TEMP;
 
@@ -24,10 +23,6 @@ void data_set_temp_arr(char *temp_arr) {
   snprintf(s_temp_arr, STR_ARR_SIZE, "%s", temp_arr);
 }
 
-void data_set_precip_arr(char *precip_arr) {
-  snprintf(s_precip_arr, STR_ARR_SIZE, "%s", precip_arr);
-}
-
 void data_set_code_arr(char *code_arr) {
   snprintf(s_code_arr, STR_ARR_SIZE, "%s", code_arr);
 }
@@ -42,10 +37,6 @@ int data_get_current_code() {
 
 char *data_get_temp_arr() {
   return s_temp_arr;
-}
-
-char* data_get_precip_arr() {
-  return s_precip_arr;
 }
 
 char* data_get_code_arr() {
@@ -99,13 +90,9 @@ GColor data_get_weather_color(int code) {
 /**
  * Arrays are two chars per item, 24 items.
  *
- * {
- *   "CURRENT_TEMP": 12,
- *   "CURRENT_CODE": 2,
  *   "TEMPS": "121211101009080910101112121212121211100807060606",
  *   "PRECIP": "000000000000000000020713161408040201000000000000",
  *   "CODES": "030303030303030302030202030202030302000100000000"
- * }
  */
 int data_get_strarr_value(char *arr, int hour) {
   const int index = hour * 2; // Two chars per code
@@ -128,11 +115,10 @@ GColor data_get_temp_color(int temp) {
     }
   }
 
-  if (temp < s_min_temp + 2) {
-    return GColorBlueMoon;
-  } else if (temp > s_max_temp - 2) {
-    return GColorOrange;
-  } else {
-    return GColorClear;
-  }
+  if (temp == s_min_temp) return GColorVividCerulean;
+  if (temp == s_max_temp) return GColorChromeYellow;
+  if (temp < s_min_temp + 2) return GColorBlueMoon;
+  if (temp > s_max_temp - 2) return GColorOrange;
+
+  return GColorClear;
 }

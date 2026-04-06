@@ -8,9 +8,9 @@ Delete me when done
 - [x] Smaller date display
 - [x] Dual arcs:
   - [x] Outer: general weather (clear, sunny, cloudy)
-  - [ ] Inner: Relative temperature vs min/max
+  - [x] Inner: Relative temperature vs min/max
 - [x] Battery fills in separator
-- [ ] Regular weather fetch (30m?)
+- [x] Regular weather fetch (1h)
 - [ ] Disconnect feature
 - [ ] Current weather / temp display
 - [ ] Design details (backgrounds, notches, etc.)

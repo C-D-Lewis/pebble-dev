@@ -178,6 +178,9 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
 }
 
 static void tick_handler(struct tm *tick_time, TimeUnits changed) {
+  // Get weather every 1h
+  if (tick_time->tm_min == 0) comm_request_weather();
+
   layer_mark_dirty(s_canvas_layer);
 }
 

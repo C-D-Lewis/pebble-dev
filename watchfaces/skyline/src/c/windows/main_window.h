@@ -4,6 +4,7 @@
 
 #include "../config.h"
 
+#include "../modules/comm.h"
 #include "../modules/data.h"
 #include "../modules/scalable.h"
 

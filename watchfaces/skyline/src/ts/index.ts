@@ -44,46 +44,66 @@ const getLocation = async () => new Promise((resolve, reject) => {
   );
 });
 
+/**
+ * Get location and weather, and send to watch.
+ */
+const sendWeather = async () => {
+  const location = await getLocation() as GeolocationPosition;
+  const { latitude, longitude } = location.coords;
+  console.log(`Got location: ${latitude}, ${longitude}`);
+
+  const weather = await fetchWeatherForecast(latitude, longitude);
+  const { current, hourly } = weather;
+  const { temperature_2m: currentTemp, weather_code: currentCode } = current;
+  const {
+    temperature_2m: hourlyTemps,
+    precipitation_probability: hourlyPrecip,
+    weather_code: hourlyCodes,
+  } = hourly;
+
+  /**
+   * Arrays are two chars per item, 24 items.
+   *
+   * {
+   *   "CURRENT_TEMP": 12,
+   *   "CURRENT_CODE": 2,
+   *   "TEMPS": "121211101009080910101112121212121211100807060606",
+   *   "PRECIP": "000000000000000000020713161408040201000000000000",
+   *   "CODES": "030303030303030302030202030202030302000100000000"
+   * }
+   */
+  const dict = {
+    CURRENT_TEMP: Math.round(currentTemp),
+    CURRENT_CODE: currentCode,
+    TEMP_ARR: hourlyTemps.reduce((acc, p) => acc + zeroPad(Math.round(p)), ''),
+    CODE_ARR: hourlyCodes.reduce((acc, p) => acc + zeroPad(p), ''),
+    // Unused
+    PRECIP_ARR: hourlyPrecip.reduce((acc, p) => acc + zeroPad(Math.round(p)), ''),
+  };
+  console.log(JSON.stringify(dict, null, 2));
+  
+  // Send to watch
+  await PebbleTS.sendAppMessage(dict);
+  console.log('Weather data sent to watch');
+};
+
 Pebble.addEventListener('ready', async (e) => {
   console.log('PebbleKit JS ready');
 
   try {
-    const location = await getLocation() as GeolocationPosition;
-    const { latitude, longitude } = location.coords;
-    console.log(`Got location: ${latitude}, ${longitude}`);
+    sendWeather();
+  } catch (e) {
+    console.log('Failed to send data');
+    console.log(e);
+  }
+});
 
-    const weather = await fetchWeatherForecast(latitude, longitude);
-    const { current, hourly } = weather;
-    const { temperature_2m: currentTemp, weather_code: currentCode } = current;
-    const {
-      temperature_2m: hourlyTemps,
-      precipitation_probability: hourlyPrecip,
-      weather_code: hourlyCodes,
-    } = hourly;
+Pebble.addEventListener('appmessage', async (e) => {
+  const { payload: dict } = e;
+  console.log(`appmessage: ${JSON.stringify(dict)}`);
 
-    /**
-     * Arrays are two chars per item, 24 items.
-     *
-     * {
-     *   "CURRENT_TEMP": 12,
-     *   "CURRENT_CODE": 2,
-     *   "TEMPS": "121211101009080910101112121212121211100807060606",
-     *   "PRECIP": "000000000000000000020713161408040201000000000000",
-     *   "CODES": "030303030303030302030202030202030302000100000000"
-     * }
-     */
-    const dict = {
-      CURRENT_TEMP: Math.round(currentTemp),
-      CURRENT_CODE: currentCode,
-      TEMP_ARR: hourlyTemps.reduce((acc, p) => acc + zeroPad(Math.round(p)), ''),
-      PRECIP_ARR: hourlyPrecip.reduce((acc, p) => acc + zeroPad(Math.round(p)), ''),
-      CODE_ARR: hourlyCodes.reduce((acc, p) => acc + zeroPad(p), ''),
-    };
-    console.log(JSON.stringify(dict, null, 2));
-    
-    // Send to watch
-    await PebbleTS.sendAppMessage(dict);
-    console.log('Weather data sent to watch');
+  try {
+    sendWeather();
   } catch (e) {
     console.log('Failed to send data');
     console.log(e);

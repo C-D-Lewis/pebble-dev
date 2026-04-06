@@ -46,7 +46,8 @@
       "CURRENT_CODE",
       "TEMP_ARR",
       "PRECIP_ARR",
-      "CODE_ARR"
+      "CODE_ARR",
+      "REQUEST_WEATHER"
     ],
     "enableMultiJS": true,
     "displayName": "Skyline",
