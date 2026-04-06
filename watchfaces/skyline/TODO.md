@@ -8,11 +8,11 @@ Delete me when done
 - [x] Smaller date display
 - [x] Dual arcs:
   - [x] Outer: general weather (clear, sunny, cloudy)
-  - [ ] Inner: rain amount (0, 25, 50, 75, 100)
+  - [ ] Inner: Relative temperature vs min/max
 - [x] Battery fills in separator
+- [ ] Regular weather fetch (30m?)
 - [ ] Disconnect feature
-- [ ] Quickview feature
-- [ ] Current temp display
+- [ ] Current weather / temp display
 - [ ] Design details (backgrounds, notches, etc.)
 - [ ] Launcher icon
 - [x] Scale to display width for square watches

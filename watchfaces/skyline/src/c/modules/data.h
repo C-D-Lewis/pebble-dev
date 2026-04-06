@@ -15,4 +15,6 @@ char* data_get_precip_arr();
 char* data_get_code_arr();
 
 GColor data_get_weather_color(int code);
-int data_get_hour_weather_code(int hour);
+int data_get_strarr_value(char *arr, int hour);
+GColor data_get_temp_color(int temp);
+
