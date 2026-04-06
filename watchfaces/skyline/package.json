@@ -15,6 +15,12 @@
       "media": [
         {
           "type": "font",
+          "name": "OXANIUM_14",
+          "file": "fonts/Oxanium-Medium.ttf",
+          "characterRegex": "[0-9a-zA-Z ]"
+        },
+        {
+          "type": "font",
           "name": "OXANIUM_18",
           "file": "fonts/Oxanium-Medium.ttf",
           "characterRegex": "[0-9a-zA-Z ]"
@@ -24,6 +30,12 @@
           "name": "OXANIUM_24",
           "file": "fonts/Oxanium-Medium.ttf",
           "characterRegex": "[0-9a-zA-Z ]"
+        },
+        {
+          "type": "font",
+          "name": "OXANIUM_30",
+          "file": "fonts/Oxanium-Medium.ttf",
+          "characterRegex": "[0-9:]"
         },
         {
           "type": "font",
@@ -57,6 +69,7 @@
       "watchface": true
     },
     "targetPlatforms": [
+      "basalt",
       "chalk",
       "emery",
       "gabbro"

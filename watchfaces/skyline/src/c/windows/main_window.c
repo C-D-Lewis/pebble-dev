@@ -58,7 +58,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     ctx,
     "0",
     scl_get_font(SFI_Dial),
-    GRect(half_w - 10, scl_y_pp({.e = 180, .c = 150, .g = 110}), 20, 20),
+    GRect(half_w - 10, scl_y_pp({.o = 170, .c = 100, .e = 180, .g = 110}), 20, 20),
     GTextOverflowModeWordWrap,
     GTextAlignmentCenter,
     NULL
@@ -67,7 +67,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     ctx,
     "12",
     scl_get_font(SFI_Dial),
-    GRect(half_w - 10, scl_y_pp({.e = 720, .c = 730, .g = 800}), 20, 20),
+    GRect(half_w - 10, scl_y_pp({.o = 710, .c = 780, .e = 720, .g = 800}), 20, 20),
     GTextOverflowModeWordWrap,
     GTextAlignmentCenter,
     NULL
@@ -100,7 +100,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   strftime(time_buff, sizeof(time_buff), "%H:%M", t);
   const GRect time_bounds = GRect(
     0,
-    scl_y_pp({.c = 240, .e = 280, .g = 240}),
+    scl_y_pp({.o = 270, .c = 240, .e = 280, .g = 240}),
     bounds.size.w,
     100
   );
@@ -126,7 +126,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   );
 
   // Separator rect
-  const int sep_y = scl_y_pp({.c = 490, .e = 490, .g = 495});
+  const int sep_y = scl_y_pp({.o = 490, .c = 490, .e = 490, .g = 495});
   graphics_context_set_fill_color(ctx, GColorDarkGray);
   graphics_fill_rect(
     ctx,
@@ -137,7 +137,8 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
 
   // Battery fills separator rect
   const BatteryChargeState state = battery_state_service_peek();
-  graphics_context_set_fill_color(ctx, GColorGreen);
+  const bool connected = connection_service_peek_pebble_app_connection();
+  graphics_context_set_fill_color(ctx, connected ? GColorGreen : GColorLightGray);
   graphics_fill_rect(
     ctx,
     GRect(bounds.size.w / 4, sep_y, (half_w * state.charge_percent) / 100, SEP_H),
@@ -150,7 +151,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   strftime(date_buff, sizeof(date_buff), "%d %b %Y", t);
   const GRect date_bounds = GRect(
     0,
-    scl_y_pp({.c = 510, .e = 525, .g = 520}),
+    scl_y_pp({.o = 510, .c = 510, .e = 525, .g = 520}),
     bounds.size.w,
     50
   );
@@ -169,6 +170,12 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
 static void tick_handler(struct tm *tick_time, TimeUnits changed) {
   // Get weather every 1h
   if (tick_time->tm_min == 0) comm_request_weather();
+
+  layer_mark_dirty(s_canvas_layer);
+}
+
+static void bt_handler(bool connected) {
+  if (!connected) vibes_double_pulse();
 
   layer_mark_dirty(s_canvas_layer);
 }
@@ -201,6 +208,7 @@ void main_window_push() {
   window_stack_push(s_window, true);
 
   tick_timer_service_subscribe(MINUTE_UNIT, tick_handler);
+  bluetooth_connection_service_subscribe(bt_handler);
 
   time_t now = time(NULL);
   struct tm *tick_now = localtime(&now);

@@ -11,8 +11,8 @@ Delete me when done
   - [x] Inner: Relative temperature vs min/max
 - [x] Battery fills in separator
 - [x] Regular weather fetch (1h)
-- [ ] Scale to display width for square watches
-- [ ] Disconnect feature
+- [x] Scale to display width for square watches
+- [x] Disconnect feature
 - [ ] Current weather / temp display
 - [ ] Design details (backgrounds, notches, etc.)
 - [ ] Launcher icon

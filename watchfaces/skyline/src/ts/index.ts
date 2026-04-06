@@ -25,7 +25,7 @@ const fetchWeatherForecast = async (lat: number, lon: number): Promise<WeatherAp
   const windUnit = 'mph';
   const tempUnit = 'celsius';
 
-  const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=temperature_2m,precipitation_probability,weather_code&current=temperature_2m,weather_code&forecast_days=1&wind_speed_unit=${windUnit}&temperature_unit=${tempUnit}`;
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=temperature_2m,precipitation_probability,weather_code&current=temperature_2m,weather_code&forecast_days=1&wind_speed_unit=${windUnit}&temperature_unit=${tempUnit}&timezone=auto`;
   const res = await fetch(url);
   if (res.status !== 200) throw new Error(await res.text());
   
