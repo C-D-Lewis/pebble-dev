@@ -31,17 +31,6 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     draw_hour_chunk(ctx, bounds, i, OUTER_RING_INSET - 1);
   }
 
-  // Fill between arcs as temperature
-  // graphics_context_set_fill_color(ctx, GColorWhite);
-  // graphics_fill_radial(
-  //   ctx,
-  //   grect_inset(bounds, GEdgeInsets(TEMP_RING_INSET)),
-  //   GOvalScaleModeFitCircle,
-  //   TEMP_RING_W,
-  //   0,
-  //   TRIG_MAX_ANGLE
-  // );
-
   // Chunks between arcs according to temp conditions
   for (int i = 0; i < 24; i++) {
     const int temp = data_get_strarr_value(data_get_temp_arr(), i);

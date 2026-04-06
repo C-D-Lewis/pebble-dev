@@ -1,6 +1,6 @@
 #include "data.h"
 
-#define STR_ARR_SIZE (24 * 2)
+#define STR_ARR_SIZE 49
 #define INIT_MIN_TEMP 999
 #define INIT_MAX_TEMP -999
 
@@ -20,11 +20,11 @@ void data_set_current_code(int code) {
 }
 
 void data_set_temp_arr(char *temp_arr) {
-  snprintf(s_temp_arr, STR_ARR_SIZE, "%s", temp_arr);
+  snprintf(s_temp_arr, sizeof(s_temp_arr), "%s", temp_arr);
 }
 
 void data_set_code_arr(char *code_arr) {
-  snprintf(s_code_arr, STR_ARR_SIZE, "%s", code_arr);
+  snprintf(s_code_arr, sizeof(s_code_arr), "%s", code_arr);
 }
 
 int data_get_current_temp() {
@@ -62,12 +62,12 @@ GColor data_get_weather_color(int code) {
     case 56: // Light Freezing Drizzle
     case 57: // Dense Freezing Drizzle
     case 61: // Slight Rain
+    case 66: // Light Freezing Rain
+    case 80: // Slight Rain showers
       return GColorBlueMoon;
     case 63: // Moderate Rain
     case 65: // Heavy Rain
-    case 66: // Light Freezing Rain
     case 67: // Heavy Freezing Rain
-    case 80: // Slight Rain showers
     case 81: // Moderate Rain showers
     case 82: // Violent Rain showers
       return GColorBlue;
@@ -97,6 +97,8 @@ GColor data_get_weather_color(int code) {
 int data_get_strarr_value(char *arr, int hour) {
   const int index = hour * 2; // Two chars per code
   const char value[3] = {arr[index], arr[index + 1], '\0'};
+  // APP_LOG(APP_LOG_LEVEL_INFO, "arr %s", arr);
+  // APP_LOG(APP_LOG_LEVEL_INFO, "hour %d value %s", (int)hour, value);
   return atoi(value);
 }
 
@@ -115,10 +117,17 @@ GColor data_get_temp_color(int temp) {
     }
   }
 
-  if (temp == s_min_temp) return GColorVividCerulean;
-  if (temp == s_max_temp) return GColorChromeYellow;
+  // Lowest/highest
+  if (temp == s_min_temp) return GColorBlue;
+  if (temp == s_max_temp) return GColorWindsorTan;
+
+  // Near
   if (temp < s_min_temp + 2) return GColorBlueMoon;
   if (temp > s_max_temp - 2) return GColorOrange;
+
+  // Not so near
+  if (temp < s_min_temp + 3) return GColorVividCerulean;
+  if (temp > s_max_temp - 3) return GColorChromeYellow;
 
   return GColorClear;
 }

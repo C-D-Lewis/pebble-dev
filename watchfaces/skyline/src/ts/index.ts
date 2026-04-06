@@ -5,6 +5,7 @@ type WeatherApiResponse = {
     weather_code: number;
   };
   hourly: {
+    time: string[];
     temperature_2m: number[];
     precipitation_probability: number[];
     weather_code: number[];
@@ -56,10 +57,13 @@ const sendWeather = async () => {
   const { current, hourly } = weather;
   const { temperature_2m: currentTemp, weather_code: currentCode } = current;
   const {
+    time,
     temperature_2m: hourlyTemps,
-    precipitation_probability: hourlyPrecip,
+    // precipitation_probability: hourlyPrecip,
     weather_code: hourlyCodes,
   } = hourly;
+
+  console.log(`Time range: ${time[0]} - ${time[time.length - 1]}`);
 
   /**
    * Arrays are two chars per item, 24 items.
@@ -78,7 +82,7 @@ const sendWeather = async () => {
     TEMP_ARR: hourlyTemps.reduce((acc, p) => acc + zeroPad(Math.round(p)), ''),
     CODE_ARR: hourlyCodes.reduce((acc, p) => acc + zeroPad(p), ''),
     // Unused
-    PRECIP_ARR: hourlyPrecip.reduce((acc, p) => acc + zeroPad(Math.round(p)), ''),
+    // PRECIP_ARR: hourlyPrecip.reduce((acc, p) => acc + zeroPad(Math.round(p)), ''),
   };
   console.log(JSON.stringify(dict, null, 2));
   
