@@ -37,9 +37,9 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   graphics_context_set_stroke_color(ctx, GColorLightGray);
   graphics_context_set_stroke_width(ctx, INNER_RING_W);
   int notch_x = half_w - 1;
-  int notch_y = scl_y_pp({.o = 130, .c = 60, .e = 130, .g = 60});
+  int notch_y = scl_y_pp({.o = 140, .c = 70, .e = 140, .g = 70});
   graphics_draw_line(ctx, GPoint(notch_x, notch_y), GPoint(notch_x, notch_y + NOTCH_L));
-  notch_y = scl_y_pp({.o = 790, .c = 860, .e = 790, .g = 850});
+  notch_y = scl_y_pp({.o = 780, .c = 850, .e = 780, .g = 850});
   graphics_draw_line(ctx, GPoint(notch_x, notch_y), GPoint(notch_x, notch_y + NOTCH_L));
 
   // Conditions chunks outside outer arc according to weather conditions

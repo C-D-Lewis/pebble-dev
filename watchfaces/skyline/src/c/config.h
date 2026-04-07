@@ -6,14 +6,14 @@
 
 #if defined(PBL_PLATFORM_BASALT) || defined(PBL_PLATFORM_CHALK)
   #define OUTER_RING_W 3
-  #define OUTER_RING_INSET 10
-  #define TEMP_RING_W 7
+  #define OUTER_RING_INSET 12
+  #define TEMP_RING_W 8
   #define INNER_RING_W 2
   #define SEP_H 4
 #else
   #define OUTER_RING_W 4
-  #define OUTER_RING_INSET 16
-  #define TEMP_RING_W 9
+  #define OUTER_RING_INSET 18
+  #define TEMP_RING_W 11
   #define INNER_RING_W 3
   #define SEP_H 5
 #endif
