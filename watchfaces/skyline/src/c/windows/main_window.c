@@ -67,6 +67,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   }
 
   // Outer decoration arc
+  graphics_context_set_antialiased(ctx, false);
   graphics_context_set_stroke_color(ctx, GColorDarkGray);
   graphics_context_set_stroke_width(ctx, OUTER_RING_W);
   graphics_draw_arc(
@@ -78,7 +79,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   );
 
   // Line from center to inner arc for day progress
-  const int line_length = half_w - INNER_RING_INSET;
+  const int line_length = half_w - INNER_RING_INSET + 1;
   const int line_end_x = half_w + (line_length * sin_lookup(s_progress_angle)) / TRIG_MAX_RATIO;
   const int line_end_y = half_h - (line_length * cos_lookup(s_progress_angle)) / TRIG_MAX_RATIO;
   graphics_context_set_stroke_color(ctx, GColorDarkGray);
@@ -91,6 +92,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     0,
     s_progress_angle
   );
+  graphics_context_set_antialiased(ctx, true);
 
   // Time
   static char time_buff[6];
