@@ -2,10 +2,15 @@
 
 static Window *s_window;
 static Layer *s_canvas_layer;
+static int s_anim_progress, s_progress_angle;
+
+/******************************************** Drawing *********************************************/
 
 static void draw_hour_chunk(GContext *ctx, GRect bounds, int hour, int inset) {
   const int chunk_start_angle = (TRIG_MAX_ANGLE * hour) / 24;
   const int chunk_end_angle = (TRIG_MAX_ANGLE * (hour + 1)) / 24;
+
+  if (chunk_end_angle > s_progress_angle) return;
 
   graphics_fill_radial(
     ctx,
@@ -22,23 +27,43 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   const int half_w = bounds.size.w / 2;
   const int half_h = bounds.size.h / 2;
 
+  // Progress through the day, animated
+  time_t temp = time(NULL);
+  struct tm *t = localtime(&temp);
+  const int day_progress = (((t->tm_hour * 60) + t->tm_min) * 100) / MINUTES_PER_DAY;
+  s_progress_angle = (TRIG_MAX_ANGLE * day_progress * s_anim_progress) / (100 * 100);
+
+  // Notches - top, bottom, left, right
+  graphics_context_set_stroke_color(ctx, GColorLightGray);
+  graphics_context_set_stroke_width(ctx, INNER_RING_W);
+  int notch_x = half_w - 1;
+  int notch_y = scl_y_pp({.o = 130, .c = 60, .e = 130, .g = 60});
+  graphics_draw_line(ctx, GPoint(notch_x, notch_y), GPoint(notch_x, notch_y + NOTCH_L));
+  notch_y = scl_y_pp({.o = 790, .c = 860, .e = 790, .g = 850});
+  graphics_draw_line(ctx, GPoint(notch_x, notch_y), GPoint(notch_x, notch_y + NOTCH_L));
+
   // Conditions chunks outside outer arc according to weather conditions
   for (int i = 0; i < 24; i++) {
     const int code = data_get_strarr_value(data_get_code_arr(), i);
     const GColor color = data_get_weather_color(code);
     
     graphics_context_set_fill_color(ctx, color);
-    draw_hour_chunk(ctx, bounds, i, OUTER_RING_INSET - 1);
+    draw_hour_chunk(
+      ctx,
+      bounds,
+      i,
+      OUTER_RING_INSET - 1
+    );
   }
 
   // Chunks between arcs according to temp conditions
+  const GRect temp_grect = grect_inset(bounds, GEdgeInsets(TEMP_RING_INSET));
   for (int i = 0; i < 24; i++) {
-    const int temp = data_get_strarr_value(data_get_temp_arr(), i);
+    const int temp = data_get_strarr_value(data_get_temp_arr(), i) - SIGNED_OFFSET;
     const GColor color = data_get_temp_color(temp);
     
-    // draw chunk function!
     graphics_context_set_fill_color(ctx, color);
-    draw_hour_chunk(ctx, grect_inset(bounds, GEdgeInsets(TEMP_RING_INSET)), i, TEMP_RING_W);
+    draw_hour_chunk(ctx, temp_grect, i, TEMP_RING_W);
   }
 
   // Outer decoration arc
@@ -52,47 +77,19 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     TRIG_MAX_ANGLE
   );
 
-  // Show 0 and 12 on the dial inside arcs
-  graphics_context_set_text_color(ctx, GColorLightGray);
-  graphics_draw_text(
-    ctx,
-    "0",
-    scl_get_font(SFI_Dial),
-    GRect(half_w - 10, scl_y_pp({.o = 170, .c = 100, .e = 180, .g = 110}), 20, 20),
-    GTextOverflowModeWordWrap,
-    GTextAlignmentCenter,
-    NULL
-  );
-  graphics_draw_text(
-    ctx,
-    "12",
-    scl_get_font(SFI_Dial),
-    GRect(half_w - 10, scl_y_pp({.o = 710, .c = 780, .e = 720, .g = 800}), 20, 20),
-    GTextOverflowModeWordWrap,
-    GTextAlignmentCenter,
-    NULL
-  );
-
   // Line from center to inner arc for day progress
-  time_t temp = time(NULL);
-  struct tm *t = localtime(&temp);
-  const int day_progress = (((t->tm_hour * 60) + t->tm_min) * 100) / MINUTES_PER_DAY;
-  const int progress_angle = (TRIG_MAX_ANGLE * day_progress) / 100;
   const int line_length = half_w - INNER_RING_INSET;
-  const int line_end_x = half_w + (line_length * sin_lookup(progress_angle)) / TRIG_MAX_RATIO;
-  const int line_end_y = half_h - (line_length * cos_lookup(progress_angle)) / TRIG_MAX_RATIO;
-  graphics_context_set_stroke_color(ctx, GColorDarkGray);
-  graphics_context_set_stroke_width(ctx, OUTER_RING_W);
+  const int line_end_x = half_w + (line_length * sin_lookup(s_progress_angle)) / TRIG_MAX_RATIO;
+  const int line_end_y = half_h - (line_length * cos_lookup(s_progress_angle)) / TRIG_MAX_RATIO;
+  graphics_context_set_stroke_color(ctx, GColorLightGray);
+  graphics_context_set_stroke_width(ctx, INNER_RING_W);
   graphics_draw_line(ctx, GPoint(half_w, half_h), GPoint(line_end_x, line_end_y));
-
-  graphics_context_set_stroke_color(ctx, GColorDarkGray);
-  graphics_context_set_stroke_width(ctx, OUTER_RING_W);
   graphics_draw_arc(
     ctx,
     grect_inset(bounds, GEdgeInsets(INNER_RING_INSET -1)),
     GOvalScaleModeFitCircle,
     0,
-    progress_angle
+    s_progress_angle
   );
 
   // Time
@@ -126,7 +123,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   );
 
   // Separator rect
-  const int sep_y = scl_y_pp({.o = 490, .c = 490, .e = 490, .g = 495});
+  const int sep_y = scl_y_pp({.o = 485, .c = 500, .e = 490, .g = 495});
   graphics_context_set_fill_color(ctx, GColorDarkGray);
   graphics_fill_rect(
     ctx,
@@ -151,7 +148,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   strftime(date_buff, sizeof(date_buff), "%d %b %Y", t);
   const GRect date_bounds = GRect(
     0,
-    scl_y_pp({.o = 510, .c = 510, .e = 525, .g = 520}),
+    scl_y_pp({.o = 510, .c = 540, .e = 525, .g = 530}),
     bounds.size.w,
     50
   );
@@ -165,7 +162,69 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     GTextAlignmentCenter,
     NULL
   );
+
+  // Current conditions
+  static char s_current_buff[16];
+  if (data_get_current_code() == WEATHER_ERROR) {
+    snprintf(
+      s_current_buff,
+      sizeof(s_current_buff),
+      "WTHR ERR"
+    );
+  } else if (data_get_current_code() != INIT_MAX_TEMP) {
+    snprintf(
+      s_current_buff,
+      sizeof(s_current_buff),
+      "%d - %s",
+      data_get_current_temp(),
+      data_get_weather_str(data_get_current_code())
+    );
+  } else {
+    snprintf(
+      s_current_buff,
+      sizeof(s_current_buff),
+      "..."
+    );
+  }
+  graphics_context_set_text_color(ctx, GColorLightGray);
+  graphics_draw_text(
+    ctx,
+    s_current_buff,
+    scl_get_font(SFI_Weather),
+    GRect(0, scl_y_pp({.o = 610, .c = 640, .e = 610, .g = 650}), PS_DISP_W, 28),
+    GTextOverflowModeWordWrap,
+    GTextAlignmentCenter,
+    NULL
+  );
 }
+
+/******************************************* Animations *******************************************/
+
+/**
+ * Update during intro animation.
+ */
+ static void intro_animation_update(Animation *animation, const AnimationProgress progress) {
+  s_anim_progress = ((int)progress * 100) / ANIMATION_NORMALIZED_MAX;
+
+  layer_mark_dirty(s_canvas_layer);
+}
+
+/**
+ * Start the intro animation.
+ */
+static void start_intro_animation() {
+  Animation *animation = animation_create();
+  animation_set_delay(animation, 100);
+  animation_set_duration(animation, 1500);
+  animation_set_curve(animation, AnimationCurveEaseInOut);
+  static AnimationImplementation implementation = {
+    .update = (AnimationUpdateImplementation) intro_animation_update
+  };
+  animation_set_implementation(animation, &implementation);
+  animation_schedule(animation);
+}
+
+/******************************************** Handlers ********************************************/
 
 static void tick_handler(struct tm *tick_time, TimeUnits changed) {
   // Get weather every 1h
@@ -179,6 +238,8 @@ static void bt_handler(bool connected) {
 
   layer_mark_dirty(s_canvas_layer);
 }
+
+/********************************************* Window *********************************************/
 
 static void window_load(Window *window) {
   Layer *window_layer = window_get_root_layer(window);
@@ -213,8 +274,10 @@ void main_window_push() {
   time_t now = time(NULL);
   struct tm *tick_now = localtime(&now);
   tick_handler(tick_now, MINUTE_UNIT);
+
+  start_intro_animation();
 }
 
 void main_window_reload() {
-  layer_mark_dirty(s_canvas_layer);
+  start_intro_animation();
 }

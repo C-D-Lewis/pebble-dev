@@ -17,19 +17,19 @@
           "type": "font",
           "name": "OXANIUM_14",
           "file": "fonts/Oxanium-Medium.ttf",
-          "characterRegex": "[0-9a-zA-Z ]"
+          "characterRegex": "[0-9a-zA-Z .-]"
         },
         {
           "type": "font",
           "name": "OXANIUM_18",
           "file": "fonts/Oxanium-Medium.ttf",
-          "characterRegex": "[0-9a-zA-Z ]"
+          "characterRegex": "[0-9a-zA-Z .-]"
         },
         {
           "type": "font",
           "name": "OXANIUM_24",
           "file": "fonts/Oxanium-Medium.ttf",
-          "characterRegex": "[0-9a-zA-Z ]"
+          "characterRegex": "[0-9a-zA-Z .-]"
         },
         {
           "type": "font",
@@ -57,9 +57,9 @@
       "CURRENT_TEMP",
       "CURRENT_CODE",
       "TEMP_ARR",
-      "PRECIP_ARR",
       "CODE_ARR",
-      "REQUEST_WEATHER"
+      "REQUEST_WEATHER",
+      "WEATHER_ERROR"
     ],
     "enableMultiJS": true,
     "displayName": "Skyline",

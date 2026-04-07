@@ -7,31 +7,43 @@ type WeatherApiResponse = {
   hourly: {
     time: string[];
     temperature_2m: number[];
-    precipitation_probability: number[]; // Unused
     weather_code: number[];
   };
 };
 
+/** Signed offset to allow negative numbers */
+const SIGNED_OFFSET = 50;
+
+/** Sample temperate temperatures, low -2, high 12 */
+const TEST_HOURLY_TEMPS = [4, 3, 2, 1, 0, -1, -2, 0, 2, 4, 6, 8, 10, 12, 11, 9, 7, 5, 4, 3, 2, 1, 0, -1];
+
 /**
- * Pad number to two digits.
+ * Zero pad a number
  */
 const zeroPad = (num: number) => String(num).padStart(2, '0');
+
+/**
+ * Encode number to two digits, adding 50 to handle negative values, which
+ * will be subtracted on the watch.
+ */
+const encodeNumber = (num: number) => {
+  const val = Math.min(Math.max(Math.round(num) + SIGNED_OFFSET, 0), 99);
+  return val >= 10 ? String(val) : `0${val}`;
+};
 
 /**
  * Fetch weather for this day from OpenMeteo.
  */
 const fetchWeatherForecast = async (lat: number, lon: number): Promise<WeatherApiResponse> => {
   // TODO: Make configurable
-  const windUnit = 'mph';
   const tempUnit = 'celsius';
 
   const params = {
     latitude: lat,
     longitude: lon,
-    hourly: 'temperature_2m,precipitation_probability,weather_code',
+    hourly: 'temperature_2m,weather_code',
     current: 'temperature_2m,weather_code',
     forecast_days: 1,
-    wind_speed_unit: windUnit,
     temperature_unit: tempUnit,
     timezone: 'auto',
   };
@@ -61,52 +73,49 @@ const getLocation = async () => new Promise((resolve, reject) => {
  * Get location and weather, and send to watch.
  */
 const sendWeather = async () => {
-  const pos = await getLocation() as GeolocationPosition;
-  const { latitude, longitude } = pos.coords;
-  console.log(`Got location: ${latitude}, ${longitude}`);
+  try {
+    const pos = await getLocation() as GeolocationPosition;
+    const { latitude, longitude } = pos.coords;
+    console.log(`Got location: ${latitude}, ${longitude}`);
 
-  const { current, hourly } = await fetchWeatherForecast(latitude, longitude);
-  const { temperature_2m: currentTemp, weather_code: currentCode } = current;
-  const { time, temperature_2m: hourlyTemps, weather_code: hourlyCodes } = hourly;
-  console.log(`Time range: ${time[0]} - ${time[time.length - 1]}`);
+    const { current, hourly } = await fetchWeatherForecast(latitude, longitude);
+    const { temperature_2m: currentTemp, weather_code: currentCode } = current;
+    const { time, temperature_2m: hourlyTemps, weather_code: hourlyCodes } = hourly;
+    console.log(`Time range: ${time[0]} - ${time[time.length - 1]}`);
 
-  /**
-   * Arrays are two chars per item, 24 items:
-   *   "TEMPS": "121211101009080910101112121212121211100807060606"
-   *   "CODES": "030303030303030302030202030202030302000100000000"
-   */
-  const dict = {
-    CURRENT_TEMP: Math.round(currentTemp),
-    CURRENT_CODE: currentCode,
-    TEMP_ARR: hourlyTemps.map((p) => zeroPad(Math.round(p))).join(''),
-    CODE_ARR: hourlyCodes.map((p) => zeroPad(p)).join(''),
-  };
-  console.log(JSON.stringify(dict, null, 2));
-  
-  // Send to watch
-  await PebbleTS.sendAppMessage(dict);
-  console.log('Weather data sent to watch');
+    /**
+     * Arrays are two chars per item, 24 items:
+     *   "CODES": "030303030303030302030202030202030302000100000000"
+     */
+    const dict = {
+      CURRENT_TEMP: Math.round(currentTemp),
+      CURRENT_CODE: currentCode,
+      TEMP_ARR: hourlyTemps.map(encodeNumber).join(''),
+      // TEMP_ARR: TEST_HOURLY_TEMPS.map(encodeNumber).join(''),
+      CODE_ARR: hourlyCodes.map(zeroPad).join(''),
+    };
+    console.log(JSON.stringify(dict, null, 2));
+    
+    // Send to watch
+    await PebbleTS.sendAppMessage(dict);
+    console.log('Weather data sent to watch');
+  } catch (e) {
+    console.log('Error fetching weather');
+    console.log(e);
+
+    await PebbleTS.sendAppMessage({ WEATHER_ERROR: 1 });
+  }
 };
 
 Pebble.addEventListener('ready', async (e) => {
   console.log('PebbleKit JS ready');
 
-  try {
-    await sendWeather();
-  } catch (e) {
-    console.log('Failed to send data');
-    console.log(e);
-  }
+  sendWeather();
 });
 
 Pebble.addEventListener('appmessage', async (e) => {
   const { payload: dict } = e;
   console.log(`appmessage: ${JSON.stringify(dict)}`);
 
-  try {
-    await sendWeather();
-  } catch (e) {
-    console.log('Failed to send data');
-    console.log(e);
-  }
+  sendWeather();
 });

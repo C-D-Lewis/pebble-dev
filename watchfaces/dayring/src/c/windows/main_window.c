@@ -92,7 +92,6 @@ static void start_intro_animation() {
   animation_schedule(animation);
 }
 
-
 /**
  * Window load event handler.
  */

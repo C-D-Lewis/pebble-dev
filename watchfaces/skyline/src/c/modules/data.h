@@ -2,6 +2,8 @@
 
 #include <pebble.h>
 
+#include "../config.h"
+
 void data_set_current_temp(int temp);
 void data_set_current_code(int code);
 void data_set_temp_arr(char* temp_arr);
@@ -15,4 +17,4 @@ char* data_get_code_arr();
 GColor data_get_weather_color(int code);
 int data_get_strarr_value(char *arr, int hour);
 GColor data_get_temp_color(int temp);
-
+char* data_get_weather_str(int code);

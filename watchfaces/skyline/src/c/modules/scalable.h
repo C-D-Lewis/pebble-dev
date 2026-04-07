@@ -4,7 +4,7 @@
 #include <pebble-scalable/pebble-scalable.h>
 
 typedef enum {
-  SFI_Dial,
+  SFI_Weather,
   SFI_Date,
   SFI_Time,
 } ScalableFontId;

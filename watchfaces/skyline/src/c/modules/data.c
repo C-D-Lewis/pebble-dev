@@ -1,10 +1,6 @@
 #include "data.h"
 
-#define STR_ARR_SIZE 49
-#define INIT_MIN_TEMP 999
-#define INIT_MAX_TEMP -999
-
-static int s_current_temp, s_current_code;
+static int s_current_temp, s_current_code = INIT_MAX_TEMP;
 static char s_temp_arr[STR_ARR_SIZE];
 static char s_code_arr[STR_ARR_SIZE];
 static int s_min_temp = INIT_MIN_TEMP, s_max_temp = INIT_MAX_TEMP;
@@ -35,6 +31,7 @@ int data_get_current_code() {
   return s_current_code;
 }
 
+// Every use of this needs the SIGNED_OFFSET applied to values
 char *data_get_temp_arr() {
   return s_temp_arr;
 }
@@ -103,6 +100,7 @@ int data_get_strarr_value(char *arr, int hour) {
 }
 
 GColor data_get_temp_color(int temp) {
+  // Works, because of the offset operation on zeros
   if (s_min_temp == INIT_MIN_TEMP || s_max_temp == INIT_MAX_TEMP) {
     char *temp_arr = data_get_temp_arr();
 
@@ -111,7 +109,7 @@ GColor data_get_temp_color(int temp) {
 
     // Find values from array
     for (int i = 0; i < 24; i++) {
-      const int temp = data_get_strarr_value(temp_arr, i);
+      const int temp = data_get_strarr_value(temp_arr, i) - SIGNED_OFFSET;
       if (temp < s_min_temp) s_min_temp = temp;
       if (temp > s_max_temp) s_max_temp = temp;
     }
@@ -119,15 +117,57 @@ GColor data_get_temp_color(int temp) {
 
   // Lowest/highest
   if (temp == s_min_temp) return GColorBlue;
-  if (temp == s_max_temp) return GColorWindsorTan;
+  if (temp == s_max_temp) return GColorRed;
 
   // Near
   if (temp < s_min_temp + 2) return GColorBlueMoon;
   if (temp > s_max_temp - 2) return GColorOrange;
 
-  // Not so near
+  // Less near
   if (temp < s_min_temp + 3) return GColorVividCerulean;
   if (temp > s_max_temp - 3) return GColorChromeYellow;
 
-  return GColorClear;
+  return GColorBlack;
+}
+
+char* data_get_weather_str(int code) {
+  switch (code) {
+    case 0:
+    case 1:
+      return "Clear";
+    case 3:
+    case 2:
+      return "Cloud";
+    case 45:
+    case 48:
+      return "Fog";
+    case 51:
+    case 53:
+    case 55:
+    case 56:
+    case 57:
+    case 61:
+    case 66:
+    case 80:
+      return "Showers";
+    case 63:
+    case 65:
+    case 67:
+    case 81:
+    case 82:
+      return "Rain";
+    case 85:
+    case 86:
+    case 71:
+    case 73:
+    case 75:
+    case 77:
+      return "Snow";
+    case 95:
+    case 96:
+    case 99:
+      return "Thunder";
+    default:
+      return "Unknown";
+  }
 }

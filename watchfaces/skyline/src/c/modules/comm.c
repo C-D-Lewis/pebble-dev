@@ -14,6 +14,10 @@ static void inbox_received_handler(DictionaryIterator *iter, void *context) {
     data_set_code_arr(packet_get_string(iter, MESSAGE_KEY_CODE_ARR));
   }
 
+  if (packet_contains_key(iter, MESSAGE_KEY_WEATHER_ERROR)) {
+    data_set_current_code(WEATHER_ERROR);
+  }
+
   main_window_reload();
 }
 
