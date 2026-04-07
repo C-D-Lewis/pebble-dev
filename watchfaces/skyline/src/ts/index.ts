@@ -107,7 +107,7 @@ Pebble.addEventListener('appmessage', async (e) => {
   console.log(`appmessage: ${JSON.stringify(dict)}`);
 
   try {
-    sendWeather();
+    await sendWeather();
   } catch (e) {
     console.log('Failed to send data');
     console.log(e);
