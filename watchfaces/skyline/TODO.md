@@ -13,7 +13,10 @@ Delete me when done
 - [x] Regular weather fetch (1h)
 - [x] Scale to display width for square watches
 - [x] Disconnect feature
+- [ ] Arr value offset (+100) for negative number handling
 - [ ] Current weather / temp display
 - [ ] Design details (backgrounds, notches, etc.)
 - [ ] Launcher icon
 - [ ] Animations
+- [ ] Weather failure appmessage
+
