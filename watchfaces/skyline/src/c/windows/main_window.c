@@ -34,7 +34,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   s_progress_angle = (TRIG_MAX_ANGLE * day_progress * s_anim_progress) / (100 * 100);
 
   // Notches - top, bottom, left, right
-  graphics_context_set_stroke_color(ctx, GColorLightGray);
+  graphics_context_set_stroke_color(ctx, GColorDarkGray);
   graphics_context_set_stroke_width(ctx, INNER_RING_W);
   int notch_x = half_w - 1;
   int notch_y = scl_y_pp({.o = 140, .c = 70, .e = 140, .g = 70});
@@ -67,7 +67,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   }
 
   // Outer decoration arc
-  graphics_context_set_stroke_color(ctx, GColorLightGray);
+  graphics_context_set_stroke_color(ctx, GColorDarkGray);
   graphics_context_set_stroke_width(ctx, OUTER_RING_W);
   graphics_draw_arc(
     ctx,
@@ -81,7 +81,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   const int line_length = half_w - INNER_RING_INSET;
   const int line_end_x = half_w + (line_length * sin_lookup(s_progress_angle)) / TRIG_MAX_RATIO;
   const int line_end_y = half_h - (line_length * cos_lookup(s_progress_angle)) / TRIG_MAX_RATIO;
-  graphics_context_set_stroke_color(ctx, GColorLightGray);
+  graphics_context_set_stroke_color(ctx, GColorDarkGray);
   graphics_context_set_stroke_width(ctx, INNER_RING_W);
   graphics_draw_line(ctx, GPoint(half_w, half_h), GPoint(line_end_x, line_end_y));
   graphics_draw_arc(
