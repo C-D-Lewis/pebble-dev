@@ -41,6 +41,23 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   const int day_progress = (((t->tm_hour * 60) + t->tm_min) * 100) / MINUTES_PER_DAY;
   s_day_prog_angle = (TRIG_MAX_ANGLE * day_progress * s_anim_progress) / (100 * 100);
 
+  // Radial lines for 'clear' weather segments
+  // graphics_context_set_stroke_color(ctx, GColorDarkGray);
+  // graphics_context_set_stroke_width(ctx, OUTER_SEP_W);
+  // for (int i = 0; i < 24; i++) {
+  //   GPoint line_end = make_hand_point(
+  //     i,
+  //     24,
+  //     scl_x_pp({.o = 465, .g = 470}),
+  //     GPoint(half_w, half_h)
+  //   );
+  //   graphics_draw_line(ctx, GPoint(half_w, half_h), line_end);
+  // }
+
+  // Cut out outer circle
+  // graphics_context_set_fill_color(ctx, GColorBlack);
+  // graphics_fill_circle(ctx, GPoint(half_w, half_h), scl_x_pp({.o = 420, .e = 435, .g = 430}));
+
   // Notches - top, bottom, left, right
   graphics_context_set_stroke_color(ctx, GColorDarkGray);
   graphics_context_set_stroke_width(ctx, INNER_RING_W);
@@ -63,7 +80,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
       scl_x_pp({.o = 465, .e = 460, .g = 470}),
       GPoint(half_w, half_h)
     );
-    graphics_draw_circle(ctx, dot_point, DOT_S);
+    graphics_fill_circle(ctx, dot_point, DOT_S);
   }
 
   // Conditions chunks outside outer arc according to weather conditions

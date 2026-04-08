@@ -76,8 +76,8 @@ const getLocation = async () => new Promise((resolve, reject) => {
  */
 const sendWeather = async () => {
   try {
-    // const pos = await getLocation() as GeolocationPosition;
-    const pos = TEST_POSITION;
+    const pos = await getLocation() as GeolocationPosition;
+    // const pos = TEST_POSITION;
     const { latitude, longitude } = pos.coords;
     console.log(`Got location: ${latitude}, ${longitude}`);
 

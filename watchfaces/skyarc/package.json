@@ -62,7 +62,7 @@
       "WEATHER_ERROR"
     ],
     "enableMultiJS": true,
-    "displayName": "Skyline",
+    "displayName": "Skyarc",
     "watchapp": {
       "onlyShownOnCommunication": false,
       "hiddenApp": false,
@@ -76,7 +76,7 @@
     ],
     "capabilities": []
   },
-  "name": "skyline",
+  "name": "skyarc",
   "devDependencies": {
     "pkts": "^0.3.0-beta.1"
   },
