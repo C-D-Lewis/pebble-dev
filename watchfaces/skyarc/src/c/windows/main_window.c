@@ -35,30 +35,13 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   const int half_w = bounds.size.w / 2;
   const int half_h = bounds.size.h / 2;
 
-  // Progress through the day, animated
+  // Progress through the day
   time_t temp = time(NULL);
   struct tm *t = localtime(&temp);
   const int day_progress = (((t->tm_hour * 60) + t->tm_min) * 100) / MINUTES_PER_DAY;
   s_day_prog_angle = (TRIG_MAX_ANGLE * day_progress * s_anim_progress) / (100 * 100);
 
-  // Radial lines for 'clear' weather segments
-  // graphics_context_set_stroke_color(ctx, GColorDarkGray);
-  // graphics_context_set_stroke_width(ctx, OUTER_SEP_W);
-  // for (int i = 0; i < 24; i++) {
-  //   GPoint line_end = make_hand_point(
-  //     i,
-  //     24,
-  //     scl_x_pp({.o = 465, .g = 470}),
-  //     GPoint(half_w, half_h)
-  //   );
-  //   graphics_draw_line(ctx, GPoint(half_w, half_h), line_end);
-  // }
-
-  // Cut out outer circle
-  // graphics_context_set_fill_color(ctx, GColorBlack);
-  // graphics_fill_circle(ctx, GPoint(half_w, half_h), scl_x_pp({.o = 420, .e = 435, .g = 430}));
-
-  // Notches - top, bottom, left, right
+  // Notches
   graphics_context_set_stroke_color(ctx, GColorDarkGray);
   graphics_context_set_stroke_width(ctx, INNER_RING_W);
   int notch_x = half_w - 1;
@@ -67,23 +50,22 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   notch_y = scl_y_pp({.o = 780, .c = 850, .e = 780, .g = 850});
   graphics_draw_line(ctx, GPoint(notch_x, notch_y), GPoint(notch_x, notch_y + NOTCH_L));
 
-  // Radial lines for 'clear' weather segments
+  // Radial dots for 'clear' weather segments
   graphics_context_set_fill_color(ctx, GColorDarkGray);
   graphics_context_set_stroke_width(ctx, 1);
   for (int i = 0; i < 24; i++) {
     const int angle = (TRIG_MAX_ANGLE * i) / 24;
     
-    // Plot x and y on a circle at a fixed radius from the center, so they are outside the outer arc
     GPoint dot_point = make_hand_point(
       i,
       24,
       scl_x_pp({.o = 465, .e = 460, .g = 470}),
       GPoint(half_w, half_h)
     );
-    graphics_fill_circle(ctx, dot_point, DOT_S);
+    graphics_draw_circle(ctx, dot_point, DOT_S);
   }
 
-  // Conditions chunks outside outer arc according to weather conditions
+  // Weather condition chunks outside outer arc
   for (int i = 0; i < 24; i++) {
     const int code = data_get_strarr_value(data_get_code_arr(), i);
     const GColor color = data_get_weather_color(code);
@@ -320,8 +302,6 @@ void main_window_push() {
   time_t now = time(NULL);
   struct tm *tick_now = localtime(&now);
   tick_handler(tick_now, MINUTE_UNIT);
-
-  start_intro_animation();
 }
 
 void main_window_reload() {
