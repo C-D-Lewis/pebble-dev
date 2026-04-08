@@ -53,7 +53,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   // Radial dots for 'clear' weather segments
   graphics_context_set_fill_color(ctx, GColorDarkGray);
   graphics_context_set_stroke_width(ctx, 1);
-  for (int i = 0; i < 24; i++) {
+  for (int i = 0; i < 24; i += 2) {
     const int angle = (TRIG_MAX_ANGLE * i) / 24;
     
     GPoint dot_point = make_hand_point(

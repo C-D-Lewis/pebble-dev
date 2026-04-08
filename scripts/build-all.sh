@@ -37,6 +37,7 @@ working_projects=$(cat <<EOF
 ./watchfaces/past-present-future/
 ./watchfaces/potential-divider/
 ./watchfaces/pseudotime/
+./watchfaces/skyarc/
 ./watchfaces/split-horizon/
 ./watchfaces/starfield-smooth/
 ./watchfaces/starfield-demo/
