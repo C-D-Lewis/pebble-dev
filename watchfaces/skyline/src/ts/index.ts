@@ -16,6 +16,8 @@ const SIGNED_OFFSET = 50;
 
 /** Sample temperate temperatures, low -2, high 12 */
 const TEST_HOURLY_TEMPS = [4, 3, 2, 1, 0, -1, -2, 0, 2, 4, 6, 8, 10, 12, 11, 9, 7, 5, 4, 3, 2, 1, 0, -1];
+/** Test position */
+const TEST_POSITION = { coords: { latitude: 51.74, longitude: 0.48 } };
 
 /**
  * Zero pad a number
@@ -74,7 +76,8 @@ const getLocation = async () => new Promise((resolve, reject) => {
  */
 const sendWeather = async () => {
   try {
-    const pos = await getLocation() as GeolocationPosition;
+    // const pos = await getLocation() as GeolocationPosition;
+    const pos = TEST_POSITION;
     const { latitude, longitude } = pos.coords;
     console.log(`Got location: ${latitude}, ${longitude}`);
 

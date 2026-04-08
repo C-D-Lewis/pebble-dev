@@ -2,15 +2,23 @@
 
 static Window *s_window;
 static Layer *s_canvas_layer;
-static int s_anim_progress, s_progress_angle;
+static int s_anim_progress, s_day_prog_angle, s_anim_prog_angle;
 
 /******************************************** Drawing *********************************************/
+
+static GPoint make_hand_point(int quantity, int intervals, int len, GPoint center) {
+  const int angle = (TRIG_MAX_ANGLE * quantity) / intervals;
+  return (GPoint) {
+    .x = (int16_t)(sin_lookup(angle) * (int32_t)len / TRIG_MAX_RATIO) + center.x,
+    .y = (int16_t)(-cos_lookup(angle) * (int32_t)len / TRIG_MAX_RATIO) + center.y,
+  };
+}
 
 static void draw_hour_chunk(GContext *ctx, GRect bounds, int hour, int inset) {
   const int chunk_start_angle = (TRIG_MAX_ANGLE * hour) / 24;
   const int chunk_end_angle = (TRIG_MAX_ANGLE * (hour + 1)) / 24;
 
-  if (chunk_end_angle > s_progress_angle) return;
+  if (chunk_end_angle > s_anim_prog_angle) return;
 
   graphics_fill_radial(
     ctx,
@@ -31,7 +39,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   time_t temp = time(NULL);
   struct tm *t = localtime(&temp);
   const int day_progress = (((t->tm_hour * 60) + t->tm_min) * 100) / MINUTES_PER_DAY;
-  s_progress_angle = (TRIG_MAX_ANGLE * day_progress * s_anim_progress) / (100 * 100);
+  s_day_prog_angle = (TRIG_MAX_ANGLE * day_progress * s_anim_progress) / (100 * 100);
 
   // Notches - top, bottom, left, right
   graphics_context_set_stroke_color(ctx, GColorDarkGray);
@@ -41,6 +49,22 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   graphics_draw_line(ctx, GPoint(notch_x, notch_y), GPoint(notch_x, notch_y + NOTCH_L));
   notch_y = scl_y_pp({.o = 780, .c = 850, .e = 780, .g = 850});
   graphics_draw_line(ctx, GPoint(notch_x, notch_y), GPoint(notch_x, notch_y + NOTCH_L));
+
+  // Radial lines for 'clear' weather segments
+  graphics_context_set_fill_color(ctx, GColorDarkGray);
+  graphics_context_set_stroke_width(ctx, 1);
+  for (int i = 0; i < 24; i++) {
+    const int angle = (TRIG_MAX_ANGLE * i) / 24;
+    
+    // Plot x and y on a circle at a fixed radius from the center, so they are outside the outer arc
+    GPoint dot_point = make_hand_point(
+      i,
+      24,
+      scl_x_pp({.o = 465, .e = 460, .g = 470}),
+      GPoint(half_w, half_h)
+    );
+    graphics_draw_circle(ctx, dot_point, DOT_S);
+  }
 
   // Conditions chunks outside outer arc according to weather conditions
   for (int i = 0; i < 24; i++) {
@@ -80,8 +104,8 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
 
   // Line from center to inner arc for day progress
   const int line_length = half_w - INNER_RING_INSET + 1;
-  const int line_end_x = half_w + (line_length * sin_lookup(s_progress_angle)) / TRIG_MAX_RATIO;
-  const int line_end_y = half_h - (line_length * cos_lookup(s_progress_angle)) / TRIG_MAX_RATIO;
+  const int line_end_x = half_w + (line_length * sin_lookup(s_day_prog_angle)) / TRIG_MAX_RATIO;
+  const int line_end_y = half_h - (line_length * cos_lookup(s_day_prog_angle)) / TRIG_MAX_RATIO;
   graphics_context_set_stroke_color(ctx, GColorDarkGray);
   graphics_context_set_stroke_width(ctx, INNER_RING_W);
   graphics_draw_line(ctx, GPoint(half_w, half_h), GPoint(line_end_x, line_end_y));
@@ -90,7 +114,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     grect_inset(bounds, GEdgeInsets(INNER_RING_INSET -1)),
     GOvalScaleModeFitCircle,
     0,
-    s_progress_angle
+    s_day_prog_angle
   );
   graphics_context_set_antialiased(ctx, true);
 
@@ -207,6 +231,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
  */
  static void intro_animation_update(Animation *animation, const AnimationProgress progress) {
   s_anim_progress = ((int)progress * 100) / ANIMATION_NORMALIZED_MAX;
+  s_anim_prog_angle = (TRIG_MAX_ANGLE * s_anim_progress) / 100;
 
   layer_mark_dirty(s_canvas_layer);
 }
@@ -215,6 +240,9 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
  * Start the intro animation.
  */
 static void start_intro_animation() {
+  s_anim_prog_angle = 0;
+  s_anim_progress = 0;
+
   Animation *animation = animation_create();
   animation_set_delay(animation, 100);
   animation_set_duration(animation, 1500);
@@ -229,7 +257,6 @@ static void start_intro_animation() {
 /******************************************** Handlers ********************************************/
 
 static void tick_handler(struct tm *tick_time, TimeUnits changed) {
-  // Get weather every 1h
   if (tick_time->tm_min == 0) comm_request_weather();
 
   layer_mark_dirty(s_canvas_layer);

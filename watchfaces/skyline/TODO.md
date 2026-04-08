@@ -19,3 +19,4 @@ Delete me when done
 - [x] Animations
 - [x] Design details (backgrounds, notches, etc.)
 - [ ] Launcher icon
+- [ ] New name
