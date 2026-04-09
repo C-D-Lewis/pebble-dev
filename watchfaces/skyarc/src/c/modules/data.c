@@ -1,9 +1,26 @@
 #include "data.h"
 
+// TODO: AppState/PersistData pattern for reusability
+
 static int s_current_temp, s_current_code = INIT_MAX_TEMP;
 static char s_temp_arr[STR_ARR_SIZE];
+static char s_precip_arr[STR_ARR_SIZE];
 static char s_code_arr[STR_ARR_SIZE];
+static char s_temp_unit[4];
 static int s_min_temp = INIT_MIN_TEMP, s_max_temp = INIT_MAX_TEMP;
+
+void data_init() {
+  if (!persist_exists(SK_TempUnit)) {
+    // Use defaults
+    snprintf(s_temp_unit, sizeof(s_temp_unit), "%s", "C");
+  } else {
+    persist_read_string(SK_TempUnit, s_temp_unit, sizeof(s_temp_unit));
+  }
+}
+
+void data_deinit() {
+  persist_write_string(SK_TempUnit, s_temp_unit);
+}
 
 /***************************** Getters / setters ******************************/
 
@@ -19,8 +36,16 @@ void data_set_temp_arr(char *temp_arr) {
   snprintf(s_temp_arr, sizeof(s_temp_arr), "%s", temp_arr);
 }
 
+void data_set_precip_arr(char *precip_arr) {
+  snprintf(s_precip_arr, sizeof(s_precip_arr), "%s", precip_arr);
+}
+
 void data_set_code_arr(char *code_arr) {
   snprintf(s_code_arr, sizeof(s_code_arr), "%s", code_arr);
+}
+
+void data_set_temp_unit(char* temp_unit) {
+  snprintf(s_temp_unit, sizeof(s_temp_unit), "%s", temp_unit);
 }
 
 int data_get_current_temp() {
@@ -36,8 +61,16 @@ char *data_get_temp_arr() {
   return s_temp_arr;
 }
 
+char *data_get_precip_arr() {
+  return s_precip_arr;
+}
+
 char* data_get_code_arr() {
   return s_code_arr;
+}
+
+char* data_get_temp_unit() {
+  return s_temp_unit;
 }
 
 /********************************** Methods ***********************************/
@@ -121,11 +154,14 @@ GColor data_get_temp_color(int temp) {
 
   // Near
   if (temp < s_min_temp + 2) return GColorBlueMoon;
-  if (temp > s_max_temp - 2) return GColorOrange;
+  if (temp > s_max_temp - 2) return GColorChromeYellow;
 
-  // Less near
-  if (temp < s_min_temp + 3) return GColorVividCerulean;
-  if (temp > s_max_temp - 3) return GColorChromeYellow;
+  // Less near if there's a high enough range
+  const int range = s_max_temp - s_min_temp;
+  if (range > 6) {
+    if (temp < s_min_temp + 3) return GColorVividCerulean;
+    if (temp > s_max_temp - 3) return GColorRajah;
+  }
 
   return GColorBlack;
 }
@@ -168,6 +204,14 @@ char* data_get_weather_str(int code) {
     case 99:
       return "Thunder";
     default:
-      return "Unknown";
+      return "?";
   }
 }
+
+GColor data_get_precip_color(int precip_chance) {
+  if (precip_chance <= 10) return GColorClear;
+  if (precip_chance < 33) return GColorVividCerulean;
+  if (precip_chance < 66) return GColorBlueMoon;
+  if (precip_chance < 90) return GColorBlue;
+  return GColorDukeBlue;
+};

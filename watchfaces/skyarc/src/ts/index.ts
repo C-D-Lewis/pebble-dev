@@ -1,34 +1,35 @@
-/** Weather response format */
-type WeatherApiResponse = {
-  current: {
-    temperature_2m: number;
-    weather_code: number;
-  };
-  hourly: {
-    time: string[];
-    temperature_2m: number[];
-    weather_code: number[];
-  };
-};
+import { setupClay } from './clay.js';
+import { WeatherApiResponse } from './types.js';
 
 /** Signed offset to allow negative numbers */
 const SIGNED_OFFSET = 50;
 
+/** Disable before release! */
+const TEST_MODE = false;
+
 /** Sample temperate temperatures, low -2, high 12 */
-const TEST_HOURLY_TEMPS = [4, 3, 2, 1, 0, -1, -2, 0, 2, 4, 6, 8, 10, 12, 11, 9, 7, 5, 4, 3, 2, 1, 0, -1];
+const TEST_TEMP_ARR = [4, 3, 2, 1, 0, -1, -2, 0, 2, 4, 6, 8, 10, 12, 11, 9, 7, 5, 4, 3, 2, 1, 0, -1];
+/** Sample precipitation data */
+const TEST_PRECIP_ARR = [0, 0, 0, 0, 0, 0, 50, 60, 60, 30, 20, 0, 0, 0, 0, 40, 80, 99, 99, 50, 0, 0, 0, 0];
 /** Test position */
 const TEST_POSITION = { coords: { latitude: 51.74, longitude: 0.48 } };
 
+setupClay();
+
 /**
- * Zero pad a number
+ * Zero pad a number, max 99
  */
-const zeroPad = (num: number) => String(num).padStart(2, '0');
+const zeroPad = (num: number) => {
+  if (num < 10) return `0${num}`;
+  if (num > 99) return '99';
+  return String(num);
+};
 
 /**
  * Encode number to two digits, adding 50 to handle negative values, which
  * will be subtracted on the watch.
  */
-const encodeNumber = (num: number) => {
+const encodeSignedNumber = (num: number) => {
   const val = Math.min(Math.max(Math.round(num) + SIGNED_OFFSET, 0), 99);
   return val >= 10 ? String(val) : `0${val}`;
 };
@@ -36,17 +37,14 @@ const encodeNumber = (num: number) => {
 /**
  * Fetch weather for this day from OpenMeteo.
  */
-const fetchWeatherForecast = async (lat: number, lon: number): Promise<WeatherApiResponse> => {
-  // TODO: Make configurable
-  const tempUnit = 'celsius';
-
+const fetchWeatherForecast = async (lat: number, lon: number ): Promise<WeatherApiResponse> => {
   const params = {
     latitude: lat,
     longitude: lon,
-    hourly: 'temperature_2m,weather_code',
+    hourly: 'temperature_2m,weather_code,precipitation_probability',
     current: 'temperature_2m,weather_code',
     forecast_days: 1,
-    temperature_unit: tempUnit,
+    temperature_unit: 'celsius',
     timezone: 'auto',
   };
   const paramStr = Object.entries(params).map(([k, v]) => `${k}=${v}`).join('&'); 
@@ -76,15 +74,22 @@ const getLocation = async () => new Promise((resolve, reject) => {
  */
 const sendWeather = async () => {
   try {
-    const pos = await getLocation() as GeolocationPosition;
-    // const pos = TEST_POSITION;
+    const pos = TEST_MODE ? TEST_POSITION : (await getLocation() as GeolocationPosition);
     const { latitude, longitude } = pos.coords;
     console.log(`Got location: ${latitude}, ${longitude}`);
 
     const { current, hourly } = await fetchWeatherForecast(latitude, longitude);
     const { temperature_2m: currentTemp, weather_code: currentCode } = current;
-    const { time, temperature_2m: hourlyTemps, weather_code: hourlyCodes } = hourly;
+    const {
+      time,
+      temperature_2m: hourlyTemps,
+      weather_code: hourlyCodes,
+      precipitation_probability: hourlyPrecip,
+    } = hourly;
     console.log(`Time range: ${time[0]} - ${time[time.length - 1]}`);
+
+    const tempArr = TEST_MODE ? TEST_TEMP_ARR : hourlyTemps;
+    const precipArr = TEST_MODE ? TEST_PRECIP_ARR : hourlyPrecip;
 
     /**
      * Arrays are two chars per item, 24 items:
@@ -93,8 +98,8 @@ const sendWeather = async () => {
     const dict = {
       CURRENT_TEMP: Math.round(currentTemp),
       CURRENT_CODE: currentCode,
-      TEMP_ARR: hourlyTemps.map(encodeNumber).join(''),
-      // TEMP_ARR: TEST_HOURLY_TEMPS.map(encodeNumber).join(''),
+      TEMP_ARR: tempArr.map(encodeSignedNumber).join(''),
+      PRECIP_ARR: precipArr.map(zeroPad).join(''),
       CODE_ARR: hourlyCodes.map(zeroPad).join(''),
     };
     console.log(JSON.stringify(dict, null, 2));

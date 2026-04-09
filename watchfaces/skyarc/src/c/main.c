@@ -3,9 +3,11 @@
 #include "windows/main_window.h"
 
 #include "modules/comm.h"
+#include "modules/data.h"
 #include "modules/scalable.h"
 
 static void init() {
+  data_init();
   comm_init(256, 256);
   scalable_init();
 
@@ -13,6 +15,7 @@ static void init() {
 }
 
 static void deinit() {
+  data_deinit();
 }
 
 int main() {

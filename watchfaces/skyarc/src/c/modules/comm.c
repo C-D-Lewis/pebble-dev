@@ -1,6 +1,7 @@
 #include "comm.h"
 
 static void inbox_received_handler(DictionaryIterator *iter, void *context) {
+  // Weather
   if (packet_contains_key(iter, MESSAGE_KEY_CURRENT_TEMP)) {
     data_set_current_temp(packet_get_integer(iter, MESSAGE_KEY_CURRENT_TEMP));
   }
@@ -10,10 +11,19 @@ static void inbox_received_handler(DictionaryIterator *iter, void *context) {
   if (packet_contains_key(iter, MESSAGE_KEY_TEMP_ARR)) {
     data_set_temp_arr(packet_get_string(iter, MESSAGE_KEY_TEMP_ARR));
   }
+  if (packet_contains_key(iter, MESSAGE_KEY_PRECIP_ARR)) {
+    data_set_precip_arr(packet_get_string(iter, MESSAGE_KEY_PRECIP_ARR));
+  }
   if (packet_contains_key(iter, MESSAGE_KEY_CODE_ARR)) {
     data_set_code_arr(packet_get_string(iter, MESSAGE_KEY_CODE_ARR));
   }
 
+  // Config
+  if (packet_contains_key(iter, MESSAGE_KEY_CONFIG_TEMP_UNIT)) {
+    data_set_temp_unit(packet_get_string(iter, MESSAGE_KEY_CONFIG_TEMP_UNIT));
+  }
+
+  // Other
   if (packet_contains_key(iter, MESSAGE_KEY_WEATHER_ERROR)) {
     data_set_current_code(WEATHER_ERROR);
   }

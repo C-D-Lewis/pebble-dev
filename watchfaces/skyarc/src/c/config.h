@@ -4,6 +4,9 @@
 
 #pragma once
 
+// Disable before release!
+// #define TEST
+
 #if defined(PBL_PLATFORM_BASALT) || defined(PBL_PLATFORM_CHALK)
   #define OUTER_RING_W 2
   #define OUTER_RING_INSET 12
@@ -30,3 +33,4 @@
 #define INIT_MAX_TEMP -50
 #define SIGNED_OFFSET 50
 #define WEATHER_ERROR 1000
+#define MIN_WEATHER_INTERVAL_S (60 * 60 - 5)

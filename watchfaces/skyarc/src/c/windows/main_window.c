@@ -2,7 +2,11 @@
 
 static Window *s_window;
 static Layer *s_canvas_layer;
+
+static AppTimer *s_tap_timer;
 static int s_anim_progress, s_day_prog_angle, s_anim_prog_angle;
+static time_t s_last_update_time;
+static bool s_tapped = false;
 
 /******************************************** Drawing *********************************************/
 
@@ -38,6 +42,10 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   // Progress through the day
   time_t temp = time(NULL);
   struct tm *t = localtime(&temp);
+#ifdef TEST
+  t->tm_hour = 21;
+  t->tm_min = 38;
+#endif
   const int day_progress = (((t->tm_hour * 60) + t->tm_min) * 100) / MINUTES_PER_DAY;
   s_day_prog_angle = (TRIG_MAX_ANGLE * day_progress * s_anim_progress) / (100 * 100);
 
@@ -54,8 +62,6 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   graphics_context_set_fill_color(ctx, GColorDarkGray);
   graphics_context_set_stroke_width(ctx, 1);
   for (int i = 0; i < 24; i += 2) {
-    const int angle = (TRIG_MAX_ANGLE * i) / 24;
-    
     GPoint dot_point = make_hand_point(
       i,
       24,
@@ -67,8 +73,16 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
 
   // Weather condition chunks outside outer arc
   for (int i = 0; i < 24; i++) {
-    const int code = data_get_strarr_value(data_get_code_arr(), i);
-    const GColor color = data_get_weather_color(code);
+    GColor color;
+    if (s_tapped) {
+      // Precip chance
+      const int chance = data_get_strarr_value(data_get_precip_arr(), i);
+      color = data_get_precip_color(chance);
+    } else {
+      // General conditions
+      const int code = data_get_strarr_value(data_get_code_arr(), i);
+      color = data_get_weather_color(code);
+    }
     
     graphics_context_set_fill_color(ctx, color);
     draw_hour_chunk(
@@ -91,7 +105,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
 
   // Outer decoration arc
   graphics_context_set_antialiased(ctx, false);
-  graphics_context_set_stroke_color(ctx, GColorDarkGray);
+  graphics_context_set_stroke_color(ctx, s_tapped  ? GColorCobaltBlue : GColorWhite);
   graphics_context_set_stroke_width(ctx, OUTER_RING_W);
   graphics_draw_arc(
     ctx,
@@ -197,11 +211,18 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
       "WTHR ERR"
     );
   } else if (data_get_current_code() != INIT_MAX_TEMP) {
+    // Convert temp to current unit
+    const char *temp_unit = data_get_temp_unit();
+    int current_temp = data_get_current_temp();
+    if (strcmp(temp_unit, "F") == 0) {
+      current_temp = (current_temp * 9 / 5) + 32;
+    }
+
     snprintf(
       s_current_buff,
       sizeof(s_current_buff),
       "%d - %s",
-      data_get_current_temp(),
+      current_temp,
       data_get_weather_str(data_get_current_code())
     );
   } else {
@@ -255,8 +276,28 @@ static void start_intro_animation() {
 
 /******************************************** Handlers ********************************************/
 
+static void tap_timer_callback(void *context) {
+  s_tapped = false;
+
+  layer_mark_dirty(s_canvas_layer);
+}
+
+static void accel_tap_handler(AccelAxisType axis, int32_t direction) {
+  if (s_tapped == true) return;
+
+  s_tapped = true;
+  layer_mark_dirty(s_canvas_layer);
+  s_tap_timer = app_timer_register(3000, tap_timer_callback, NULL);
+}
+
 static void tick_handler(struct tm *tick_time, TimeUnits changed) {
-  if (tick_time->tm_min == 0) comm_request_weather();
+  // Seeing multiple ticks with MINUTE_UNIT...
+  // APP_LOG(APP_LOG_LEVEL_DEBUG, "Tick! %d", tick_time->tm_sec);
+
+  time_t now = time(NULL);
+  if (tick_time->tm_min == 0 && (now - s_last_update_time) >= MIN_WEATHER_INTERVAL_S) {
+    comm_request_weather();
+  }
 
   layer_mark_dirty(s_canvas_layer);
 }
@@ -298,12 +339,11 @@ void main_window_push() {
 
   tick_timer_service_subscribe(MINUTE_UNIT, tick_handler);
   bluetooth_connection_service_subscribe(bt_handler);
-
-  time_t now = time(NULL);
-  struct tm *tick_now = localtime(&now);
-  tick_handler(tick_now, MINUTE_UNIT);
+  accel_tap_service_subscribe(accel_tap_handler);
 }
 
 void main_window_reload() {
+  // Weather data or config came in
+  s_last_update_time = time(NULL);
   start_intro_animation();
 }
