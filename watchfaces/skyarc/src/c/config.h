@@ -34,3 +34,5 @@
 #define SIGNED_OFFSET 50
 #define WEATHER_ERROR 1000
 #define MIN_WEATHER_INTERVAL_S (60 * 60 - 5)
+
+#define DATA_EMPTY -1000

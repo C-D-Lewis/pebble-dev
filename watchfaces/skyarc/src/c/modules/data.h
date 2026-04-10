@@ -5,25 +5,26 @@
 #include "../config.h"
 
 typedef enum {
-  SK_TempUnit = 10,
+  SK_PersistData = 10,
 } StorageKeys;
+
+typedef struct {
+  int current_temp;
+  int current_code;
+  char temp_arr[STR_ARR_SIZE];
+  char precip_arr[STR_ARR_SIZE];
+  char code_arr[STR_ARR_SIZE];
+} AppState;
+
+typedef struct {
+  char temp_unit[4];
+} PersistData;
 
 void data_init();
 void data_deinit();
 
-void data_set_current_temp(int temp);
-void data_set_current_code(int code);
-void data_set_temp_arr(char* temp_arr);
-void data_set_precip_arr(char* precip_arr);
-void data_set_code_arr(char* code_arr);
-void data_set_temp_unit(char* temp_unit);
-
-int data_get_current_temp();
-int data_get_current_code();
-char* data_get_temp_arr();
-char* data_get_precip_arr();
-char* data_get_code_arr();
-char* data_get_temp_unit();
+AppState* data_get_app_state();
+PersistData* data_get_persist_data();
 
 GColor data_get_weather_color(int code);
 int data_get_strarr_value(char *arr, int hour);

@@ -1,76 +1,35 @@
 #include "data.h"
 
-// TODO: AppState/PersistData pattern for reusability
+static AppState s_app_state;
+static PersistData s_persist_data;
 
-static int s_current_temp, s_current_code = INIT_MAX_TEMP;
-static char s_temp_arr[STR_ARR_SIZE];
-static char s_precip_arr[STR_ARR_SIZE];
-static char s_code_arr[STR_ARR_SIZE];
-static char s_temp_unit[4];
 static int s_min_temp = INIT_MIN_TEMP, s_max_temp = INIT_MAX_TEMP;
 
 void data_init() {
-  if (!persist_exists(SK_TempUnit)) {
-    // Use defaults
-    snprintf(s_temp_unit, sizeof(s_temp_unit), "%s", "C");
+  // Default state always
+  s_app_state.current_code = DATA_EMPTY;
+
+  if (!persist_exists(SK_PersistData)) {
+    // Default persist data
+    snprintf(s_persist_data.temp_unit, sizeof(s_persist_data.temp_unit), "%s", "C");
   } else {
-    persist_read_string(SK_TempUnit, s_temp_unit, sizeof(s_temp_unit));
+    // Read persist struct
+    persist_read_data(SK_PersistData, &s_persist_data, sizeof(PersistData));
   }
 }
 
 void data_deinit() {
-  persist_write_string(SK_TempUnit, s_temp_unit);
+  persist_write_data(SK_PersistData, &s_persist_data, sizeof(PersistData));
 }
 
 /***************************** Getters / setters ******************************/
 
-void data_set_current_temp(int temp) {
-  s_current_temp = temp;
+AppState* data_get_app_state() {
+  return &s_app_state;
 }
 
-void data_set_current_code(int code) {
-  s_current_code = code;
-}
-
-void data_set_temp_arr(char *temp_arr) {
-  snprintf(s_temp_arr, sizeof(s_temp_arr), "%s", temp_arr);
-}
-
-void data_set_precip_arr(char *precip_arr) {
-  snprintf(s_precip_arr, sizeof(s_precip_arr), "%s", precip_arr);
-}
-
-void data_set_code_arr(char *code_arr) {
-  snprintf(s_code_arr, sizeof(s_code_arr), "%s", code_arr);
-}
-
-void data_set_temp_unit(char* temp_unit) {
-  snprintf(s_temp_unit, sizeof(s_temp_unit), "%s", temp_unit);
-}
-
-int data_get_current_temp() {
-  return s_current_temp;
-}
-
-int data_get_current_code() {
-  return s_current_code;
-}
-
-// Every use of this needs the SIGNED_OFFSET applied to values
-char *data_get_temp_arr() {
-  return s_temp_arr;
-}
-
-char *data_get_precip_arr() {
-  return s_precip_arr;
-}
-
-char* data_get_code_arr() {
-  return s_code_arr;
-}
-
-char* data_get_temp_unit() {
-  return s_temp_unit;
+PersistData* data_get_persist_data() {
+  return &s_persist_data;
 }
 
 /********************************** Methods ***********************************/
@@ -135,8 +94,7 @@ int data_get_strarr_value(char *arr, int hour) {
 GColor data_get_temp_color(int temp) {
   // Works, because of the offset operation on zeros
   if (s_min_temp == INIT_MIN_TEMP || s_max_temp == INIT_MAX_TEMP) {
-    char *temp_arr = data_get_temp_arr();
-
+    char *temp_arr = s_app_state.temp_arr;
     // No data yet
     if (strlen(temp_arr) == 0) return GColorClear;
 

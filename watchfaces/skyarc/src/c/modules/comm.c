@@ -1,31 +1,34 @@
 #include "comm.h"
 
 static void inbox_received_handler(DictionaryIterator *iter, void *context) {
+  AppState *app_state = data_get_app_state();
+  PersistData *persist_data = data_get_persist_data();
+
   // Weather
   if (packet_contains_key(iter, MESSAGE_KEY_CURRENT_TEMP)) {
-    data_set_current_temp(packet_get_integer(iter, MESSAGE_KEY_CURRENT_TEMP));
+    app_state->current_temp = packet_get_integer(iter, MESSAGE_KEY_CURRENT_TEMP);
   }
   if (packet_contains_key(iter, MESSAGE_KEY_CURRENT_CODE)) {
-    data_set_current_code(packet_get_integer(iter, MESSAGE_KEY_CURRENT_CODE));
+    app_state->current_code = packet_get_integer(iter, MESSAGE_KEY_CURRENT_CODE);
   }
   if (packet_contains_key(iter, MESSAGE_KEY_TEMP_ARR)) {
-    data_set_temp_arr(packet_get_string(iter, MESSAGE_KEY_TEMP_ARR));
+    snprintf(app_state->temp_arr, sizeof(app_state->temp_arr), "%s", packet_get_string(iter, MESSAGE_KEY_TEMP_ARR));
   }
   if (packet_contains_key(iter, MESSAGE_KEY_PRECIP_ARR)) {
-    data_set_precip_arr(packet_get_string(iter, MESSAGE_KEY_PRECIP_ARR));
+    snprintf(app_state->precip_arr, sizeof(app_state->precip_arr), "%s", packet_get_string(iter, MESSAGE_KEY_PRECIP_ARR));
   }
   if (packet_contains_key(iter, MESSAGE_KEY_CODE_ARR)) {
-    data_set_code_arr(packet_get_string(iter, MESSAGE_KEY_CODE_ARR));
+    snprintf(app_state->code_arr, sizeof(app_state->code_arr), "%s", packet_get_string(iter, MESSAGE_KEY_CODE_ARR));
   }
 
   // Config
   if (packet_contains_key(iter, MESSAGE_KEY_CONFIG_TEMP_UNIT)) {
-    data_set_temp_unit(packet_get_string(iter, MESSAGE_KEY_CONFIG_TEMP_UNIT));
+    snprintf(persist_data->temp_unit, sizeof(persist_data->temp_unit), "%s", packet_get_string(iter, MESSAGE_KEY_CONFIG_TEMP_UNIT));
   }
 
   // Other
   if (packet_contains_key(iter, MESSAGE_KEY_WEATHER_ERROR)) {
-    data_set_current_code(WEATHER_ERROR);
+    app_state->current_code = WEATHER_ERROR;
   }
 
   main_window_reload();

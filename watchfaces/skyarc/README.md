@@ -10,22 +10,12 @@ gradations for 1 and 2 degrees above, and hottest is darkest red with a similar
 scheme of two ligher shades.
 
 When shaken, the outer weather arc is replaced with chance of precipitation. The
-darker the shade of blue, the higher chance of rain.
+darker the shade of blue, the higher chance of rain. The battery level is shown
+in the middle bar, and is green when Bluetooth is connected or grey otherwise.
 
-The battery level is shown in the middle bar, and is green when Bluetooth is
-connected or grey otherwise.
+App configuration includes choice of temperature unit.
 
 Weather data from [OpenMeteo](https://open-meteo.com/).
-
-## Adding Clay to PKTS project
-
-> Derived from [CometDog/pebble-kite](https://github.com/CometDog/pebble-kite)
-
-1. Update `build` npm script
-2. Install deps: `rollup`, `@rollup/plugin-commonjs`, `@rollup/plugin-terser`, `@rollup/plugin-typescript`
-3. Add `rollup.config.mjs`
-4. Add Clay config to `src/ts-config/config.ts`
-5. Add imports in `src/ts/clay.ts` to set up Clay
 
 ## TODO
 
@@ -48,5 +38,5 @@ Weather data from [OpenMeteo](https://open-meteo.com/).
 - [x] Launcher icon
 - [x] New name
 - [x] Configuration: temp units, ?
+- [x] Update pattern used in `data.c`
 - [ ] Wind speed?
-- [ ] Update pattern used in `data.c`

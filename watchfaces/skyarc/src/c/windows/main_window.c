@@ -35,6 +35,9 @@ static void draw_hour_chunk(GContext *ctx, GRect bounds, int hour, int inset) {
 }
 
 static void canvas_update_proc(Layer *layer, GContext *ctx) {
+  AppState *app_state = data_get_app_state();
+  PersistData *persist_data = data_get_persist_data();
+
   GRect bounds = layer_get_bounds(layer);
   const int half_w = bounds.size.w / 2;
   const int half_h = bounds.size.h / 2;
@@ -76,11 +79,11 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     GColor color;
     if (s_tapped) {
       // Precip chance
-      const int chance = data_get_strarr_value(data_get_precip_arr(), i);
+      const int chance = data_get_strarr_value(app_state->precip_arr, i);
       color = data_get_precip_color(chance);
     } else {
       // General conditions
-      const int code = data_get_strarr_value(data_get_code_arr(), i);
+      const int code = data_get_strarr_value(app_state->code_arr, i);
       color = data_get_weather_color(code);
     }
     
@@ -96,7 +99,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   // Chunks between arcs according to temp conditions
   const GRect temp_grect = grect_inset(bounds, GEdgeInsets(TEMP_RING_INSET));
   for (int i = 0; i < 24; i++) {
-    const int temp = data_get_strarr_value(data_get_temp_arr(), i) - SIGNED_OFFSET;
+    const int temp = data_get_strarr_value(app_state->temp_arr, i) - SIGNED_OFFSET;
     const GColor color = data_get_temp_color(temp);
     
     graphics_context_set_fill_color(ctx, color);
@@ -204,17 +207,17 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
 
   // Current conditions
   static char s_current_buff[16];
-  if (data_get_current_code() == WEATHER_ERROR) {
+  int current_code = app_state->current_code;
+  if (current_code == WEATHER_ERROR) {
     snprintf(
       s_current_buff,
       sizeof(s_current_buff),
       "WTHR ERR"
     );
-  } else if (data_get_current_code() != INIT_MAX_TEMP) {
+  } else if (current_code != DATA_EMPTY) {
     // Convert temp to current unit
-    const char *temp_unit = data_get_temp_unit();
-    int current_temp = data_get_current_temp();
-    if (strcmp(temp_unit, "F") == 0) {
+    int current_temp = app_state->current_temp;
+    if (strcmp(persist_data->temp_unit, "F") == 0) {
       current_temp = (current_temp * 9 / 5) + 32;
     }
 
@@ -223,7 +226,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
       sizeof(s_current_buff),
       "%d - %s",
       current_temp,
-      data_get_weather_str(data_get_current_code())
+      data_get_weather_str(current_code)
     );
   } else {
     snprintf(

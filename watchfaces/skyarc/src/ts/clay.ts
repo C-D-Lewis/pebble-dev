@@ -1,15 +1,44 @@
-// Clay setup with PKTS - see README.md
+// Clay setup with PKTS
+//
+// Derived from https://github.com/CometDog/pebble-kite
 
-// TODO: Better typing if this proves to work
 interface Clay {}
 interface ClayConstructor {
   new(config: object[]): Clay;
 };
 
+const config = [
+  {
+    type: 'heading',
+    defaultValue: 'Skyline Configuration'
+  },
+  {
+    type: 'section',
+    items: [
+      {
+        type: 'heading',
+        defaultValue: 'Units'
+      },
+      {
+        type: 'select',
+        messageKey: 'CONFIG_TEMP_UNIT',
+        defaultValue: 'celsius',
+        label: 'Temperature Unit',
+        options: [
+          { label: 'Celsius', value: 'C' },
+          { label: 'Farenheit', value: 'F' }
+        ]
+      }
+    ]
+  },
+  {
+    type: 'submit',
+    defaultValue: 'Save'
+  }
+];
+
 export const setupClay = () => {
   // @ts-ignore
   const Clay: ClayConstructor = require('@rebble/clay');
-  // @ts-ignore
-  const buildClayConfig: () => any[] = require("../ts-build/config");
-  new Clay(buildClayConfig());
+  new Clay(config);
 };
