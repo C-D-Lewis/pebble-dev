@@ -1,10 +1,9 @@
 import {
   STATUS_EMPTY,
   STATUS_CHARGED,
-  STATUS_NO_CHANGE,
   SECONDS_PER_DAY,
   MIN_CHARGE_AMOUNT,
-  SECONDS_PER_HOUR,
+  MAX_GAP_SECONDS,
 } from './constants';
 import { HistoryItem } from './types';
 
@@ -20,6 +19,9 @@ export const calculateDischargeRate = (history: HistoryItem[]): number => {
     const { chargeDiff, timeDiff, result } = p;
 
     if ([STATUS_EMPTY, STATUS_CHARGED].includes(result)) return;
+
+    // If too large a gap, skip this sample
+    if (timeDiff > MAX_GAP_SECONDS) return;
 
     timeDiffSum += timeDiff;
     chargeDiffSum += chargeDiff;

@@ -19,6 +19,8 @@ export const SECONDS_PER_DAY = SECONDS_PER_HOUR * 24;
 
 /** Minimum charge amount to count */
 export const MIN_CHARGE_AMOUNT = 20;
+/** Max gap in samples */
+export const MAX_GAP_SECONDS = 12 * SECONDS_PER_HOUR; // 12 hours
 
 /** Whether to use test data */
 export const TEST_SAMPLE_DATA = false;

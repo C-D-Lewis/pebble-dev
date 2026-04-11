@@ -107,21 +107,28 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
       persist_data->last_sample_time = ts_now;
     }
 
-    if (discharge_perc < 0) {
-      // Charged up
-      // Can't combine with the 'if' above due to the 'else' otherwise being taken
-      if (!battery_bumped) {
-        // Recently charged by user a significant amount
-        result = STATUS_CHARGED;
-        persist_data->last_charge_time = ts_now;
-      }
-    } else if (discharge_perc == 0) {
-      // No change since last sample - probably on full-charge or very low drain
-      result = STATUS_NO_CHANGE;
+    // Too long since last sample, don't record a result
+    if (time_diff_s > MAX_GAP_SECONDS) {
+      // APP_LOG(APP_LOG_LEVEL_INFO, "Too long since last sample, skipping");
+      result = STATUS_EMPTY;
     } else {
-      // Calculate new daily discharge rate estimate!
-      result = (discharge_perc * SECONDS_PER_DAY) / time_diff_s;
-      // APP_LOG(APP_LOG_LEVEL_INFO, "estimate: %d", result);
+      // Close enough to last sample, calculate result as normal
+      if (discharge_perc < 0) {
+        // Charged up
+        // Can't combine with the 'if' above due to the 'else' otherwise being taken
+        if (!battery_bumped) {
+          // Recently charged by user a significant amount
+          result = STATUS_CHARGED;
+          persist_data->last_charge_time = ts_now;
+        }
+      } else if (discharge_perc == 0) {
+        // No change since last sample - probably on full-charge or very low drain
+        result = STATUS_NO_CHANGE;
+      } else {
+        // Calculate new daily discharge rate estimate!
+        result = (discharge_perc * SECONDS_PER_DAY) / time_diff_s;
+        // APP_LOG(APP_LOG_LEVEL_INFO, "estimate: %d", result);
+      }
     }
 
     if (result != STATUS_EMPTY) {

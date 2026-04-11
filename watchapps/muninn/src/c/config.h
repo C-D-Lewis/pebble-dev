@@ -30,8 +30,10 @@
 #define EVEVATED_RATE_MULT 3
 // Minimum negative charge_diff to count as charging
 #define MIN_CHARGE_AMOUNT 10
-/** Maximum synced items - 120 days / 4 months (must match constants.ts) */
+// Maximum synced items - 120 days / 4 months (must match constants.ts)
 #define MAX_SYNC_ITEMS 480
+// Max time since last sample before being ignored
+#define MAX_GAP_SECONDS (12 * SECONDS_PER_HOUR)
 
 ///////////// Testing area ////////////////
 //                                       //
