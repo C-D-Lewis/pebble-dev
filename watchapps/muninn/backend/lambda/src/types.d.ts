@@ -59,13 +59,24 @@ export type GetHistoryResponse = {
   updatedAt: number;
 } & WatchData;
 
-export type GlobalStatItem = {
+type StatItem = {
   groupName: string;
   names: string[];
+  count: number;
+  minBatteryLife: number;
+  maxBatteryLife: number;
+  batteryLifeRange: number;
+};
+
+export type AggregateItem = StatItem & {
+  totalBatteryLife: number;
+  totalRate: number;
+};
+
+export type GlobalStatItem = StatItem & {
   avgBatteryLife: number;
   avgRate: number;
-  count: number;
-}
+};
 
 export type GetGlobalStatsResponse = {
   historyCount: number;

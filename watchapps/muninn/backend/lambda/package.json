@@ -11,6 +11,7 @@
   "keywords": [],
   "author": "C-D-Lewis",
   "devDependencies": {
+    "@aws-sdk/util-dynamodb": "^3.996.2",
     "@types/aws-lambda": "^8.10.161",
     "@types/node": "^25.5.0",
     "c8": "^11.0.0",

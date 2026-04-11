@@ -1,16 +1,8 @@
 import { GetCommand, PutCommand, type DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
 import { ScanCommand } from '@aws-sdk/lib-dynamodb';
 import { AGGREGATION_DOC_ID, HISTORY_TABLE_NAME, METADATA_TABLE_NAME } from './constants.ts';
-import type { DbDocument, GlobalStatItem, MetadataDocument } from './types.js';
+import type { AggregateItem, DbDocument, GlobalStatItem, MetadataDocument } from './types.js';
 import { sortByName } from './util.ts';
-
-type AggregateItem = {
-  groupName: string;
-  names: string[];
-  totalBatteryLife: number;
-  totalRate: number;
-  count: number;
-};
 
 /**
  * Get battery life for a row - using all-time rate.
@@ -22,6 +14,7 @@ const getBatteryLife = (row: DbDocument) => {
   const rate = row.stats?.allTimeRate;
   if (!rate || rate === 0) return 0; 
 
+  // Don't round here to preserve accuracy at the end
   return 100 / rate;
 };
 
@@ -56,23 +49,34 @@ export const aggregateAllByKey = (rows: DbDocument[], key: keyof DbDocument): Gl
   for (const row of rows) {
     const name = (row[key] ?? '').toString().trim() || 'Unknown';
     const groupName = name.includes('pebble_') ? getGroupName(name) : name;
+    const batteryLife = getBatteryLife(row);
+    if (batteryLife === 0) continue; // Skip entries with no rate
 
-    // Have we already seen this value of the key?
     if (!buckets[groupName]) {
       // This is a new one
       buckets[groupName] = {
         groupName,
         names: [name],
-        totalBatteryLife: getBatteryLife(row) || 0,
+        totalBatteryLife: batteryLife || 0,
         totalRate: row.stats?.allTimeRate || 0,
-        count: 1
+        count: 1,
+        minBatteryLife: batteryLife || 0,
+        maxBatteryLife: batteryLife || 0,
+        batteryLifeRange: 0,
       };
     } else {
       // Update current aggregate
       const b = buckets[groupName];
-      b.totalBatteryLife += getBatteryLife(row) || 0;
+      b.totalBatteryLife += batteryLife || 0;
       b.totalRate += row.stats?.allTimeRate || 0;
       b.count++;
+      if (batteryLife < b.minBatteryLife) {
+        b.minBatteryLife = batteryLife;
+      }
+      if (batteryLife > b.maxBatteryLife) {
+        b.maxBatteryLife = batteryLife;
+      }
+      b.batteryLifeRange = b.maxBatteryLife - b.minBatteryLife;
       if (!b.names.includes(name)) b.names.push(name);
     }
   }
@@ -89,9 +93,41 @@ export const aggregateAllByKey = (rows: DbDocument[], key: keyof DbDocument): Gl
         names: b.names,
         count: b.count,
         avgBatteryLife,
-        avgRate
+        avgRate,
+        minBatteryLife: Math.round(b.minBatteryLife),
+        maxBatteryLife: Math.round(b.maxBatteryLife),
+        batteryLifeRange: Math.round(b.batteryLifeRange),
       };
     });
+};
+
+/**
+ * Core aggregation function.
+ *
+ * @param {DbDocument[]} allRows - All DB rows, representing all watches.
+ * @returns {MetadataDocument} Document to save with aggregations results.
+ */
+export const performAggregations = (allRows: DbDocument[]): MetadataDocument => {
+  // Filter out some rows (i.e: test data)
+  const ignores = ['qemu', 'TEST', 'test'];
+  const rows = allRows.filter((p) => {
+    return !(ignores.some((q) => p.model.includes(q) || p.platform.includes(q)))
+  });
+
+  const models: GlobalStatItem[] = aggregateAllByKey(rows, 'model');
+  const platforms: GlobalStatItem[] = aggregateAllByKey(rows, 'platform');
+  // top IDs?
+  // firmwares? Less meaningful without model/platform context
+
+  // Save all
+  const doc: MetadataDocument = {
+    id: AGGREGATION_DOC_ID,
+    historyCount: rows.length,
+    models: models.sort(sortByName),
+    platforms: platforms.sort(sortByName),
+    updatedAt: Date.now(),
+  };
+  return doc;
 };
 
 /**
@@ -122,26 +158,8 @@ export const updateAggregations = async (docClient: DynamoDBDocumentClient) => {
   console.log(`Scanned ${res.Items?.length} items`);
 
   const allRows: DbDocument[] = res.Items as unknown as DbDocument[];
+  const doc = performAggregations(allRows);
 
-  // Filter out some rows (i.e: test data)
-  const ignores = ['qemu', 'TEST', 'test'];
-  const rows = allRows.filter((p) => {
-    return !(ignores.some((q) => p.model.includes(q) || p.platform.includes(q)))
-  });
-
-  const models: GlobalStatItem[] = aggregateAllByKey(rows, 'model');
-  const platforms: GlobalStatItem[] = aggregateAllByKey(rows, 'platform');
-  // top IDs?
-  // firmwares? Less meaningful without model/platform context
-
-  // Save all
-  const doc: MetadataDocument = {
-    id: AGGREGATION_DOC_ID,
-    historyCount: rows.length,
-    models: models.sort(sortByName),
-    platforms: platforms.sort(sortByName),
-    updatedAt: Date.now(),
-  };
   await docClient.send(
     new PutCommand({ TableName: METADATA_TABLE_NAME, Item: doc }),
   );
