@@ -63,9 +63,11 @@ type StatItem = {
   groupName: string;
   names: string[];
   count: number;
+  
   minBatteryLife: number;
   maxBatteryLife: number;
   batteryLifeRange: number;
+  values: number[];
 };
 
 export type AggregateItem = StatItem & {
@@ -76,6 +78,8 @@ export type AggregateItem = StatItem & {
 export type GlobalStatItem = StatItem & {
   avgBatteryLife: number;
   avgRate: number;
+
+  medianBatteryLife: number;
 };
 
 export type GetGlobalStatsResponse = {
