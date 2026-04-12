@@ -1,4 +1,7 @@
 {
   "extends": "pkts/config/tsconfig.json",
-  "include": ["src/ts/**/*", "node_modules/pkts/lib/**/*"]
+  "include": ["src/ts/**/*", "node_modules/pkts/lib/**/*"],
+  "compilerOptions": {
+    "ignoreDeprecations": "6.0"
+  }
 }

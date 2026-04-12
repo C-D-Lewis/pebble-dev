@@ -1,7 +1,7 @@
 {
   "name": "muninn",
   "author": "Chris Lewis",
-  "version": "1.29.0",
+  "version": "1.30.0",
   "_note": "Checklist in config.h!",
   "private": true,
   "keywords": [
