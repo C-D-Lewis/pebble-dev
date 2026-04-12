@@ -265,12 +265,14 @@ describe('Unit tests', () => {
           count: 2,
           avgBatteryLife: 10,
           avgRate: 10,
+          medianBatteryLife: 10,
         }, {
           groupName: 'Pebble Time Steel',
           names: ['pebble_time_steel_silver'],
           count: 2,
           avgBatteryLife: 4,
           avgRate: 30,
+          medianBatteryLife: 5,
         }];
         
         expect(res).to.deep.equal(expected);
@@ -307,42 +309,49 @@ describe('Unit tests', () => {
           count: 1,
           groupName: 'Pebble 2 Duo',
           names: ['pebble_2_duo_black'],
+          medianBatteryLife: 10,
         }, {
           avgBatteryLife: 10,
           avgRate: 10,
           count: 1,
           groupName: 'Pebble 2 HR',
           names: ['pebble_2_hr_charcoal_red'],
+          medianBatteryLife: 10,
         }, {
           avgBatteryLife: 10,
           avgRate: 10,
           count: 1,
           groupName: 'Pebble 2',
           names: ['pebble_2_se_black_charcoal'],
+          medianBatteryLife: 10,
         }, {
           avgBatteryLife: 10,
           avgRate: 10,
           count: 1,
           groupName: 'Pebble Time',
           names: ['pebble_time_red'],
+          medianBatteryLife: 10,
         }, {
           avgBatteryLife: 10,
           avgRate: 10,
           count: 1,
           groupName: 'Pebble Time 2',
           names: ['pebble_time_2_black_gray'],
+          medianBatteryLife: 10,
         }, {
           avgBatteryLife: 3,
           avgRate: 40,
           count: 1,
           groupName: 'Pebble Time Round',
           names: ['pebble_time_round_silver_20'],
+          medianBatteryLife: 3,
         }, {
           avgBatteryLife: 5,
           avgRate: 20,
           count: 1,
           groupName: 'Pebble Time Steel',
           names: ['pebble_time_steel_silver'],
+          medianBatteryLife: 5,
         }];
         
         expect(res).to.deep.equal(expected);
@@ -372,6 +381,7 @@ describe('Unit tests', () => {
             count: 1,
             avgBatteryLife: 10,
             avgRate: 10,
+            medianBatteryLife: 10,
           },
           {
             groupName: 'emery',
@@ -379,6 +389,7 @@ describe('Unit tests', () => {
             count: 2,
             avgBatteryLife: 4,
             avgRate: 30,
+            medianBatteryLife: 5,
           },
         ];
         

@@ -47,7 +47,8 @@ export const GlobalStatsTable = (
     .setChildren([
       TableHeader({ textAlign: 'left' }).setText('Name'),
       TableHeader({ textAlign: 'center' }).setText('#'),
-      TableHeader({ textAlign: 'center' }).setText('Avg. Battery'),
+      // TableHeader({ textAlign: 'center' }).setText('Avg. Battery'),
+      TableHeader({ textAlign: 'center' }).setText('Median Battery'),
       TableHeader({ textAlign: 'center' }).setText('Avg. Rate'),
     ]);
 
@@ -62,7 +63,8 @@ export const GlobalStatsTable = (
           .setChildren([
             TableCell({ textAlign: 'left' }).setText(item.groupName),
             TableCell({ textAlign: 'center' }).setText(String(item.count)),
-            TableCell({ textAlign: 'center' }).setText(`${item.avgBatteryLife} days`),
+            // TableCell({ textAlign: 'center' }).setText(`${item.avgBatteryLife} days`),
+            TableCell({ textAlign: 'center' }).setText(`${item.medianBatteryLife} days`),
             TableCell({ textAlign: 'center' }).setText(`${item.avgRate}%`),
           ])),
       );

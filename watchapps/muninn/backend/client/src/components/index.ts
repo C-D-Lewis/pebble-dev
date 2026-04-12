@@ -316,7 +316,9 @@ export const StatsList = () => fabricate('Column')
     let compareDaysStr = '-';
     let compareRateStr = '-';
     if (modelStats) {
-      const diffDays = batteryDays - modelStats.avgBatteryLife;
+      // TODO: Clean this up
+      // const diffDays = batteryDays - modelStats.avgBatteryLife;
+      const diffDays = batteryDays - modelStats.medianBatteryLife;
       let operator = diffDays >= 0 ? 'above' : 'below';
       compareDaysStr = `${Math.abs(diffDays)} ${operator} average for this model`;
 

@@ -97,6 +97,9 @@ export const aggregateAllByKey = (rows: DbDocument[], key: keyof DbDocument): Gl
         b.values.reduce((acc, v) => acc + Math.pow(v - avgBatteryLife, 2), 0) / b.count
       );
       const finalValues = sortedValues.filter(v => Math.abs(v - avgBatteryLife) <= 2 * stdDev);
+    
+      // Median as alternative to average, less affected by outliers
+      const medianBatteryLife = finalValues.length ? finalValues[Math.floor(finalValues.length / 2)] || 0  : 0;
 
       return {
         groupName: b.groupName,
@@ -104,7 +107,7 @@ export const aggregateAllByKey = (rows: DbDocument[], key: keyof DbDocument): Gl
         count: b.count,
         avgBatteryLife,
         avgRate,
-        medianBatteryLife: finalValues.length ? finalValues[Math.floor(finalValues.length / 2)] || 0  : 0,
+        medianBatteryLife,
 
         // Not yet used in UI, just for testing in localAggregations.mjs
         minBatteryLife: Math.round(b.minBatteryLife),

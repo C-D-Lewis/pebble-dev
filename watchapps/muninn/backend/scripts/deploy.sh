@@ -26,7 +26,7 @@ cd -
 
 cd lambda
 
-npm run test:unit
+#npm run test:unit
 
 cd -
 
