@@ -11,6 +11,8 @@ typedef enum {
 typedef struct {
   int current_temp;
   int current_code;
+  char sunrise[8];
+  char sunset[8];
   char temp_arr[STR_ARR_SIZE];
   char precip_arr[STR_ARR_SIZE];
   char code_arr[STR_ARR_SIZE];

@@ -63,6 +63,8 @@
     "messageKeys": [
       "CURRENT_TEMP",
       "CURRENT_CODE",
+      "SUNRISE",
+      "SUNSET",
       "TEMP_ARR",
       "PRECIP_ARR",
       "CODE_ARR",

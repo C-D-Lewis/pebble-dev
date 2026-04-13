@@ -11,11 +11,22 @@ static void inbox_received_handler(DictionaryIterator *iter, void *context) {
   if (packet_contains_key(iter, MESSAGE_KEY_CURRENT_CODE)) {
     app_state->current_code = packet_get_integer(iter, MESSAGE_KEY_CURRENT_CODE);
   }
+  if (packet_contains_key(iter, MESSAGE_KEY_SUNRISE)) {
+    snprintf(app_state->sunrise, sizeof(app_state->sunrise), "%s", packet_get_string(iter, MESSAGE_KEY_SUNRISE));
+  }
+  if (packet_contains_key(iter, MESSAGE_KEY_SUNSET)) {
+    snprintf(app_state->sunset, sizeof(app_state->sunset), "%s", packet_get_string(iter, MESSAGE_KEY_SUNSET));
+  }
   if (packet_contains_key(iter, MESSAGE_KEY_TEMP_ARR)) {
     snprintf(app_state->temp_arr, sizeof(app_state->temp_arr), "%s", packet_get_string(iter, MESSAGE_KEY_TEMP_ARR));
   }
   if (packet_contains_key(iter, MESSAGE_KEY_PRECIP_ARR)) {
-    snprintf(app_state->precip_arr, sizeof(app_state->precip_arr), "%s", packet_get_string(iter, MESSAGE_KEY_PRECIP_ARR));
+    snprintf(
+      app_state->precip_arr,
+      sizeof(app_state->precip_arr),
+      "%s",
+      packet_get_string(iter, MESSAGE_KEY_PRECIP_ARR)
+    );
   }
   if (packet_contains_key(iter, MESSAGE_KEY_CODE_ARR)) {
     snprintf(app_state->code_arr, sizeof(app_state->code_arr), "%s", packet_get_string(iter, MESSAGE_KEY_CODE_ARR));
@@ -23,7 +34,12 @@ static void inbox_received_handler(DictionaryIterator *iter, void *context) {
 
   // Config
   if (packet_contains_key(iter, MESSAGE_KEY_CONFIG_TEMP_UNIT)) {
-    snprintf(persist_data->temp_unit, sizeof(persist_data->temp_unit), "%s", packet_get_string(iter, MESSAGE_KEY_CONFIG_TEMP_UNIT));
+    snprintf(
+      persist_data->temp_unit,
+      sizeof(persist_data->temp_unit),
+      "%s",
+      packet_get_string(iter, MESSAGE_KEY_CONFIG_TEMP_UNIT)
+    );
   }
 
   // Other

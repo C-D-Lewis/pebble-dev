@@ -34,6 +34,25 @@ static void draw_hour_chunk(GContext *ctx, GRect bounds, int hour, int inset) {
   );
 }
 
+static void draw_outer_time_marker(GContext *ctx, GRect bounds, char* str, GColor color) {
+  if (strlen(str) == 0) return;
+
+  const char h_arr[3] = {str[0], str[1], '\0'};
+  const char m_arr[3] = {str[3], str[4], '\0'};
+  const int hour = atoi(h_arr);
+  const int mins = atoi(m_arr);
+  const int angle = ((hour * 60) + mins) * TRIG_MAX_ANGLE / MINUTES_PER_DAY;
+  graphics_context_set_fill_color(ctx, color);
+  graphics_fill_radial(
+    ctx,
+    bounds,
+    GOvalScaleModeFitCircle,
+    OUTER_RING_INSET,
+    angle - 200,
+    angle + 200
+  );
+}
+
 static void canvas_update_proc(Layer *layer, GContext *ctx) {
   AppState *app_state = data_get_app_state();
   PersistData *persist_data = data_get_persist_data();
@@ -117,6 +136,11 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     0,
     TRIG_MAX_ANGLE
   );
+  graphics_context_set_antialiased(ctx, true);
+
+  // Markers for sunrise/sunset
+  draw_outer_time_marker(ctx, bounds, app_state->sunrise, GColorFolly);
+  draw_outer_time_marker(ctx, bounds, app_state->sunset, GColorYellow);
 
   // Line from center to inner arc for day progress
   const int line_length = half_w - INNER_RING_INSET + 1;
@@ -124,6 +148,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   const int line_end_y = half_h - (line_length * cos_lookup(s_day_prog_angle)) / TRIG_MAX_RATIO;
   graphics_context_set_stroke_color(ctx, GColorDarkGray);
   graphics_context_set_stroke_width(ctx, INNER_RING_W);
+  graphics_context_set_antialiased(ctx, false);
   graphics_draw_line(ctx, GPoint(half_w, half_h), GPoint(line_end_x, line_end_y));
   graphics_draw_arc(
     ctx,
@@ -249,9 +274,6 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
 
 /******************************************* Animations *******************************************/
 
-/**
- * Update during intro animation.
- */
  static void intro_animation_update(Animation *animation, const AnimationProgress progress) {
   s_anim_progress = ((int)progress * 100) / ANIMATION_NORMALIZED_MAX;
   s_anim_prog_angle = (TRIG_MAX_ANGLE * s_anim_progress) / 100;
@@ -259,9 +281,6 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   layer_mark_dirty(s_canvas_layer);
 }
 
-/**
- * Start the intro animation.
- */
 static void start_intro_animation() {
   s_anim_prog_angle = 0;
   s_anim_progress = 0;
@@ -294,9 +313,6 @@ static void accel_tap_handler(AccelAxisType axis, int32_t direction) {
 }
 
 static void tick_handler(struct tm *tick_time, TimeUnits changed) {
-  // Seeing multiple ticks with MINUTE_UNIT...
-  // APP_LOG(APP_LOG_LEVEL_DEBUG, "Tick! %d", tick_time->tm_sec);
-
   time_t now = time(NULL);
   if (tick_time->tm_min == 0 && (now - s_last_update_time) >= MIN_WEATHER_INTERVAL_S) {
     comm_request_weather();

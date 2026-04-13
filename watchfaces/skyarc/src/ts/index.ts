@@ -43,6 +43,7 @@ const fetchWeatherForecast = async (lat: number, lon: number ): Promise<WeatherA
     longitude: lon,
     hourly: 'temperature_2m,weather_code,precipitation_probability',
     current: 'temperature_2m,weather_code',
+    daily: 'sunrise,sunset',
     forecast_days: 1,
     temperature_unit: 'celsius',
     timezone: 'auto',
@@ -70,6 +71,11 @@ const getLocation = async () => new Promise((resolve, reject) => {
 });
 
 /**
+ * Get the time portion of ISO datetime.
+ */
+const getTime = (str: string) => str.split('T')[1];
+
+/**
  * Get location and weather, and send to watch.
  */
 const sendWeather = async () => {
@@ -78,7 +84,7 @@ const sendWeather = async () => {
     const { latitude, longitude } = pos.coords;
     console.log(`Got location: ${latitude}, ${longitude}`);
 
-    const { current, hourly } = await fetchWeatherForecast(latitude, longitude);
+    const { current, hourly, daily } = await fetchWeatherForecast(latitude, longitude);
     const { temperature_2m: currentTemp, weather_code: currentCode } = current;
     const {
       time,
@@ -86,10 +92,14 @@ const sendWeather = async () => {
       weather_code: hourlyCodes,
       precipitation_probability: hourlyPrecip,
     } = hourly;
+    const { sunrise, sunset } = daily;
     console.log(`Time range: ${time[0]} - ${time[time.length - 1]}`);
 
     const tempArr = TEST_MODE ? TEST_TEMP_ARR : hourlyTemps;
     const precipArr = TEST_MODE ? TEST_PRECIP_ARR : hourlyPrecip;
+
+    const sunriseTime = getTime(sunrise[0]);
+    const sunsetTime = getTime(sunset[0]);
 
     /**
      * Arrays are two chars per item, 24 items:
@@ -98,6 +108,8 @@ const sendWeather = async () => {
     const dict = {
       CURRENT_TEMP: Math.round(currentTemp),
       CURRENT_CODE: currentCode,
+      SUNRISE: sunriseTime,
+      SUNSET: sunsetTime,
       TEMP_ARR: tempArr.map(encodeSignedNumber).join(''),
       PRECIP_ARR: precipArr.map(zeroPad).join(''),
       CODE_ARR: hourlyCodes.map(zeroPad).join(''),
