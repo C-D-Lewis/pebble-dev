@@ -48,8 +48,8 @@ static void draw_outer_time_marker(GContext *ctx, GRect bounds, char* str, GColo
     bounds,
     GOvalScaleModeFitCircle,
     OUTER_RING_INSET,
-    angle - 200,
-    angle + 200
+    angle - 300,
+    angle + 300
   );
 }
 
@@ -140,7 +140,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
 
   // Markers for sunrise/sunset
   draw_outer_time_marker(ctx, bounds, app_state->sunrise, GColorFolly);
-  draw_outer_time_marker(ctx, bounds, app_state->sunset, GColorYellow);
+  draw_outer_time_marker(ctx, bounds, app_state->sunset, GColorChromeYellow);
 
   // Line from center to inner arc for day progress
   const int line_length = half_w - INNER_RING_INSET + 1;
