@@ -11,14 +11,14 @@
   #define OUTER_RING_W 2
   #define OUTER_RING_INSET 12
   #define TEMP_RING_W 8
-  #define INNER_RING_W 1
+  #define INNER_RING_W 2
   #define SEP_H 4
   #define DOT_S 2
 #else
   #define OUTER_RING_W 3
   #define OUTER_RING_INSET 18
   #define TEMP_RING_W 10
-  #define INNER_RING_W 2
+  #define INNER_RING_W 3
   #define SEP_H 5
   #define DOT_S 3
 #endif
