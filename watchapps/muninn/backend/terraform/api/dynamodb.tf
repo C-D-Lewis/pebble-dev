@@ -6,6 +6,11 @@ resource "aws_dynamodb_table" "ids_table" {
   hash_key                    = "id"
   deletion_protection_enabled = var.deletion_protection
 
+  point_in_time_recovery {
+    enabled = true
+    recovery_period_in_days = 14
+  }
+
   attribute {
     name = "id"
     type = "S"
@@ -37,6 +42,11 @@ resource "aws_dynamodb_table" "history_table" {
   hash_key                    = "id"
   deletion_protection_enabled = var.deletion_protection
 
+  point_in_time_recovery {
+    enabled = true
+    recovery_period_in_days = 14
+  }
+
   attribute {
     name = "id"
     type = "S"
@@ -50,6 +60,11 @@ resource "aws_dynamodb_table" "metadata" {
   write_capacity              = 5
   hash_key                    = "id"
   deletion_protection_enabled = var.deletion_protection
+
+  point_in_time_recovery {
+    enabled = true
+    recovery_period_in_days = 14
+  }
 
   attribute {
     name = "id"

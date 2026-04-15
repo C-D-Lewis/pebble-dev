@@ -9,12 +9,17 @@ void data_init() {
   // Default state always
   s_app_state.current_code = DATA_EMPTY;
 
-  if (!persist_exists(SK_PersistData)) {
-    // Default persist data
-    snprintf(s_persist_data.temp_unit, sizeof(s_persist_data.temp_unit), "%s", "C");
-  } else {
-    // Read persist struct
+  // Read existing data if it exists
+  if (persist_exists(SK_PersistData)) {
     persist_read_data(SK_PersistData, &s_persist_data, sizeof(PersistData));
+  }
+
+  // If unset
+  if (strlen(s_persist_data.wind_unit) == 0) {
+    snprintf(s_persist_data.wind_unit, sizeof(s_persist_data.wind_unit), "%s", WIND_UNIT_MPH);
+  }
+  if (strlen(s_persist_data.temp_unit) == 0) {
+    snprintf(s_persist_data.temp_unit, sizeof(s_persist_data.temp_unit), "%s", TEMP_UNIT_C);
   }
 }
 
@@ -30,6 +35,14 @@ AppState* data_get_app_state() {
 
 PersistData* data_get_persist_data() {
   return &s_persist_data;
+}
+
+int data_get_min_temp() {
+  return s_min_temp;
+}
+
+int data_get_max_temp() {
+  return s_max_temp;
 }
 
 /********************************** Methods ***********************************/

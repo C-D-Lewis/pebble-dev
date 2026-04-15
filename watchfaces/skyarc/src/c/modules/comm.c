@@ -11,6 +11,12 @@ static void inbox_received_handler(DictionaryIterator *iter, void *context) {
   if (packet_contains_key(iter, MESSAGE_KEY_CURRENT_CODE)) {
     app_state->current_code = packet_get_integer(iter, MESSAGE_KEY_CURRENT_CODE);
   }
+  if (packet_contains_key(iter, MESSAGE_KEY_CURRENT_HUMIDITY)) {
+    app_state->current_humidity_perc = packet_get_integer(iter, MESSAGE_KEY_CURRENT_HUMIDITY);
+  }
+  if (packet_contains_key(iter, MESSAGE_KEY_CURRENT_WIND)) {
+    app_state->current_wind_kmh = packet_get_integer(iter, MESSAGE_KEY_CURRENT_WIND);
+  }
   if (packet_contains_key(iter, MESSAGE_KEY_SUNRISE)) {
     snprintf(app_state->sunrise, sizeof(app_state->sunrise), "%s", packet_get_string(iter, MESSAGE_KEY_SUNRISE));
   }
@@ -39,6 +45,14 @@ static void inbox_received_handler(DictionaryIterator *iter, void *context) {
       sizeof(persist_data->temp_unit),
       "%s",
       packet_get_string(iter, MESSAGE_KEY_CONFIG_TEMP_UNIT)
+    );
+  }
+  if (packet_contains_key(iter, MESSAGE_KEY_CONFIG_WIND_UNIT)) {
+    snprintf(
+      persist_data->wind_unit,
+      sizeof(persist_data->wind_unit),
+      "%s",
+      packet_get_string(iter, MESSAGE_KEY_CONFIG_WIND_UNIT)
     );
   }
 

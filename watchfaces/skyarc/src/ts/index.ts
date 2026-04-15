@@ -7,8 +7,8 @@ const SIGNED_OFFSET = 50;
 /** Disable before release! */
 const TEST_MODE = false;
 
-/** Sample temperate temperatures, low -2, high 12 */
-const TEST_TEMP_ARR = [4, 3, 2, 1, 0, -1, -2, 0, 2, 4, 6, 8, 10, 12, 11, 9, 7, 5, 4, 3, 2, 1, 0, -1];
+/** Sample temperate temperatures */
+const TEST_TEMP_ARR = [4, 3, 3, 3, 5, 7, 8, 5, 5, 6, 8, 13, 15, 15, 14, 13, 7, 7, 8, 7, 7, 7, 5, 5];
 /** Sample precipitation data */
 const TEST_PRECIP_ARR = [0, 0, 0, 0, 0, 0, 50, 60, 60, 30, 20, 0, 0, 0, 0, 40, 80, 99, 99, 50, 0, 0, 0, 0];
 /** Test position */
@@ -42,7 +42,7 @@ const fetchWeatherForecast = async (lat: number, lon: number ): Promise<WeatherA
     latitude: lat,
     longitude: lon,
     hourly: 'temperature_2m,weather_code,precipitation_probability',
-    current: 'temperature_2m,weather_code',
+    current: 'temperature_2m,weather_code,relative_humidity_2m,wind_speed_10m',
     daily: 'sunrise,sunset',
     forecast_days: 1,
     temperature_unit: 'celsius',
@@ -66,7 +66,7 @@ const getLocation = async () => new Promise((resolve, reject) => {
   navigator.geolocation.getCurrentPosition(
     resolve,
     reject,
-    { timeout: 5000, maximumAge: 60000, enableHighAccuracy: false },
+    { timeout: 5000, maximumAge: 60000 },
   );
 });
 
@@ -85,7 +85,12 @@ const sendWeather = async () => {
     console.log(`Got location: ${latitude}, ${longitude}`);
 
     const { current, hourly, daily } = await fetchWeatherForecast(latitude, longitude);
-    const { temperature_2m: currentTemp, weather_code: currentCode } = current;
+    const {
+      temperature_2m: currentTemp,
+      weather_code: currentCode,
+      relative_humidity_2m: currentHumidity,
+      wind_speed_10m: currentWindSpeed,
+    } = current;
     const {
       time,
       temperature_2m: hourlyTemps,
@@ -110,6 +115,8 @@ const sendWeather = async () => {
       CURRENT_CODE: currentCode,
       SUNRISE: sunriseTime,
       SUNSET: sunsetTime,
+      CURRENT_HUMIDITY: currentHumidity,
+      CURRENT_WIND: currentWindSpeed,
       TEMP_ARR: tempArr.map(encodeSignedNumber).join(''),
       PRECIP_ARR: precipArr.map(zeroPad).join(''),
       CODE_ARR: hourlyCodes.map(zeroPad).join(''),

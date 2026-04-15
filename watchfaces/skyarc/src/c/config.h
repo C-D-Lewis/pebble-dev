@@ -14,6 +14,7 @@
   #define INNER_RING_W 2
   #define SEP_H 4
   #define DOT_S 2
+  #define ICON_SIZE 24
 #else
   #define OUTER_RING_W 3
   #define OUTER_RING_INSET 18
@@ -21,6 +22,7 @@
   #define INNER_RING_W 3
   #define SEP_H 5
   #define DOT_S 3
+  #define ICON_SIZE 28
 #endif
 
 #define OUTER_SEP_W 2
@@ -36,3 +38,7 @@
 #define MIN_WEATHER_INTERVAL_S (60 * 60 - 5)
 
 #define DATA_EMPTY -1000
+#define TEMP_UNIT_C "C"
+#define TEMP_UNIT_F "F"
+#define WIND_UNIT_MPH "MPH"
+#define WIND_UNIT_KPH "KPH"

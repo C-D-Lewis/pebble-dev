@@ -4,6 +4,7 @@ static Window *s_window;
 static Layer *s_canvas_layer;
 
 static AppTimer *s_tap_timer;
+static GBitmap *s_temp_bitmap, *s_wind_bitmap, *s_humidity_bitmap;
 static int s_anim_progress, s_day_prog_angle, s_anim_prog_angle;
 static time_t s_last_update_time;
 static bool s_tapped = false;
@@ -16,6 +17,20 @@ static GPoint make_hand_point(int quantity, int intervals, int len, GPoint cente
     .x = (int16_t)(sin_lookup(angle) * (int32_t)len / TRIG_MAX_RATIO) + center.x,
     .y = (int16_t)(-cos_lookup(angle) * (int32_t)len / TRIG_MAX_RATIO) + center.y,
   };
+}
+
+static int convert_temp(PersistData *persist_data, int val_c) {
+  if (strcmp(persist_data->temp_unit, "F") == 0) {
+    return (val_c * 9 / 5) + 32;
+  }
+  return val_c;
+}
+
+static int convert_wind_speed(PersistData *persist_data, int val_kph) {
+  if (strcmp(persist_data->wind_unit, WIND_UNIT_MPH) == 0) {
+    return (val_kph * 1000) / 1609;
+  }
+  return val_kph;
 }
 
 static void draw_hour_chunk(GContext *ctx, GRect bounds, int hour, int inset) {
@@ -53,9 +68,219 @@ static void draw_outer_time_marker(GContext *ctx, GRect bounds, char* str, GColo
   );
 }
 
-static void canvas_update_proc(Layer *layer, GContext *ctx) {
+static void draw_time_display(GContext *ctx, GRect bounds, struct tm *t) {
   AppState *app_state = data_get_app_state();
   PersistData *persist_data = data_get_persist_data();
+
+  const int half_w = bounds.size.w / 2;
+
+  // Time
+  static char time_buff[6];
+  strftime(time_buff, sizeof(time_buff), "%H:%M", t);
+  const GRect time_bounds = GRect(
+    0,
+    scl_y_pp({.o = 270, .c = 240, .e = 280, .g = 240}),
+    bounds.size.w,
+    100
+  );
+  graphics_context_set_text_color(ctx, GColorDarkGray);
+  graphics_draw_text(
+    ctx,
+    time_buff,
+    scl_get_font(SFI_Time),
+    grect_inset(time_bounds, GEdgeInsets(3, 0, 0, 0)),
+    GTextOverflowModeWordWrap,
+    GTextAlignmentCenter,
+    NULL
+  );
+  graphics_context_set_text_color(ctx, GColorWhite);
+  graphics_draw_text(
+    ctx,
+    time_buff,
+    scl_get_font(SFI_Time),
+    time_bounds,
+    GTextOverflowModeWordWrap,
+    GTextAlignmentCenter,
+    NULL
+  );
+
+  // Separator rect
+  const int sep_y = scl_y_pp({.o = 485, .c = 490, .e = 485, .g = 495});
+  graphics_context_set_fill_color(ctx, GColorDarkGray);
+  graphics_fill_rect(
+    ctx,
+    GRect(bounds.size.w / 4, sep_y, half_w, SEP_H),
+    0,
+    GCornersAll
+  );
+
+  // Battery fills separator rect
+  const BatteryChargeState state = battery_state_service_peek();
+  const bool connected = connection_service_peek_pebble_app_connection();
+  graphics_context_set_fill_color(ctx, connected ? GColorGreen : GColorLightGray);
+  graphics_fill_rect(
+    ctx,
+    GRect(bounds.size.w / 4, sep_y, (half_w * state.charge_percent) / 100, SEP_H),
+    0,
+    GCornersAll
+  );
+
+  // Date
+  static char date_buff[12];
+  strftime(date_buff, sizeof(date_buff), "%d %b %Y", t);
+  const GRect date_bounds = GRect(
+    0,
+    scl_y_pp({.o = 510, .c = 510, .e = 505, .g = 530}),
+    bounds.size.w,
+    50
+  );
+  graphics_context_set_text_color(ctx, GColorWhite);
+  graphics_draw_text(
+    ctx,
+    date_buff,
+    scl_get_font(SFI_Date),
+    date_bounds,
+    GTextOverflowModeWordWrap,
+    GTextAlignmentCenter,
+    NULL
+  );
+
+  // Current conditions
+  static char s_current_buff[16];
+  int current_code = app_state->current_code;
+  if (current_code == WEATHER_ERROR) {
+    snprintf(
+      s_current_buff,
+      sizeof(s_current_buff),
+      "WTHR ERR"
+    );
+  } else if (current_code != DATA_EMPTY) {
+    // Convert temp to current unit
+    const int current_temp = convert_temp(persist_data, app_state->current_temp);
+
+    snprintf(
+      s_current_buff,
+      sizeof(s_current_buff),
+      "%d - %s",
+      current_temp,
+      data_get_weather_str(current_code)
+    );
+  } else {
+    snprintf(
+      s_current_buff,
+      sizeof(s_current_buff),
+      "..."
+    );
+  }
+  graphics_context_set_text_color(ctx, GColorLightGray);
+  graphics_draw_text(
+    ctx,
+    s_current_buff,
+    scl_get_font(SFI_Weather),
+    GRect(0, scl_y_pp({.o = 600, .c = 630, .e = 590, .g = 630}), PS_DISP_W, 28),
+    GTextOverflowModeWordWrap,
+    GTextAlignmentCenter,
+    NULL
+  );
+}
+
+static void draw_weather_display(GContext *ctx, GRect bounds) {
+  PersistData *persist_data = data_get_persist_data();
+  AppState *app_state = data_get_app_state();
+
+  if (app_state->current_code == DATA_EMPTY) return;
+
+  const int text_x = scl_x_pp({.o = 410, .c = 380, .e = 400, .g = 350});
+  const int icon_x = scl_x_pp({.o = 220, .c = 220, .e = 240, .g = 220});
+
+  // Low / high in readable colors
+  graphics_context_set_compositing_mode(ctx, GCompOpSet);
+  graphics_draw_bitmap_in_rect(
+    ctx,
+    s_temp_bitmap,
+    GRect(
+      icon_x,
+      scl_y_pp({.o = 300, .c = 300, .e = 300, .g = 300}),
+      ICON_SIZE,
+      ICON_SIZE
+    )
+  );
+  static char s_low_high_buff[16];
+  snprintf(
+    s_low_high_buff,
+    sizeof(s_low_high_buff),
+    "%d / %d",
+    convert_temp(persist_data, data_get_min_temp()),
+    convert_temp(persist_data, data_get_max_temp())
+  );
+  graphics_context_set_text_color(ctx, GColorWhite);
+  graphics_draw_text(
+    ctx,
+    s_low_high_buff,
+    scl_get_font(SFI_Weather),
+    GRect(text_x, scl_y_pp({.o = 315, .c = 300, .e = 300, .g = 290}), PS_DISP_W, 28),
+    GTextOverflowModeWordWrap,
+    GTextAlignmentLeft,
+    NULL
+  );
+
+  // Wind speed
+  graphics_draw_bitmap_in_rect(
+    ctx,
+    s_wind_bitmap,
+    GRect(
+      icon_x,
+      scl_y_pp({.o = 450, .c = 450, .e = 450, .g = 450}),
+      ICON_SIZE,
+      ICON_SIZE
+    )
+  );
+  static char s_wind_buff[16];
+  const char *wind_unit = strcmp(persist_data->wind_unit, WIND_UNIT_MPH) == 0 ? "mph" : "km/h";
+  snprintf(
+    s_wind_buff,
+    sizeof(s_wind_buff),
+    "%d %s",
+    convert_wind_speed(persist_data, app_state->current_wind_kmh),
+    wind_unit
+  );
+  graphics_draw_text(
+    ctx,
+    s_wind_buff,
+    scl_get_font(SFI_Weather),
+    GRect(text_x, scl_y_pp({.o = 465, .c = 450, .e = 450, .g = 440}), PS_DISP_W, 28),
+    GTextOverflowModeWordWrap,
+    GTextAlignmentLeft,
+    NULL
+  );
+
+  // Humidity
+  graphics_draw_bitmap_in_rect(
+    ctx,
+    s_humidity_bitmap,
+    GRect(
+      icon_x,
+      scl_y_pp({.o = 600, .c = 600, .e = 600, .g = 600}),
+      ICON_SIZE,
+      ICON_SIZE
+    )
+  );
+  static char s_humidity_buff[16];
+  // TODO: Setting for humidity? Although they are equivalent
+  snprintf(s_humidity_buff, sizeof(s_humidity_buff), "%d %%", app_state->current_humidity_perc);
+  graphics_draw_text(
+    ctx,
+    s_humidity_buff,
+    scl_get_font(SFI_Weather),
+    GRect(text_x, scl_y_pp({.o = 615, .c = 600, .e = 600, .g = 590}), PS_DISP_W, 28),
+    GTextOverflowModeWordWrap,
+    GTextAlignmentLeft,
+    NULL
+  );
+}
+
+static void canvas_update_proc(Layer *layer, GContext *ctx) {
+  AppState *app_state = data_get_app_state();
 
   GRect bounds = layer_get_bounds(layer);
   const int half_w = bounds.size.w / 2;
@@ -126,7 +351,6 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   }
 
   // Outer decoration arc
-  graphics_context_set_antialiased(ctx, false);
   graphics_context_set_stroke_color(ctx, s_tapped  ? GColorCobaltBlue : GColorWhite);
   graphics_context_set_stroke_width(ctx, OUTER_RING_W);
   graphics_draw_arc(
@@ -136,140 +360,35 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     0,
     TRIG_MAX_ANGLE
   );
-  graphics_context_set_antialiased(ctx, true);
 
   // Markers for sunrise/sunset
   draw_outer_time_marker(ctx, bounds, app_state->sunrise, GColorFolly);
   draw_outer_time_marker(ctx, bounds, app_state->sunset, GColorChromeYellow);
 
   // Line from center to inner arc for day progress
-  const int line_length = half_w - INNER_RING_INSET + 1;
-  const int line_end_x = half_w + (line_length * sin_lookup(s_day_prog_angle)) / TRIG_MAX_RATIO;
-  const int line_end_y = half_h - (line_length * cos_lookup(s_day_prog_angle)) / TRIG_MAX_RATIO;
-  graphics_context_set_stroke_color(ctx, GColorDarkGray);
-  graphics_context_set_stroke_width(ctx, INNER_RING_W);
-  graphics_context_set_antialiased(ctx, false);
-  graphics_draw_line(ctx, GPoint(half_w, half_h), GPoint(line_end_x, line_end_y));
-  graphics_draw_arc(
-    ctx,
-    grect_inset(bounds, GEdgeInsets(INNER_RING_INSET -1)),
-    GOvalScaleModeFitCircle,
-    0,
-    s_day_prog_angle
-  );
-  graphics_context_set_antialiased(ctx, true);
-
-  // Time
-  static char time_buff[6];
-  strftime(time_buff, sizeof(time_buff), "%H:%M", t);
-  const GRect time_bounds = GRect(
-    0,
-    scl_y_pp({.o = 270, .c = 240, .e = 280, .g = 240}),
-    bounds.size.w,
-    100
-  );
-  graphics_context_set_text_color(ctx, GColorDarkGray);
-  graphics_draw_text(
-    ctx,
-    time_buff,
-    scl_get_font(SFI_Time),
-    grect_inset(time_bounds, GEdgeInsets(3, 0, 0, 0)),
-    GTextOverflowModeWordWrap,
-    GTextAlignmentCenter,
-    NULL
-  );
-  graphics_context_set_text_color(ctx, GColorWhite);
-  graphics_draw_text(
-    ctx,
-    time_buff,
-    scl_get_font(SFI_Time),
-    time_bounds,
-    GTextOverflowModeWordWrap,
-    GTextAlignmentCenter,
-    NULL
-  );
-
-  // Separator rect
-  const int sep_y = scl_y_pp({.o = 485, .c = 500, .e = 490, .g = 495});
-  graphics_context_set_fill_color(ctx, GColorDarkGray);
-  graphics_fill_rect(
-    ctx,
-    GRect(bounds.size.w / 4, sep_y, half_w, SEP_H),
-    0,
-    GCornersAll
-  );
-
-  // Battery fills separator rect
-  const BatteryChargeState state = battery_state_service_peek();
-  const bool connected = connection_service_peek_pebble_app_connection();
-  graphics_context_set_fill_color(ctx, connected ? GColorGreen : GColorLightGray);
-  graphics_fill_rect(
-    ctx,
-    GRect(bounds.size.w / 4, sep_y, (half_w * state.charge_percent) / 100, SEP_H),
-    0,
-    GCornersAll
-  );
-
-  // Date
-  static char date_buff[12];
-  strftime(date_buff, sizeof(date_buff), "%d %b %Y", t);
-  const GRect date_bounds = GRect(
-    0,
-    scl_y_pp({.o = 510, .c = 540, .e = 525, .g = 530}),
-    bounds.size.w,
-    50
-  );
-  graphics_context_set_text_color(ctx, GColorWhite);
-  graphics_draw_text(
-    ctx,
-    date_buff,
-    scl_get_font(SFI_Date),
-    date_bounds,
-    GTextOverflowModeWordWrap,
-    GTextAlignmentCenter,
-    NULL
-  );
-
-  // Current conditions
-  static char s_current_buff[16];
-  int current_code = app_state->current_code;
-  if (current_code == WEATHER_ERROR) {
-    snprintf(
-      s_current_buff,
-      sizeof(s_current_buff),
-      "WTHR ERR"
+  if (!s_tapped) {
+    const int line_length = half_w - INNER_RING_INSET + 1;
+    const int line_end_x = half_w + (line_length * sin_lookup(s_day_prog_angle)) / TRIG_MAX_RATIO;
+    const int line_end_y = half_h - (line_length * cos_lookup(s_day_prog_angle)) / TRIG_MAX_RATIO;
+    graphics_context_set_stroke_color(ctx, GColorDarkGray);
+    graphics_context_set_stroke_width(ctx, INNER_RING_W);
+    graphics_draw_arc(
+      ctx,
+      grect_inset(bounds, GEdgeInsets(INNER_RING_INSET -1)),
+      GOvalScaleModeFitCircle,
+      0,
+      s_day_prog_angle
     );
-  } else if (current_code != DATA_EMPTY) {
-    // Convert temp to current unit
-    int current_temp = app_state->current_temp;
-    if (strcmp(persist_data->temp_unit, "F") == 0) {
-      current_temp = (current_temp * 9 / 5) + 32;
-    }
-
-    snprintf(
-      s_current_buff,
-      sizeof(s_current_buff),
-      "%d - %s",
-      current_temp,
-      data_get_weather_str(current_code)
-    );
-  } else {
-    snprintf(
-      s_current_buff,
-      sizeof(s_current_buff),
-      "..."
-    );
+    graphics_draw_line(ctx, GPoint(half_w, half_h), GPoint(line_end_x, line_end_y));
   }
-  graphics_context_set_text_color(ctx, GColorLightGray);
-  graphics_draw_text(
-    ctx,
-    s_current_buff,
-    scl_get_font(SFI_Weather),
-    GRect(0, scl_y_pp({.o = 610, .c = 640, .e = 610, .g = 650}), PS_DISP_W, 28),
-    GTextOverflowModeWordWrap,
-    GTextAlignmentCenter,
-    NULL
-  );
+
+  // TEST
+  // s_tapped = true;
+  if (!s_tapped) {
+    draw_time_display(ctx, bounds, t);
+  } else {
+    draw_weather_display(ctx, bounds);
+  }
 }
 
 /******************************************* Animations *******************************************/
@@ -333,6 +452,10 @@ static void window_load(Window *window) {
   Layer *window_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(window_layer);
 
+  s_temp_bitmap = gbitmap_create_with_resource(RESOURCE_ID_ICON_TEMP);
+  s_wind_bitmap = gbitmap_create_with_resource(RESOURCE_ID_ICON_WIND);
+  s_humidity_bitmap = gbitmap_create_with_resource(RESOURCE_ID_ICON_HUMIDITY);
+
   s_canvas_layer = layer_create(bounds);
   layer_set_update_proc(s_canvas_layer, canvas_update_proc);
   layer_add_child(window_layer, s_canvas_layer);
@@ -340,6 +463,10 @@ static void window_load(Window *window) {
 
 static void window_unload(Window *window) {
   layer_destroy(s_canvas_layer);
+
+  gbitmap_destroy(s_temp_bitmap);
+  gbitmap_destroy(s_wind_bitmap);
+  gbitmap_destroy(s_humidity_bitmap);
 
   window_destroy(s_window);
   s_window = NULL;

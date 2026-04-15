@@ -13,13 +13,16 @@ typedef struct {
   int current_code;
   char sunrise[8];
   char sunset[8];
+  int current_humidity_perc;
+  int current_wind_kmh;
   char temp_arr[STR_ARR_SIZE];
   char precip_arr[STR_ARR_SIZE];
   char code_arr[STR_ARR_SIZE];
 } AppState;
 
 typedef struct {
-  char temp_unit[4];
+  char temp_unit[4]; // C or F
+  char wind_unit[8]; // MPH or KPH
 } PersistData;
 
 void data_init();
@@ -27,6 +30,8 @@ void data_deinit();
 
 AppState* data_get_app_state();
 PersistData* data_get_persist_data();
+int data_get_min_temp();
+int data_get_max_temp();
 
 GColor data_get_weather_color(int code);
 int data_get_strarr_value(char *arr, int hour);

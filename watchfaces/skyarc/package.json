@@ -21,22 +21,37 @@
           "menuIcon": true
         },
         {
+          "type": "bitmap",
+          "name": "ICON_TEMP",
+          "file": "images/temp_icon.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "ICON_WIND",
+          "file": "images/wind_icon.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "ICON_HUMIDITY",
+          "file": "images/humidity_icon.png"
+        },
+        {
           "type": "font",
           "name": "OXANIUM_14",
           "file": "fonts/Oxanium-Medium.ttf",
-          "characterRegex": "[0-9a-zA-Z .-]"
+          "characterRegex": "[0-9a-zA-Z./% -]"
         },
         {
           "type": "font",
-          "name": "OXANIUM_18",
+          "name": "OXANIUM_19",
           "file": "fonts/Oxanium-Medium.ttf",
-          "characterRegex": "[0-9a-zA-Z .-]"
+          "characterRegex": "[0-9a-zA-Z./% -]"
         },
         {
           "type": "font",
-          "name": "OXANIUM_24",
+          "name": "OXANIUM_25",
           "file": "fonts/Oxanium-Medium.ttf",
-          "characterRegex": "[0-9a-zA-Z .-]"
+          "characterRegex": "[0-9a-zA-Z./% -]"
         },
         {
           "type": "font",
@@ -65,12 +80,15 @@
       "CURRENT_CODE",
       "SUNRISE",
       "SUNSET",
+      "CURRENT_HUMIDITY",
+      "CURRENT_WIND",
       "TEMP_ARR",
       "PRECIP_ARR",
       "CODE_ARR",
       "REQUEST_WEATHER",
       "WEATHER_ERROR",
-      "CONFIG_TEMP_UNIT"
+      "CONFIG_TEMP_UNIT",
+      "CONFIG_WIND_UNIT"
     ],
     "enableMultiJS": true,
     "displayName": "Skyarc",

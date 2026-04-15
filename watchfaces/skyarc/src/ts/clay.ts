@@ -22,11 +22,21 @@ const config = [
       {
         type: 'select',
         messageKey: 'CONFIG_TEMP_UNIT',
-        defaultValue: 'celsius',
+        defaultValue: 'C',
         label: 'Temperature Unit',
         options: [
           { label: 'Celsius', value: 'C' },
           { label: 'Farenheit', value: 'F' }
+        ]
+      },
+      {
+        type: 'select',
+        messageKey: 'CONFIG_WIND_UNIT',
+        defaultValue: 'MPH',
+        label: 'Wind Speed Unit',
+        options: [
+          { label: 'MPH', value: 'MPH' },
+          { label: 'KPH', value: 'KPH' }
         ]
       }
     ]
