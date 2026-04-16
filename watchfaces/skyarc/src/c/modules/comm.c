@@ -55,6 +55,25 @@ static void inbox_received_handler(DictionaryIterator *iter, void *context) {
       packet_get_string(iter, MESSAGE_KEY_CONFIG_WIND_UNIT)
     );
   }
+  if (packet_contains_key(iter, MESSAGE_KEY_CONFIG_ANIMATIONS)) {
+    snprintf(
+      persist_data->animations,
+      sizeof(persist_data->animations),
+      "%s",
+      packet_get_boolean(iter, MESSAGE_KEY_CONFIG_ANIMATIONS) ? "true" : "false"
+    );
+  }
+  if (packet_contains_key(iter, MESSAGE_KEY_CONFIG_COLOR_BG)) {
+    snprintf(
+      persist_data->color_bg,
+      sizeof(persist_data->color_bg),
+      "%s",
+      packet_get_string(iter, MESSAGE_KEY_CONFIG_COLOR_BG)
+    );
+  }
+  if (packet_contains_key(iter, MESSAGE_KEY_CONFIG_TAP_TIMEOUT)) {
+    persist_data->tap_timeout = atoi(packet_get_string(iter, MESSAGE_KEY_CONFIG_TAP_TIMEOUT));
+  }
 
   // Other
   if (packet_contains_key(iter, MESSAGE_KEY_WEATHER_ERROR)) {

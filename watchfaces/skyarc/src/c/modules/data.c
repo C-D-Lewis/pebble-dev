@@ -14,12 +14,21 @@ void data_init() {
     persist_read_data(SK_PersistData, &s_persist_data, sizeof(PersistData));
   }
 
-  // If unset
+  // If unset or newly added
   if (strlen(s_persist_data.wind_unit) == 0) {
     snprintf(s_persist_data.wind_unit, sizeof(s_persist_data.wind_unit), "%s", WIND_UNIT_MPH);
   }
   if (strlen(s_persist_data.temp_unit) == 0) {
     snprintf(s_persist_data.temp_unit, sizeof(s_persist_data.temp_unit), "%s", TEMP_UNIT_C);
+  }
+  if (strlen(s_persist_data.animations) == 0) {
+    snprintf(s_persist_data.animations, sizeof(s_persist_data.animations), "true");
+  }
+  if (strlen(s_persist_data.color_bg) == 0) {
+    snprintf(s_persist_data.color_bg, sizeof(s_persist_data.color_bg), COLOR_BLACK);
+  }
+  if (s_persist_data.tap_timeout == 0) {
+    s_persist_data.tap_timeout = 5;
   }
 }
 
@@ -45,9 +54,23 @@ int data_get_max_temp() {
   return s_max_temp;
 }
 
+// Maybe there is a way to convert a Clay color string to a GColor?
+GColor data_get_bg_color() {
+#ifdef PBL_COLOR
+  if (strcmp(s_persist_data.color_bg, COLOR_BLACK) == 0) return GColorBlack;
+  if (strcmp(s_persist_data.color_bg, COLOR_OXFORD_BLUE) == 0) return GColorOxfordBlue;
+  if (strcmp(s_persist_data.color_bg, COLOR_BULGARIAN_ROSE) == 0) return GColorBulgarianRose;
+  if (strcmp(s_persist_data.color_bg, COLOR_DARK_GREEN) == 0) return GColorDarkGreen;
+  if (strcmp(s_persist_data.color_bg, COLOR_CHROME_YELLOW) == 0) return GColorChromeYellow;
+  return GColorBlack;
+#else
+  return GColorBlack;
+#endif
+}
+
 /********************************** Methods ***********************************/
 
-GColor data_get_weather_color(int code) {
+static GColor data_get_weather_color_color(int code) {
   switch (code) {
     case 0:
     case 1: // Mainly clear
@@ -89,6 +112,52 @@ GColor data_get_weather_color(int code) {
   }
 };
 
+static GColor data_get_weather_color_bw(int code) {
+  switch (code) {
+    case 0:
+    case 1: // Mainly clear
+      return GColorClear;
+    case 3: // Overcast
+    case 2: // Partly cloudy
+    case 45: // Fog
+    case 48: // Depositing rime fog
+      return GColorLightGray;
+    case 51: // Light Drizzle
+    case 53: // Moderate Drizzle
+    case 55: // Dense Drizzle
+    case 56: // Light Freezing Drizzle
+    case 57: // Dense Freezing Drizzle
+    case 61: // Slight Rain
+    case 66: // Light Freezing Rain
+    case 80: // Slight Rain showers
+    case 63: // Moderate Rain
+    case 65: // Heavy Rain
+    case 67: // Heavy Freezing Rain
+    case 81: // Moderate Rain showers
+    case 82: // Violent Rain showers
+    case 85: // Slight Snow showers
+    case 86: // Heavy Snow showers
+    case 71: // Slight Snow fall
+    case 73: // Moderate Snow fall
+    case 75: // Heavy Snow fall
+    case 77: // Snow grains
+    case 95: // Thunderstorm: Slight or moderate
+    case 96: // Thunderstorm with slight hail
+    case 99: // Thunderstorm with heavy hail
+      return GColorWhite;  // A bit of a cop out, but they're all worth noting
+    default:
+      return GColorClear;
+  }
+};
+
+GColor data_get_weather_color(int code) {
+#ifdef PBL_COLOR
+  return data_get_weather_color_color(code);
+#else
+  return data_get_weather_color_bw(code);
+#endif
+};
+
 /**
  * Arrays are two chars per item, 24 items.
  *
@@ -120,20 +189,21 @@ GColor data_get_temp_color(int temp) {
   }
 
   // Lowest/highest
-  if (temp == s_min_temp) return GColorBlue;
-  if (temp == s_max_temp) return GColorRed;
+  if (temp == s_min_temp) return PBL_IF_COLOR_ELSE(GColorBlue, GColorWhite);
+  if (temp == s_max_temp) return PBL_IF_COLOR_ELSE(GColorRed, GColorWhite);
 
   // Near
-  if (temp < s_min_temp + 2) return GColorBlueMoon;
-  if (temp > s_max_temp - 2) return GColorChromeYellow;
+  if (temp < s_min_temp + 2) return PBL_IF_COLOR_ELSE(GColorBlueMoon, GColorLightGray);
+  if (temp > s_max_temp - 2) return PBL_IF_COLOR_ELSE(GColorChromeYellow, GColorLightGray);
 
   // Less near if there's a high enough range
   const int range = s_max_temp - s_min_temp;
   if (range > 6) {
-    if (temp < s_min_temp + 3) return GColorVividCerulean;
-    if (temp > s_max_temp - 3) return GColorRajah;
+    if (temp < s_min_temp + 3) return PBL_IF_COLOR_ELSE(GColorVividCerulean, GColorLightGray);
+    if (temp > s_max_temp - 3) return PBL_IF_COLOR_ELSE(GColorRajah, GColorLightGray);
   }
 
+  // Average or mid-range
   return GColorBlack;
 }
 
@@ -180,9 +250,13 @@ char* data_get_weather_str(int code) {
 }
 
 GColor data_get_precip_color(int precip_chance) {
+#ifdef PBL_COLOR
   if (precip_chance <= 10) return GColorClear;
   if (precip_chance < 33) return GColorVividCerulean;
   if (precip_chance < 66) return GColorBlueMoon;
   if (precip_chance < 90) return GColorBlue;
   return GColorDukeBlue;
+#else
+  return GColorLightGray;
+#endif
 };

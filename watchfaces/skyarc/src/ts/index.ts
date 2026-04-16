@@ -13,6 +13,8 @@ const TEST_TEMP_ARR = [4, 3, 3, 3, 5, 7, 8, 5, 5, 6, 8, 13, 15, 15, 14, 13, 7, 7
 const TEST_PRECIP_ARR = [0, 0, 0, 0, 0, 0, 50, 60, 60, 30, 20, 0, 0, 0, 0, 40, 80, 99, 99, 50, 0, 0, 0, 0];
 /** Test position */
 const TEST_POSITION = { coords: { latitude: 51.74, longitude: 0.48 } };
+// Birmingham
+// const TEST_POSITION = { coords: { latitude: 52.489471, longitude: -1.898575 } };
 
 setupClay();
 

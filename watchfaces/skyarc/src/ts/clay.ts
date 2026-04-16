@@ -8,17 +8,54 @@ interface ClayConstructor {
 };
 
 const config = [
+  { type: 'heading', defaultValue: 'Skyline Configuration' },
   {
-    type: 'heading',
-    defaultValue: 'Skyline Configuration'
+    type: 'section',
+    items: [
+      { type: 'heading', defaultValue: 'Features' },
+      {
+        type: 'toggle',
+        messageKey: 'CONFIG_ANIMATIONS',
+        label: 'Show Animations',
+        defaultValue: true
+      },
+      {
+        type: 'select',
+        messageKey: 'CONFIG_TAP_TIMEOUT',
+        defaultValue: '5',
+        label: 'Tap/shake Timeout',
+        options: [
+          { label: '3 seconds', value: '3' },
+          { label: '5 seconds', value: '5' },
+          { label: '10 seconds', value: '10' }
+        ]
+      }
+    ]
   },
   {
     type: 'section',
     items: [
+      { type: 'heading', defaultValue: 'Colors' },
+      { type: 'text', defaultValue: 'Only available on color watches.' },
       {
-        type: 'heading',
-        defaultValue: 'Units'
+        type: 'select',
+        messageKey: 'CONFIG_COLOR_BG',
+        defaultValue: 'GColorOxfordBlue',
+        label: 'Background Color',
+        options: [
+          { label: 'Black', value: 'GColorBlack' },
+          { label: 'Oxford Blue', value: 'GColorOxfordBlue' },
+          { label: 'Bulgarian Rose', value: 'GColorBulgarianRose' },
+          { label: 'Dark Green', value: 'GColorDarkGreen' },
+          { label: 'Chrome Yellow', value: 'GColorChromeYellow' }
+        ]
       },
+    ]
+  },
+  {
+    type: 'section',
+    items: [
+      { type: 'heading', defaultValue: 'Units' },
       {
         type: 'select',
         messageKey: 'CONFIG_TEMP_UNIT',
@@ -41,10 +78,7 @@ const config = [
       }
     ]
   },
-  {
-    type: 'submit',
-    defaultValue: 'Save'
-  }
+  { type: 'submit', defaultValue: 'Save' }
 ];
 
 export const setupClay = () => {

@@ -7,7 +7,7 @@
 // Disable before release!
 // #define TEST
 
-#if defined(PBL_PLATFORM_BASALT) || defined(PBL_PLATFORM_CHALK)
+#if defined(PBL_PLATFORM_APLITE) || defined(PBL_PLATFORM_BASALT) || defined(PBL_PLATFORM_CHALK) || defined(PBL_PLATFORM_FLINT)
   #define OUTER_RING_W 2
   #define OUTER_RING_INSET 12
   #define TEMP_RING_W 8
@@ -15,30 +15,40 @@
   #define SEP_H 4
   #define DOT_S 2
   #define ICON_SIZE 24
+  #define NUM_PATTERN_STROKES 8
 #else
   #define OUTER_RING_W 3
-  #define OUTER_RING_INSET 18
+  #define OUTER_RING_INSET 20
   #define TEMP_RING_W 10
   #define INNER_RING_W 3
   #define SEP_H 5
   #define DOT_S 3
   #define ICON_SIZE 28
+  #define NUM_PATTERN_STROKES 12
 #endif
 
+// Layout
 #define OUTER_SEP_W 2
 #define TEMP_RING_INSET (OUTER_RING_INSET + OUTER_RING_W - 3)
 #define INNER_RING_INSET (TEMP_RING_INSET + TEMP_RING_W + 1)
 #define NOTCH_L scl_x(80)
 
+// Config
+#define MIN_WEATHER_INTERVAL_S (60 * 60 - 5)
+
+// Constants
 #define STR_ARR_SIZE 49
 #define INIT_MIN_TEMP 50
 #define INIT_MAX_TEMP -50
 #define SIGNED_OFFSET 50
 #define WEATHER_ERROR 1000
-#define MIN_WEATHER_INTERVAL_S (60 * 60 - 5)
-
 #define DATA_EMPTY -1000
 #define TEMP_UNIT_C "C"
 #define TEMP_UNIT_F "F"
 #define WIND_UNIT_MPH "MPH"
 #define WIND_UNIT_KPH "KPH"
+#define COLOR_BLACK "GColorBlack"
+#define COLOR_OXFORD_BLUE "GColorOxfordBlue"
+#define COLOR_BULGARIAN_ROSE "GColorBulgarianRose"
+#define COLOR_DARK_GREEN "GColorDarkGreen"
+#define COLOR_CHROME_YELLOW "GColorChromeYellow"

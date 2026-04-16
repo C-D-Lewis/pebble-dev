@@ -21,8 +21,11 @@ typedef struct {
 } AppState;
 
 typedef struct {
-  char temp_unit[4]; // C or F
-  char wind_unit[8]; // MPH or KPH
+  char temp_unit[4];  // C or F
+  char wind_unit[8];  // MPH or KPH
+  char animations[8]; // 'true' or 'false' - use string for the unset/false state
+  char color_bg[32];  // Name of selected color
+  int tap_timeout;
 } PersistData;
 
 void data_init();
@@ -32,6 +35,7 @@ AppState* data_get_app_state();
 PersistData* data_get_persist_data();
 int data_get_min_temp();
 int data_get_max_temp();
+GColor data_get_bg_color();
 
 GColor data_get_weather_color(int code);
 int data_get_strarr_value(char *arr, int hour);
