@@ -30,7 +30,7 @@ void data_init() {
     s_bluetooth_alert = persist_read_bool(PreferenceBluetoothAlert);
   } else {
     // Default settings
-    s_animations = true;
+    s_animations = false;
     persist_write_bool(PreferenceAnimations, s_animations);
     s_bluetooth_alert = true;
     persist_write_bool(PreferenceBluetoothAlert, s_bluetooth_alert);

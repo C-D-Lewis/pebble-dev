@@ -46,7 +46,7 @@ module.exports = [
         type: 'toggle',
         label: 'Animations',
         messageKey: 'AppKeyAnimations',
-        defaultValue: true,
+        defaultValue: false,
         capabilities: [ 'RECT' ]
       },
       {
