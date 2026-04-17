@@ -92,7 +92,7 @@ static void draw_time_display(GContext *ctx, GRect bounds, struct tm *t) {
 
   // Time
   static char time_buff[6];
-  strftime(time_buff, sizeof(time_buff), "%H:%M", t);
+  strftime(time_buff, sizeof(time_buff), clock_is_24h_style() ? "%H:%M" : "%I:%M", t);
   const GRect time_bounds = GRect(
     0,
     scl_y_pp({.o = 270, .c = 240, .e = 280, .g = 240}),
