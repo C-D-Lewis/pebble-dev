@@ -25,7 +25,7 @@ To begin a new game watchapp, begin with the template file in `/docs/template.c.
 
 > This is the bare minimum to make a looping game with PGE!
 
-```
+```c
 #include <pebble.h>
 #include <pebble-pge-simple/pebble-pge-simple.h>
 

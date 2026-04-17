@@ -17,16 +17,16 @@ Some PBWs can be found in `/pbw` for sideloading.
 > Platforms: `A` = Aplite, `B` = Basalt, `C` = Chalk, `D` = Diorite, `E` = Emery, `F` = Flint, `G` = Gabbro
 > Parentheses: unpublished
 
-| Name             | Screenshot                                             | Builds      | Icon | PBW                           |
-|------------------|--------------------------------------------------------|-------------|------|-------------------------------|
-| `beam-up`        | ![](watchfaces/beam-up/screenshots/aplite.png)         | `A - F`     | ✅    | [pbw](pbw/beam-up.pbw)        |
-| `brackets`       | ![](watchfaces/brackets/screenshots/diorite.png)       | `A - F`     | ✅    | [pbw](pbw/brackets.pbw)       |
-| `cards`          | ![](watchfaces/cards/screenshots/diorite.png)          | `A` `B` `D` |      | [pbw](pbw/cards.pbw)          |
-| `cmd-time-typed` | ![](watchfaces/cmd-time-typed/screenshots/diorite.png) | `A - E`     | ✅    | [pbw](pbw/cmd-time-typed.pbw) |
-| `cmd-time`       | ![](watchfaces/cmd-time/screenshots/diorite.png)       | `A - E`     | ✅    | [pbw](pbw/cmd-time.pbw)       |
-| `dayring`        | ![](watchfaces/dayring/screenshots/basalt.png)         | `A - F`     |      | [pbw](pbw/dayring.pbw)        |
-| `deep-rock`      | ![](watchfaces/deep-rock/screenshots/basalt.png)       | `A` `B` `D` |      | [pbw](pbw/deep-rock.pbw)      |
-| `dont-panic` | ![](watchfaces/dont-panic/screenshots/emery.png) | `E` | [pbw](pbw/dont-panic.pbw) |
+| Name             | Screenshot                                             | Builds              | Icon | PBW                           |
+|------------------|--------------------------------------------------------|---------------------|------|-------------------------------|
+| `beam-up`        | ![](watchfaces/beam-up/screenshots/aplite.png)         | `A - F`             | ✅    | [pbw](pbw/beam-up.pbw)        |
+| `brackets`       | ![](watchfaces/brackets/screenshots/diorite.png)       | `A - F`             | ✅    | [pbw](pbw/brackets.pbw)       |
+| `cards`          | ![](watchfaces/cards/screenshots/diorite.png)          | `A` `B` `D`         |      | [pbw](pbw/cards.pbw)          |
+| `cmd-time-typed` | ![](watchfaces/cmd-time-typed/screenshots/diorite.png) | `A - E`             | ✅    | [pbw](pbw/cmd-time-typed.pbw) |
+| `cmd-time`       | ![](watchfaces/cmd-time/screenshots/diorite.png)       | `A - E`             | ✅    | [pbw](pbw/cmd-time.pbw)       |
+| `dayring`        | ![](watchfaces/dayring/screenshots/basalt.png)         | `A - G`             |      | [pbw](pbw/dayring.pbw)        |
+| `deep-rock`      | ![](watchfaces/deep-rock/screenshots/basalt.png)       | `A` `B` `D` `E` `F` |      | [pbw](pbw/deep-rock.pbw)      |
+| `dont-panic` | ![](watchfaces/dont-panic/screenshots/emery.png) | `(E)` | [pbw](pbw/dont-panic.pbw) |
 | `dual-gauge`          | ![](watchfaces/dual-gauge/screenshots/basalt.png)          | `A - D`         |      | [pbw](pbw/dual-gauge.pbw)          |
 | `eclipse`             | ![](watchfaces/eclipse/screenshots/aplite.png)             | `A` `B` `D`             |      | [pbw](pbw/eclipse.pbw)             |
 | `eventful`            | ![](watchfaces/eventful/screenshots/aplite.png)            | `A - D`         |      | [pbw](pbw/eventful.pbw)            |
@@ -36,14 +36,14 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `isotime-appstore`    | ![](watchfaces/isotime-appstore/screenshots/yellow.png)    | `A - G`     | ✅    | [pbw](pbw/isotime-appstore.pbw)             |
 | `kitty-watchface`     | ![](watchfaces/kitty-watchface/screenshots/aplite.png)     | `A` `B` `D`             |      | [pbw](pbw/kitty-watchface.pbw)     |
 | `morndas`             | ![](watchfaces/morndas/screenshots/basalt.png)             | `A` `B` `D` `E` `F`            |      | [pbw](pbw/morndas.pbw)             |
-| `patchwork`           | ![](watchfaces/patchwork/screenshots/basalt-ocean.png)     | `B` `C` `E` `G`      |      | [pbw](pbw/patchwork.pbw)             |
 | `past-present-future` | ![](watchfaces/past-present-future/screenshots/aplite.png) | `A` `B` `D`             |      | [pbw](pbw/past-present-future.pbw) |
+| `patchwork`           | ![](watchfaces/patchwork/screenshots/basalt-ocean.png)     | `B` `C` `E` `G`      |      | [pbw](pbw/patchwork.pbw)             |
 | `potential-divider`   | ![](watchfaces/potential-divider/screenshots/aplite.png)   | `A` `B` `D`             | ✅    | [pbw](pbw/potential-divider.pbw)   |
 | `pseudotime`          | ![](watchfaces/pseudotime/screenshots/basalt.png)          | `A - G` |      | [pbw](pbw/pseudotime.pbw)          |
 | `skyarc`   | ![](watchfaces/skyarc/screenshots/emery1.png)      | `A - G`   | ✅    | [pbw](pbw/skyarc.pbw)       |
-| `split-horizon`       | ![](watchfaces/split-horizon/screenshots/diorite.png)      | `A` `B` `D`             | ✅    | [pbw](pbw/split-horizon.pbw)       |
+| `split-horizon`       | ![](watchfaces/split-horizon/screenshots/diorite.png)      | `A` `B` `D` `E` `F`            | ✅    | [pbw](pbw/split-horizon.pbw)       |
 | `starfield-demo`      | ![](watchfaces/starfield-demo/screenshots/aplite.png)      | `A - D`         |      | [pbw](pbw/starfield-demo.pbw)      |
-| `starfield-smooth`    | ![](watchfaces/starfield-smooth/screenshots/aplite.png)    | `A` `B` `C`             | ✅    | [pbw](pbw/starfield-smooth.pbw)    |
+| `starfield-smooth`    | ![](watchfaces/starfield-smooth/screenshots/aplite.png)    | `A - C`             | ✅    | [pbw](pbw/starfield-smooth.pbw)    |
 | `thin`                | ![](watchfaces/thin/screenshots/basalt.png)                | `A - G`     | ✅    | [pbw](pbw/thin.pbw)                |
 | `time-dots-appstore`  | ![](watchfaces/time-dots-appstore/screenshots/basalt1.png) | `A - G` |      | [pbw](pbw/time-dots-appstore.pbw)  |
 | `void-statues`        | ![](watchfaces/void-statues/screenshots/basalt.png)        | `A - F`     |      | [pbw](pbw/void-statues.pbw)        |
@@ -56,7 +56,7 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `block-world`    | ![](watchapps/block-world/screenshots/basalt.png)       | `B` `C` `E`           |      | [pbw](pbw/block-world.pbw)    |
 | `dashboard`      | ![](watchapps/dashboard/assets/screenshots/basalt1.png) | `A - D`               | ✅    | [pbw](pbw/dashboard.pbw)      |
 | `muninn`         | ![](watchapps/muninn/screenshots/basalt.png)            | `A - F`               | ✅    | [pbw](pbw/muninn.pbw)         |
-| `news-headlines` | ![](watchapps/news-headlines/screenshots/basalt.png)    | `A - E`               | ✅    | [pbw](pbw/news-headlines.pbw) |
+| `news-headlines` | ![](watchapps/news-headlines/screenshots/basalt.png)    | `A - F`               | ✅    | [pbw](pbw/news-headlines.pbw) |
 | `tube-status`    | ![](watchapps/tube-status/screenshots/basalt.png)       | `A - E`               | ✅    | [pbw](pbw/tube-status.pbw)    |
 | `pge-examples`   |                                                         | ❌ (needs pge package) |      |                               |
 

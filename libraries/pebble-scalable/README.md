@@ -187,5 +187,5 @@ graphics_draw_bitmap_in_rect(
 - [x] Solution for picking bitmaps (to work with their scalable GRects)
 - [x] Find solution to 'ever expanding args' problem for new platforms
 - [x] Chalk support
-- [ ] Gabbro support
+- [x] Gabbro support
 - [ ] Can we save devs loading all fonts when only some are used on a platform?
