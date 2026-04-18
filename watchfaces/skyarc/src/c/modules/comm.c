@@ -74,6 +74,14 @@ static void inbox_received_handler(DictionaryIterator *iter, void *context) {
   if (packet_contains_key(iter, MESSAGE_KEY_CONFIG_TAP_TIMEOUT)) {
     persist_data->tap_timeout = atoi(packet_get_string(iter, MESSAGE_KEY_CONFIG_TAP_TIMEOUT));
   }
+  if (packet_contains_key(iter, MESSAGE_KEY_CONFIG_CLOUD_RENDER_MODE)) {
+    snprintf(
+      persist_data->cloud_render_mode,
+      sizeof(persist_data->cloud_render_mode),
+      "%s",
+      packet_get_string(iter, MESSAGE_KEY_CONFIG_CLOUD_RENDER_MODE)
+    );
+  }
 
   // Other
   if (packet_contains_key(iter, MESSAGE_KEY_WEATHER_ERROR)) {

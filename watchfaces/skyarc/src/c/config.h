@@ -52,3 +52,5 @@
 #define COLOR_BULGARIAN_ROSE "GColorBulgarianRose"
 #define COLOR_DARK_GREEN "GColorDarkGreen"
 #define COLOR_CHROME_YELLOW "GColorChromeYellow"
+#define CLOUD_RENDER_MODE_STRIPED "STRIPED"
+#define CLOUD_RENDER_MODE_SOLID "SOLID"

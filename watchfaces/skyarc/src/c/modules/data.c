@@ -30,6 +30,13 @@ void data_init() {
   if (s_persist_data.tap_timeout == 0) {
     s_persist_data.tap_timeout = 5;
   }
+  if (strlen(s_persist_data.cloud_render_mode) == 0) {
+    snprintf(
+      s_persist_data.cloud_render_mode,
+      sizeof(s_persist_data.cloud_render_mode),
+      CLOUD_RENDER_MODE_STRIPED
+    );
+  }
 }
 
 void data_deinit() {
@@ -70,6 +77,7 @@ GColor data_get_bg_color() {
 
 /********************************** Methods ***********************************/
 
+#ifdef PBL_COLOR
 static GColor data_get_weather_color_color(int code) {
   switch (code) {
     case 0:
@@ -111,7 +119,9 @@ static GColor data_get_weather_color_color(int code) {
       return GColorClear;
   }
 };
+#endif
 
+#if !defined(PBL_COLOR)
 static GColor data_get_weather_color_bw(int code) {
   switch (code) {
     case 0:
@@ -149,6 +159,7 @@ static GColor data_get_weather_color_bw(int code) {
       return GColorClear;
   }
 };
+#endif
 
 GColor data_get_weather_color(int code) {
 #ifdef PBL_COLOR

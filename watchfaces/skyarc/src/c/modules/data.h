@@ -21,11 +21,12 @@ typedef struct {
 } AppState;
 
 typedef struct {
-  char temp_unit[4];  // C or F
-  char wind_unit[8];  // MPH or KPH
-  char animations[8]; // 'true' or 'false' - use string for the unset/false state
-  char color_bg[32];  // Name of selected color
+  char temp_unit[4];         // C or F
+  char wind_unit[8];         // MPH or KPH
+  char animations[8];        // 'true' or 'false' - use string for the unset/false state
+  char color_bg[32];         // Name of selected color
   int tap_timeout;
+  char cloud_render_mode[8]; // STRIPED or SOLID
 } PersistData;
 
 void data_init();

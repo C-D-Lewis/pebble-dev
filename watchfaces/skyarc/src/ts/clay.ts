@@ -29,6 +29,16 @@ const config = [
           { label: '5 seconds', value: '5' },
           { label: '10 seconds', value: '10' }
         ]
+      },
+      {
+        type: 'select',
+        messageKey: 'CONFIG_CLOUD_RENDER_MODE',
+        defaultValue: '5',
+        label: 'Draw cloudy periods as',
+        options: [
+          { label: 'Striped', value: 'STRIPED' },
+          { label: 'Solid', value: 'SOLID' }
+        ]
       }
     ]
   },

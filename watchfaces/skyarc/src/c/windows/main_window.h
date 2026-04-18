@@ -7,6 +7,7 @@
 #include "../modules/comm.h"
 #include "../modules/data.h"
 #include "../modules/scalable.h"
+#include "../modules/util.h"
 
 void main_window_push();
 

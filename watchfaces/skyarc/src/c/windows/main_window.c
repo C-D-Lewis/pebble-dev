@@ -11,33 +11,13 @@ static bool s_tapped = false;
 
 /******************************************** Drawing *********************************************/
 
-static GPoint make_hand_point(int quantity, int intervals, int len, GPoint center) {
-  const int angle = (TRIG_MAX_ANGLE * quantity) / intervals;
-  return (GPoint) {
-    .x = (int16_t)(sin_lookup(angle) * (int32_t)len / TRIG_MAX_RATIO) + center.x,
-    .y = (int16_t)(-cos_lookup(angle) * (int32_t)len / TRIG_MAX_RATIO) + center.y,
-  };
-}
-
-static int convert_temp(PersistData *persist_data, int val_c) {
-  return strcmp(persist_data->temp_unit, "F") == 0
-    ? (val_c * 9 / 5) + 32
-    : val_c;
-}
-
-static int convert_wind_speed(PersistData *persist_data, int val_kph) {
-  return strcmp(persist_data->wind_unit, WIND_UNIT_MPH) == 0
-    ? (val_kph * 1000) / 1609
-    : val_kph;
-}
-
-static void draw_hour_chunk(GContext *ctx, GRect bounds, int hour, int inset, bool pattern) {
+static void draw_hour_chunk(GContext *ctx, GRect bounds, int hour, int inset, bool striped) {
   const int chunk_start_angle = (TRIG_MAX_ANGLE * hour) / 24;
   const int chunk_end_angle = (TRIG_MAX_ANGLE * (hour + 1)) / 24;
 
   if (chunk_end_angle > s_anim_prog_angle) return;
 
-  if (pattern) {
+  if (striped) {
     const int chunk_size = chunk_end_angle - chunk_start_angle;
     const int stroke_size = chunk_size / NUM_PATTERN_STROKES;
     // Slim slices between start and end
@@ -172,7 +152,7 @@ static void draw_weather_display(GContext *ctx, GRect bounds) {
   if (current_code == WEATHER_ERROR) {
     snprintf(s_current_buff, sizeof(s_current_buff), "WTHR ERR");
   } else if (current_code != DATA_EMPTY) {
-    const int current_temp = convert_temp(persist_data, app_state->current_temp);
+    const int current_temp = util_convert_temp(persist_data, app_state->current_temp);
     snprintf(
       s_current_buff,
       sizeof(s_current_buff),
@@ -209,8 +189,8 @@ static void draw_weather_display(GContext *ctx, GRect bounds) {
     s_low_high_buff,
     sizeof(s_low_high_buff),
     "%d / %d",
-    convert_temp(persist_data, data_get_min_temp()),
-    convert_temp(persist_data, data_get_max_temp())
+    util_convert_temp(persist_data, data_get_min_temp()),
+    util_convert_temp(persist_data, data_get_max_temp())
   );
   graphics_context_set_text_color(ctx, GColorWhite);
   graphics_draw_text(
@@ -235,7 +215,7 @@ static void draw_weather_display(GContext *ctx, GRect bounds) {
     s_wind_buff,
     sizeof(s_wind_buff),
     "%d %s",
-    convert_wind_speed(persist_data, app_state->current_wind_kmh),
+    util_convert_wind_speed(persist_data, app_state->current_wind_kmh),
     wind_unit
   );
   graphics_draw_text(
@@ -270,6 +250,7 @@ static void draw_weather_display(GContext *ctx, GRect bounds) {
 
 static void canvas_update_proc(Layer *layer, GContext *ctx) {
   AppState *app_state = data_get_app_state();
+  PersistData *persist_data = data_get_persist_data();
 
   GRect bounds = layer_get_bounds(layer);
   const int half_w = bounds.size.w / 2;
@@ -290,7 +271,12 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   graphics_context_set_stroke_color(ctx, GColorDarkGray);
   graphics_context_set_stroke_width(ctx, 1);
   for (int i = 0; i < 24; i += 2) {
-    GPoint dot_point = make_hand_point(i, 24, scl_x_pp({.o = 465, .e = 460, .g = 470}), center);
+    GPoint dot_point = util_make_hand_point(
+      i,
+      24,
+      scl_x_pp({.o = 465, .e = 460, .g = 470}),
+      center
+    );
     graphics_draw_circle(ctx, dot_point, DOT_S);
   }
 
@@ -346,9 +332,11 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     }
     
     // Use pattern for cloudy segments
-    const bool pttrn = gcolor_equal(color, GColorLightGray) || gcolor_equal(color, GColorDarkGray);
+    const bool do_stripes = strcmp(persist_data->cloud_render_mode, CLOUD_RENDER_MODE_STRIPED) == 0;
+    const bool striped = do_stripes &&
+      (gcolor_equal(color, GColorLightGray) || gcolor_equal(color, GColorDarkGray));
     graphics_context_set_fill_color(ctx, color);
-    draw_hour_chunk(ctx, chunk_bounds, i, thickness, pttrn);
+    draw_hour_chunk(ctx, chunk_bounds, i, thickness, striped);
   }
 
   if (!s_tapped) {
