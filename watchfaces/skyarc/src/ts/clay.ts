@@ -32,8 +32,18 @@ const config = [
       },
       {
         type: 'select',
+        messageKey: 'CONFIG_CLOCK_MODE',
+        defaultValue: 'ANALOGUE',
+        label: 'Clock type',
+        options: [
+          { label: 'Digital', value: 'DIGITAL' },
+          { label: 'Analog', value: 'ANALOGUE' }
+        ]
+      },
+      {
+        type: 'select',
         messageKey: 'CONFIG_CLOUD_RENDER_MODE',
-        defaultValue: '5',
+        defaultValue: 'STRIPED',
         label: 'Draw cloudy periods as',
         options: [
           { label: 'Striped', value: 'STRIPED' },

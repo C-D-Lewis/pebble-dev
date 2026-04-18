@@ -92,7 +92,8 @@
       "CONFIG_ANIMATIONS",
       "CONFIG_COLOR_BG",
       "CONFIG_TAP_TIMEOUT",
-      "CONFIG_CLOUD_RENDER_MODE"
+      "CONFIG_CLOUD_RENDER_MODE",
+      "CONFIG_CLOCK_MODE"
     ],
     "enableMultiJS": true,
     "displayName": "Skyarc",

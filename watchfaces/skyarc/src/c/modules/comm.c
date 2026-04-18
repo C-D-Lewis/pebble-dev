@@ -82,6 +82,14 @@ static void inbox_received_handler(DictionaryIterator *iter, void *context) {
       packet_get_string(iter, MESSAGE_KEY_CONFIG_CLOUD_RENDER_MODE)
     );
   }
+  if (packet_contains_key(iter, MESSAGE_KEY_CONFIG_CLOCK_MODE)) {
+    snprintf(
+      persist_data->clock_mode,
+      sizeof(persist_data->clock_mode),
+      "%s",
+      packet_get_string(iter, MESSAGE_KEY_CONFIG_CLOCK_MODE)
+    );
+  }
 
   // Other
   if (packet_contains_key(iter, MESSAGE_KEY_WEATHER_ERROR)) {

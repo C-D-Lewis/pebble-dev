@@ -67,7 +67,7 @@ static void draw_outer_time_marker(GContext *ctx, GRect bounds, char* str, GColo
   );
 }
 
-static void draw_time_display(GContext *ctx, GRect bounds, struct tm *t) {
+static void draw_digital_time(GContext *ctx, GRect bounds, struct tm *t) {
   const int half_w = bounds.size.w / 2;
 
   // Time
@@ -118,13 +118,82 @@ static void draw_time_display(GContext *ctx, GRect bounds, struct tm *t) {
     0,
     GCornersAll
   );
+}
+
+static void draw_analog_time(GContext *ctx, GRect bounds, struct tm *t) {
+  const int half_w = bounds.size.w / 2;
+  const int half_h = bounds.size.h / 2;
+  const GPoint center = GPoint(half_w, half_h);
+
+  // Small battery arc
+  const int battery_radius = scl_x(70);
+  const GRect battery_bounds = GRect(
+    center.x - battery_radius,
+    center.y - battery_radius,
+    battery_radius * 2,
+    battery_radius * 2
+  );
+  graphics_context_set_stroke_width(ctx, INNER_RING_W + 1);
+  graphics_context_set_stroke_color(ctx, GColorDarkGray);
+  graphics_draw_arc(ctx, battery_bounds, GOvalScaleModeFitCircle, 0, TRIG_MAX_ANGLE);
+  const BatteryChargeState state = battery_state_service_peek();
+  const bool connected = connection_service_peek_pebble_app_connection();
+  graphics_context_set_stroke_color(
+    ctx,
+    connected ? PBL_IF_COLOR_ELSE(GColorGreen, GColorWhite) : GColorLightGray
+  );
+  graphics_draw_arc(
+    ctx,
+    battery_bounds,
+    GOvalScaleModeFitCircle,
+    0,
+    (TRIG_MAX_ANGLE * state.charge_percent) / 100
+  );
+
+  // Time hands
+  const int total_hours_mins = ((t->tm_hour % 12) * 60) + t->tm_min;
+  GPoint hour_end = util_make_hand_point(total_hours_mins, 720, scl_x(180), center);
+  graphics_context_set_stroke_color(ctx, PBL_IF_COLOR_ELSE(GColorLightGray, GColorWhite));
+  graphics_context_set_stroke_width(ctx, INNER_RING_W + 1);
+  graphics_draw_line(ctx, center, hour_end);
+
+  GPoint mins_end = util_make_hand_point(t->tm_min, 60, scl_x(260), center);
+  graphics_context_set_stroke_color(ctx, GColorWhite);
+  graphics_context_set_stroke_width(ctx, INNER_RING_W);
+  graphics_draw_line(ctx, center, mins_end);
+
+  // Five-minute markers, within inner arc
+  graphics_context_set_stroke_color(ctx, PBL_IF_COLOR_ELSE(GColorDarkGray, GColorWhite));
+  graphics_context_set_stroke_width(ctx, INNER_RING_W - 1);
+  for (int i = 0; i < 60; i += 5) {
+    const int mark_angle = (TRIG_MAX_ANGLE * i) / 60;
+    const int outer_radius = half_w - INNER_RING_INSET - scl_x(45);
+    const int inner_radius = half_w - INNER_RING_INSET - scl_x(70);
+    GPoint mark_start = util_make_hand_point(i, 60, outer_radius, center);
+    GPoint mark_end   = util_make_hand_point(i, 60, inner_radius, center);
+    graphics_draw_line(ctx, mark_start, mark_end);
+  }
+}
+
+static void draw_date_and_time_display(GContext *ctx, GRect bounds, struct tm *t) {
+  PersistData *persist_data = data_get_persist_data();
+
+  const bool is_digital = strcmp(persist_data->clock_mode, CLOCK_MODE_DIGITAL) == 0;
+  if (is_digital) {
+    draw_digital_time(ctx, bounds, t);
+  } else {
+    draw_analog_time(ctx, bounds, t);
+  }
 
   // Date
   static char date_buff[12];
-  strftime(date_buff, sizeof(date_buff), "%d %b %Y", t);
+  strftime(date_buff, sizeof(date_buff), is_digital ? "%d %b %Y" : "%d %b", t);
+  const int date_y = is_digital
+    ? scl_y_pp({.o = 510, .c = 510, .e = 505, .g = 530})
+    : scl_y_pp({.o = 580, .c = 580, .e = 575, .g = 600});
   const GRect date_bounds = GRect(
     0,
-    scl_y_pp({.o = 510, .c = 510, .e = 505, .g = 530}),
+    date_y,
     bounds.size.w,
     50
   );
@@ -396,7 +465,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   // TEST
   // s_tapped = true;
   if (!s_tapped) {
-    draw_time_display(ctx, bounds, t);
+    draw_date_and_time_display(ctx, bounds, t);
   } else {
     draw_weather_display(ctx, bounds);
   }

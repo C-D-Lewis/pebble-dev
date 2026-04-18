@@ -27,6 +27,7 @@ typedef struct {
   char color_bg[32];         // Name of selected color
   int tap_timeout;
   char cloud_render_mode[8]; // STRIPED or SOLID
+  char clock_mode [12];      // DIGITAL or ANALOG
 } PersistData;
 
 void data_init();
