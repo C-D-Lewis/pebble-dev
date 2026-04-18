@@ -166,7 +166,6 @@ static void draw_analog_time(GContext *ctx, GRect bounds, struct tm *t) {
   graphics_context_set_stroke_color(ctx, PBL_IF_COLOR_ELSE(GColorDarkGray, GColorWhite));
   graphics_context_set_stroke_width(ctx, INNER_RING_W - 1);
   for (int i = 0; i < 60; i += 5) {
-    const int mark_angle = (TRIG_MAX_ANGLE * i) / 60;
     const int outer_radius = half_w - INNER_RING_INSET - scl_x(45);
     const int inner_radius = half_w - INNER_RING_INSET - scl_x(70);
     GPoint mark_start = util_make_hand_point(i, 60, outer_radius, center);
@@ -446,11 +445,8 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
       PBL_IF_COLOR_ELSE(GColorChromeYellow, GColorWhite)
     );
 
-    // Line from center to inner arc for day progress
-    const int line_length = half_w - INNER_RING_INSET + 1;
-    const int line_end_x = half_w + (line_length * sin_lookup(s_day_prog_angle)) / TRIG_MAX_RATIO;
-    const int line_end_y = half_h - (line_length * cos_lookup(s_day_prog_angle)) / TRIG_MAX_RATIO;
-    graphics_context_set_stroke_color(ctx, GColorDarkGray);
+    // Day progress indicator
+    graphics_context_set_stroke_color(ctx, PBL_IF_COLOR_ELSE(GColorDarkGray, GColorWhite));
     graphics_context_set_stroke_width(ctx, INNER_RING_W);
     graphics_draw_arc(
       ctx,
@@ -459,7 +455,23 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
       0,
       s_day_prog_angle
     );
-    graphics_draw_line(ctx, center, GPoint(line_end_x, line_end_y));
+
+    // Draw notch meeting day progress arc to indicate
+    const int notch_outer_radius = half_w - INNER_RING_INSET + 1;
+    const int notch_inner_radius = notch_outer_radius - NOTCH_L;
+    GPoint day_notch_start = util_make_hand_point(
+      s_day_prog_angle,
+      TRIG_MAX_ANGLE,
+      notch_outer_radius,
+      center
+    );
+    GPoint day_notch_end = util_make_hand_point(
+      s_day_prog_angle,
+      TRIG_MAX_ANGLE,
+      notch_inner_radius,
+      center
+    );
+    graphics_draw_line(ctx, day_notch_start, day_notch_end);
   }
 
   // TEST
