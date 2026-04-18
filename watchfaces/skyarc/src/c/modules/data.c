@@ -38,7 +38,7 @@ void data_init() {
     );
   }
   if (strlen(s_persist_data.clock_mode) == 0) {
-    snprintf(s_persist_data.clock_mode, sizeof(s_persist_data.clock_mode), CLOCK_MODE_ANALOG);
+    snprintf(s_persist_data.clock_mode, sizeof(s_persist_data.clock_mode), CLOCK_MODE_DIGITAL);
   }
 }
 

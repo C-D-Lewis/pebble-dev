@@ -33,7 +33,7 @@ const config = [
       {
         type: 'select',
         messageKey: 'CONFIG_CLOCK_MODE',
-        defaultValue: 'ANALOGUE',
+        defaultValue: 'DIGITAL',
         label: 'Clock type',
         options: [
           { label: 'Digital', value: 'DIGITAL' },
