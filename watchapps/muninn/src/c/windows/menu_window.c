@@ -114,7 +114,7 @@ static void main_window_load(Window *window) {
   Layer *root_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(root_layer);
 
-  s_header_layer = util_create_header_layer("Settings", 10);
+  s_header_layer = util_create_header_layer("Menu", 10);
   layer_add_child(root_layer, s_header_layer);
 
   s_menu_layer = menu_layer_create(grect_inset(bounds, GEdgeInsets(HEADER_INSET, 0, 0, 0)));
