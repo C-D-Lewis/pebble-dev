@@ -43,6 +43,7 @@ void data_init() {
 
   // TEST
   // snprintf(s_persist_data.clock_mode, sizeof(s_persist_data.clock_mode), CLOCK_MODE_ANALOG);
+  // snprintf(s_persist_data.color_bg, sizeof(s_persist_data.color_bg), COLOR_WHITE);
 }
 
 void data_deinit() {
@@ -71,6 +72,7 @@ int data_get_max_temp() {
 GColor data_get_bg_color() {
 #ifdef PBL_COLOR
   if (strcmp(s_persist_data.color_bg, COLOR_BLACK) == 0) return GColorBlack;
+  if (strcmp(s_persist_data.color_bg, COLOR_WHITE) == 0) return GColorWhite;
   if (strcmp(s_persist_data.color_bg, COLOR_OXFORD_BLUE) == 0) return GColorOxfordBlue;
   if (strcmp(s_persist_data.color_bg, COLOR_BULGARIAN_ROSE) == 0) return GColorBulgarianRose;
   if (strcmp(s_persist_data.color_bg, COLOR_DARK_GREEN) == 0) return GColorDarkGreen;

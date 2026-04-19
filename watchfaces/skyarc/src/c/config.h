@@ -48,6 +48,7 @@
 #define WIND_UNIT_MPH "MPH"
 #define WIND_UNIT_KPH "KPH"
 #define COLOR_BLACK "GColorBlack"
+#define COLOR_WHITE "GColorWhite"
 #define COLOR_OXFORD_BLUE "GColorOxfordBlue"
 #define COLOR_BULGARIAN_ROSE "GColorBulgarianRose"
 #define COLOR_DARK_GREEN "GColorDarkGreen"

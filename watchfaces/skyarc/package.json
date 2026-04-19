@@ -1,5 +1,6 @@
 {
   "version": "1.6.0",
+  "_note": "Check for tests!",
   "author": "Chris Lewis",
   "private": true,
   "dependencies": {
@@ -36,6 +37,21 @@
           "file": "images/humidity_icon.png"
         },
         {
+          "type": "bitmap",
+          "name": "ICON_TEMP_BLACK",
+          "file": "images/temp_icon_black.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "ICON_WIND_BLACK",
+          "file": "images/wind_icon_black.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "ICON_HUMIDITY_BLACK",
+          "file": "images/humidity_icon_black.png"
+        },
+        {
           "type": "font",
           "name": "OXANIUM_14",
           "file": "fonts/Oxanium-Medium.ttf",
@@ -43,7 +59,7 @@
         },
         {
           "type": "font",
-          "name": "OXANIUM_19",
+          "name": "OXANIUM_20",
           "file": "fonts/Oxanium-Medium.ttf",
           "characterRegex": "[0-9a-zA-Z./% -]"
         },

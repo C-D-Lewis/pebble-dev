@@ -64,6 +64,7 @@ const config = [
         label: 'Background Color',
         options: [
           { label: 'Black', value: 'GColorBlack' },
+          { label: 'White', value: 'GColorWhite' },
           { label: 'Oxford Blue', value: 'GColorOxfordBlue' },
           { label: 'Bulgarian Rose', value: 'GColorBulgarianRose' },
           { label: 'Dark Green', value: 'GColorDarkGreen' },

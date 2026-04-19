@@ -7,7 +7,23 @@ static AppTimer *s_tap_timer;
 static GBitmap *s_temp_bitmap, *s_wind_bitmap, *s_humidity_bitmap;
 static int s_anim_progress, s_day_prog_angle, s_anim_prog_angle;
 static time_t s_last_update_time;
-static bool s_tapped = false;
+static bool s_tapped, s_is_white_bg;
+
+static void reload_bitmaps() {
+  if (s_temp_bitmap) gbitmap_destroy(s_temp_bitmap);
+  if (s_wind_bitmap) gbitmap_destroy(s_wind_bitmap);
+  if (s_humidity_bitmap) gbitmap_destroy(s_humidity_bitmap);
+
+  s_temp_bitmap = gbitmap_create_with_resource(
+    s_is_white_bg ? RESOURCE_ID_ICON_TEMP_BLACK : RESOURCE_ID_ICON_TEMP
+  );
+  s_wind_bitmap = gbitmap_create_with_resource(
+    s_is_white_bg ? RESOURCE_ID_ICON_WIND_BLACK : RESOURCE_ID_ICON_WIND
+  );
+  s_humidity_bitmap = gbitmap_create_with_resource(
+    s_is_white_bg ? RESOURCE_ID_ICON_HUMIDITY_BLACK : RESOURCE_ID_ICON_HUMIDITY
+  );
+}
 
 /******************************************** Drawing *********************************************/
 
@@ -79,7 +95,7 @@ static void draw_digital_time(GContext *ctx, GRect bounds, struct tm *t) {
     bounds.size.w,
     100
   );
-  graphics_context_set_text_color(ctx, GColorDarkGray);
+  graphics_context_set_text_color(ctx, s_is_white_bg ? GColorLightGray : GColorDarkGray);
   graphics_draw_text(
     ctx,
     time_buff,
@@ -89,7 +105,7 @@ static void draw_digital_time(GContext *ctx, GRect bounds, struct tm *t) {
     GTextAlignmentCenter,
     NULL
   );
-  graphics_context_set_text_color(ctx, GColorWhite);
+  graphics_context_set_text_color(ctx, s_is_white_bg ? GColorBlack : GColorWhite);
   graphics_draw_text(
     ctx,
     time_buff,
@@ -110,7 +126,7 @@ static void draw_digital_time(GContext *ctx, GRect bounds, struct tm *t) {
   const bool connected = connection_service_peek_pebble_app_connection();
   graphics_context_set_fill_color(
     ctx,
-    connected ? PBL_IF_COLOR_ELSE(GColorGreen, GColorWhite) : GColorLightGray
+    connected ? PBL_IF_COLOR_ELSE(GColorGreen, s_is_white_bg ? GColorBlack : GColorWhite) : GColorLightGray
   );
   graphics_fill_rect(
     ctx,
@@ -127,7 +143,7 @@ static void draw_analog_time(GContext *ctx, GRect bounds, struct tm *t) {
 
   // Small battery arc
   const int battery_radius = scl_x(70);
-  const GRect battery_bounds = GRect(
+  GRect battery_bounds = GRect(
     center.x - battery_radius,
     center.y - battery_radius,
     battery_radius * 2,
@@ -138,6 +154,8 @@ static void draw_analog_time(GContext *ctx, GRect bounds, struct tm *t) {
   graphics_draw_arc(ctx, battery_bounds, GOvalScaleModeFitCircle, 0, TRIG_MAX_ANGLE);
   const BatteryChargeState state = battery_state_service_peek();
   const bool connected = connection_service_peek_pebble_app_connection();
+
+  graphics_context_set_stroke_width(ctx, INNER_RING_W + 2);
   graphics_context_set_stroke_color(
     ctx,
     connected ? PBL_IF_COLOR_ELSE(GColorGreen, GColorWhite) : GColorLightGray
@@ -153,12 +171,15 @@ static void draw_analog_time(GContext *ctx, GRect bounds, struct tm *t) {
   // Time hands
   const int total_hours_mins = ((t->tm_hour % 12) * 60) + t->tm_min;
   GPoint hour_end = util_make_hand_point(total_hours_mins, 720, scl_x(180), center);
-  graphics_context_set_stroke_color(ctx, PBL_IF_COLOR_ELSE(GColorLightGray, GColorWhite));
+  graphics_context_set_stroke_color(
+    ctx,
+    PBL_IF_COLOR_ELSE(s_is_white_bg ? GColorDarkGray : GColorLightGray, GColorWhite)
+  );
   graphics_context_set_stroke_width(ctx, INNER_RING_W + 1);
   graphics_draw_line(ctx, center, hour_end);
 
   GPoint mins_end = util_make_hand_point(t->tm_min, 60, scl_x(260), center);
-  graphics_context_set_stroke_color(ctx, GColorWhite);
+  graphics_context_set_stroke_color(ctx, s_is_white_bg ? GColorBlack : GColorWhite);
   graphics_context_set_stroke_width(ctx, INNER_RING_W);
   graphics_draw_line(ctx, center, mins_end);
 
@@ -177,6 +198,7 @@ static void draw_analog_time(GContext *ctx, GRect bounds, struct tm *t) {
 static void draw_date_and_time_display(GContext *ctx, GRect bounds, struct tm *t) {
   PersistData *persist_data = data_get_persist_data();
 
+  const bool s_is_white_bg = gcolor_equal(data_get_bg_color(), GColorWhite);
   const bool is_digital = strcmp(persist_data->clock_mode, CLOCK_MODE_DIGITAL) == 0;
   if (is_digital) {
     draw_digital_time(ctx, bounds, t);
@@ -196,7 +218,7 @@ static void draw_date_and_time_display(GContext *ctx, GRect bounds, struct tm *t
     bounds.size.w,
     50
   );
-  graphics_context_set_text_color(ctx, GColorWhite);
+  graphics_context_set_text_color(ctx, s_is_white_bg ? GColorBlack : GColorWhite);
   graphics_draw_text(
     ctx,
     date_buff,
@@ -231,7 +253,7 @@ static void draw_weather_display(GContext *ctx, GRect bounds) {
   } else {
     snprintf(s_current_buff, sizeof(s_current_buff), "...");
   }
-  graphics_context_set_text_color(ctx, GColorWhite);
+  graphics_context_set_text_color(ctx, s_is_white_bg ? GColorBlack : GColorWhite);
   graphics_draw_text(
     ctx,
     s_current_buff,
@@ -260,7 +282,6 @@ static void draw_weather_display(GContext *ctx, GRect bounds) {
     util_convert_temp(persist_data, data_get_min_temp()),
     util_convert_temp(persist_data, data_get_max_temp())
   );
-  graphics_context_set_text_color(ctx, GColorWhite);
   graphics_draw_text(
     ctx,
     s_low_high_buff,
@@ -458,7 +479,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
 
     // Draw notch meeting day progress arc to indicate
     const int notch_outer_radius = half_w - INNER_RING_INSET + 1;
-    const int notch_inner_radius = notch_outer_radius - NOTCH_L;
+    const int notch_inner_radius = notch_outer_radius - NOTCH_L - 5;
     GPoint day_notch_start = util_make_hand_point(
       s_day_prog_angle,
       TRIG_MAX_ANGLE,
@@ -545,9 +566,7 @@ static void window_load(Window *window) {
   Layer *window_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(window_layer);
 
-  s_temp_bitmap = gbitmap_create_with_resource(RESOURCE_ID_ICON_TEMP);
-  s_wind_bitmap = gbitmap_create_with_resource(RESOURCE_ID_ICON_WIND);
-  s_humidity_bitmap = gbitmap_create_with_resource(RESOURCE_ID_ICON_HUMIDITY);
+  reload_bitmaps();
 
   s_canvas_layer = layer_create(bounds);
   layer_set_update_proc(s_canvas_layer, canvas_update_proc);
@@ -566,6 +585,8 @@ static void window_unload(Window *window) {
 }
 
 void main_window_push() {
+  s_is_white_bg = gcolor_equal(data_get_bg_color(), GColorWhite);
+
   if(!s_window) {
     s_window = window_create();
     window_set_window_handlers(s_window, (WindowHandlers) {
@@ -586,7 +607,11 @@ void main_window_reload() {
   PersistData *persist_data = data_get_persist_data();
 
   s_last_update_time = time(NULL);
+  s_is_white_bg = gcolor_equal(data_get_bg_color(), GColorWhite);
 
+  reload_bitmaps();
+
+  // Update display
   if (strcmp(persist_data->animations, "true") == 0) {
     s_anim_prog_angle = 0;
     s_anim_progress = 0;
