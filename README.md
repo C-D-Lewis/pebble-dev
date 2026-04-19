@@ -26,7 +26,7 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `cmd-time`            | ![](watchfaces/cmd-time/screenshots/diorite.png)           | `A - E`             | ✅    | [pbw](pbw/cmd-time.pbw)            |
 | `dayring`             | ![](watchfaces/dayring/screenshots/basalt.png)             | `A - G`             |      | [pbw](pbw/dayring.pbw)             |
 | `deep-rock`           | ![](watchfaces/deep-rock/screenshots/basalt.png)           | `A` `B` `D` `E` `F` |      | [pbw](pbw/deep-rock.pbw)           |
-| `dont-panic`          | ![](watchfaces/dont-panic/screenshots/emery.png)           | `(E)`               |      | [pbw](pbw/dont-panic.pbw)          |
+| `dont-panic`          | ![](watchfaces/dont-panic/screenshots/emery.png)           | `B` `C` `E` `G`     |      | [pbw](pbw/dont-panic.pbw)          |
 | `dual-gauge`          | ![](watchfaces/dual-gauge/screenshots/basalt.png)          | `A - D`             |      | [pbw](pbw/dual-gauge.pbw)          |
 | `eclipse`             | ![](watchfaces/eclipse/screenshots/aplite.png)             | `A` `B` `D`         |      | [pbw](pbw/eclipse.pbw)             |
 | `eventful`            | ![](watchfaces/eventful/screenshots/aplite.png)            | `A - D`             |      | [pbw](pbw/eventful.pbw)            |
