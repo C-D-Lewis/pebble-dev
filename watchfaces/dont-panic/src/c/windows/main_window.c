@@ -23,13 +23,21 @@ static void window_load(Window *window) {
   bitmap_layer_set_bitmap(s_bg_layer, s_bg_bitmap);
   layer_add_child(root_layer, bitmap_layer_get_layer(s_bg_layer));
 
-  s_time_layer = text_layer_create(GRect(0, 20, 200, 100));
+#if defined(PBL_PLATFORM_EMERY) || defined(PBL_PLATFORM_GABBRO)
+  const uint32_t res_id = RESOURCE_ID_ABSENDER_64;
+#else
+  const uint32_t res_id = RESOURCE_ID_ABSENDER_48;
+#endif
+
+  s_time_layer = text_layer_create(
+    GRect(0, scl_y_pp({.o = 210, .c = 150, .e = 180, .g = 170}), PS_DISP_W, 100)
+  );
   text_layer_set_text_alignment(s_time_layer, GTextAlignmentCenter);
   text_layer_set_background_color(s_time_layer, GColorClear);
   text_layer_set_text_color(s_time_layer, GColorWhite);
   text_layer_set_font(
     s_time_layer,
-    fonts_load_custom_font(resource_get_handle(RESOURCE_ID_ABSENDER_64))
+    fonts_load_custom_font(resource_get_handle(res_id))
   );
   layer_add_child(root_layer, text_layer_get_layer(s_time_layer));
 }

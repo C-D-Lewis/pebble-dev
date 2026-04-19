@@ -12,7 +12,12 @@
         {
           "type": "png",
           "name": "BACKGROUND",
-          "file": "images/background.png"
+          "file": "images/bg.png"
+        },
+        {
+          "type": "font",
+          "name": "ABSENDER_48",
+          "file": "fonts/absender.ttf"
         },
         {
           "type": "font",
@@ -23,8 +28,7 @@
     },
     "projectType": "native",
     "uuid": "e1886c59-5b71-4b00-959c-424242424242",
-    "messageKeys": {
-    },
+    "messageKeys": {},
     "enableMultiJS": true,
     "displayName": "dont-panic",
     "watchapp": {
@@ -33,9 +37,15 @@
       "watchface": true
     },
     "targetPlatforms": [
-      "emery"
+      "basalt",
+      "chalk",
+      "emery",
+      "gabbro"
     ],
     "capabilities": []
   },
-  "name": "dont-panic"
+  "name": "dont-panic",
+  "dependencies": {
+    "pebble-scalable": "^2.2.0"
+  }
 }
