@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "author": "Chris Lewis",
   "private": true,
   "keywords": [
@@ -30,7 +30,7 @@
     "uuid": "e1886c59-5b71-4b00-959c-424242424242",
     "messageKeys": {},
     "enableMultiJS": true,
-    "displayName": "dont-panic",
+    "displayName": "Don't Panic",
     "watchapp": {
       "onlyShownOnCommunication": false,
       "hiddenApp": false,
