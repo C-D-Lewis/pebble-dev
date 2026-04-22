@@ -174,7 +174,8 @@ export const GlobalStatsCard = () => AppCard()
   .setStyles({ marginTop: '25px' })
   .setChildren([
     CardTitle().setText('Global Stats'),
-    Text().setText('These averages are derived from all Muninn users who opted to upload their history. Over time, more users will hopefully increase data accuracy.'),
+    Text().setText('These averages are derived from all Muninn users who opted to upload their history. Over time, more users will increase data accuracy.'),
+    Annotation().setText('Accuracy may vary if data issues are present such as long gaps, missing samples, large outliers etc.'),
     Separator(),
     fabricate.conditional(
       (state) => state.globalStats.historyCount !== 0,
