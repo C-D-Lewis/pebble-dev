@@ -96,7 +96,6 @@ void out_sent_handler(DictionaryIterator *iterator, void *context) {
 
 void inbox_received_handler(DictionaryIterator *iter, void *context) {
   PersistData *persist_data = data_get_persist_data();
-  AppState *app_state = data_get_app_state();
 
   // Things to do when JS is ready
   // We can only respond with one AppMessage at a time it seems
@@ -113,6 +112,8 @@ void inbox_received_handler(DictionaryIterator *iter, void *context) {
   }
 
 #ifdef FEATURE_SYNC
+  AppState *app_state = data_get_app_state();
+  
   // Response to sync info request
   t = dict_find(iter, MESSAGE_KEY_SYNC_TIMESTAMP);
   if (t) {

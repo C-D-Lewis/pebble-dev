@@ -39,7 +39,7 @@ static int s_days_remaining, s_rate, s_anim_days, s_anim_rate;
 static void update_subtitle(int days) {
   static char s_subtitle_buff[40];
 #if defined(PBL_PLATFORM_EMERY)
-  const char *template = "    Day%s left        Est. %%/day";
+  const char *template = "   Day%s left        Est. %%/day";
 #elif defined(PBL_PLATFORM_CHALK)
   const char *template = "      Day%s left       Est. %%/day";
 #else
@@ -257,7 +257,8 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   graphics_context_set_stroke_width(ctx, LINE_W);
 
   // Vertical
-  const int v_div_x = (PS_DISP_W / 2) - scl_x(40);
+  const int v_div_nudge = scl_x_pp({.o = 70, .c = 40});
+  const int v_div_x = (PS_DISP_W / 2) - v_div_nudge;
   const int v_div_y = scl_y_pp({.o = 365, .c = 350, .e = 355});
   const int v_div_h = scl_y_pp({.o = 700, .c = 475, .e = 700});
   graphics_draw_line(
@@ -331,7 +332,12 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   graphics_draw_bitmap_in_rect(
     ctx,
     bitmaps_get(RESOURCE_ID_RATE),
-    GRect(scl_x(530), scl_y_pp({.o = 390, .e = 385}), ICON_SIZE, ICON_SIZE)
+    GRect(
+      scl_x_pp({.o = 500, .c = 530}),
+      scl_y_pp({.o = 390, .e = 385}),
+      ICON_SIZE,
+      ICON_SIZE
+    )
   );
 #endif
 
@@ -344,8 +350,8 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     ctx,
     bitmaps_get(RESOURCE_ID_NEXT_CHARGE),
     GRect(
-      scl_x_pp({.o = 480, .c = 500, .e = 490}),
-      scl_y_pp({.o = 665, .e = 670}),
+      scl_x_pp({.o = 450, .c = 500, .e = 450}),
+      scl_y_pp({.o = 665, .c = 670, .e = 670}),
       ICON_SIZE,
       ICON_SIZE
     )
@@ -362,7 +368,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   graphics_context_set_stroke_color(ctx, GColorBlack);
   graphics_context_set_stroke_width(ctx, 1);
 
-  const int icon_x = scl_x(470);
+  const int icon_x = scl_x(450);
   const int icon_y = scl_y(845);
   const int center_x = icon_x + (ICON_SIZE / 2);
   const int center_y = icon_y + (ICON_SIZE / 2);
@@ -377,7 +383,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     ctx,
     bitmaps_get(RESOURCE_ID_READING),
     GRect(
-      scl_x_pp({.o = 470, .c = 330, .e = 490}),
+      scl_x_pp({.o = 460, .c = 330, .e = 470}),
       scl_y_pp({.o = 850, .c = 840, .e = 860}),
       ICON_SIZE,
       ICON_SIZE
@@ -443,6 +449,8 @@ static void window_load(Window *window) {
   text_layer_set_text_color(s_desc_layer, GColorWhite);
   layer_add_child(root_layer, text_layer_get_layer(s_desc_layer));
 
+  // TODO: Move ALL of this to the draw procedure, break it into functions
+
   // Row 1
   int row_x = scl_x_pp({.o = 40, .c = 60, .e = 50});
   int row_y = scl_y_pp({.o = 350, .e = 365});
@@ -458,7 +466,7 @@ static void window_load(Window *window) {
   );
   layer_add_child(root_layer, text_layer_get_layer(s_remaining_layer));
 
-  row_x += scl_x_pp({.o = 485, .c = 445, .e = 485});
+  row_x += scl_x_pp({.o = 465, .c = 445, .e = 475});
 
   s_rate_layer = util_make_text_layer(
     GRect(row_x, row_y, PS_DISP_W, 100),
@@ -483,7 +491,7 @@ static void window_load(Window *window) {
   );
   layer_add_child(root_layer, text_layer_get_layer(s_last_charge_layer));
 
-  row_x += scl_x_pp({.o = 450, .c = 380, .e = 450});
+  row_x += scl_x_pp({.o = 430, .c = 380, .e = 410});
 
   s_next_charge_layer = util_make_text_layer(
     GRect(row_x, row_y, PS_DISP_W, 100),
