@@ -34,21 +34,36 @@ static void draw_hour_chunk(GContext *ctx, GRect bounds, int hour, int inset, bo
   if (chunk_end_angle > s_anim_prog_angle) return;
 
   if (striped) {
-    const int chunk_size = chunk_end_angle - chunk_start_angle;
-    const int stroke_size = chunk_size / NUM_PATTERN_STROKES;
-    // Slim slices between start and end
-    for (int i = 0; i < NUM_PATTERN_STROKES; i++) {
-      if (i % 2 == 0) continue;
+    // OLD WAY
+    // const int chunk_size = chunk_end_angle - chunk_start_angle;
+    // const int stroke_size = chunk_size / NUM_PATTERN_STROKES;
+    // // Slim slices between start and end
+    // for (int i = 0; i < NUM_PATTERN_STROKES; i++) {
+    //   if (i % 2 == 0) continue;
 
-      const int slice_start_angle = chunk_start_angle + (i * stroke_size);
-      const int slice_end_angle = slice_start_angle + stroke_size;
-      graphics_fill_radial(
+    //   const int slice_start_angle = chunk_start_angle + (i * stroke_size);
+    //   const int slice_end_angle = slice_start_angle + stroke_size;
+    //   graphics_fill_radial(
+    //     ctx,
+    //     bounds,
+    //     GOvalScaleModeFitCircle,
+    //     inset,
+    //     slice_start_angle,
+    //     slice_end_angle
+    //   );
+    // }
+
+    // NEW WAY using lines, should be faster
+    const int half_w = bounds.size.w / 2;
+    const int half_h = bounds.size.h / 2;
+    const GPoint center = GPoint(half_w, half_h);
+    const int interval = TRIG_MAX_ANGLE / (NUM_PATTERN_STROKES * 24 / 2); // *2 because every other is blank
+    graphics_context_set_stroke_width(ctx, STROKE_W);
+    for (int angle = chunk_start_angle; angle < chunk_end_angle; angle += interval) {
+      graphics_draw_line(
         ctx,
-        bounds,
-        GOvalScaleModeFitCircle,
-        inset,
-        slice_start_angle,
-        slice_end_angle
+        util_make_hand_point(angle, TRIG_MAX_ANGLE, half_w, center),
+        util_make_hand_point(angle, TRIG_MAX_ANGLE, half_w - inset, center)
       );
     }
   } else {
@@ -264,6 +279,9 @@ static void draw_weather_display(GContext *ctx, GRect bounds) {
     NULL
   );
 
+  // If invalid, stop after showing the error message
+  if (!util_weather_data_is_valid()) return;
+
   const int text_x = scl_x_pp({.o = 410, .c = 380, .e = 420, .g = 350});
   const int icon_x = scl_x_pp({.o = 220, .c = 220, .e = 260, .g = 220});
 
@@ -340,6 +358,8 @@ static void draw_weather_display(GContext *ctx, GRect bounds) {
 static void canvas_update_proc(Layer *layer, GContext *ctx) {
   AppState *app_state = data_get_app_state();
   PersistData *persist_data = data_get_persist_data();
+
+  graphics_context_set_antialiased(ctx, false);
 
   GRect bounds = layer_get_bounds(layer);
   const int half_w = bounds.size.w / 2;
@@ -424,7 +444,12 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     const bool do_stripes = strcmp(persist_data->cloud_render_mode, CLOUD_RENDER_MODE_STRIPED) == 0;
     const bool striped = do_stripes &&
       (gcolor_equal(color, GColorLightGray) || gcolor_equal(color, GColorDarkGray));
-    graphics_context_set_fill_color(ctx, color);
+    if (striped) {
+      graphics_context_set_stroke_color(ctx, color);
+      graphics_context_set_stroke_width(ctx, STROKE_W);
+    } else {
+      graphics_context_set_fill_color(ctx, color);
+    }
     draw_hour_chunk(ctx, chunk_bounds, i, thickness, striped);
   }
 
@@ -465,34 +490,6 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
       app_state->sunset,
       PBL_IF_COLOR_ELSE(GColorChromeYellow, GColorWhite)
     );
-
-    // Day progress indicator
-    graphics_context_set_stroke_color(ctx, PBL_IF_COLOR_ELSE(GColorDarkGray, GColorWhite));
-    graphics_context_set_stroke_width(ctx, INNER_RING_W);
-    graphics_draw_arc(
-      ctx,
-      grect_inset(bounds, GEdgeInsets(INNER_RING_INSET -1)),
-      GOvalScaleModeFitCircle,
-      0,
-      s_day_prog_angle
-    );
-
-    // Draw notch meeting day progress arc to indicate
-    const int notch_outer_radius = half_w - INNER_RING_INSET + 1;
-    const int notch_inner_radius = notch_outer_radius - NOTCH_L - 5;
-    GPoint day_notch_start = util_make_hand_point(
-      s_day_prog_angle,
-      TRIG_MAX_ANGLE,
-      notch_outer_radius,
-      center
-    );
-    GPoint day_notch_end = util_make_hand_point(
-      s_day_prog_angle,
-      TRIG_MAX_ANGLE,
-      notch_inner_radius,
-      center
-    );
-    graphics_draw_line(ctx, day_notch_start, day_notch_end);
   }
 
   // TEST
@@ -502,6 +499,32 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   } else {
     draw_weather_display(ctx, bounds);
   }
+
+  // Day progress indicator
+  graphics_context_set_stroke_color(ctx, PBL_IF_COLOR_ELSE(GColorDarkGray, GColorWhite));
+  graphics_context_set_stroke_width(ctx, INNER_RING_W);
+  graphics_draw_arc(
+    ctx,
+    grect_inset(bounds, GEdgeInsets(INNER_RING_INSET -1)),
+    GOvalScaleModeFitCircle,
+    0,
+    s_day_prog_angle
+  );
+  const int notch_outer_radius = half_w - INNER_RING_INSET + 1;
+  const int notch_inner_radius = notch_outer_radius - NOTCH_L - 5;
+  GPoint day_notch_start = util_make_hand_point(
+    s_day_prog_angle,
+    TRIG_MAX_ANGLE,
+    notch_outer_radius,
+    center
+  );
+  GPoint day_notch_end = util_make_hand_point(
+    s_day_prog_angle,
+    TRIG_MAX_ANGLE,
+    notch_inner_radius,
+    center
+  );
+  graphics_draw_line(ctx, day_notch_start, day_notch_end);
 }
 
 /******************************************* Animations *******************************************/

@@ -19,3 +19,11 @@ int util_convert_wind_speed(PersistData *persist_data, int val_kph) {
     ? (val_kph * 1000) / 1609
     : val_kph;
 }
+
+bool util_weather_data_is_valid() {
+  AppState *app_state = data_get_app_state();
+
+  // If the current code is set and it isn't an error, weather is proabbly populated
+  return app_state->current_code != DATA_EMPTY
+    && app_state->current_code != WEATHER_ERROR;
+};

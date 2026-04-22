@@ -28,6 +28,7 @@
 #endif
 
 // Layout
+#define STROKE_W 1
 #define OUTER_SEP_W 2
 #define TEMP_RING_INSET (OUTER_RING_INSET + OUTER_RING_W - 3)
 #define INNER_RING_INSET (TEMP_RING_INSET + TEMP_RING_W + 1)

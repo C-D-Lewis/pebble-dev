@@ -128,9 +128,18 @@ const sendWeather = async () => {
     // Send to watch
     await PebbleTS.sendAppMessage(dict);
     console.log('Weather data sent to watch');
-  } catch (e) {
+  } catch (err: unknown) {
     console.log('Error fetching weather');
-    console.log(e);
+
+    if (err instanceof Error) {
+      console.log('Error string: ' + JSON.stringify(err));
+    } else {
+      const e = err as GeolocationPositionError;
+      if (e.code || e.message) {
+        console.log('Error Code: ' + e.code);
+        console.log('Error Msg: ' + e.message);
+      }
+    }
 
     await PebbleTS.sendAppMessage({ WEATHER_ERROR: 1 });
   }
