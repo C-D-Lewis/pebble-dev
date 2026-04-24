@@ -240,6 +240,9 @@ void util_draw_button_hints(GContext *ctx, bool hints[3]) {
 
 void util_draw_skyline(GContext *ctx, bool is_nighttime) {
   // Mascot banner
+  // const GColor day_color = PBL_IF_COLOR_ELSE(GColorVividCerulean, GColorWhite);
+  // const GColor night_color = PBL_IF_COLOR_ELSE(GColorOxfordBlue, GColorBlack);
+  // graphics_context_set_fill_color(ctx, is_nighttime ? night_color : day_color);
   graphics_context_set_fill_color(ctx, is_nighttime ? GColorBlack : GColorWhite);
   const uint8_t skyline_y = scl_y(160);
   const GRect skyline_rect = GRect(0, 0, PS_DISP_W, skyline_y);

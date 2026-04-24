@@ -24,10 +24,7 @@ static TextLayer
   *s_battery_layer,
   *s_reading_layer,
   *s_row_1_subtitle_layer,
-  *s_remaining_layer,
-  *s_rate_layer,
   *s_hint_layer,
-  *s_last_charge_layer,
   *s_next_charge_layer;
 
 static GBitmap *s_mascot_bitmap, *s_batt_bitmap;
@@ -35,6 +32,11 @@ static AppTimer *s_blink_timer;
 static int s_blink_budget;
 static bool s_is_blinking, s_is_enabled;
 static int s_days_remaining, s_rate, s_anim_days, s_anim_rate;
+
+// Text buffers
+static char s_remaining_buff[4];
+static char s_rate_buff[4];
+static char s_fmt_lc_buff[8];
 
 static void update_subtitle(int days) {
   static char s_subtitle_buff[40];
@@ -63,24 +65,20 @@ static void update_anim_text() {
   // Separate tens and units for decimal point display
   const int days_10x = data_calculate_days_remaining(true);
   int tens = days_10x / 10;
-  static char s_remaining_buff[8];
   if (animating || tens >= 10) {
     snprintf(s_remaining_buff, sizeof(s_remaining_buff), "%d", days);
   } else {
     // Show with more precision if not animating and less than 10 days remaining
     snprintf(s_remaining_buff, sizeof(s_remaining_buff), "%d.%d", tens, days_10x % 10);
   }
-  text_layer_set_text(s_remaining_layer, s_remaining_buff);
 
   const int rate_100x = data_calculate_avg_discharge_rate_x100(false);
   tens = rate_100x / 100;
-  static char s_rate_buff[8];
   if (animating || tens >= 10) {
     snprintf(s_rate_buff, sizeof(s_rate_buff), "%d", rate);
   } else {
     snprintf(s_rate_buff, sizeof(s_rate_buff), "%d.%d", tens, (rate_100x % 100) / 10);
   }
-  text_layer_set_text(s_rate_layer, s_rate_buff);
 }
 
 #ifdef FEATURE_ANIMATIONS
@@ -164,8 +162,8 @@ static void update_data() {
   if (!s_is_enabled) {
     // Anything that makes predictions should not be shown if not actively monitoring
     text_layer_set_text(s_reading_layer, " --:--");
-    text_layer_set_text(s_remaining_layer, "--");
-    text_layer_set_text(s_rate_layer, "--");
+    snprintf(s_remaining_buff, sizeof(s_remaining_buff), "--");
+    snprintf(s_rate_buff, sizeof(s_rate_buff), "--");
     text_layer_set_text(s_next_charge_layer, "--");
 
     layer_set_hidden(text_layer_get_layer(s_hint_layer), false);
@@ -178,13 +176,13 @@ static void update_data() {
     if (util_is_not_status(s_days_remaining)) {
 #ifdef FEATURE_ANIMATIONS
       // Handled in animation
-      text_layer_set_text(s_remaining_layer, "--");
+      snprintf(s_remaining_buff, sizeof(s_remaining_buff), "--");
 #else
       // Set statically
       update_anim_text();
 #endif
     } else {
-      text_layer_set_text(s_remaining_layer, "--");
+      snprintf(s_remaining_buff, sizeof(s_remaining_buff), "--");
     }
 
     update_subtitle(s_days_remaining);
@@ -193,16 +191,15 @@ static void update_data() {
     s_rate = data_calculate_avg_discharge_rate_x100(false) / 100;
     if (util_is_not_status(s_rate)) {
 #ifdef FEATURE_ANIMATIONS
-      text_layer_set_text(s_rate_layer, "--");
+      snprintf(s_rate_buff, sizeof(s_rate_buff), "--");
 #else
       update_anim_text();
 #endif
     } else {
-      text_layer_set_text(s_rate_layer, "--");
+      snprintf(s_rate_buff, sizeof(s_rate_buff), "--");
     }
 
     // "Xd" last charge time
-    static char s_fmt_lc_buff[8];
     const int last_charge_ts = persist_data->last_charge_time;
     if (util_is_not_status(last_charge_ts)) {
       util_fmt_time_ago(
@@ -210,17 +207,17 @@ static void update_data() {
         &s_fmt_lc_buff[0],
         sizeof(s_fmt_lc_buff)
       );
-      text_layer_set_text(s_last_charge_layer, s_fmt_lc_buff);
     } else {
-      text_layer_set_text(s_last_charge_layer, "--");
+      snprintf(s_fmt_lc_buff, sizeof(s_fmt_lc_buff), "--");
     }
 
-    // "12 Dec" next charge time
+    // "01/12" next charge time
+    // TODO: Add setting for DD/MM vs MM/DD
     static char s_nc_buff[8];
     time_t next_charge_ts = data_get_next_charge_time();
     if (util_is_not_status(next_charge_ts)) {
       struct tm *nc_info = localtime(&next_charge_ts);
-      strftime(s_nc_buff, sizeof(s_nc_buff), "%d %b", nc_info);
+      strftime(s_nc_buff, sizeof(s_nc_buff), "%d/%m", nc_info);
       text_layer_set_text(s_next_charge_layer, s_nc_buff);
     } else {
       text_layer_set_text(s_next_charge_layer, "--");
@@ -252,44 +249,15 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   const GRect braid_rect = GRect(0, BRAID_Y, PS_DISP_W - ACTION_BAR_W, BRAID_H);
   util_draw_braid(ctx, braid_rect);
 
-  // Row dividers
-  graphics_context_set_stroke_color(ctx, GColorBlack);
-  graphics_context_set_stroke_width(ctx, LINE_W);
-
-  // Vertical
-  const int v_div_nudge = scl_x_pp({.o = 70, .c = 40});
-  const int v_div_x = (PS_DISP_W / 2) - v_div_nudge;
-  const int v_div_y = scl_y_pp({.o = 365, .c = 350, .e = 355});
-  const int v_div_h = scl_y_pp({.o = 700, .c = 475, .e = 700});
-  graphics_draw_line(
-    ctx,
-    GPoint(v_div_x, v_div_y),
-    GPoint(v_div_x, v_div_y + v_div_h)
-  );
-
-  // Horizontal below row 1
-  const int row_2_div_y = scl_y_pp({.o = 650, .e = 630});
-  graphics_draw_line(
-    ctx,
-    GPoint(0, row_2_div_y),
-    GPoint(PS_DISP_W - (ACTION_BAR_W), row_2_div_y)
-  );
-
-  // Horizontal below row 2
-  const int row_3_div_y = scl_y_pp({.o = 830, .c = 835, .e = 835});
-  graphics_draw_line(
-    ctx,
-    GPoint(0, row_3_div_y),
-    GPoint(PS_DISP_W - ACTION_BAR_W, row_3_div_y)
-  );
-
   // Status BG
   graphics_context_set_fill_color(ctx, GColorBlack);
   graphics_fill_rect(ctx, scl_grect(0, 160, 940, 120), 0, GCornerNone);
 
+  // Skyline
   const bool is_night = util_get_is_night();
   util_draw_skyline(ctx, is_night);
 
+  // Hints
   util_draw_button_hints(ctx, (bool[3]){true, true, true});
 
   // Mascot
@@ -315,6 +283,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     graphics_fill_rect(ctx, EYE_RECT, 0, GCornerNone);
   }
 
+  // Bitmaps
   BatteryChargeState state = battery_state_service_peek();
   if (s_batt_bitmap != NULL) {
     bitmaps_destroy_ptr(s_batt_bitmap);
@@ -322,54 +291,91 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   }
   s_batt_bitmap = bitmaps_get(util_get_battery_resource_id(state.charge_percent));
 
-  // Save memory for Aplite, draw icons that don't change without a BitmapLayer
+  int icon_x = scl_x_pp({.o = 40, .c = 80});
+  int icon_y = scl_y_pp({.o = 390, .e = 385});
+  int text_x = icon_x + ICON_SIZE + scl_x(20);
+  int text_y = icon_y - scl_y_pp({.o = 40, .e = 15});
+
+  // Left column
 #if !defined(PBL_PLATFORM_APLITE)
   graphics_draw_bitmap_in_rect(
     ctx,
     bitmaps_get(RESOURCE_ID_REMAINING),
-    GRect(scl_x_pp({.o = 40, .c = 80}), scl_y_pp({.o = 390, .e = 385}), ICON_SIZE, ICON_SIZE)
+    GRect(icon_x, icon_y, ICON_SIZE, ICON_SIZE)
    );
-  graphics_draw_bitmap_in_rect(
-    ctx,
-    bitmaps_get(RESOURCE_ID_RATE),
-    GRect(
-      scl_x_pp({.o = 500, .c = 530}),
-      scl_y_pp({.o = 390, .e = 385}),
-      ICON_SIZE,
-      ICON_SIZE
-    )
-  );
 #endif
+  graphics_context_set_text_color(ctx, GColorBlack);
+  graphics_draw_text(
+    ctx,
+    s_remaining_buff,
+    scl_get_font(SFI_LargeBold),
+    GRect(text_x, text_y, 100, 50),
+    GTextOverflowModeWordWrap,
+    GTextAlignmentLeft,
+    NULL
+  );
+
+  icon_y += scl_y_pp({.o = 290, .e = 285});
+  text_y = icon_y - scl_y_pp({.o = 20, .e = 15});
+
+  graphics_draw_text(
+    ctx,
+    s_fmt_lc_buff,
+    scl_get_font(SFI_Medium),
+    GRect(text_x, text_y, 100, 50),
+    GTextOverflowModeWordWrap,
+    GTextAlignmentLeft,
+    NULL
+  );
 
   graphics_draw_bitmap_in_rect(
     ctx,
     bitmaps_get(RESOURCE_ID_LAST_CHARGE),
-    GRect(scl_x_pp({.o = 30, .c = 140}), scl_y_pp({.o = 665, .e = 670}), ICON_SIZE, ICON_SIZE)
+    GRect(icon_x, icon_y, ICON_SIZE, ICON_SIZE)
   );
+
+  icon_y += scl_y_pp({.o = 190, .e = 185});
+
+  graphics_draw_bitmap_in_rect(ctx, s_batt_bitmap, GRect(icon_x, icon_y, ICON_SIZE, ICON_SIZE));
+
+  // Right column
+  icon_x = scl_x_pp({.o = 480, .c = 530});
+  icon_y = scl_y_pp({.o = 390, .e = 385});
+  text_x = icon_x + ICON_SIZE + scl_x(20);
+  text_y = icon_y - scl_y_pp({.o = 40, .e = 15});
+
+#if !defined(PBL_PLATFORM_APLITE)
+  graphics_draw_bitmap_in_rect(
+    ctx,
+    bitmaps_get(RESOURCE_ID_RATE),
+    GRect(icon_x, icon_y, ICON_SIZE, ICON_SIZE)
+  );
+#endif
+  graphics_draw_text(
+    ctx,
+    s_rate_buff,
+    scl_get_font(SFI_LargeBold),
+    GRect(text_x, text_y, 100, 50),
+    GTextOverflowModeWordWrap,
+    GTextAlignmentLeft,
+    NULL
+  );
+
+  icon_y += scl_y_pp({.o = 290, .e = 285});
+  
   graphics_draw_bitmap_in_rect(
     ctx,
     bitmaps_get(RESOURCE_ID_NEXT_CHARGE),
-    GRect(
-      scl_x_pp({.o = 450, .c = 500, .e = 450}),
-      scl_y_pp({.o = 665, .c = 670, .e = 670}),
-      ICON_SIZE,
-      ICON_SIZE
-    )
+    GRect(icon_x, icon_y, ICON_SIZE, ICON_SIZE)
   );
 
-  graphics_draw_bitmap_in_rect(
-    ctx,
-    s_batt_bitmap,
-    GRect(scl_x(10), scl_y_pp({.o = 845, .e = 860}), ICON_SIZE, ICON_SIZE)
-  );
+  icon_y += scl_y_pp({.o = 190, .e = 185});
 
 #if defined(PBL_PLATFORM_APLITE)
   // Draw clock instead of bitmap for 'next sample'
   graphics_context_set_stroke_color(ctx, GColorBlack);
   graphics_context_set_stroke_width(ctx, 1);
 
-  const int icon_x = scl_x(450);
-  const int icon_y = scl_y(845);
   const int center_x = icon_x + (ICON_SIZE / 2);
   const int center_y = icon_y + (ICON_SIZE / 2);
   graphics_draw_circle(ctx, GPoint(center_x, center_y), (ICON_SIZE / 2) - 4);
@@ -382,12 +388,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   graphics_draw_bitmap_in_rect(
     ctx,
     bitmaps_get(RESOURCE_ID_READING),
-    GRect(
-      scl_x_pp({.o = 460, .c = 330, .e = 470}),
-      scl_y_pp({.o = 850, .c = 840, .e = 860}),
-      ICON_SIZE,
-      ICON_SIZE
-    )
+    GRect(icon_x, icon_y, ICON_SIZE, ICON_SIZE)
    );
 #endif
 }
@@ -460,19 +461,7 @@ static void window_load(Window *window) {
   row_x += scl_x_pp({.o = 190, .e = 150});
 #endif
 
-  s_remaining_layer = util_make_text_layer(
-    GRect(row_x, row_y, PS_DISP_W, 100),
-    scl_get_font(SFI_LargeBold)
-  );
-  layer_add_child(root_layer, text_layer_get_layer(s_remaining_layer));
-
   row_x += scl_x_pp({.o = 465, .c = 445, .e = 475});
-
-  s_rate_layer = util_make_text_layer(
-    GRect(row_x, row_y, PS_DISP_W, 100),
-    scl_get_font(SFI_LargeBold)
-  );
-  layer_add_child(root_layer, text_layer_get_layer(s_rate_layer));
 
   s_row_1_subtitle_layer = util_make_text_layer(
     GRect(2, row_y + scl_y_pp({.o = 155, .e = 120}), PS_DISP_W - ACTION_BAR_W, 40),
@@ -485,11 +474,6 @@ static void window_load(Window *window) {
   row_y = scl_y_pp({.o = 635, .c = 650, .e = 650});
 
   const int text_ico_nudge = scl_x_pp({.o = 60, .e = 40});
-  s_last_charge_layer = util_make_text_layer(
-    GRect(row_x + text_ico_nudge, row_y, PS_DISP_W, 100),
-    scl_get_font(SFI_Medium)
-  );
-  layer_add_child(root_layer, text_layer_get_layer(s_last_charge_layer));
 
   row_x += scl_x_pp({.o = 430, .c = 380, .e = 410});
 
@@ -543,10 +527,7 @@ static void window_unload(Window *window) {
   text_layer_destroy(s_row_1_subtitle_layer);
   text_layer_destroy(s_battery_layer);
   text_layer_destroy(s_reading_layer);
-  text_layer_destroy(s_remaining_layer);
-  text_layer_destroy(s_rate_layer);
   text_layer_destroy(s_hint_layer);
-  text_layer_destroy(s_last_charge_layer);
   text_layer_destroy(s_next_charge_layer);
 
   layer_destroy(s_canvas_layer);
