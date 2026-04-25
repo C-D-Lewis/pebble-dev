@@ -21,6 +21,8 @@ bool util_is_not_status(int v);
 
 bool util_is_not_charging(int v);
 
+void util_draw_braid(GContext *ctx, GRect rect);
+
 void util_menu_cell_draw(GContext *ctx, Layer *layer, char *title, char *desc);
 
 void util_draw_button_hints(GContext *ctx, bool hints[3]);

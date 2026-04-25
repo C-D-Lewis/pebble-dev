@@ -111,6 +111,35 @@ bool util_is_not_charging(int v) {
   return util_is_not_status(v) || v == STATUS_NO_CHANGE;
 }
 
+void util_draw_braid(GContext *ctx, GRect rect) {
+// #if !defined(PBL_PLATFORM_APLITE)
+  graphics_draw_bitmap_in_rect(ctx, bitmaps_get(RESOURCE_ID_BRAID), rect);
+// #else
+//   graphics_context_set_fill_color(ctx, GColorBlack);
+//   graphics_fill_rect(ctx, rect, 0, GCornerNone);
+
+//   // Draw braid without image on Aplite to save memory
+//   const int size = 2;
+//   const int start_x = size;
+//   const int end_x = rect.size.w - size;
+//   const int start_y = rect.origin.y + size;
+//   const int end_y = rect.origin.y + rect.size.h - size;
+//   for (int y = start_y; y < end_y; y += size) {
+//     const bool offset = ((y - start_y) / size) % 2 == 1;
+//     for (int x = start_x + (offset ? size : 0); x < end_x; x += (2 * size)) {
+//       graphics_context_set_fill_color(ctx, GColorWhite);
+//       graphics_fill_rect(
+//         ctx,
+//         GRect(x, y, size, size),
+//         0,
+//         GCornerNone
+//       );
+//     }
+//   }
+// #endif
+}
+
+
 // Like menu_cell_basic_draw but with larger subtitle
 void util_menu_cell_draw(GContext *ctx, Layer *layer, char *title, char *desc) {
   // TODO: Can we use ContentSize here without layout issues?

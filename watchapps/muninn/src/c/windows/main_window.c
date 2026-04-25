@@ -5,22 +5,21 @@
   #define EYE_RECT GRect(96, 11, 3, 3)
   #define BRAID_H 18
   #define ICON_SIZE 28
-  #define ROW_2_LABEL "  Prv. chrg          Next chrg"
+  #define ROW_2_LABEL " Last charge    Next charge"
 #elif defined(PBL_PLATFORM_CHALK)
   #define EYE_RECT GRect(91, 9, 2, 2)
   #define BRAID_H 14
   #define ICON_SIZE 24
-  #define ROW_2_LABEL " Prv. chrg         Next chrg"
+  #define ROW_2_LABEL "      Last charge    Next charge"
 #else
   #define EYE_RECT GRect(72, 7, 2, 2)
   #define BRAID_H 14
   #define ICON_SIZE 24
-  #define ROW_2_LABEL " Prv. chrg       Next chrg"
+  #define ROW_2_LABEL " Last chrg      Next chrg"
 #endif
 
 static Window *s_window;
 static Layer *s_canvas_layer;
-static TextLayer *s_hint_layer;
 
 static GBitmap *s_mascot_bitmap, *s_batt_bitmap;
 static AppTimer *s_blink_timer;
@@ -155,10 +154,7 @@ static void update_data() {
     snprintf(s_remaining_buff, sizeof(s_remaining_buff), "--");
     snprintf(s_rate_buff, sizeof(s_rate_buff), "--");
     snprintf(s_nc_buff, sizeof(s_nc_buff), "--");
-
-    layer_set_hidden(text_layer_get_layer(s_hint_layer), false);
   } else {
-    layer_set_hidden(text_layer_get_layer(s_hint_layer), true);
     schedule_blink();
 
     // Days remaining
@@ -244,7 +240,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
 
   // Divider braid
   const GRect braid_rect = GRect(0, scl_y(160), PS_DISP_W - ACTION_BAR_W, BRAID_H);
-  graphics_draw_bitmap_in_rect(ctx, bitmaps_get(RESOURCE_ID_BRAID), braid_rect);
+  util_draw_braid(ctx, braid_rect);
 
   // Skyline
   const bool is_night = util_get_is_night();
@@ -284,40 +280,55 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   }
   s_batt_bitmap = bitmaps_get(util_get_battery_resource_id(state.charge_percent));
 
-  int icon_x = scl_x_pp({.o = 40, .c = 80});
+  graphics_context_set_text_color(ctx, GColorBlack);
+
+  // Not enabled hint
+  if (!s_is_enabled) {
+    graphics_draw_text(
+      ctx,
+      "Hold the Up button to wake Muninn!",
+      scl_get_font(SFI_MediumBold),
+      GRect(4, scl_y_pp({.o = 360, .c = 370, .e = 400}), PS_DISP_W - ACTION_BAR_W - 8, 100),
+      GTextOverflowModeWordWrap,
+      GTextAlignmentCenter,
+      NULL
+    );
+    return;
+  }
+
+  // Left column
+  int icon_x = scl_x_pp({.o = 30, .c = 100, .e = 50});
   int icon_y = scl_y_pp({.o = 290, .e = 285});
   int text_x = icon_x + ICON_SIZE + scl_x(10);
   int text_y = icon_y - scl_y_pp({.o = 40, .e = 15});
 
-  // Left column
   graphics_draw_bitmap_in_rect(
     ctx,
     bitmaps_get(RESOURCE_ID_REMAINING),
     GRect(icon_x, icon_y, ICON_SIZE, ICON_SIZE)
    );
-  graphics_context_set_text_color(ctx, GColorBlack);
   draw_text(ctx, s_remaining_buff, SFI_LargeBold, text_x + scl_x(10), text_y);
 
-  icon_y = scl_y_pp({.o = 560, .e = 550});
+  icon_y = scl_y_pp({.o = 560, .e = 560});
   text_y = icon_y - scl_y_pp({.o = 20, .e = 15});
-
-  draw_text(ctx, s_fmt_lc_buff, SFI_Medium, text_x, text_y);
 
   graphics_draw_bitmap_in_rect(
     ctx,
     bitmaps_get(RESOURCE_ID_LAST_CHARGE),
     GRect(icon_x, icon_y, ICON_SIZE, ICON_SIZE)
   );
+  draw_text(ctx, s_fmt_lc_buff, SFI_Medium, text_x, text_y);
 
+#if !defined(PBL_PLATFORM_CHALK)
   icon_y = scl_y_pp({.o = 840, .e = 855});
-  text_y = icon_y - scl_y_pp({.o = 20, .e = 15});
+  text_y = icon_y - scl_y_pp({.o = 30, .e = 20});
 
   draw_text(ctx, s_battery_buff, SFI_Medium, text_x, text_y);
-
   graphics_draw_bitmap_in_rect(ctx, s_batt_bitmap, GRect(icon_x, icon_y, ICON_SIZE, ICON_SIZE));
+#endif
 
   // Right column
-  icon_x = scl_x_pp({.o = 480, .c = 530});
+  icon_x = scl_x_pp({.o = 480, .c = 500});
   icon_y = scl_y_pp({.o = 290, .e = 285});
   text_x = icon_x + ICON_SIZE + scl_x(10);
   text_y = icon_y - scl_y_pp({.o = 40, .e = 15});
@@ -327,12 +338,11 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     bitmaps_get(RESOURCE_ID_RATE),
     GRect(icon_x, icon_y, ICON_SIZE, ICON_SIZE)
   );
-
   draw_text(ctx, s_rate_buff, SFI_LargeBold, text_x + scl_x(10), text_y);
 
-  icon_x = scl_x_pp({.o = 460, .c = 530});
-  icon_y = scl_y_pp({.o = 580, .e = 570});
-  text_x = icon_x + ICON_SIZE + scl_x(10);
+  icon_x = scl_x_pp({.o = 460, .c = 500});
+  icon_y = scl_y_pp({.o = 560, .e = 560});
+  text_x = icon_x + ICON_SIZE - scl_x(10);
   text_y = icon_y - scl_y_pp({.o = 20, .e = 15});
   
   graphics_draw_bitmap_in_rect(
@@ -340,11 +350,12 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     bitmaps_get(RESOURCE_ID_NEXT_CHARGE),
     GRect(icon_x, icon_y, ICON_SIZE, ICON_SIZE)
   );
+  draw_text(ctx, s_nc_buff, SFI_Medium, text_x - scl_x_pp({.o = 0, .e = 10}), text_y);
 
-  draw_text(ctx, s_nc_buff, SFI_Medium, text_x, text_y);
-
-  icon_y = scl_y_pp({.o = 840, .e = 855});
-  text_y = icon_y - scl_y_pp({.o = 20, .e = 15});
+  icon_x = scl_x_pp({.o = 460, .c = 320});
+  icon_y = scl_y_pp({.o = 840, .c = 820, .e = 855});
+  text_x = icon_x + ICON_SIZE - scl_x(10);
+  text_y = icon_y - scl_y_pp({.o = 30, .e = 20});
 
 #if defined(PBL_PLATFORM_APLITE)
   // Draw clock instead of bitmap for 'next sample'
@@ -366,12 +377,11 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     GRect(icon_x, icon_y, ICON_SIZE, ICON_SIZE)
    );
 #endif
-
   draw_text(ctx, s_reading_buff, SFI_Medium, text_x, text_y);
 
   // Row labels
   draw_text(ctx, s_row_1_labels_buff, SFI_Small, 0, scl_y_pp({.o = 410, .e = 390}));
-  draw_text(ctx, ROW_2_LABEL, SFI_Small, 0, scl_y_pp({.o = 680, .e = 660}));
+  draw_text(ctx, ROW_2_LABEL, SFI_Small, 0, scl_y_pp({.o = 680, .c = 665, .e = 660}));
 }
 
 ////////////////////////////////////////////// Clicks //////////////////////////////////////////////
@@ -423,27 +433,12 @@ static void window_load(Window *window) {
   layer_set_update_proc(s_canvas_layer, canvas_update_proc);
   layer_add_child(root_layer, s_canvas_layer);
 
-  // Hint for when Muninn is asleep (topmost)
-  const GRect hint_rect = GRect(
-    0,
-    scl_y_pp({.o = 360, .e = 355}),
-    PS_DISP_W - ACTION_BAR_W,
-    scl_y_pp({.o = 470, .e = 475})
-  );
-  s_hint_layer = util_make_text_layer(hint_rect, scl_get_font(SFI_Medium));
-  text_layer_set_background_color(s_hint_layer, GColorWhite);
-  text_layer_set_text_alignment(s_hint_layer, GTextAlignmentCenter);
-  text_layer_set_text(s_hint_layer, "Hold the Up button\nto wake Muninn.");
-  layer_add_child(root_layer, text_layer_get_layer(s_hint_layer));
-
   update_data();
 
   APP_LOG(APP_LOG_LEVEL_INFO, "Heap %d", heap_bytes_free());
 }
 
 static void window_unload(Window *window) {
-  text_layer_destroy(s_hint_layer);
-
   layer_destroy(s_canvas_layer);
 
   window_destroy(s_window);

@@ -40,7 +40,7 @@ static void braid_update_proc(Layer *layer, GContext *ctx) {
 #endif
 
   GRect braid_rect = GRect(0, BRAID_Y, bounds.size.w, BRAID_H);
-  graphics_draw_bitmap_in_rect(ctx, bitmaps_get(RESOURCE_ID_BRAID), braid_rect);
+  util_draw_braid(ctx, braid_rect);
 }
 
 static void window_load(Window *window) {
