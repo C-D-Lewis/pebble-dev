@@ -5,17 +5,17 @@
   #define EYE_RECT GRect(96, 11, 3, 3)
   #define BRAID_H 18
   #define ICON_SIZE 28
-  #define ROW_2_LABEL " Last charge    Next charge"
+  #define ROW_2_LABEL "  Last chrg       Next chrg"
 #elif defined(PBL_PLATFORM_CHALK)
   #define EYE_RECT GRect(91, 9, 2, 2)
   #define BRAID_H 14
   #define ICON_SIZE 24
-  #define ROW_2_LABEL "      Last charge    Next charge"
+  #define ROW_2_LABEL "      Last chrg       Next chrg"
 #else
   #define EYE_RECT GRect(72, 7, 2, 2)
   #define BRAID_H 14
   #define ICON_SIZE 24
-  #define ROW_2_LABEL " Last chrg      Next chrg"
+  #define ROW_2_LABEL " Last chrg     Next chrg"
 #endif
 
 static Window *s_window;
@@ -23,11 +23,11 @@ static Layer *s_canvas_layer;
 
 static GBitmap *s_mascot_bitmap, *s_batt_bitmap;
 static AppTimer *s_blink_timer;
-static char s_remaining_buff[4];
-static char s_rate_buff[4];
+static char s_remaining_buff[16];
+static char s_rate_buff[16];
 static char s_fmt_lc_buff[8];
 static char s_battery_buff[8];
-static char s_nc_buff[8];
+static char s_nc_buff[16];
 static char s_reading_buff[8];
 static char s_row_1_labels_buff[40];
 static int s_blink_budget, s_days_remaining, s_rate, s_anim_days, s_anim_rate;
@@ -35,11 +35,11 @@ static bool s_is_blinking, s_is_enabled;
 
 static void update_labels(int days) {
 #if defined(PBL_PLATFORM_EMERY)
-  const char *template = "   Day%s left        Est. %%/day";
+  const char *template = "    Day%s left          %%/day";
 #elif defined(PBL_PLATFORM_CHALK)
-  const char *template = "      Day%s left       Est. %%/day";
+  const char *template = "       Day%s left          %%/day";
 #else
-  const char *template = "     Day%s          Est. %%/d";
+  const char *template = "     Day%s            %%/day";
 #endif
   snprintf(s_row_1_labels_buff, sizeof(s_row_1_labels_buff), template, days == 1 ? " " : "s");
 }
@@ -197,12 +197,15 @@ static void update_data() {
       snprintf(s_fmt_lc_buff, sizeof(s_fmt_lc_buff), "--");
     }
 
-    // "01/12" next charge time
-    // TODO: Add setting for DD/MM vs MM/DD
+    // "26/4" next charge time
     time_t next_charge_ts = data_get_next_charge_time();
     if (util_is_not_status(next_charge_ts)) {
       struct tm *nc_info = localtime(&next_charge_ts);
-      strftime(s_nc_buff, sizeof(s_nc_buff), "%d/%m", nc_info);
+      if (persist_data->reverse_dates) {
+        snprintf(s_nc_buff, sizeof(s_nc_buff), "%d/%d", nc_info->tm_mon + 1, nc_info->tm_mday);
+      } else {
+        snprintf(s_nc_buff, sizeof(s_nc_buff), "%d/%d", nc_info->tm_mday, nc_info->tm_mon + 1);
+      }
     } else {
       snprintf(s_nc_buff, sizeof(s_nc_buff), "--");
     }
@@ -306,11 +309,11 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     ctx,
     bitmaps_get(RESOURCE_ID_REMAINING),
     GRect(icon_x, icon_y, ICON_SIZE, ICON_SIZE)
-   );
+  );
   draw_text(ctx, s_remaining_buff, SFI_LargeBold, text_x + scl_x(10), text_y);
 
   icon_y = scl_y_pp({.o = 560, .e = 560});
-  text_y = icon_y - scl_y_pp({.o = 20, .e = 15});
+  text_y = icon_y - scl_y_pp({.o = 25, .e = 20});
 
   graphics_draw_bitmap_in_rect(
     ctx,
@@ -320,11 +323,15 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   draw_text(ctx, s_fmt_lc_buff, SFI_Medium, text_x, text_y);
 
 #if !defined(PBL_PLATFORM_CHALK)
-  icon_y = scl_y_pp({.o = 840, .e = 855});
+  icon_y = scl_y(840);
   text_y = icon_y - scl_y_pp({.o = 30, .e = 20});
 
-  draw_text(ctx, s_battery_buff, SFI_Medium, text_x, text_y);
-  graphics_draw_bitmap_in_rect(ctx, s_batt_bitmap, GRect(icon_x, icon_y, ICON_SIZE, ICON_SIZE));
+  graphics_draw_bitmap_in_rect(
+    ctx,
+    s_batt_bitmap,
+    GRect(icon_x - scl_x(15), icon_y, ICON_SIZE, ICON_SIZE)
+  );
+  draw_text(ctx, s_battery_buff, SFI_Medium, text_x - scl_x(20), text_y);
 #endif
 
   // Right column
@@ -343,18 +350,18 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   icon_x = scl_x_pp({.o = 460, .c = 500});
   icon_y = scl_y_pp({.o = 560, .e = 560});
   text_x = icon_x + ICON_SIZE - scl_x(10);
-  text_y = icon_y - scl_y_pp({.o = 20, .e = 15});
+  text_y = icon_y - scl_y_pp({.o = 25, .e = 20});
   
   graphics_draw_bitmap_in_rect(
     ctx,
     bitmaps_get(RESOURCE_ID_NEXT_CHARGE),
     GRect(icon_x, icon_y, ICON_SIZE, ICON_SIZE)
   );
-  draw_text(ctx, s_nc_buff, SFI_Medium, text_x - scl_x_pp({.o = 0, .e = 10}), text_y);
+  draw_text(ctx, s_nc_buff, SFI_Medium, text_x, text_y);
 
   icon_x = scl_x_pp({.o = 460, .c = 320});
-  icon_y = scl_y_pp({.o = 840, .c = 820, .e = 855});
-  text_x = icon_x + ICON_SIZE - scl_x(10);
+  icon_y = scl_y_pp({.o = 840, .c = 820});
+  text_x = icon_x + ICON_SIZE;
   text_y = icon_y - scl_y_pp({.o = 30, .e = 20});
 
 #if defined(PBL_PLATFORM_APLITE)
@@ -435,7 +442,7 @@ static void window_load(Window *window) {
 
   update_data();
 
-  APP_LOG(APP_LOG_LEVEL_INFO, "Heap %d", heap_bytes_free());
+  // APP_LOG(APP_LOG_LEVEL_INFO, "Heap %d", heap_bytes_free());
 }
 
 static void window_unload(Window *window) {
@@ -445,6 +452,14 @@ static void window_unload(Window *window) {
   s_window = NULL;
 }
 
+static void window_appear(Window *window) {
+  // Some settings need redraw like date format
+  if (!s_canvas_layer) return;
+  
+  update_data();
+  layer_mark_dirty(s_canvas_layer);
+}
+
 static void window_disappear(Window *window) {
   bitmaps_destroy_all();
 
@@ -452,8 +467,8 @@ static void window_disappear(Window *window) {
   s_mascot_bitmap = NULL;
   s_batt_bitmap = NULL;
 
-  APP_LOG(APP_LOG_LEVEL_INFO, "wd %d B", heap_bytes_free());
-  bitmap_log_allocated_count();
+  // APP_LOG(APP_LOG_LEVEL_INFO, "wd %d B", heap_bytes_free());
+  // bitmap_log_allocated_count();
 }
 
 void main_window_push() {
@@ -462,6 +477,7 @@ void main_window_push() {
     window_set_window_handlers(s_window, (WindowHandlers) {
       .load = window_load,
       .unload = window_unload,
+      .appear = window_appear,
       .disappear = window_disappear,
     });
     window_set_click_config_provider(s_window, click_config_provider);

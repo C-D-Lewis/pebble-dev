@@ -12,6 +12,7 @@ typedef enum {
   MI_PUSH_TIMELINE_PINS,
   MI_ELEVATED_RATE_ALERT,
   MI_ONE_DAY_ALERT,
+  MI_REVERSE_DATES,
 #ifdef FEATURE_SYNC
   MI_AUTO_UPLOAD,
 #endif
@@ -77,6 +78,14 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
         persist_data->one_day_alert ? "Enabled" : "Disabled"
       );
       break;
+    case MI_REVERSE_DATES:
+      util_menu_cell_draw(
+        ctx,
+        cell_layer,
+        "Date Format",
+        persist_data->reverse_dates ? "MM/DD" : "DD/MM"
+      );
+      break;
 #ifdef FEATURE_SYNC
     case MI_AUTO_UPLOAD:
       util_menu_cell_draw(
@@ -106,6 +115,7 @@ static int16_t get_cell_height_callback(struct MenuLayer *menu_layer, MenuIndex 
     case MI_PUSH_TIMELINE_PINS:
     case MI_ELEVATED_RATE_ALERT:
     case MI_ONE_DAY_ALERT:
+    case MI_REVERSE_DATES:
 #ifdef FEATURE_SYNC
     case MI_AUTO_UPLOAD:
 #endif
@@ -136,6 +146,9 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
       break;
     case MI_ONE_DAY_ALERT:
       persist_data->one_day_alert = !persist_data->one_day_alert;
+      break;
+    case MI_REVERSE_DATES:
+      persist_data->reverse_dates = !persist_data->reverse_dates;
       break;
 #ifdef FEATURE_SYNC
     case MI_AUTO_UPLOAD: {
