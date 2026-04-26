@@ -5,18 +5,20 @@
   #define EYE_RECT GRect(96, 11, 3, 3)
   #define BRAID_H 18
   #define ICON_SIZE 28
-  #define ROW_2_LABEL "  Last chrg       Next chrg"
+  #define ROW_2_LABEL "  Last charge   Next charge"
 #elif defined(PBL_PLATFORM_CHALK)
   #define EYE_RECT GRect(91, 9, 2, 2)
   #define BRAID_H 14
   #define ICON_SIZE 24
-  #define ROW_2_LABEL "      Last chrg       Next chrg"
+  #define ROW_2_LABEL "      Last charge  Next charge"
 #else
   #define EYE_RECT GRect(72, 7, 2, 2)
   #define BRAID_H 14
   #define ICON_SIZE 24
   #define ROW_2_LABEL " Last chrg     Next chrg"
 #endif
+
+#define DIV_W 2
 
 static Window *s_window;
 static Layer *s_canvas_layer;
@@ -35,11 +37,11 @@ static bool s_is_blinking, s_is_enabled;
 
 static void update_labels(int days) {
 #if defined(PBL_PLATFORM_EMERY)
-  const char *template = "    Day%s left          %%/day";
+  const char *template = "  Day%s left        %% per day";
 #elif defined(PBL_PLATFORM_CHALK)
-  const char *template = "       Day%s left          %%/day";
+  const char *template = "      Day%s left         %% per day";
 #else
-  const char *template = "     Day%s            %%/day";
+  const char *template = " Day%s left      %% per day";
 #endif
   snprintf(s_row_1_labels_buff, sizeof(s_row_1_labels_buff), template, days == 1 ? " " : "s");
 }
@@ -300,8 +302,8 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   }
 
   // Left column
-  int icon_x = scl_x_pp({.o = 30, .c = 100, .e = 50});
-  int icon_y = scl_y_pp({.o = 290, .e = 285});
+  int icon_x = scl_x_pp({.o = 40, .c = 100, .e = 50});
+  int icon_y = scl_y_pp({.o = 275, .e = 285});
   int text_x = icon_x + ICON_SIZE + scl_x(10);
   int text_y = icon_y - scl_y_pp({.o = 40, .e = 15});
 
@@ -323,7 +325,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   draw_text(ctx, s_fmt_lc_buff, SFI_Medium, text_x, text_y);
 
 #if !defined(PBL_PLATFORM_CHALK)
-  icon_y = scl_y(840);
+  icon_y = scl_y_pp({.o = 850, .e = 870});
   text_y = icon_y - scl_y_pp({.o = 30, .e = 20});
 
   graphics_draw_bitmap_in_rect(
@@ -336,7 +338,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
 
   // Right column
   icon_x = scl_x_pp({.o = 480, .c = 500});
-  icon_y = scl_y_pp({.o = 290, .e = 285});
+  icon_y = scl_y_pp({.o = 275, .e = 285});
   text_x = icon_x + ICON_SIZE + scl_x(10);
   text_y = icon_y - scl_y_pp({.o = 40, .e = 15});
 
@@ -360,7 +362,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   draw_text(ctx, s_nc_buff, SFI_Medium, text_x, text_y);
 
   icon_x = scl_x_pp({.o = 460, .c = 320});
-  icon_y = scl_y_pp({.o = 840, .c = 820});
+  icon_y = scl_y_pp({.o = 850, .c = 830, .e = 870});
   text_x = icon_x + ICON_SIZE;
   text_y = icon_y - scl_y_pp({.o = 30, .e = 20});
 
@@ -386,8 +388,17 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
 #endif
   draw_text(ctx, s_reading_buff, SFI_Medium, text_x, text_y);
 
+  // Bottom divider - DIV_W - just above bottom two icons
+  graphics_context_set_fill_color(ctx, GColorBlack);
+  graphics_fill_rect(
+    ctx,
+    GRect(0, scl_y_pp({.o = 835, .c = 810, .e = 840}), PS_DISP_W - ACTION_BAR_W, DIV_W),
+    0,
+    GCornerNone
+  );
+
   // Row labels
-  draw_text(ctx, s_row_1_labels_buff, SFI_Small, 0, scl_y_pp({.o = 410, .e = 390}));
+  draw_text(ctx, s_row_1_labels_buff, SFI_Small, 0, scl_y_pp({.o = 390, .e = 390}));
   draw_text(ctx, ROW_2_LABEL, SFI_Small, 0, scl_y_pp({.o = 680, .c = 665, .e = 660}));
 }
 
