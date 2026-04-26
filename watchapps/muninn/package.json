@@ -1,7 +1,7 @@
 {
   "name": "muninn",
   "author": "Chris Lewis",
-  "version": "1.32.0",
+  "version": "1.33.0",
   "_note": "Checklist in config.h!",
   "private": true,
   "keywords": [
@@ -18,7 +18,9 @@
       "flint"
     ],
     "enableMultiJS": true,
-    "capabilities": ["configurable"],
+    "capabilities": [
+      "configurable"
+    ],
     "projectType": "native",
     "displayName": "Muninn",
     "uuid": "d008a08a-6e34-4cc4-98dc-bae02ce5e087",
@@ -146,7 +148,7 @@
     ]
   },
   "dependencies": {
-    "pebble-scalable": "^2.0.0"
+    "pebble-scalable": "^2.2.0"
   },
   "devDependencies": {
     "pkts": "^0.3.0-beta.1",

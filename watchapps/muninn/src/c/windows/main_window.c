@@ -410,9 +410,18 @@ static void up_long_click_handler(ClickRecognizerRef recognizer, void *context) 
   const bool should_enable = !util_is_not_status(persist_data->wakeup_id);
   if (should_enable) {
     s_blink_budget = 5;
-    schedule_blink();
 
+    schedule_blink();
     wakeup_schedule_next();
+
+    // New user, tell them to wait
+    if (data_get_log_length() == 0) {
+      message_window_push(
+        "Data will begin to appear after a few samples have been taken.",
+        false,
+        false
+      );
+    }
   } else {
     wakeup_unschedule();
   }

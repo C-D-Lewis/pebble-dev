@@ -17,7 +17,7 @@
 // ! Check Aplite works before releasing
 // ! Comment out INFO logs
 // ! Check TS test flags
-#define VERSION "1.32.0"
+#define VERSION "1.33.0"
 // Minimum samples before providing estimations
 #define MIN_SAMPLES 2
 // Min samples before graph is shown
@@ -37,7 +37,7 @@
 
 ///////////// Testing area ////////////////
 //                                       //
-#define USE_TEST_DATA true            //
+// #define USE_TEST_DATA true            //
 //                                       //
 // #define SAVE_TEST_DATA true           //
 //                                       //
