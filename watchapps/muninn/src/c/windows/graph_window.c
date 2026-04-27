@@ -81,13 +81,12 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   }
 
   // Find total time and so the gap between intervals
-  int time_total = 0;
-  for (int i = 0; i < count - 1; i++) {
-    const Sample *s = data_get_sample(i);
-    time_total += s->time_diff;
-  }
-  if (time_total == 0) time_total = SECONDS_PER_DAY; // Avoid divide by zero, show something
-  const int x_gap = (GRAPH_W * SECONDS_PER_DAY) / time_total;
+  const Sample *newest_s = data_get_sample(0);
+  const Sample *oldest_s = data_get_sample(count - 1);
+  long total_time = (newest_s && oldest_s)
+    ? (newest_s->timestamp - oldest_s->timestamp)
+    : SECONDS_PER_DAY;
+  if (total_time <= 0) total_time = SECONDS_PER_DAY;
 
   // Draw Y and X axes
   graphics_context_set_fill_color(ctx, GColorBlack);
@@ -140,12 +139,11 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     const Sample *s = data_get_sample(idx);
     if (!s || !util_is_not_status(s->charge_perc)) continue;
 
-    const Sample *oldest_s = data_get_sample(count - 1);
     if (!oldest_s) continue;
     const int oldest_ts = oldest_s->timestamp;
 
     // Find it's percentage x of the total based on timestamp more than oldest ts
-    const int x = GRAPH_MARGIN + ((s->timestamp - oldest_ts) * x_gap) / SECONDS_PER_DAY;
+    const int x = GRAPH_MARGIN + (((s->timestamp - oldest_ts) * GRAPH_W) / total_time);
     const int y = ROOT_Y + GRAPH_H - (( (s->charge_perc - low_v) * GRAPH_H) / y_range);
 
     // Draw this point
