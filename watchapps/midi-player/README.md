@@ -6,7 +6,8 @@ MIDI files can be compiled into the `notes.h` header with...
 
 ## TODO
 
-- [ ] Read compiled notes
+- [x] Read compiled notes
 - [ ] Use real speaker API once available
 - [ ] Pause/play and restart controls
 - [ ] Simple note pitch and time visualisation
+- [ ] Load custom MIDI file

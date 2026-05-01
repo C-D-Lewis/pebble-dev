@@ -1,7 +1,7 @@
 #include "main_window.h"
 
 // Use C-D-Lewis/pico-dev repo pico-pipes project to compile this from a MIDI file
-#include "notes-pebble.h"
+#include "../notes-pebble.h"
 
 static Window *s_window;
 static TextLayer *s_progress_layer;
@@ -10,6 +10,25 @@ static AppTimer *s_note_timer;
 static int s_note_index = 0;
 
 static void play_note();
+
+unsigned long get_mHz_compact(int pitch) {
+    // One octave (C4 to B4) in mHz
+    static const unsigned long octave4[] = {
+        261626, 277183, 293665, 311127, 329628, 349228, 
+        369994, 391995, 415305, 440000, 466164, 493883
+    };
+
+    int octave = (pitch / 12) - 4;
+    int noteIndex = pitch % 12;
+    unsigned long freq = octave4[noteIndex];
+
+    if (octave > 0) {
+        freq <<= octave; // Double for every octave up
+    } else if (octave < 0) {
+        freq >>= (-octave); // Halve for every octave down
+    }
+    return freq;
+}
 
 static void note_end_handler(void *context) {
   s_note_index++;
@@ -36,13 +55,19 @@ static void play_note() {
   snprintf(
     s_progress_buff,
     sizeof(s_progress_buff),
-    "%d/%d\n%dHz %dms",
+    "%d/%d\n%d pitch %dms",
     s_note_index,
     NUM_NOTES,
     pitch,
     duration_ms
   );
   text_layer_set_text(s_progress_layer, s_progress_buff);
+
+  SpeakerNote notes[] = {
+    { .midi_note = pitch, .waveform = SpeakerWaveformSine,     .duration_ms = duration_ms },
+  };
+
+  speaker_play_notes(notes, ARRAY_LENGTH(notes), 80);
 
   // Schedule next
   stop_playing();
