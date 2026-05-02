@@ -492,14 +492,6 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     );
   }
 
-  // TEST
-  // s_tapped = true;
-  if (!s_tapped) {
-    draw_date_and_time_display(ctx, bounds, t);
-  } else {
-    draw_weather_display(ctx, bounds);
-  }
-
   // Day progress indicator
   graphics_context_set_stroke_color(ctx, PBL_IF_COLOR_ELSE(GColorDarkGray, GColorWhite));
   graphics_context_set_stroke_width(ctx, INNER_RING_W);
@@ -525,6 +517,14 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     center
   );
   graphics_draw_line(ctx, day_notch_start, day_notch_end);
+
+  // TEST
+  // s_tapped = true;
+  if (!s_tapped) {
+    draw_date_and_time_display(ctx, bounds, t);
+  } else {
+    draw_weather_display(ctx, bounds);
+  }
 }
 
 /******************************************* Animations *******************************************/
