@@ -1,13 +1,10 @@
 #include "main_window.h"
 
-#define WIDTH PBL_IF_ROUND_ELSE(180, 144)
-#define HEIGHT PBL_IF_ROUND_ELSE(180, 168)
-#define IMAGE_SIZE 140
-
-#define HOLLY_Y_MARGIN PBL_IF_ROUND_ELSE(20, -10)
-#define GRECT_HOLLY GRect((WIDTH - IMAGE_SIZE) / 2, ((HEIGHT + HOLLY_Y_MARGIN) - IMAGE_SIZE) / 2, IMAGE_SIZE, IMAGE_SIZE)  
-#define GRECT_QUOTE GRect(0, HEIGHT - PBL_IF_ROUND_ELSE(35, 30), PBL_IF_ROUND_ELSE(WIDTH - 30, WIDTH), 30)
-#define GRECT_TIME GRect(0, PBL_IF_ROUND_ELSE(20, 0), WIDTH, 30)
+#ifdef PBL_PLATFORM_GABBRO
+#define TIME_FONT FONT_KEY_GOTHIC_18_BOLD
+#else
+#define TIME_FONT FONT_KEY_GOTHIC_14
+#endif
 
 static Window *s_window;
 static BitmapLayer *s_holly_layer;
@@ -62,14 +59,16 @@ static void window_load(Window *window) {
 
   s_holly_bitmap = gbitmap_create_with_resource(RESOURCE_ID_HOLLY);
 
-  s_holly_layer = bitmap_layer_create(GRECT_HOLLY);
+  s_holly_layer = bitmap_layer_create(
+    grect_inset(bounds, GEdgeInsets(scl_y_pp({.o = 0, .c = 100}), 0, 0, 0))
+  );
   bitmap_layer_set_bitmap(s_holly_layer, s_holly_bitmap);
   bitmap_layer_set_compositing_mode(s_holly_layer, GCompOpSet);
   layer_add_child(window_layer, bitmap_layer_get_layer(s_holly_layer));
 
-  s_time_layer = text_layer_create(GRECT_TIME);
+  s_time_layer = text_layer_create(GRect(0, scl_y_pp({.o = 10, .c = 110, .g = 80}), PS_DISP_W, 30));
   text_layer_set_text_alignment(s_time_layer, GTextAlignmentCenter);
-  text_layer_set_font(s_time_layer, fonts_get_system_font(FONT_KEY_GOTHIC_14));
+  text_layer_set_font(s_time_layer, fonts_get_system_font(TIME_FONT));
   text_layer_set_text_color(s_time_layer, GColorWhite);
   text_layer_set_background_color(s_time_layer, GColorClear);
   layer_add_child(window_layer, text_layer_get_layer(s_time_layer));

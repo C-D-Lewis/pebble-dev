@@ -1,8 +1,10 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "author": "Chris Lewis",
   "private": true,
-  "dependencies": {},
+  "dependencies": {
+    "pebble-scalable": "^2.2.0"
+  },
   "keywords": [
     "pebble-app"
   ],
@@ -23,7 +25,7 @@
       "dummy": 0
     },
     "enableMultiJS": true,
-    "displayName": "hollywatch",
+    "displayName": "Hollywatch",
     "watchapp": {
       "onlyShownOnCommunication": false,
       "hiddenApp": false,
@@ -33,7 +35,10 @@
       "aplite",
       "basalt",
       "chalk",
-      "diorite"
+      "diorite",
+      "emery",
+      "flint",
+      "gabbro"
     ],
     "capabilities": []
   },
