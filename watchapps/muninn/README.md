@@ -10,47 +10,41 @@ _Odin tasked Muninn with memory of the land... Over time, he will provide you wi
   </tr>
 </table>
 
-Muninn is an extremely lightweight battery estimation app that uses the
-Wakeup API instead of the Background Worker to monitor battery discharging
-trends and provide insight without negatively affecting battery life. It uses a
-moving average of six-hourly readings over time to estimate remaining days of
-battery life and rate of discharge.
+## Description
 
-Estimates will begin to appear after two of these readings have been taken.
+Muninn is an extremely lightweight battery tracking and prediction app. It uses the Wakeup API instead of the Background Worker to monitor trends and provide insight without negatively affecting battery life, using a moving average of readings over time to estimate days left, rate of discharge, next charge date, and more!
 
-Features include:
-- Negligible battery impact.
-- Moving-average estimation of remaining battery life, weighted towards recent values.
-- Display of last observed charge and predicted next charge date.
-- Notifies when there is about one day of charge remaining.
-- Attempt to set AppGlance to show estimate in the launcher menu.
-- View detailed log and graph of recent estimates.
-- Sync up to 120 days of data to the phone for extended stats.
-- View general battery tips.
-- Ability to disable temporarily.
-- Completely delete and reset all app data.
+Features:
+- Negligible battery impact
+- Days remaining and drain rate estimation
+- Last observed charge and predicted next charge date
+- Graph and detailed log of recent samples, up to 4 days
+- Sync up to 120 days of data to the phone for long-term insights*
+- Upload and view all your data in web config page*
+- Set an AppGlance to show estimate in the launcher menu
+- View general battery tips
+- Completely delete and reset all app data
 
 Options:
-- Vibrate when a sample is taken.
-- Advise when battery charge is below a chosen threshold (50%/20%/10%).
-- Set a timeline pin at noon the day charge may run out.
-- Be notified if the rate of drain is 2x average.
-- Be notified if there is about one day left.
+- Custom low battery threshold notification (50%/20%/10%)
+- Timeline pin at noon on the last day remaining
+- High (above average) rate of drain notification
+- One day left notification
+- Auto-update of web config page stats (noon daily)*
+
+*Pebble Time and newer only
 
 Important notes:
-
-Once installed it must be woken up, and if the watch is off at the next
-six-hourly interval, the app must be launched to allow wakeups to be resumed.
-If the first period is less than six hours, the initial estimate may be an
-overestimate but will smooth out soon. Any missed wakeups will be ignored.
+- If the watch is off at the next sample time, the app must be launched to allow wakeups to be resumed.
+- The initial estimate may be an overestimate but will smooth out soon after.
 
 ## Backend
 
 For Basalt and above, the extended sample history saved in JS-side storage can
 be uploaded to the backend, which assigns a 6-character short code for each
 watch token, and allows viewing of all the data with charts and longer-term
-statistics. It's built with TypeScript, Vite, and deployed with Terraform. See
-[backend](./backend/) for more information.
+statistics. It's built with TypeScript, Vite, and deployed with Terraform into
+AWS. See [backend](./backend/) for more information.
 
 ## Challenges:
 
@@ -62,9 +56,7 @@ statistics. It's built with TypeScript, Vite, and deployed with Terraform. See
 
 ## Bugs
 
-Please report bugs including - watch model and age (i.e.: Pebble Time Steel, 
-from 2016) and what kind of anomalous behavior you encountered.
-
-## TODO
-
-- [ ] Import data from JS? Could be invalid/stale
+Please report bugs here on in the
+[Discord thread](https://discord.com/channels/221364737269694464/1444392721539403868)
+including watch model and age (i.e.: Pebble Time Steel, from 2016) and what
+kind of anomalous behavior you encountered.
