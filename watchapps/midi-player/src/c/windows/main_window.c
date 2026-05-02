@@ -6,72 +6,12 @@
 static Window *s_window;
 static TextLayer *s_progress_layer;
 
+// TODO: Use this to visualize progress through the song
 static AppTimer *s_note_timer;
 static int s_note_index = 0;
 
-static void play_note();
-
-unsigned long get_mHz_compact(int pitch) {
-    // One octave (C4 to B4) in mHz
-    static const unsigned long octave4[] = {
-        261626, 277183, 293665, 311127, 329628, 349228, 
-        369994, 391995, 415305, 440000, 466164, 493883
-    };
-
-    int octave = (pitch / 12) - 4;
-    int noteIndex = pitch % 12;
-    unsigned long freq = octave4[noteIndex];
-
-    if (octave > 0) {
-        freq <<= octave; // Double for every octave up
-    } else if (octave < 0) {
-        freq >>= (-octave); // Halve for every octave down
-    }
-    return freq;
-}
-
-static void note_end_handler(void *context) {
-  s_note_index++;
-
-  play_note();
-}
-
-static void stop_playing() {
-  if (s_note_timer) {
-    app_timer_cancel(s_note_timer);
-    s_note_timer = NULL;
-  }
-}
-
-static void play_note() {
-  // Get note params
-  const int pitch = NOTE_TABLE[s_note_index][1];
-  const int start_ms = (NOTE_TABLE[s_note_index][2]);
-  const int end_ms = (NOTE_TABLE[s_note_index][3]);
-  const int duration_ms = end_ms - start_ms;
-
-  // "Play" - stand-in until speaker API is available. Hopefully it works this way.
-  static char s_progress_buff[32];
-  snprintf(
-    s_progress_buff,
-    sizeof(s_progress_buff),
-    "%d/%d\n%d pitch %dms",
-    s_note_index,
-    NUM_NOTES,
-    pitch,
-    duration_ms
-  );
-  text_layer_set_text(s_progress_layer, s_progress_buff);
-
-  SpeakerNote notes[] = {
-    { .midi_note = pitch, .waveform = SpeakerWaveformSine,     .duration_ms = duration_ms },
-  };
-
-  speaker_play_notes(notes, ARRAY_LENGTH(notes), 80);
-
-  // Schedule next
-  stop_playing();
-  s_note_timer = app_timer_register(duration_ms, note_end_handler, NULL);
+static void play_notes() {
+  speaker_play_tracks(TRACKS, ARRAY_LENGTH(TRACKS), 80);
 }
 
 static void window_load(Window *window) {
@@ -93,16 +33,13 @@ static void window_unload(Window *window) {
 }
 
 static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
-  // Restart
-  stop_playing();
+  // Restart?
   
-  s_note_index = 0;
-  play_note();
 }
 
 static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
   // Start
-  play_note();
+  play_notes();
 }
 
 static void click_config_provider(void *context) {
