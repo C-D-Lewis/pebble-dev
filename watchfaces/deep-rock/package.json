@@ -20,13 +20,31 @@
         },
         {
           "type": "font",
+          "name": "OSTRICH_REGULAR_22",
+          "file": "fonts/ostrich-regular.ttf",
+          "characterRegex": "[A-Z]"
+        },
+        {
+          "type": "font",
           "name": "OSTRICH_HEAVY_22",
           "file": "fonts/ostrich-heavy.ttf",
           "characterRegex": "[A-Za-z0-9 ]"
         },
         {
           "type": "font",
+          "name": "OSTRICH_HEAVY_30",
+          "file": "fonts/ostrich-heavy.ttf",
+          "characterRegex": "[A-Za-z0-9 ]"
+        },
+        {
+          "type": "font",
           "name": "OSTRICH_HEAVY_40",
+          "file": "fonts/ostrich-heavy.ttf",
+          "characterRegex": "[0-9 :HXT]"
+        },
+        {
+          "type": "font",
+          "name": "OSTRICH_HEAVY_55",
           "file": "fonts/ostrich-heavy.ttf",
           "characterRegex": "[0-9 :HXT]"
         },
