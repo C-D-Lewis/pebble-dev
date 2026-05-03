@@ -1,4 +1,4 @@
-import { SECONDS_PER_DAY } from "./constants";
+import { SECONDS_PER_DAY } from '../constants';
 
 /** Timeline API root that coreapp will respond to */
 const API_URL_ROOT = 'https://timeline-api.rebble.io';

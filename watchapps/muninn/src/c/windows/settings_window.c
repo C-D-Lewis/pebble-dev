@@ -91,7 +91,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
       util_menu_cell_draw(
         ctx,
         cell_layer,
-        "Auto Upload (Web)",
+        "Daily Upload (Web)",
         persist_data->auto_upload ? "Enabled" : "Disabled"
       );
       break;
@@ -101,7 +101,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
         ctx,
         cell_layer,
         "Delete All Data",
-        s_reset_confirm ? "Tap again to confirm" : NULL
+        s_reset_confirm ? "ARE YOU SURE?" : NULL
       );
       break;
     default: break;

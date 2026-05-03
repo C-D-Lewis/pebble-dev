@@ -1,6 +1,18 @@
-import { SECONDS_PER_DAY, SECONDS_PER_HOUR, STATUS_CHARGED, STATUS_EMPTY, STATUS_NO_CHANGE, TEST_LOG_OK_TESTS } from '../constants';
+import {
+  SECONDS_PER_HOUR,
+  STATUS_CHARGED,
+  STATUS_EMPTY,
+  STATUS_NO_CHANGE,
+  TEST_LOG_OK_TESTS
+} from '../constants';
 import { MULTI_CHARGE_SAMPLE_DATA, SAMPLE_DATA } from './sample-data';
-import { calculateDischargeRate, calculateLastWeekRate, calculateMeanTimeBetweenCharges, calculateNumCharges, isChargeEvent } from '../stats';
+import {
+  calculateDischargeRate,
+  calculateLastWeekRate,
+  calculateMeanTimeBetweenCharges,
+  calculateNumCharges,
+  isChargeEvent
+} from '../modules/stats';
 import { HistoryItem } from '../types';
 
 let numTests = 0;

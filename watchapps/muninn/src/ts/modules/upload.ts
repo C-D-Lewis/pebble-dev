@@ -1,13 +1,13 @@
-import { UPLOAD_ID_EMPTY, UPLOAD_API_URL } from './constants';
+import { UPLOAD_ID_EMPTY, UPLOAD_API_URL } from '../constants';
 import {
   calculateDischargeRate,
   calculateLastWeekRate,
   calculateNumCharges,
   calculateMeanTimeBetweenCharges,
 } from './stats';
-import { loadHistory } from './sync';
-import { HistoryItem, UploadHistoryItem } from './types';
+import { HistoryItem, UploadHistoryItem } from '../types';
 import { buildUploadKey } from './util';
+import { loadHistory } from './history';
 
 const mapHistoryForDisplay = (history: HistoryItem[]): UploadHistoryItem[] =>
   history.map(p => ({
@@ -16,7 +16,6 @@ const mapHistoryForDisplay = (history: HistoryItem[]): UploadHistoryItem[] =>
     r: p.rate,
     res: p.result,
   }));
-
 
 /**
  * Get upload ID from the API, if possible.

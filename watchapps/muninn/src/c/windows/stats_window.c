@@ -6,7 +6,7 @@ typedef enum {
   MI_TOTAL_DURATION,
   MI_ALL_TIME_RATE,
   MI_LAST_WEEK_RATE,
-  MI_NUM_CHARGES,
+  MI_EST_BATTERY_LIFE,
   MI_MTBC,
   MI_UPLOAD,
 
@@ -25,13 +25,13 @@ static uint16_t get_num_rows_callback(MenuLayer *menu_layer, uint16_t section_in
 }
 
 static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_index, void *context) {
+  GRect bounds = layer_get_bounds(cell_layer);
   AppState *app_state = data_get_app_state();
 
   // Format buffers
   static char s_t_d_buff[32];
   if (util_is_not_status(app_state->stat_total_days)) {
-    const int sync_perc = (app_state->sync_count * 100) / MAX_SYNC_ITEMS;
-    snprintf(s_t_d_buff, sizeof(s_t_d_buff), "%d days (%d%%)", app_state->stat_total_days, sync_perc);
+    snprintf(s_t_d_buff, sizeof(s_t_d_buff), "%d days", app_state->stat_total_days);
   } else {
     snprintf(s_t_d_buff, sizeof(s_t_d_buff), "-");
   }
@@ -53,13 +53,16 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
   }
   // snprintf(s_l_w_r_buff, sizeof(s_l_w_r_buff), "8%% per day");
 
-  static char s_n_c_buff[12];
-  if (util_is_not_status(app_state->stat_num_charges)) {
-    snprintf(s_n_c_buff, sizeof(s_n_c_buff), "%d", app_state->stat_num_charges);
+  const int battery_days = util_is_not_status(app_state->stat_all_time_rate)
+    ? (100 / app_state->stat_all_time_rate)
+    : STATUS_EMPTY;
+  static char s_e_b_l_buff[16];
+  if (util_is_not_status(battery_days)) {
+    snprintf(s_e_b_l_buff, sizeof(s_e_b_l_buff), "%d days", battery_days);
   } else {
-    snprintf(s_n_c_buff, sizeof(s_n_c_buff), "-");
+    snprintf(s_e_b_l_buff, sizeof(s_e_b_l_buff), "-");
   }
-  // snprintf(s_n_c_buff, sizeof(s_n_c_buff), "3");
+  // snprintf(s_e_b_l_buff, sizeof(s_e_b_l_buff), "20 days");
 
   static char s_mtbc_buff[12];
   if (util_is_not_status(app_state->stat_mtbc)) {
@@ -86,19 +89,53 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
   }
 
   switch(cell_index->row) {
-    case MI_TOTAL_DURATION:
-      util_menu_cell_draw(
+    case MI_TOTAL_DURATION: {
+      const GColor fg_color = menu_cell_layer_is_highlighted(cell_layer) ? GColorWhite : GColorBlack;
+      graphics_context_set_text_color(ctx, fg_color);
+      graphics_draw_text(
         ctx,
-        cell_layer,
-        "Total Duration",
-        s_t_d_buff
+        s_t_d_buff,
+        scl_get_font(SFI_Medium),
+        GRect(scl_x(30), scl_y_pp({.o = 5, .e = 22}), PS_DISP_W, 50),
+        GTextOverflowModeTrailingEllipsis,
+        GTextAlignmentLeft,
+        NULL
       );
-      break;
+
+      // Filling up rect progressbar
+      const int bar_x = scl_x(480);
+      const int bar_y = scl_y(30);
+      const int bar_w = scl_x(490);
+      const int bar_h = scl_y(70);
+      const int sync_perc = (app_state->sync_count * 100) / MAX_SYNC_ITEMS;
+      graphics_context_set_stroke_color(ctx, fg_color);
+      graphics_draw_rect(ctx, GRect(bar_x, bar_y, bar_w, bar_h));
+      graphics_context_set_fill_color(ctx, fg_color);
+      graphics_fill_rect(
+        ctx,
+        GRect(bar_x, bar_y, bar_w * sync_perc / 100, bar_h),
+        0,
+        GCornerNone
+      );
+
+      // Percentage text label beneath progress bar
+      char perc_buff[8];
+      snprintf(perc_buff, sizeof(perc_buff), "%d%% full", sync_perc);
+      graphics_draw_text(
+        ctx,
+        perc_buff,
+        scl_get_font(SFI_Small),
+        GRect(bar_x, bar_y + bar_h - scl_y(18), bar_w, 30),
+        GTextOverflowModeTrailingEllipsis,
+        GTextAlignmentCenter,
+        NULL
+      );
+    } break;
     case MI_ALL_TIME_RATE:
       util_menu_cell_draw(
         ctx,
         cell_layer,
-        "Avg. Drain Rate",
+        "Avg. Rate",
         s_a_t_r_buff
       );
       break;
@@ -106,16 +143,16 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
       util_menu_cell_draw(
         ctx,
         cell_layer,
-        "Last Week Avg.",
+        "Last Week Av. Rate",
         s_l_w_r_buff
       );
       break;
-    case MI_NUM_CHARGES:
+    case MI_EST_BATTERY_LIFE:
       util_menu_cell_draw(
         ctx,
         cell_layer,
-        "Charge Events",
-        s_n_c_buff
+        "Est. Battery Life",
+        s_e_b_l_buff
       );
       break;
     case MI_MTBC:
@@ -139,7 +176,12 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
 }
 
 static int16_t get_cell_height_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) {
-  return ROW_HEIGHT_LARGE;
+  switch(cell_index->row) {
+    case MI_TOTAL_DURATION:
+      return ROW_HEIGHT_SMALL;
+    default:
+      return ROW_HEIGHT_LARGE;
+  }
 }
 
 static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) {

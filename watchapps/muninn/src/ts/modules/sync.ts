@@ -1,47 +1,13 @@
-import {
-  MAX_SYNC_ITEMS,
-  STATUS_EMPTY,
-  TEST_SAMPLE_DATA,
-} from './constants';
+import { MAX_SYNC_ITEMS, STATUS_EMPTY, TEST_SAMPLE_DATA } from '../constants';
 import {
   calculateDischargeRate,
   calculateLastWeekRate,
-  calculateNumCharges,
   calculateMeanTimeBetweenCharges,
 } from './stats';
-import { HistoryItem } from './types';
+import { HistoryItem } from '../types';
 import { ensureUploadId } from './upload';
-import { buildHistoryKey, generateTestData } from './util';
-
-/**
- * Save the history of samples.
- */
-const saveHistory = (history: HistoryItem[]) => {
-  const start = Date.now();
-  localStorage.setItem(buildHistoryKey(), JSON.stringify(history));
-  console.log(`saveHistory: ${history.length} items in ${Date.now() - start}ms`);
-};
-
-/**
- * Load the history of samples.
- */
-export const loadHistory = (): HistoryItem[] => {
-  if (TEST_SAMPLE_DATA) return generateTestData();
-
-  try {
-    const start = Date.now();
-    const arr = JSON.parse(localStorage.getItem(buildHistoryKey()) || '[]');
-    // console.log(JSON.stringify(arr));
-    console.log(`loadHistory: ${arr.length} items in ${Date.now() - start}ms`);
-    return arr;
-  } catch (e) {
-    console.error('Failed to load history');
-    console.error(e);
-
-    // Can't load JSON, user can't fix. Reset it.
-    return [];
-  }
-};
+import { buildHistoryKey } from './util';
+import { loadHistory, saveHistory } from './history';
 
 /**
  * Send the watch the last seen timestamp so updates can be incremental.
@@ -63,7 +29,6 @@ export const handleGetSyncInfo = async () => {
     STAT_TOTAL_DAYS: Math.floor(history.length / 4),
     STAT_ALL_TIME_RATE: calculateDischargeRate(history),
     STAT_LAST_WEEK_RATE: calculateLastWeekRate(history),
-    STAT_NUM_CHARGES: calculateNumCharges(history),
     STAT_MTBC: calculateMeanTimeBetweenCharges(history),
     UPLOAD_ID: uploadId,
   };

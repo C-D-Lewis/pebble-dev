@@ -57,6 +57,7 @@ void draw_row_handler(GContext *ctx, const Layer *cell_layer, MenuIndex *cell_in
   );
   GPoint center = grect_center_point(&logo_bounds);
 
+  // Undo the invert highlight behavior
   graphics_context_set_fill_color(ctx, GColorWhite);
   graphics_fill_rect(ctx, bounds, GCornerNone, 0);
 

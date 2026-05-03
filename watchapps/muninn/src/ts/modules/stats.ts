@@ -4,8 +4,8 @@ import {
   SECONDS_PER_DAY,
   MIN_CHARGE_AMOUNT,
   MAX_GAP_SECONDS,
-} from './constants';
-import { HistoryItem } from './types';
+} from '../constants';
+import { HistoryItem } from '../types';
 
 /**
  * Average discharge rate using all history samples.

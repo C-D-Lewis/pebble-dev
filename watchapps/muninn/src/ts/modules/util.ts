@@ -4,8 +4,8 @@ import {
   STATUS_CHARGED,
   MIN_CHARGE_AMOUNT,
   STATUS_EMPTY
-} from './constants';
-import { HistoryItem } from './types';
+} from '../constants';
+import { HistoryItem } from '../types';
 
 /**
  * Test scenario:

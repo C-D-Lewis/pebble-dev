@@ -21,6 +21,7 @@ typedef enum {
   // Sample data key base - due to the 256B limit per-key we need to store each separately
   SK_SampleBase = 10,
   // Wipe - adding new fields to Sample struct and expanding number of samples
+  // Removed: 1.36
   SK_Migration_1 = 50,
 
   // Max storage value used
@@ -61,7 +62,6 @@ typedef struct {
   int stat_total_days;     // Days covered by JS history
   int stat_all_time_rate;  // All-time avg discharge rate
   int stat_last_week_rate; // Last week avg discharge rate
-  int stat_num_charges;    // Number of observed charges on phone
   int stat_mtbc;           // Mean time between charges
 
   char upload_id[8];       // Upload ID issued by the API

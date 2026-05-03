@@ -135,24 +135,10 @@ void util_draw_braid(GContext *ctx, GRect rect) {
 
 // Like menu_cell_basic_draw but with larger subtitle
 void util_menu_cell_draw(GContext *ctx, Layer *layer, char *title, char *desc) {
-  // TODO: Can we use ContentSize here without layout issues?
-  //       It may conflict with pebble-scalable font system
-  //
-  // Somehow removing this consumes 200B more static memory!?
-  PreferredContentSize content_size = preferred_content_size();
-  // APP_LOG(APP_LOG_LEVEL_INFO, "content_size: %d", (int)content_size);
-
-  // Medium or smaller (rare?), use regular rendering
-  if (content_size <= PreferredContentSizeMedium) {
-    menu_cell_basic_draw(ctx, layer, title, desc, NULL);
-    return;
-  }
-
-  // Else, use larger one
   GRect title_rect = GRect(scl_x(30), scl_y_pp({.o = -30, .e = -10}), PS_DISP_W, 100);
-  if (desc == NULL) {
-    title_rect.origin.y += scl_y(30);
-  }
+
+  // Title only
+  if (desc == NULL) title_rect.origin.y += scl_y(30);
 
   graphics_draw_text(
     ctx,

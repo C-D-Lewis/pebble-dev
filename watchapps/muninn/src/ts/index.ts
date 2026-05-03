@@ -1,7 +1,7 @@
 import { testStats } from './test/tests';
-import { handleGetSyncInfo, handleSync } from './sync';
-import { handlePushTimelinePin } from './timeline';
-import { ensureUploadId, uploadHistory } from './upload';
+import { handleGetSyncInfo, handleSync } from './modules/sync';
+import { handlePushTimelinePin } from './modules/timeline';
+import { ensureUploadId, uploadHistory } from './modules/upload';
 
 /**
  * Clear all data phone-side for this watch.

@@ -157,13 +157,6 @@ void inbox_received_handler(DictionaryIterator *iter, void *context) {
       app_state->stat_last_week_rate = STATUS_EMPTY;
     }
 
-    t = dict_find(iter, MESSAGE_KEY_STAT_NUM_CHARGES);
-    if (t) {
-      app_state->stat_num_charges = t->value->int32;
-    } else {
-      app_state->stat_num_charges = STATUS_EMPTY;
-    }
-
     t = dict_find(iter, MESSAGE_KEY_STAT_MTBC);
     if (t) {
       app_state->stat_mtbc = t->value->int32;
@@ -244,6 +237,9 @@ void comm_request_sync_stats() {
 }
 
 void comm_upload_history() {
+  const bool enough_data = data_get_log_length() >= MIN_SAMPLES_FOR_WEB;
+  if (!enough_data) return;
+
   stats_window_set_result("Uploading...");
   send_int(MESSAGE_KEY_UPLOAD_HISTORY);
 }
