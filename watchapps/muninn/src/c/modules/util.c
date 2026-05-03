@@ -206,7 +206,7 @@ void util_draw_button_hints(GContext *ctx, bool hints[3]) {
     select_x -= 2;
 #endif
     const GPoint select_center = { .x = select_x, .y = top_y + (HINT_H / 2) };
-    graphics_fill_circle(ctx, select_center, scl_x_pp({.o = 20, .c = 10}));
+    graphics_fill_circle(ctx, select_center, scl_x_pp({.o = 20, .c = 10, .g = 10}));
   }
 
   if (hints[1]) {
@@ -275,7 +275,7 @@ void util_draw_skyline(GContext *ctx, bool is_nighttime) {
     graphics_draw_bitmap_in_rect(
       ctx,
       bitmaps_get(RESOURCE_ID_CLOUD),
-      GRect(scl_x_pp({.o = 60, .c = 240, .e = 80}), scl_y(20), CLOUD_SIZE.w, CLOUD_SIZE.h)
+      GRect(scl_x_pp({.o = 60, .c = 240, .e = 80, .g = 240}), scl_y(20), CLOUD_SIZE.w, CLOUD_SIZE.h)
     );
     graphics_draw_bitmap_in_rect(
       ctx,
@@ -322,7 +322,7 @@ static void underline_update_proc(Layer *layer, GContext *ctx) {
     ctx,
     title,
     scl_get_font(SFI_Small),
-    GRect(0, scl_y_pp({-30, .c = -20, .e = -25}), PS_DISP_W, 100),
+    GRect(0, scl_y_pp({-30, .c = -20, .e = -25, .g = -20}), PS_DISP_W, 100),
     GTextOverflowModeWordWrap,
     GTextAlignmentCenter,
     NULL

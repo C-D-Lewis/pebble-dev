@@ -1,9 +1,13 @@
-import { SECONDS_PER_DAY, STATUS_CHARGED, STATUS_EMPTY, STATUS_NO_CHANGE, TEST_LOG_OK_TESTS } from '../constants';
+import { SECONDS_PER_DAY, SECONDS_PER_HOUR, STATUS_CHARGED, STATUS_EMPTY, STATUS_NO_CHANGE, TEST_LOG_OK_TESTS } from '../constants';
 import { MULTI_CHARGE_SAMPLE_DATA, SAMPLE_DATA } from './sample-data';
 import { calculateDischargeRate, calculateLastWeekRate, calculateMeanTimeBetweenCharges, calculateNumCharges, isChargeEvent } from '../stats';
 import { HistoryItem } from '../types';
 
+let numTests = 0;
+
 const test = (label: string, cb: Function) => {
+  numTests++;
+
   const [result, expected] = cb();
   const ok = result === expected;
   if (ok) {
@@ -170,7 +174,13 @@ const testCalculateDischargeRate = () => {
 
 const testCalculateLastWeekRate = () => {
   test('calculateLastWeekRate > correct with real world data', () => {
-    return [calculateLastWeekRate(SAMPLE_DATA), 7];
+    const now = Date.now() / 1000;
+    const data = SAMPLE_DATA.map((p, i) => {
+      // Update timestamps using test time, not ideal but avoids mock Date.now()
+      const timestamp = now - (i * 6 * SECONDS_PER_HOUR);
+      return { ...p, timestamp };
+    })
+    return [calculateLastWeekRate(data), 7];
   });
 
   test('calculateLastWeekRate > correct with not enough samples', () => {
@@ -221,5 +231,5 @@ export const testStats = () => {
   testCalculateDischargeRate();
   testCalculateLastWeekRate();
   testCalculateMeanTimeBetweenCharges();
-  console.log('[Completed JS tests]');
+  console.log(`[Completed ${numTests} JS tests]`);
 };

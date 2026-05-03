@@ -31,8 +31,8 @@ static void braid_update_proc(Layer *layer, GContext *ctx) {
     ctx,
     bitmaps_get(util_get_mascot_res_id(true, is_night)),
     GRect(
-      scl_x_pp({.o = 400, .c = 430, .e = 400}),
-      scl_y_pp({.o = 20, .c = 25, .e = 25}),
+      scl_x_pp({.o = 400, .c = 430, .e = 400, .g = 430}),
+      scl_y_pp({.o = 20, .c = 25, .e = 25, .g = 25}),
       MASCOT_SIZE,
       MASCOT_SIZE
     )

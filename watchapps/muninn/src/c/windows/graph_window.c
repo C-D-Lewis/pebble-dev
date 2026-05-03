@@ -1,9 +1,9 @@
 #include "log_window.h"
 
-#define ROOT_Y scl_y_pp({.o = 160, .c = 200, .e = 160})
-#define GRAPH_MARGIN scl_x_pp({.o = 65, .c = 130, .e = 65})
-#define GRAPH_W scl_x_pp({.o = 820, .c = 760, .e = 830})
-#define GRAPH_H scl_y_pp({.o = 550, .c = 430, .e = 550})
+#define ROOT_Y scl_y_pp({.o = 160, .c = 200, .e = 160, .g = 200})
+#define GRAPH_MARGIN scl_x_pp({.o = 65, .c = 130, .e = 65, .g = 130})
+#define GRAPH_W scl_x_pp({.o = 820, .c = 760, .e = 830, .g = 760})
+#define GRAPH_H scl_y_pp({.o = 550, .c = 430, .e = 550, .g = 430})
 #define NOTCH_S scl_x(35)
 
 // Not scaled
@@ -211,7 +211,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   const int box_h = scl_y(100);
   const int date_box_y = ROOT_Y + GRAPH_H + scl_y(60);
   const GRect box_rect = scl_center_x(
-    GRect(0, date_box_y, scl_x_pp({.o = 630, .c = 580, .e = 580}), box_h)
+    GRect(0, date_box_y, scl_x_pp({.o = 630, .c = 580, .e = 580, .g = 580}), box_h)
   );
   graphics_context_set_stroke_color(ctx, GColorBlack);
   graphics_draw_rect(ctx, box_rect);
@@ -229,7 +229,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
       ctx,
       s_date_buff,
       scl_get_font(SFI_Small),
-      GRect(0, date_box_y - scl_y_pp({.o = 25, .c = 20, .e = 25}), PS_DISP_W, 300),
+      GRect(0, date_box_y - scl_y_pp({.o = 25, .c = 20, .e = 25, .g = 20}), PS_DISP_W, 300),
       GTextOverflowModeTrailingEllipsis,
       GTextAlignmentCenter,
       NULL
@@ -306,7 +306,7 @@ static void main_window_load(Window *window) {
   layer_add_child(root_layer, s_canvas_layer);
 
   s_desc_layer = util_make_text_layer(
-    GRect(0, scl_y_pp({.o = 860, .c = 770, .e = 860}), PS_DISP_W, 100),
+    GRect(0, scl_y_pp({.o = 860, .c = 770, .e = 860, .g = 770}), PS_DISP_W, 100),
     scl_get_font(SFI_Small)
   );
   text_layer_set_text_alignment(s_desc_layer, GTextAlignmentCenter);

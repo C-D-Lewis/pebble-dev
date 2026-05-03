@@ -97,7 +97,7 @@ export const calculateMeanTimeBetweenCharges = (history: HistoryItem[]): number 
   // Calculate mean time between charges (in days)
   const meanTimeS = timeDiffs.reduce((acc, p) => acc + p, 0) / timeDiffs.length;
   const meanDays = meanTimeS / SECONDS_PER_DAY;
-  console.log(JSON.stringify({ chargeTimes, timeDiffs, meanTimeS, meanDays }));
+  // console.log(JSON.stringify({ chargeTimes, timeDiffs, meanTimeS, meanDays }));
 
   return Math.round(meanDays);
 };

@@ -1,7 +1,12 @@
 #include "main_window.h"
 
 // Not scaled
-#if defined(PBL_PLATFORM_EMERY)
+#if defined(PBL_PLATFORM_GABBRO)
+  #define EYE_RECT GRect(96, 11, 3, 3)
+  #define BRAID_H 18
+  #define ICON_SIZE 28
+  #define ROW_2_LABEL "      Last charge       Next charge"
+#elif defined(PBL_PLATFORM_EMERY)
   #define EYE_RECT GRect(96, 11, 3, 3)
   #define BRAID_H 18
   #define ICON_SIZE 28
@@ -36,7 +41,9 @@ static int s_blink_budget, s_days_remaining, s_rate, s_anim_days, s_anim_rate;
 static bool s_is_blinking, s_is_enabled;
 
 static void update_labels(int days) {
-#if defined(PBL_PLATFORM_EMERY)
+#if defined(PBL_PLATFORM_GABBRO)
+  const char *template = "      Day%s left            %% per day";
+#elif defined(PBL_PLATFORM_EMERY)
   const char *template = "  Day%s left        %% per day";
 #elif defined(PBL_PLATFORM_CHALK)
   const char *template = "      Day%s left         %% per day";
@@ -56,6 +63,12 @@ static void update_anim_text() {
 #endif
   const int days = animating ? s_anim_days : s_days_remaining;
   const int rate = animating ? s_anim_rate : s_rate;
+
+  if (!util_is_not_status(days) || !util_is_not_status(rate)) {
+    snprintf(s_remaining_buff, sizeof(s_remaining_buff), "--");
+    snprintf(s_rate_buff, sizeof(s_rate_buff), "--");
+    return;
+  }
 
   // Separate tens and units for decimal point display
   const int days_10x = data_calculate_days_remaining(true);
@@ -275,8 +288,8 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     ctx,
     s_mascot_bitmap,
     GRect(
-      scl_x_pp({.o = 400, .c = 430, .e = 400}),
-      scl_y_pp({.o = 20, .c = 25, .e = 25}),
+      scl_x_pp({.o = 400, .c = 430, .e = 400, .g = 430}),
+      scl_y_pp({.o = 20, .c = 25, .e = 25, .g = 25}),
       MASCOT_SIZE,
       MASCOT_SIZE
     )
@@ -304,7 +317,12 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
       ctx,
       "Hold the Up button to wake Muninn!",
       scl_get_font(SFI_MediumBold),
-      GRect(4, scl_y_pp({.o = 360, .c = 370, .e = 400}), PS_DISP_W - ACTION_BAR_W - 8, 100),
+      GRect(
+        4,
+        scl_y_pp({.o = 360, .c = 370, .e = 400, .g = 370}),
+        PS_DISP_W - ACTION_BAR_W - 8,
+        100
+      ),
       GTextOverflowModeWordWrap,
       GTextAlignmentCenter,
       NULL
@@ -313,7 +331,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   }
 
   // Left column
-  int icon_x = scl_x_pp({.o = 40, .c = 100, .e = 50});
+  int icon_x = scl_x_pp({.o = 40, .c = 100, .e = 50, .g = 100});
   int icon_y = scl_y_pp({.o = 275, .e = 285});
   int text_x = icon_x + ICON_SIZE + scl_x(10);
   int text_y = icon_y - scl_y_pp({.o = 40, .e = 15});
@@ -348,7 +366,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
 #endif
 
   // Right column
-  icon_x = scl_x_pp({.o = 480, .c = 500});
+  icon_x = scl_x_pp({.o = 480, .c = 500, .g = 500});
   icon_y = scl_y_pp({.o = 275, .e = 285});
   text_x = icon_x + ICON_SIZE + scl_x(10);
   text_y = icon_y - scl_y_pp({.o = 40, .e = 15});
@@ -360,7 +378,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   );
   draw_text(ctx, s_rate_buff, SFI_LargeBold, text_x + scl_x(10), text_y);
 
-  icon_x = scl_x_pp({.o = 460, .c = 500});
+  icon_x = scl_x_pp({.o = 460, .c = 500, .g = 500});
   icon_y = scl_y_pp({.o = 560, .e = 560});
   text_x = icon_x + ICON_SIZE - scl_x(10);
   text_y = icon_y - scl_y_pp({.o = 25, .e = 20});
@@ -372,8 +390,8 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   );
   draw_text(ctx, s_nc_buff, SFI_Medium, text_x, text_y);
 
-  icon_x = scl_x_pp({.o = 460, .c = 320});
-  icon_y = scl_y_pp({.o = 850, .c = 830, .e = 870});
+  icon_x = scl_x_pp({.o = 460, .c = 320, .g = 320});
+  icon_y = scl_y_pp({.o = 850, .c = 830, .e = 870, .g = 830});
   text_x = icon_x + ICON_SIZE;
   text_y = icon_y - scl_y_pp({.o = 30, .e = 20});
 
@@ -403,14 +421,14 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   graphics_context_set_fill_color(ctx, GColorBlack);
   graphics_fill_rect(
     ctx,
-    GRect(0, scl_y_pp({.o = 835, .c = 810, .e = 840}), PS_DISP_W - ACTION_BAR_W, DIV_W),
+    GRect(0, scl_y_pp({.o = 835, .c = 810, .e = 840, .g = 810}), PS_DISP_W - ACTION_BAR_W, DIV_W),
     0,
     GCornerNone
   );
 
   // Row labels
   draw_text(ctx, s_row_1_labels_buff, SFI_Small, 0, scl_y_pp({.o = 390, .e = 390}));
-  draw_text(ctx, ROW_2_LABEL, SFI_Small, 0, scl_y_pp({.o = 680, .c = 665, .e = 660}));
+  draw_text(ctx, ROW_2_LABEL, SFI_Small, 0, scl_y_pp({.o = 680, .c = 665, .e = 660, .g = 665}));
 }
 
 ////////////////////////////////////////////// Clicks //////////////////////////////////////////////
@@ -473,7 +491,7 @@ static void window_load(Window *window) {
 
   update_data();
 
-  // APP_LOG(APP_LOG_LEVEL_INFO, "Heap %d", heap_bytes_free());
+  APP_LOG(APP_LOG_LEVEL_INFO, "Heap %d", heap_bytes_free());
 }
 
 static void window_unload(Window *window) {
@@ -498,7 +516,7 @@ static void window_disappear(Window *window) {
   s_mascot_bitmap = NULL;
   s_batt_bitmap = NULL;
 
-  // APP_LOG(APP_LOG_LEVEL_INFO, "wd %d B", heap_bytes_free());
+  APP_LOG(APP_LOG_LEVEL_INFO, "wd %d B", heap_bytes_free());
   // bitmap_log_allocated_count();
 }
 
