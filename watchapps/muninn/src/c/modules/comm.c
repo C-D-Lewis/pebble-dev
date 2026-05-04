@@ -157,6 +157,13 @@ void inbox_received_handler(DictionaryIterator *iter, void *context) {
       app_state->stat_last_week_rate = STATUS_EMPTY;
     }
 
+    t = dict_find(iter, MESSAGE_KEY_STAT_BATTERY_LIFE);
+    if (t) {
+      app_state->stat_battery_life = t->value->int32;
+    } else {
+      app_state->stat_battery_life = STATUS_EMPTY;
+    }
+
     t = dict_find(iter, MESSAGE_KEY_STAT_MTBC);
     if (t) {
       app_state->stat_mtbc = t->value->int32;

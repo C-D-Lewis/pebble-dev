@@ -5,7 +5,7 @@
   #define EYE_RECT GRect(96, 11, 3, 3)
   #define BRAID_H 18
   #define ICON_SIZE 28
-  #define ROW_2_LABEL "      Last charge       Next charge"
+  #define ROW_2_LABEL "         Last charge          Next charge"
 #elif defined(PBL_PLATFORM_EMERY)
   #define EYE_RECT GRect(96, 11, 3, 3)
   #define BRAID_H 18

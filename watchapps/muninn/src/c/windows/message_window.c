@@ -1,6 +1,6 @@
 #include "message_window.h"
 
-#if defined(PBL_PLATFORM_EMERY)
+#if defined(PBL_PLATFORM_EMERY) || defined(PBL_PLATFORM_GABBRO)
   #define BRAID_H 18
 #else
   #define BRAID_H 14

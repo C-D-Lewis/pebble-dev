@@ -17,7 +17,7 @@
 // ! Check Aplite works before releasing
 // ! Comment out INFO logs
 // ! Check TS test flags
-#define VERSION "1.35.0"
+#define VERSION "1.36.0"
 // Minimum samples before providing estimations
 #define MIN_SAMPLES 2
 // Min samples before graph is shown
@@ -77,7 +77,7 @@
 #define HEADER_INSET scl_y(115)
 
 // Per-platform layout values
-#if defined(PBL_PLATFORM_EMERY)
+#if defined(PBL_PLATFORM_EMERY) || defined(PBL_PLATFORM_GABBRO)
   #define LINE_W 2
   #define MASCOT_SIZE 30
 #else

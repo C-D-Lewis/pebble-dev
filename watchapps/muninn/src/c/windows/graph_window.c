@@ -7,7 +7,7 @@
 #define NOTCH_S scl_x(35)
 
 // Not scaled
-#if defined(PBL_PLATFORM_EMERY)
+#if defined(PBL_PLATFORM_EMERY) || defined(PBL_PLATFORM_GABBRO)
 #define POINT_S 3
 #else
 #define POINT_S 2
@@ -319,7 +319,7 @@ static void main_window_load(Window *window) {
     snprintf(
       s_desc_buff,
       sizeof(s_desc_buff),
-#if defined(PBL_PLATFORM_EMERY)
+#if defined(PBL_PLATFORM_EMERY) || defined(PBL_PLATFORM_GABBRO)
       "Trend: %s%d%% (%s expected)",
 #else
       "Trend: %s%d%% (%s expd.)",

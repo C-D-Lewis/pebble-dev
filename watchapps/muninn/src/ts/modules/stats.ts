@@ -10,7 +10,7 @@ import { HistoryItem } from '../types';
 /**
  * Average discharge rate using all history samples.
  */
-export const calculateDischargeRate = (history: HistoryItem[]): number => {
+export const calculateDischargeRate = (history: HistoryItem[], round: boolean = true): number => {
   if (history.length === 0) return STATUS_EMPTY;
 
   let chargeDiffSum = 0;
@@ -29,7 +29,8 @@ export const calculateDischargeRate = (history: HistoryItem[]): number => {
 
   if (timeDiffSum <= 0) return STATUS_EMPTY;
 
-  return Math.round((chargeDiffSum * SECONDS_PER_DAY) / timeDiffSum);
+  const result = (chargeDiffSum * SECONDS_PER_DAY) / timeDiffSum;
+  return round ? Math.round(result) : result;
 };
 
 /**
@@ -100,4 +101,15 @@ export const calculateMeanTimeBetweenCharges = (history: HistoryItem[]): number 
   // console.log(JSON.stringify({ chargeTimes, timeDiffs, meanTimeS, meanDays }));
 
   return Math.round(meanDays);
+};
+
+/**
+ * Calculate the days using floating point accuracy.
+ */
+export const calculateEstimatedBatteryLife = (history: HistoryItem[]): number => {
+  // Could use weekly rate but it takes 7 days to populate
+  const rateWDecimal = calculateDischargeRate(history, false);
+  if (rateWDecimal <= 0) return STATUS_EMPTY;
+
+  return Math.floor(100 / rateWDecimal);
 };

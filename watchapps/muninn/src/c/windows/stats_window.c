@@ -53,12 +53,9 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
   }
   // snprintf(s_l_w_r_buff, sizeof(s_l_w_r_buff), "8%% per day");
 
-  const int battery_days = util_is_not_status(app_state->stat_all_time_rate)
-    ? (100 / app_state->stat_all_time_rate)
-    : STATUS_EMPTY;
   static char s_e_b_l_buff[16];
-  if (util_is_not_status(battery_days)) {
-    snprintf(s_e_b_l_buff, sizeof(s_e_b_l_buff), "%d days", battery_days);
+  if (util_is_not_status(app_state->stat_battery_life)) {
+    snprintf(s_e_b_l_buff, sizeof(s_e_b_l_buff), "%d days", app_state->stat_battery_life);
   } else {
     snprintf(s_e_b_l_buff, sizeof(s_e_b_l_buff), "-");
   }
@@ -135,7 +132,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
       util_menu_cell_draw(
         ctx,
         cell_layer,
-        "Avg. Rate",
+        "Average Rate",
         s_a_t_r_buff
       );
       break;
@@ -143,7 +140,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
       util_menu_cell_draw(
         ctx,
         cell_layer,
-        "Last Week Av. Rate",
+        "Weekly Avg. Rate",
         s_l_w_r_buff
       );
       break;
@@ -159,7 +156,11 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
       util_menu_cell_draw(
         ctx,
         cell_layer,
+#if defined(PBL_PLATFORM_EMERY) || defined(PBL_PLATFORM_GABBRO)
+        "Avg. Charge Interval",
+#else
         "Avg. Charge Gap",
+#endif
         s_mtbc_buff
       );
       break;
@@ -167,7 +168,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
       util_menu_cell_draw(
         ctx,
         cell_layer,
-        "View All (via Web)",
+        "View All (Web)",
         s_upload_status_buff
       );
       break;

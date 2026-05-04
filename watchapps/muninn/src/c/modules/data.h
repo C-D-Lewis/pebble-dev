@@ -62,6 +62,7 @@ typedef struct {
   int stat_total_days;     // Days covered by JS history
   int stat_all_time_rate;  // All-time avg discharge rate
   int stat_last_week_rate; // Last week avg discharge rate
+  int stat_battery_life;   // Estimated battery life
   int stat_mtbc;           // Mean time between charges
 
   char upload_id[8];       // Upload ID issued by the API

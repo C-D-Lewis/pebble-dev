@@ -6,7 +6,7 @@
 #define X_END scl_x_pp({.o = 980, .c = 930, .e = 980, .g = 930})
 
 // Extra precision needed
-#if defined(PBL_PLATFORM_EMERY)
+#if defined(PBL_PLATFORM_EMERY) || defined(PBL_PLATFORM_GABBRO)
   #define DIV_W 2
 #else
   #define DIV_W 1

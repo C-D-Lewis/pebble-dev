@@ -1,6 +1,7 @@
 import { MAX_SYNC_ITEMS, STATUS_EMPTY, TEST_SAMPLE_DATA } from '../constants';
 import {
   calculateDischargeRate,
+  calculateEstimatedBatteryLife,
   calculateLastWeekRate,
   calculateMeanTimeBetweenCharges,
 } from './stats';
@@ -29,6 +30,7 @@ export const handleGetSyncInfo = async () => {
     STAT_TOTAL_DAYS: Math.floor(history.length / 4),
     STAT_ALL_TIME_RATE: calculateDischargeRate(history),
     STAT_LAST_WEEK_RATE: calculateLastWeekRate(history),
+    STAT_BATTERY_LIFE: calculateEstimatedBatteryLife(history),
     STAT_MTBC: calculateMeanTimeBetweenCharges(history),
     UPLOAD_ID: uploadId,
   };

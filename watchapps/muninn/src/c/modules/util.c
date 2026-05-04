@@ -1,6 +1,6 @@
 #include "util.h"
 
-#if defined(PBL_PLATFORM_EMERY)
+#if defined(PBL_PLATFORM_EMERY) || defined(PBL_PLATFORM_GABBRO)
   #define CLOUD_SIZE GSize(30, 19)
 #elif defined(PBL_PLATFORM_CHALK)
   #define CLOUD_SIZE GSize(24, 15)
