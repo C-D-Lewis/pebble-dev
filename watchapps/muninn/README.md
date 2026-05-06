@@ -12,7 +12,7 @@ _Odin tasked Muninn with memory of the land... Over time, he will provide you wi
 
 ## Description
 
-Muninn is an extremely lightweight battery tracking and prediction app. It uses the Wakeup API instead of the Background Worker to monitor trends and provide insight without negatively affecting battery life, using a moving average of readings over time to estimate days left, rate of discharge, next charge date, and more!
+Muninn is an extremely lightweight battery tracking and prediction app. It uses the Wakeup API (every 6 hours) instead of the Background Worker to monitor trends and provide insight without negatively affecting battery life, using a moving average of readings over time to estimate days left, rate of discharge, next charge date, and more!
 
 Features:
 - Negligible battery impact
