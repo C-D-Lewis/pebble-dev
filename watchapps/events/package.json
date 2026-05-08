@@ -1,0 +1,37 @@
+{
+  "name": "events",
+  "version": "1.0.0",
+  "author": "Chris Lewis",
+  "private": true,
+  "dependencies": {
+  },
+  "devDependencies": {
+  },
+  "scripts": {
+  },
+  "keywords": [
+    "pebble-app"
+  ],
+  "pebble": {
+    "sdkVersion": "3",
+    "resources": {
+      "media": [
+      ]
+    },
+    "projectType": "native",
+    "uuid": "dc791f67-9c44-4233-9aa6-fb5061fc68ec",
+    "messageKeys": [
+    ],
+    "enableMultiJS": true,
+    "displayName": "Events",
+    "watchapp": {
+      "onlyShownOnCommunication": false,
+      "hiddenApp": false,
+      "watchface": false
+    },
+    "targetPlatforms": [
+      "emery"
+    ],
+    "capabilities": []
+  }
+}

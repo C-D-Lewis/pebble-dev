@@ -1,0 +1,9 @@
+#pragma once
+
+#define EVENT_NAMES (const char *[]) { \
+  "Party" \
+}
+
+#define EVENT_TIMES (const char *[]) { \
+  "Fri 18:30 - 20:15" \
+}
