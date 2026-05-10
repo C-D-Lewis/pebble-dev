@@ -1,5 +1,5 @@
 {
-  "name": "events",
+  "name": "schedule-app",
   "version": "1.0.0",
   "author": "Chris Lewis",
   "private": true,
@@ -23,7 +23,7 @@
     "messageKeys": [
     ],
     "enableMultiJS": true,
-    "displayName": "Events",
+    "displayName": "Schedule App",
     "watchapp": {
       "onlyShownOnCommunication": false,
       "hiddenApp": false,

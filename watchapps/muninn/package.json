@@ -15,7 +15,8 @@
       "chalk",
       "diorite",
       "emery",
-      "flint"
+      "flint",
+      "gabbro"
     ],
     "enableMultiJS": true,
     "capabilities": [

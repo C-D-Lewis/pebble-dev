@@ -135,7 +135,7 @@ void util_draw_braid(GContext *ctx, GRect rect) {
 
 // Like menu_cell_basic_draw but with larger subtitle
 void util_menu_cell_draw(GContext *ctx, Layer *layer, char *title, char *desc) {
-  GRect title_rect = GRect(scl_x(30), scl_y_pp({.o = -30, .e = -10}), PS_DISP_W, 100);
+  GRect title_rect = GRect(scl_x(30), scl_y_pp({.o = -30, .e = -10, .g = -10}), PS_DISP_W, 100);
 
   // Title only
   if (desc == NULL) title_rect.origin.y += scl_y(30);
@@ -155,7 +155,7 @@ void util_menu_cell_draw(GContext *ctx, Layer *layer, char *title, char *desc) {
       ctx,
       desc,
       scl_get_font(SFI_Medium),
-      GRect(scl_x(30), scl_y_pp({.o = 110, .e = 130}), PS_DISP_W, 100),
+      GRect(scl_x(30), scl_y_pp({.o = 110, .e = 130, .g = 130}), PS_DISP_W, 100),
       GTextOverflowModeTrailingEllipsis,
       GTextAlignmentLeft,
       NULL
@@ -220,9 +220,6 @@ void util_draw_button_hints(GContext *ctx, bool hints[3]) {
 
 void util_draw_skyline(GContext *ctx, bool is_nighttime) {
   // Mascot banner
-  // const GColor day_color = PBL_IF_COLOR_ELSE(GColorVividCerulean, GColorWhite);
-  // const GColor night_color = PBL_IF_COLOR_ELSE(GColorOxfordBlue, GColorBlack);
-  // graphics_context_set_fill_color(ctx, is_nighttime ? night_color : day_color);
   graphics_context_set_fill_color(ctx, is_nighttime ? GColorBlack : GColorWhite);
   const uint8_t skyline_y = scl_y(160);
   const GRect skyline_rect = GRect(0, 0, PS_DISP_W, skyline_y);
@@ -268,7 +265,7 @@ void util_draw_skyline(GContext *ctx, bool is_nighttime) {
       bitmaps_get(RESOURCE_ID_CLOUD),
       GRect(scl_x(680), scl_y(50), CLOUD_SIZE.w, CLOUD_SIZE.h)
     );
-#if !defined(PBL_PLATFORM_CHALK)
+#if !(defined(PBL_PLATFORM_CHALK) || defined(PBL_PLATFORM_GABBRO))
     graphics_draw_bitmap_in_rect(
       ctx,
       bitmaps_get(RESOURCE_ID_BIRD),
