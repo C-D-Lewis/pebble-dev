@@ -330,11 +330,13 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   int text_x = icon_x + ICON_SIZE + scl_x(10);
   int text_y = icon_y - scl_y_pp({.o = 40, .e = 15});
 
+// #if !defined(PBL_PLATFORM_APLITE)
   graphics_draw_bitmap_in_rect(
     ctx,
     bitmaps_get(RESOURCE_ID_REMAINING),
     GRect(icon_x, icon_y, ICON_SIZE, ICON_SIZE)
   );
+// #endif
   draw_text(ctx, s_remaining_buff, SFI_LargeBold, text_x + scl_x(10), text_y);
 
   icon_y = scl_y_pp({.o = 560, .e = 560});
@@ -365,11 +367,13 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   text_x = icon_x + ICON_SIZE + scl_x(10);
   text_y = icon_y - scl_y_pp({.o = 40, .e = 15});
 
+// #if !defined(PBL_PLATFORM_APLITE)
   graphics_draw_bitmap_in_rect(
     ctx,
     bitmaps_get(RESOURCE_ID_RATE),
     GRect(icon_x, icon_y, ICON_SIZE, ICON_SIZE)
   );
+// #endif
   draw_text(ctx, s_rate_buff, SFI_LargeBold, text_x + scl_x(10), text_y);
 
   icon_x = scl_x_pp({.o = 460, .c = 500, .g = 500});
