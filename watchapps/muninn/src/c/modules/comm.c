@@ -143,8 +143,7 @@ void inbox_received_handler(DictionaryIterator *iter, void *context) {
       snprintf(app_state->upload_id, sizeof(app_state->upload_id), "error");
     }
 
-    settings_window_reload();
-    stats_window_reload();
+    menu_window_reload();
 
 #ifdef SEND_SAMPLES
     // Continue sync after summary is received, but not every time
@@ -165,10 +164,7 @@ void inbox_received_handler(DictionaryIterator *iter, void *context) {
         "Success! Open the settings for Muninn in the Pebble app. (code %s)",
         app_state->upload_id
       );
-      stats_window_set_result("Upload success");
       message_window_push(s_upload_buff, false, false);
-    } else {
-      stats_window_set_result("Upload failed");
     }
     return;
   }
@@ -197,7 +193,6 @@ void comm_deinit() {}
 void comm_upload_history() {
   if (data_get_log_length() < MIN_SAMPLES_FOR_WEB) return;
 
-  stats_window_set_result("Uploading...");
   send_int(MESSAGE_KEY_UPLOAD_HISTORY);
 }
 #endif

@@ -111,8 +111,3 @@ char* data_get_error();
 Sample* data_get_sample(int index);
 PersistData* data_get_persist_data();
 AppState* data_get_app_state();
-
-// Strings
-#define MSG_WELCOME "Welcome to Muninn!\n\nEstimates will appear after three samples.\n\nLaunch me if the watch is off when a sample is missed."
-#define MSG_TIPS "Use a watchface that ticks each minute.\n\nFilter notifications from noisy apps.\n\nDisable the motion backlight & lower intensity.\n\nIncrease HRM interval.\n\nDisable touch."
-#define MSG_INFORMATION "Samples are taken every 6 hours.\n\nThe main screen shows:\n- Days remaining and rate.\n- Last detected & next predicted charge.\n- Current battery and next sample time.\n\nGraph shows each reading, outlined circles for predicted levels.\n\nIf watch is off during a sample, launch the app again to resume."

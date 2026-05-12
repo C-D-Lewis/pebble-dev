@@ -13,5 +13,3 @@
 #include "stats_window.h"
 
 void settings_window_push();
-
-void settings_window_reload();

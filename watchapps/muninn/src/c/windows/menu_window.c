@@ -24,7 +24,6 @@ static uint16_t get_num_rows_callback(MenuLayer *menu_layer, uint16_t section_in
 }
 
 static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_index, void *context) {
-
 #ifdef FEATURE_SYNC
   // Sync status
   AppState *app_state = data_get_app_state();
@@ -94,16 +93,30 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
 #ifdef FEATURE_SYNC
     case MI_SYNC_INFO: {
       AppState *app_state = data_get_app_state();
-      const bool enough_data = data_get_log_length() >= MIN_SAMPLES_FOR_GRAPH;
+      const bool enough_data = data_get_log_length() >= MIN_SAMPLES_FOR_WEB;
       if (enough_data && app_state->sync_count > 0) stats_window_push();
     } break;
 #endif
     case MI_BATTERY_TIPS:
-      message_window_push(MSG_TIPS, false, false);
+      message_window_push(
+#if defined(PBL_PLATFORM_APLITE)
+        "Use a watchface that ticks each minute.\n\nFilter notifications from noisy apps.\n\nDisable the motion backlight & lower intensity.",
+#else
+        "Use a watchface that ticks each minute.\n\nFilter notifications from noisy apps.\n\nDisable the motion backlight & lower intensity.\n\nIncrease HRM interval.\n\nDisable touch.",
+#endif
+        false,
+        false
+      );
       break;
+#if !defined(PBL_PLATFORM_APLITE)
     case MI_VERSION:
-      message_window_push(MSG_INFORMATION, false, false);
+      message_window_push(
+        "Samples are taken every 6 hours.\n\nThe main screen shows:\n- Days remaining and rate.\n- Last detected & next predicted charge.\n- Current battery and next sample time.\n\nGraph shows each reading, outlined circles for predicted levels.\n\nIf watch is off during a sample, launch the app again to resume.",
+        false,
+        false
+      );
       break;
+#endif
     default: break;
   }
 

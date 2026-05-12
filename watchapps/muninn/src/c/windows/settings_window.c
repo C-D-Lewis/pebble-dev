@@ -69,7 +69,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
       util_menu_cell_draw(
         ctx,
         cell_layer,
-        "Daily Upload (Web)",
+        "Daily Web Update",
         persist_data->auto_upload ? "Enabled" : "Disabled"
       );
       break;
@@ -117,7 +117,7 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
 
       if (new_state) {
         message_window_push(
-          "If available, history will be uploaded for viewing in the app config page daily during the noon sample.",
+          "If available, history will be uploaded daily at noon for viewing in the Pebble mobile app Settings for Muninn.",
           false,
           false
         );
@@ -166,10 +166,4 @@ void settings_window_push() {
   }
 
   window_stack_push(s_window, true);
-}
-
-void settings_window_reload() {
-  if(!s_window) return;
-  
-  menu_layer_reload_data(s_menu_layer);
 }

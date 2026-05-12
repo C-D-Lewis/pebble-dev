@@ -73,7 +73,11 @@ export const handlePushTimelinePin = async (dict: Record<string, any>) => {
     console.log(e);
 
     // Fallback method
-    await timelineRequest(pin);
+    try {
+      await timelineRequest(pin);
+    } catch (e2) {
+      console.log(e2);
+    }
   }
   console.log('Pin insert returned');
 };

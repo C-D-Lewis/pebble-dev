@@ -161,16 +161,10 @@ static void update_data() {
 
   // Battery now
   BatteryChargeState state = battery_state_service_peek();
-  const int perc = state.charge_percent;
-#if defined(PBL_PLATFORM_APLITE) || defined(PBL_PLATFORM_DIORITE) || defined(PBL_PLATFORM_FLINT)
-  const bool no_percent = perc == 100;
-#else
-  const bool no_percent = false;
-#endif
   snprintf(
     s_battery_buff,
     sizeof(s_battery_buff),
-    no_percent ? "%d" : "%d%%",
+    state.charge_percent == 100 ? "%d" : "%d%%",
     state.charge_percent
   );
 

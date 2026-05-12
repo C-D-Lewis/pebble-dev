@@ -36,13 +36,18 @@ static void init() {
   wakeup_service_subscribe(wakeup_handler);
 
   if (missed) {
+    // Test data won't have valid wakeup ID
 #if !defined(USE_TEST_DATA)
     message_window_push("Muninn missed a sample, but will continue.", true, false);
 #endif
   }
 
   if (first_launch) {
-    message_window_push(MSG_WELCOME, false, false);
+    message_window_push(
+      "Welcome to Muninn!\n\nEstimates will appear after 3 samples.\n\nLaunch me if the watch is off when a sample is missed.",
+      false,
+      false
+    );
     persist_data->seen_first_launch = true;
   }
 }

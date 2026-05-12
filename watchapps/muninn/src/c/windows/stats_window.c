@@ -17,9 +17,6 @@ static Window *s_window;
 static MenuLayer *s_menu_layer;
 static Layer *s_header_layer;
 
-static char s_upload_status_buff[32];
-static char s_result_buff[16];
-
 static uint16_t get_num_rows_callback(MenuLayer *menu_layer, uint16_t section_index, void *context) {
   return MI_MAX;
 }
@@ -68,22 +65,6 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
     snprintf(s_mtbc_buff, sizeof(s_mtbc_buff), "-");
   }
   // snprintf(s_mtbc_buff, sizeof(s_mtbc_buff), "12 days");
-
-  // Upload status
-  if (strlen(app_state->upload_id) == 0) {
-    snprintf(s_upload_status_buff, sizeof(s_upload_status_buff), "Loading...");
-  } else if (strlen(s_result_buff) > 1) {
-    snprintf(s_upload_status_buff, sizeof(s_upload_status_buff), "%s", s_result_buff);
-  } else if (data_get_log_length() < MIN_SAMPLES_FOR_WEB) {
-    snprintf(
-      s_upload_status_buff,
-      sizeof(s_upload_status_buff),
-      "Req. %d samples",
-      MIN_SAMPLES_FOR_WEB
-    );
-  } else {
-    snprintf(s_upload_status_buff, sizeof(s_upload_status_buff), "Press to upload");
-  }
 
   switch(cell_index->row) {
     case MI_TOTAL_DURATION: {
@@ -168,8 +149,8 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
       util_menu_cell_draw(
         ctx,
         cell_layer,
-        "View All (Web)",
-        s_upload_status_buff
+        "View All Data",
+        "Open mobile Settings"
       );
       break;
     default: break;
@@ -185,22 +166,6 @@ static int16_t get_cell_height_callback(struct MenuLayer *menu_layer, MenuIndex 
   }
 }
 
-static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) {
-  const bool enough_data = data_get_log_length() >= MIN_SAMPLES_FOR_WEB;
-
-  switch(cell_index->row) {
-    case MI_UPLOAD: {
-      if (!enough_data) return;
-
-      snprintf(s_result_buff, sizeof(s_result_buff), " ");
-      comm_upload_history();
-    } break;
-    default: break;
-  }
-
-  menu_layer_reload_data(s_menu_layer);
-}
-
 static void window_load(Window *window) {
   Layer *root_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(root_layer);
@@ -213,8 +178,7 @@ static void window_load(Window *window) {
   menu_layer_set_callbacks(s_menu_layer, NULL, (MenuLayerCallbacks) {
     .get_num_rows = (MenuLayerGetNumberOfRowsInSectionsCallback)get_num_rows_callback,
     .draw_row = (MenuLayerDrawRowCallback)draw_row_callback,
-    .get_cell_height = (MenuLayerGetCellHeightCallback)get_cell_height_callback,
-    .select_click = (MenuLayerSelectCallback)select_callback,
+    .get_cell_height = (MenuLayerGetCellHeightCallback)get_cell_height_callback
   });
   layer_add_child(root_layer, menu_layer_get_layer(s_menu_layer));
 }
@@ -243,10 +207,6 @@ void stats_window_reload() {
   if (!s_window) return;
   
   menu_layer_reload_data(s_menu_layer);
-}
-
-void stats_window_set_result(char *result) {
-  snprintf(s_result_buff, sizeof(s_result_buff), "%s", result);
 }
 
 #endif
