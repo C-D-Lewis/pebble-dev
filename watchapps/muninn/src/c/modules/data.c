@@ -210,8 +210,12 @@ void data_init() {
   return;
 #endif
 
-  // Init AppState emphemeral fields
+  // Init AppState emphemeral fields, updated in comm.c
   s_app_state.sync_count = STATUS_EMPTY;
+  s_app_state.stat_total_days = STATUS_EMPTY;
+  s_app_state.stat_all_time_rate = STATUS_EMPTY;
+  s_app_state.stat_battery_life = STATUS_EMPTY;
+  s_app_state.stat_mtbc = STATUS_EMPTY;
 
   // Never used, write defaults
   if (!persist_exists(SK_PersistData)) {

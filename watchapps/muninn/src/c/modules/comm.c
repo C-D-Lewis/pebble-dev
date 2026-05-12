@@ -137,40 +137,19 @@ void inbox_received_handler(DictionaryIterator *iter, void *context) {
     app_state->sync_count = sync_count;
 
     t = dict_find(iter, MESSAGE_KEY_STAT_TOTAL_DAYS);
-    if (t) {
-      app_state->stat_total_days = t->value->int32;
-    } else {
-      app_state->stat_total_days = STATUS_EMPTY;
-    }
+    if (t) app_state->stat_total_days = t->value->int32;
 
     t = dict_find(iter, MESSAGE_KEY_STAT_ALL_TIME_RATE);
-    if (t) {
-      app_state->stat_all_time_rate = t->value->int32;
-    } else {
-      app_state->stat_all_time_rate = STATUS_EMPTY;
-    }
+    if (t) app_state->stat_all_time_rate = t->value->int32;
 
     t = dict_find(iter, MESSAGE_KEY_STAT_LAST_WEEK_RATE);
-    if (t) {
-      app_state->stat_last_week_rate = t->value->int32;
-    } else {
-      app_state->stat_last_week_rate = STATUS_EMPTY;
-    }
+    if (t) app_state->stat_last_week_rate = t->value->int32;
 
     t = dict_find(iter, MESSAGE_KEY_STAT_BATTERY_LIFE);
-    if (t) {
-      app_state->stat_battery_life = t->value->int32;
-    } else {
-      app_state->stat_battery_life = STATUS_EMPTY;
-    }
+    if (t) app_state->stat_battery_life = t->value->int32;
 
     t = dict_find(iter, MESSAGE_KEY_STAT_MTBC);
-    if (t) {
-      app_state->stat_mtbc = t->value->int32;
-    } else {
-      app_state->stat_mtbc = STATUS_EMPTY;
-    }
-    APP_LOG(APP_LOG_LEVEL_INFO, "MTBC: %d", app_state->stat_mtbc);
+    if (t) app_state->stat_mtbc = t->value->int32;
 
     t = dict_find(iter, MESSAGE_KEY_UPLOAD_ID);
     if (t) {
@@ -209,7 +188,6 @@ void inbox_received_handler(DictionaryIterator *iter, void *context) {
       message_window_push(s_upload_buff, false, false);
     } else {
       stats_window_set_result("Upload failed");
-      message_window_push("Upload failed :(\n\nTry later or after restarting Muninn.", false, false);
     }
     return;
   }
