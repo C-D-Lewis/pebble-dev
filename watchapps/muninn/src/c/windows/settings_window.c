@@ -4,20 +4,14 @@ static Window *s_window;
 static MenuLayer *s_menu_layer;
 static Layer *s_header_layer;
 
-static bool s_reset_confirm;
-
 typedef enum {
-  MI_VIBE_ON_SAMPLE,
   MI_CUSTOM_ALERT_LEVEL,
-  MI_PUSH_TIMELINE_PINS,
   MI_ELEVATED_RATE_ALERT,
   MI_ONE_DAY_ALERT,
   MI_REVERSE_DATES,
 #ifdef FEATURE_SYNC
   MI_AUTO_UPLOAD,
 #endif
-
-  MI_DELETE_ALL_DATA,
 
   MI_MAX,
 } MenuItems;
@@ -38,28 +32,12 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
   }
 
   switch(cell_index->row) {
-    case MI_VIBE_ON_SAMPLE:
-      util_menu_cell_draw(
-        ctx,
-        cell_layer,
-        "Vibrate on Sample",
-        persist_data->vibe_on_sample ? "Enabled" : "Disabled"
-      );
-      break;
     case MI_CUSTOM_ALERT_LEVEL:
       util_menu_cell_draw(
         ctx,
         cell_layer,
         "Custom Alert",
         alert_disabled ? "Disabled" : s_alert_buff
-      );
-      break;
-    case MI_PUSH_TIMELINE_PINS:
-      util_menu_cell_draw(
-        ctx,
-        cell_layer,
-        "Timeline Pins",
-        persist_data->push_timeline_pins ? "Enabled" : "Disabled"
       );
       break;
     case MI_ELEVATED_RATE_ALERT:
@@ -96,23 +74,13 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
       );
       break;
 #endif
-    case MI_DELETE_ALL_DATA:
-      util_menu_cell_draw(
-        ctx,
-        cell_layer,
-        "Delete All Data",
-        s_reset_confirm ? "ARE YOU SURE?" : NULL
-      );
-      break;
     default: break;
   }
 }
 
 static int16_t get_cell_height_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) {
   switch(cell_index->row) {
-    case MI_VIBE_ON_SAMPLE:
     case MI_CUSTOM_ALERT_LEVEL:
-    case MI_PUSH_TIMELINE_PINS:
     case MI_ELEVATED_RATE_ALERT:
     case MI_ONE_DAY_ALERT:
     case MI_REVERSE_DATES:
@@ -120,8 +88,6 @@ static int16_t get_cell_height_callback(struct MenuLayer *menu_layer, MenuIndex 
     case MI_AUTO_UPLOAD:
 #endif
       return ROW_HEIGHT_LARGE;
-    case MI_DELETE_ALL_DATA:
-      return s_reset_confirm ? ROW_HEIGHT_LARGE : ROW_HEIGHT_SMALL;
     default:
       return ROW_HEIGHT_SMALL;
   }
@@ -132,14 +98,8 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
 
   switch(cell_index->row) {
     // Options
-    case MI_VIBE_ON_SAMPLE:
-      persist_data->vibe_on_sample = !persist_data->vibe_on_sample;
-      break;
     case MI_CUSTOM_ALERT_LEVEL:
       data_cycle_custom_alert_level();
-      break;
-    case MI_PUSH_TIMELINE_PINS:
-      persist_data->push_timeline_pins = !persist_data->push_timeline_pins;
       break;
     case MI_ELEVATED_RATE_ALERT:
       persist_data->elevated_rate_alert = !persist_data->elevated_rate_alert;
@@ -164,22 +124,6 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
       }
     } break;
 #endif
-
-    // Other
-    case MI_DELETE_ALL_DATA:
-      if (s_reset_confirm) {
-#ifdef FEATURE_SYNC
-        comm_request_deletion();
-#endif
-        data_reset_all();
-        vibes_double_pulse();
-        window_stack_pop_all(true);
-      } else {
-        vibes_long_pulse();
-      }
-
-      s_reset_confirm = !s_reset_confirm;
-      break;
     default: break;
   }
 
@@ -207,8 +151,6 @@ static void main_window_load(Window *window) {
 static void window_unload(Window *window) {
   menu_layer_destroy(s_menu_layer);
   layer_destroy(s_header_layer);
-
-  s_reset_confirm = false;
 
   window_destroy(window);
   s_window = NULL;

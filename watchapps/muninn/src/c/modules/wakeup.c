@@ -180,12 +180,11 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
   if (!one_day_left && one_day_notified) persist_data->one_day_notified = false;
 
   // Main display on wakeup
-  const bool do_vibe = persist_data->vibe_on_sample;
   if (result != STATUS_EMPTY) {
     // Tell the user if a sample was taken
-    message_window_push("Muninn is taking a note.", do_vibe, true);
+    message_window_push("Muninn is taking a note.", false, true);
   } else {
-    message_window_push("Muninn chose to wait some more.", do_vibe, true);
+    message_window_push("Muninn chose to wait some more.", false, true);
   }
 }
 

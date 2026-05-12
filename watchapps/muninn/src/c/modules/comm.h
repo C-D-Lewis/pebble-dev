@@ -15,9 +15,5 @@ void comm_init();
 void comm_deinit();
 
 #ifdef FEATURE_SYNC
-void comm_request_deletion();
-
-void comm_request_sync_stats();
-
 void comm_upload_history();
 #endif

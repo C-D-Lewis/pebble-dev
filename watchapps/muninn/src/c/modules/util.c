@@ -112,25 +112,25 @@ bool util_is_not_charging(int v) {
 }
 
 void util_draw_braid(GContext *ctx, GRect rect) {
-// #if !defined(PBL_PLATFORM_APLITE)
+#if !defined(PBL_PLATFORM_APLITE)
   graphics_draw_bitmap_in_rect(ctx, bitmaps_get(RESOURCE_ID_BRAID), rect);
-// #else
-//   graphics_context_set_fill_color(ctx, GColorBlack);
-//   graphics_fill_rect(ctx, rect, 0, GCornerNone);
+#else
+  graphics_context_set_fill_color(ctx, GColorBlack);
+  graphics_fill_rect(ctx, rect, 0, GCornerNone);
 
-//   // Draw braid without image on Aplite to save memory
-//   const uint8_t size = 2;
-//   const uint8_t end_x = rect.size.w - size;
-//   const uint8_t start_y = rect.origin.y + size;
-//   const uint8_t end_y = rect.origin.y + rect.size.h - size;
-//   for (uint8_t y = start_y; y < end_y; y += size) {
-//     const bool offset = ((y - start_y) / size) % 2 == 1;
-//     for (uint8_t x = size + (offset ? size : 0); x < end_x; x += (2 * size)) {
-//       graphics_context_set_fill_color(ctx, GColorWhite);
-//       graphics_fill_rect(ctx, GRect(x, y, size, size), 0, GCornerNone);
-//     }
-//   }
-// #endif
+  // Draw braid without image on Aplite to save memory
+  const int size = 2;
+  const int end_x = rect.size.w - size;
+  const int start_y = rect.origin.y + size;
+  const int end_y = rect.origin.y + rect.size.h - size;
+  for (int y = start_y; y < end_y; y += size) {
+    const bool offset = ((y - start_y) / size) % 2 == 1;
+    for (int x = size + (offset ? size : 0); x < end_x; x += (2 * size)) {
+      graphics_context_set_fill_color(ctx, GColorWhite);
+      graphics_fill_rect(ctx, GRect(x, y, size, size), 0, GCornerNone);
+    }
+  }
+#endif
 }
 
 // Like menu_cell_basic_draw but with larger subtitle
@@ -221,12 +221,13 @@ void util_draw_button_hints(GContext *ctx, bool hints[3]) {
 void util_draw_skyline(GContext *ctx, bool is_nighttime) {
   // Mascot banner
   graphics_context_set_fill_color(ctx, is_nighttime ? GColorBlack : GColorWhite);
-  const uint8_t skyline_y = scl_y(160);
+  const int skyline_y = scl_y(160);
   const GRect skyline_rect = GRect(0, 0, PS_DISP_W, skyline_y);
   graphics_fill_rect(ctx, skyline_rect, 0, GCornerNone);
 
   if (is_nighttime) {
     graphics_context_set_fill_color(ctx, GColorWhite);
+#if !defined(PBL_PLATFORM_APLITE)
     // Draw a couple of stars in black
     const GPoint stars[] = {
       GPoint(scl_x(40), scl_y(50)),
@@ -238,12 +239,13 @@ void util_draw_skyline(GContext *ctx, bool is_nighttime) {
       GPoint(scl_x(610), scl_y(30)),
       GPoint(scl_x(880), scl_y(110))
     };
-    const uint8_t num_stars = 8;
-    const uint8_t star_max_size = scl_x(15);
+    const int num_stars = 8;
+    const int star_max_size = scl_x(15);
     for (int i = 0; i < num_stars; i++) {
-      const uint8_t size = (i % star_max_size) + 1;
+      const int size = (i % star_max_size) + 1;
       graphics_fill_rect(ctx, GRect(stars[i].x, stars[i].y, size, size), 0, GCornerNone);
     }
+#endif
 
     // Skyline below mascot
     graphics_context_set_stroke_color(ctx, GColorWhite);
@@ -254,7 +256,8 @@ void util_draw_skyline(GContext *ctx, bool is_nighttime) {
       GPoint(PS_DISP_W - ACTION_BAR_W - 1, skyline_y)
     );
   } else {
-    // Clouds and Huginn
+#if !defined(PBL_PLATFORM_APLITE)
+    // Clouds
     graphics_draw_bitmap_in_rect(
       ctx,
       bitmaps_get(RESOURCE_ID_CLOUD),
@@ -266,11 +269,13 @@ void util_draw_skyline(GContext *ctx, bool is_nighttime) {
       GRect(scl_x(680), scl_y(50), CLOUD_SIZE.w, CLOUD_SIZE.h)
     );
 #if !(defined(PBL_PLATFORM_CHALK) || defined(PBL_PLATFORM_GABBRO))
+    // Huginn
     graphics_draw_bitmap_in_rect(
       ctx,
       bitmaps_get(RESOURCE_ID_BIRD),
       GRect(scl_x(270), scl_y(30), 16, 16)
     );
+#endif
 #endif
   }
 }

@@ -40,10 +40,8 @@ static void init_data_fields() {
   s_persist_data.last_charge_perc = STATUS_EMPTY;
   s_persist_data.wakeup_id = STATUS_EMPTY;
   s_persist_data.seen_first_launch = false;
-  s_persist_data.vibe_on_sample = false;
   s_persist_data.custom_alert_level = AL_20;
   s_persist_data.ca_has_notified = false;
-  s_persist_data.push_timeline_pins = true;
   s_persist_data.elevated_rate_alert = true;
   s_persist_data.last_charge_time = STATUS_EMPTY;
   s_persist_data.one_day_alert = true;
@@ -136,11 +134,9 @@ static void test_data_generator() {
   s_persist_data.last_charge_perc = 80;  // Agrees with emulator
   s_persist_data.wakeup_id = base + (12 * SECONDS_PER_HOUR);  // Won't be found
   s_persist_data.seen_first_launch = true;
-  s_persist_data.vibe_on_sample = true;
   s_persist_data.custom_alert_level = AL_20;
   s_persist_data.ca_has_notified = false;
   s_persist_data.elevated_rate_alert = false;
-  s_persist_data.push_timeline_pins = false;
   s_persist_data.one_day_notified = false;
   s_persist_data.last_charge_time = base - (3 * SECONDS_PER_DAY);
   s_persist_data.one_day_alert = false;
@@ -268,7 +264,6 @@ void data_log_state() {
     s_persist_data.wakeup_id,
     (int)wakeup_ts,
     s_persist_data.seen_first_launch == 1 ? "T" : "F",
-    s_persist_data.vibe_on_sample == 1 ? "T" : "F",
     s_persist_data.custom_alert_level,
     s_persist_data.ca_has_notified == 1 ? "T" : "F"
   );

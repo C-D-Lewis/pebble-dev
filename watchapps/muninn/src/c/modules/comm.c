@@ -34,10 +34,6 @@ static void send_int(uint32_t key) {
   app_message_outbox_send();
 }
 
-static void add_get_sync_info_data(DictionaryIterator *iter) {
-  dict_write_int32(iter, MESSAGE_KEY_GET_SYNC_INFO, 1);
-}
-
 static void send_sample(int index) {
   const Sample *s = data_get_sample(index);
   
@@ -71,6 +67,7 @@ static void send_next_sample_after(int last_ts) {
     index--;
   }
 
+  // Sync is complete
   if (index < 0) {
     // APP_LOG(APP_LOG_LEVEL_INFO, "syncd");
     return;
@@ -82,7 +79,7 @@ static void send_next_sample_after(int last_ts) {
 #endif
 
 void out_failed_handler(DictionaryIterator *failed, AppMessageResult reason, void *context) {
-  APP_LOG(APP_LOG_LEVEL_ERROR, "Out f %d", (int)reason);
+  // APP_LOG(APP_LOG_LEVEL_ERROR, "Out f %d", (int)reason);
 }
 
 void out_sent_handler(DictionaryIterator *iterator, void *context) {
@@ -103,9 +100,9 @@ void inbox_received_handler(DictionaryIterator *iter, void *context) {
   if (t) {
     DictionaryIterator *out;
     app_message_outbox_begin(&out);
-    if (persist_data->push_timeline_pins) add_push_pin_data(out);
+    add_push_pin_data(out);
 #if defined(FEATURE_SYNC)
-    add_get_sync_info_data(out);
+    dict_write_int32(out, MESSAGE_KEY_GET_SYNC_INFO, 1);
 #endif
     app_message_outbox_send();
     return;
@@ -121,20 +118,8 @@ void inbox_received_handler(DictionaryIterator *iter, void *context) {
 
     t = dict_find(iter, MESSAGE_KEY_SYNC_COUNT);
     const int sync_count = (int)t->value->int32;
-    APP_LOG(APP_LOG_LEVEL_INFO, "Sync: %d (%d)", last_ts, sync_count);
-
-    // Test compare with last seen value
-    // const int temp_key = 5000;
-    // if (persist_exists(temp_key)) {
-    //   int last_count = persist_read_int(temp_key);
-    //   // some value was saved
-    //   if (sync_count > 0 && sync_count < last_count) {
-    //     message_window_push("Phone count is less than watch count!", true, false);
-    //   }
-    // }
-    // persist_write_int(temp_key, sync_count);
-
     app_state->sync_count = sync_count;
+    APP_LOG(APP_LOG_LEVEL_INFO, "Sync: %d (%d)", last_ts, sync_count);
 
     t = dict_find(iter, MESSAGE_KEY_STAT_TOTAL_DAYS);
     if (t) app_state->stat_total_days = t->value->int32;
@@ -161,10 +146,6 @@ void inbox_received_handler(DictionaryIterator *iter, void *context) {
     settings_window_reload();
     stats_window_reload();
 
-    // TODO: If watch is empty and phone has data, option to sync back to watch?
-    //       Only if it is intended that JS data persists when watchapp is uninstalled
-    //       This might be stale data though.
-
 #ifdef SEND_SAMPLES
     // Continue sync after summary is received, but not every time
     send_next_sample_after(last_ts);
@@ -177,11 +158,11 @@ void inbox_received_handler(DictionaryIterator *iter, void *context) {
   if (t) {
     const int success = (int)t->value->int32;
     if (success) {
-      static char s_upload_buff[128];
+      static char s_upload_buff[100];
       snprintf(
         s_upload_buff,
         sizeof(s_upload_buff),
-        "Success! Open the settings for Muninn in the Pebble app to see your full history. (code %s)",
+        "Success! Open the settings for Muninn in the Pebble app. (code %s)",
         app_state->upload_id
       );
       stats_window_set_result("Upload success");
@@ -213,17 +194,8 @@ void comm_init() {
 void comm_deinit() {}
 
 #ifdef FEATURE_SYNC
-void comm_request_deletion() {
-  send_int(MESSAGE_KEY_SYNC_DELETE);
-}
-
-void comm_request_sync_stats() {
-  send_int(MESSAGE_KEY_GET_STATS);
-}
-
 void comm_upload_history() {
-  const bool enough_data = data_get_log_length() >= MIN_SAMPLES_FOR_WEB;
-  if (!enough_data) return;
+  if (data_get_log_length() < MIN_SAMPLES_FOR_WEB) return;
 
   stats_window_set_result("Uploading...");
   send_int(MESSAGE_KEY_UPLOAD_HISTORY);

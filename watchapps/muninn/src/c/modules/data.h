@@ -41,10 +41,10 @@ typedef struct {
   int last_charge_perc;     // Last sample charge percentage
   int wakeup_id;            // Current wakeup ID
   bool seen_first_launch;   // Has the app been launched before?
-  bool vibe_on_sample;      // Vibrate on sample
+  bool _vibe_on_sample;
   int custom_alert_level;   // Custom alert level
   bool ca_has_notified;     // Has notified for custom alert
-  bool push_timeline_pins;  // Push timeline pins
+  bool _push_timeline_pins;
   bool elevated_rate_alert; // Elevated rate alert
   int _unused_pin_set_time; 
   bool one_day_notified;    // One day remaining alert has notified
@@ -113,6 +113,6 @@ PersistData* data_get_persist_data();
 AppState* data_get_app_state();
 
 // Strings
-#define MSG_WELCOME "Welcome to Muninn!\n\nEstimates will appear after three samples are taken.\n\nPlease launch me if the watch is off when a sample is missed."
-#define MSG_TIPS "Use a watchface that updates every minute.\n\nFilter notifications from any very noisy apps.\n\nDisable the motion-activated backlight and lower intensity.\n\nIncrease HRM interval (if applicable).\n\nDisable touch (if applicable)."
-#define MSG_INFORMATION "Samples are taken every 6 hours.\n\nThe main screen shows:\n- Estimate data if available.\n- Last detected & next predicted charge.\n- Current battery level and next sample time.\n\nThe graph shows each reading, with an outlined circle for predicted levels.\n\nIf watch is off when a wakeup is missed, the app must be launched again."
+#define MSG_WELCOME "Welcome to Muninn!\n\nEstimates will appear after three samples.\n\nLaunch me if the watch is off when a sample is missed."
+#define MSG_TIPS "Use a watchface that ticks each minute.\n\nFilter notifications from noisy apps.\n\nDisable the motion backlight & lower intensity.\n\nIncrease HRM interval.\n\nDisable touch."
+#define MSG_INFORMATION "Samples are taken every 6 hours.\n\nThe main screen shows:\n- Days remaining and rate.\n- Last detected & next predicted charge.\n- Current battery and next sample time.\n\nGraph shows each reading, outlined circles for predicted levels.\n\nIf watch is off during a sample, launch the app again to resume."
