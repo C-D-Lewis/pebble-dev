@@ -115,6 +115,8 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
       const bool new_state = !persist_data->auto_upload;
       persist_data->auto_upload = new_state;
 
+// VERY LOW MEMORY
+#ifndef PBL_PLATFORM_APLITE
       if (new_state) {
         message_window_push(
           "If available, history will be uploaded daily at noon for viewing in the Pebble mobile app Settings for Muninn.",
@@ -122,6 +124,7 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
           false
         );
       }
+#endif
     } break;
 #endif
     default: break;

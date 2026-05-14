@@ -135,18 +135,23 @@ void util_draw_braid(GContext *ctx, GRect rect) {
 
 // Like menu_cell_basic_draw but with larger subtitle
 void util_menu_cell_draw(GContext *ctx, Layer *layer, char *title, char *desc) {
-  GRect title_rect = GRect(scl_x(30), scl_y_pp({.o = -30, .e = -10, .g = -10}), PS_DISP_W, 100);
+  const int text_x = scl_x_pp({.o = 30, .c = -20, .g = -20});
+  GRect title_rect = GRect(text_x, scl_y_pp({.o = -30, .e = -10, .g = -10}), PS_DISP_W, 100);
 
   // Title only
   if (desc == NULL) title_rect.origin.y += scl_y(30);
 
+  GTextAlignment alignment = GTextAlignmentLeft;
+#ifdef PBL_ROUND
+  alignment = GTextAlignmentCenter;
+#endif
   graphics_draw_text(
     ctx,
     title,
     scl_get_font(SFI_MediumBold),
     title_rect,
-    GTextOverflowModeTrailingEllipsis,
-    GTextAlignmentLeft,
+    GTextOverflowModeWordWrap,
+    alignment,
     NULL
   );
 
@@ -155,9 +160,9 @@ void util_menu_cell_draw(GContext *ctx, Layer *layer, char *title, char *desc) {
       ctx,
       desc,
       scl_get_font(SFI_Medium),
-      GRect(scl_x(30), scl_y_pp({.o = 110, .e = 130, .g = 130}), PS_DISP_W, 100),
+      GRect(text_x, scl_y_pp({.o = 110, .e = 130, .g = 130}), PS_DISP_W, 100),
       GTextOverflowModeTrailingEllipsis,
-      GTextAlignmentLeft,
+      alignment,
       NULL
     );
   }

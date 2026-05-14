@@ -38,11 +38,6 @@ static bool graph_is_available() {
   return data_get_log_length() >= MIN_SAMPLES_FOR_GRAPH;
 }
 
-static char* get_exp_sign(int acc) {
-  if (acc == 0) return "=";
-  return acc > 0 ? ">" : "<";
-}
-
 static void canvas_update_proc(Layer *layer, GContext *ctx) {
   // Button hints
   util_draw_button_hints(ctx, (bool[3]){false, true, false});
@@ -313,20 +308,25 @@ static void main_window_load(Window *window) {
   text_layer_set_overflow_mode(s_desc_layer, GTextOverflowModeWordWrap);
   layer_add_child(root_layer, text_layer_get_layer(s_desc_layer));;
 
+  // Show drain vs trend (accumulation of changes mult. by instanteneous rates)
   if (graph_is_available()) {
     const int acc = data_calculate_accuracy();
-    static char s_desc_buff[48];
+    static char s_desc_buff[32];
+    char *sign = acc > 0 ? ">" : "<";
+    if (acc == 0) {
+      sign = "=";
+    }
     snprintf(
       s_desc_buff,
       sizeof(s_desc_buff),
 #if defined(PBL_PLATFORM_EMERY) || defined(PBL_PLATFORM_GABBRO)
-      "Trend: %s%d%% (%s expected)",
+      "Drain %s expected (%s%d%%)",
 #else
-      "Trend: %s%d%% (%s expd.)",
+      "Drain %s expd. (%s%d%%)",
 #endif
+      sign,
       acc >= 0 ? "+" : "",
-      acc,
-      get_exp_sign(acc)
+      acc
     );
     text_layer_set_text(s_desc_layer, s_desc_buff);
   }

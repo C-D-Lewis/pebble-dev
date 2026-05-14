@@ -20,7 +20,7 @@
   #define EYE_RECT GRect(72, 7, 2, 2)
   #define BRAID_H 14
   #define ICON_SIZE 24
-  #define ROW_2_LABEL " Last chrg     Next chrg"
+  #define ROW_2_LABEL " Last chrg.    Next chrg."
 #endif
 
 #define DIV_W 2
@@ -29,7 +29,6 @@ static Window *s_window;
 static Layer *s_canvas_layer;
 
 static GBitmap *s_mascot_bitmap, *s_batt_bitmap;
-static AppTimer *s_blink_timer;
 static char s_remaining_buff[16];
 static char s_rate_buff[16];
 static char s_fmt_lc_buff[8];
@@ -38,7 +37,11 @@ static char s_nc_buff[16];
 static char s_reading_buff[8];
 static char s_row_1_labels_buff[40];
 static int s_blink_budget, s_days_remaining, s_rate, s_anim_days, s_anim_rate;
-static bool s_is_blinking, s_is_enabled;
+static bool s_is_enabled, s_anim_started;
+#ifdef FEATURE_ANIMATIONS
+static AppTimer *s_blink_timer;
+static bool s_is_blinking;
+#endif
 
 static void update_labels(int days) {
 #if defined(PBL_PLATFORM_GABBRO)
@@ -64,6 +67,7 @@ static void update_anim_text() {
   const int days = animating ? s_anim_days : s_days_remaining;
   const int rate = animating ? s_anim_rate : s_rate;
 
+  // Not enough data yet
   if (!util_is_not_status(days) || !util_is_not_status(rate)) {
     snprintf(s_remaining_buff, sizeof(s_remaining_buff), "--");
     snprintf(s_rate_buff, sizeof(s_rate_buff), "--");
@@ -91,6 +95,7 @@ static void update_anim_text() {
 
 #ifdef FEATURE_ANIMATIONS
 static void anim_update(Animation *anim, AnimationProgress dist_normalized) {
+  s_anim_started = true;
   s_anim_days = util_anim_percentage(dist_normalized, s_days_remaining);
   s_anim_rate = util_anim_percentage(dist_normalized, s_rate);
 
@@ -102,7 +107,6 @@ static void anim_teardown(Animation *anim) {
   update_anim_text();
   layer_mark_dirty(s_canvas_layer);
 }
-#endif
 
 ///////////////////////////////////////////// Blinking /////////////////////////////////////////////
 
@@ -142,6 +146,7 @@ static void cancel_blink() {
   s_is_blinking = false;
   layer_mark_dirty(s_canvas_layer);
 }
+#endif
 
 ///////////////////////////////////////////// Handlers /////////////////////////////////////////////
 
@@ -157,7 +162,9 @@ static void update_data() {
     data_set_error("Scheduled wakeup was not found");
   }
 
+#ifdef FEATURE_ANIMATIONS
   cancel_blink();
+#endif
 
   // Battery now
   BatteryChargeState state = battery_state_service_peek();
@@ -168,82 +175,64 @@ static void update_data() {
     state.charge_percent
   );
 
+  // Not enabled
   if (!s_is_enabled) {
-    // Anything that makes predictions should not be shown if not actively monitoring
     snprintf(s_reading_buff, sizeof(s_reading_buff), "--:--");
     snprintf(s_remaining_buff, sizeof(s_remaining_buff), "--");
     snprintf(s_rate_buff, sizeof(s_rate_buff), "--");
     snprintf(s_nc_buff, sizeof(s_nc_buff), "--");
+    return;
+  }
+  
+#ifdef FEATURE_ANIMATIONS
+  schedule_blink();
+#endif
+
+  // Days remaining
+  s_days_remaining = data_calculate_days_remaining(false);
+  if (util_is_not_status(s_days_remaining)) {
+    update_anim_text();
   } else {
-    schedule_blink();
-
-    // Days remaining
-    s_days_remaining = data_calculate_days_remaining(false);
-    if (util_is_not_status(s_days_remaining)) {
-#ifdef FEATURE_ANIMATIONS
-      // Handled in animation
-      snprintf(s_remaining_buff, sizeof(s_remaining_buff), "--");
-#else
-      // Set statically
-      update_anim_text();
-#endif
-    } else {
-      snprintf(s_remaining_buff, sizeof(s_remaining_buff), "--");
-    }
-
-    update_labels(s_days_remaining);
-
-    // Rate per day
-    s_rate = data_calculate_avg_discharge_rate_x100(false) / 100;
-    if (util_is_not_status(s_rate)) {
-#ifdef FEATURE_ANIMATIONS
-      snprintf(s_rate_buff, sizeof(s_rate_buff), "--");
-#else
-      update_anim_text();
-#endif
-    } else {
-      snprintf(s_rate_buff, sizeof(s_rate_buff), "--");
-    }
-
-    // "Xd" last charge time
-    const int last_charge_ts = persist_data->last_charge_time;
-    if (util_is_not_status(last_charge_ts)) {
-      util_fmt_time_ago(
-        last_charge_ts,
-        &s_fmt_lc_buff[0],
-        sizeof(s_fmt_lc_buff)
-      );
-    } else {
-      snprintf(s_fmt_lc_buff, sizeof(s_fmt_lc_buff), "--");
-    }
-
-    // "26/4" next charge time
-    time_t next_charge_ts = data_get_next_charge_time();
-    if (util_is_not_status(next_charge_ts)) {
-      struct tm *nc_info = localtime(&next_charge_ts);
-      if (persist_data->reverse_dates) {
-        snprintf(s_nc_buff, sizeof(s_nc_buff), "%d/%d", nc_info->tm_mon + 1, nc_info->tm_mday);
-      } else {
-        snprintf(s_nc_buff, sizeof(s_nc_buff), "%d/%d", nc_info->tm_mday, nc_info->tm_mon + 1);
-      }
-    } else {
-      snprintf(s_nc_buff, sizeof(s_nc_buff), "--");
-    }
-
-    // Next reading
-    util_fmt_time(wakeup_ts, &s_reading_buff[0], sizeof(s_reading_buff));
+    snprintf(s_remaining_buff, sizeof(s_remaining_buff), "--");
   }
 
-#ifdef FEATURE_ANIMATIONS
-  if (data_calculate_avg_discharge_rate_x100(false) != STATUS_EMPTY) {
-    // If data to show, begin smooth animation
-    static AnimationImplementation anim_implementation = {
-      .update = anim_update,
-      .teardown = anim_teardown
-    };
-    util_animate(500, 50, &anim_implementation, true);
+  update_labels(s_days_remaining);
+
+  // Rate per day
+  s_rate = data_calculate_avg_discharge_rate_x100(false) / 100;
+  if (util_is_not_status(s_rate)) {
+    update_anim_text();
+  } else {
+    snprintf(s_rate_buff, sizeof(s_rate_buff), "--");
   }
-#endif
+
+  // "Xd" last charge time
+  const int last_charge_ts = persist_data->last_charge_time;
+  if (util_is_not_status(last_charge_ts)) {
+    util_fmt_time_ago(
+      last_charge_ts,
+      &s_fmt_lc_buff[0],
+      sizeof(s_fmt_lc_buff)
+    );
+  } else {
+    snprintf(s_fmt_lc_buff, sizeof(s_fmt_lc_buff), "--");
+  }
+
+  // "26/4" next charge time
+  time_t next_charge_ts = data_get_next_charge_time();
+  if (util_is_not_status(next_charge_ts)) {
+    struct tm *nc_info = localtime(&next_charge_ts);
+    if (persist_data->reverse_dates) {
+      snprintf(s_nc_buff, sizeof(s_nc_buff), "%d/%d", nc_info->tm_mon + 1, nc_info->tm_mday);
+    } else {
+      snprintf(s_nc_buff, sizeof(s_nc_buff), "%d/%d", nc_info->tm_mday, nc_info->tm_mon + 1);
+    }
+  } else {
+    snprintf(s_nc_buff, sizeof(s_nc_buff), "--");
+  }
+
+  // Next reading
+  util_fmt_time(wakeup_ts, &s_reading_buff[0], sizeof(s_reading_buff));
 }
 
 static void draw_text(GContext *ctx, char *ptr, int font_id, int x, int y) {
@@ -289,11 +278,13 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     )
   );
 
+#ifdef FEATURE_ANIMATIONS
   // Blink Muninn's eye
   if (s_is_blinking) {
     graphics_context_set_fill_color(ctx, is_night ? GColorWhite : GColorBlack);
     graphics_fill_rect(ctx, EYE_RECT, 0, GCornerNone);
   }
+#endif
 
   // Bitmaps
   BatteryChargeState state = battery_state_service_peek();
@@ -330,24 +321,34 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   int text_x = icon_x + ICON_SIZE + scl_x(10);
   int text_y = icon_y - scl_y_pp({.o = 40, .e = 15});
 
-// #if !defined(PBL_PLATFORM_APLITE)
+#if !defined(PBL_PLATFORM_APLITE)
   graphics_draw_bitmap_in_rect(
     ctx,
     bitmaps_get(RESOURCE_ID_REMAINING),
     GRect(icon_x, icon_y, ICON_SIZE, ICON_SIZE)
   );
-// #endif
-  draw_text(ctx, s_remaining_buff, SFI_LargeBold, text_x + scl_x(10), text_y);
+#endif
+  int row1_text_x = text_x;
+#ifdef PBL_PLATFORM_APLITE
+  row1_text_x -= scl_x(110);
+#endif
+  draw_text(ctx, s_remaining_buff, SFI_LargeBold, row1_text_x, text_y);
 
   icon_y = scl_y_pp({.o = 560, .e = 560});
   text_y = icon_y - scl_y_pp({.o = 25, .e = 20});
 
+#if !defined(PBL_PLATFORM_APLITE)
   graphics_draw_bitmap_in_rect(
     ctx,
     bitmaps_get(RESOURCE_ID_LAST_CHARGE),
     GRect(icon_x, icon_y, ICON_SIZE, ICON_SIZE)
   );
-  draw_text(ctx, s_fmt_lc_buff, SFI_Medium, text_x, text_y);
+#endif
+  int row2_text_x = text_x;
+#ifdef PBL_PLATFORM_APLITE
+  row2_text_x -= scl_x(85);
+#endif
+  draw_text(ctx, s_fmt_lc_buff, SFI_Medium, row2_text_x, text_y);
 
 #if !defined(PBL_PLATFORM_CHALK)
   icon_y = scl_y_pp({.o = 850, .e = 870});
@@ -367,26 +368,36 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   text_x = icon_x + ICON_SIZE + scl_x(10);
   text_y = icon_y - scl_y_pp({.o = 40, .e = 15});
 
-// #if !defined(PBL_PLATFORM_APLITE)
+#if !defined(PBL_PLATFORM_APLITE)
   graphics_draw_bitmap_in_rect(
     ctx,
     bitmaps_get(RESOURCE_ID_RATE),
     GRect(icon_x, icon_y, ICON_SIZE, ICON_SIZE)
   );
-// #endif
-  draw_text(ctx, s_rate_buff, SFI_LargeBold, text_x + scl_x(10), text_y);
+#endif
+  row1_text_x = text_x;
+#ifdef PBL_PLATFORM_APLITE
+  row1_text_x -= scl_x(30);
+#endif
+  draw_text(ctx, s_rate_buff, SFI_LargeBold, row1_text_x, text_y);
 
   icon_x = scl_x_pp({.o = 460, .c = 500, .g = 500});
   icon_y = scl_y_pp({.o = 560, .e = 560});
   text_x = icon_x + ICON_SIZE - scl_x(10);
   text_y = icon_y - scl_y_pp({.o = 25, .e = 20});
   
+#if !defined(PBL_PLATFORM_APLITE)
   graphics_draw_bitmap_in_rect(
     ctx,
     bitmaps_get(RESOURCE_ID_NEXT_CHARGE),
     GRect(icon_x, icon_y, ICON_SIZE, ICON_SIZE)
   );
-  draw_text(ctx, s_nc_buff, SFI_Medium, text_x, text_y);
+#endif
+  row2_text_x = text_x;
+#ifdef PBL_PLATFORM_APLITE
+  row2_text_x -= scl_x(40);
+#endif
+  draw_text(ctx, s_nc_buff, SFI_Medium, row2_text_x, text_y);
 
   icon_x = scl_x_pp({.o = 460, .c = 320, .g = 320});
   icon_y = scl_y_pp({.o = 850, .c = 830, .e = 870, .g = 830});
@@ -438,7 +449,9 @@ static void up_long_click_handler(ClickRecognizerRef recognizer, void *context) 
   if (should_enable) {
     s_blink_budget = 5;
 
+#ifdef FEATURE_ANIMATIONS
     schedule_blink();
+#endif
     wakeup_schedule_next();
 
     // New user, tell them to wait
@@ -455,6 +468,7 @@ static void up_long_click_handler(ClickRecognizerRef recognizer, void *context) 
 
   vibes_long_pulse();
   update_data();
+  layer_mark_dirty(s_canvas_layer);
 }
 
 static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
@@ -489,7 +503,18 @@ static void window_load(Window *window) {
 
   update_data();
 
-  APP_LOG(APP_LOG_LEVEL_INFO, "Heap %d", heap_bytes_free());
+  if (util_is_not_status(data_calculate_avg_discharge_rate_x100(false))) {
+#ifdef FEATURE_ANIMATIONS
+    // If data to show, begin smooth animation
+    static AnimationImplementation anim_implementation = {
+      .update = anim_update,
+      .teardown = anim_teardown
+    };
+    util_animate(600, 0, &anim_implementation, true);
+#endif
+  }
+
+  APP_LOG(APP_LOG_LEVEL_INFO, "wl %dB", heap_bytes_free());
 }
 
 static void window_unload(Window *window) {
@@ -503,8 +528,15 @@ static void window_appear(Window *window) {
   // Some settings need redraw like date format
   if (!s_canvas_layer) return;
   
-  update_data();
-  layer_mark_dirty(s_canvas_layer);
+#ifdef FEATURE_ANIMATIONS
+  // Only show data if returning to this window
+  if (s_anim_started) {
+#endif
+    update_data();
+    layer_mark_dirty(s_canvas_layer);
+#ifdef FEATURE_ANIMATIONS
+  }
+#endif
 }
 
 static void window_disappear(Window *window) {
@@ -514,7 +546,7 @@ static void window_disappear(Window *window) {
   s_mascot_bitmap = NULL;
   s_batt_bitmap = NULL;
 
-  APP_LOG(APP_LOG_LEVEL_INFO, "wd %d B", heap_bytes_free());
+  APP_LOG(APP_LOG_LEVEL_INFO, "wd %dB", heap_bytes_free());
   // bitmap_log_allocated_count();
 }
 

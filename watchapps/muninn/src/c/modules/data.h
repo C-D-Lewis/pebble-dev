@@ -62,6 +62,8 @@ typedef struct {
   int stat_total_days;     // Days covered by JS history
   int stat_all_time_rate;  // All-time avg discharge rate
   int stat_last_week_rate; // Last week avg discharge rate
+  // char stat_all_time_rate[6];  // All-time avg discharge rate
+  // char stat_last_week_rate[6]; // Last week avg discharge rate
   int stat_battery_life;   // Estimated battery life
   int stat_mtbc;           // Mean time between charges
 

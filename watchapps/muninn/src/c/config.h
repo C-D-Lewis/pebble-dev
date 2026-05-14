@@ -17,7 +17,7 @@
 // ! Check Aplite works before releasing
 // ! Comment out INFO logs
 // ! Check TS test flags
-#define VERSION "1.37.0"
+#define VERSION "1.38.0"
 // Minimum samples before providing estimations
 #define MIN_SAMPLES 2
 // Min samples before graph is shown
@@ -55,11 +55,12 @@
 //                                       //
 ///////////////////////////////////////////
 
-//////////////// Features //////////
+/////////// Feature Flags //////////
 #if !defined(PBL_PLATFORM_APLITE) //
 #define FEATURE_ANIMATIONS true   //
 #define FEATURE_SYNC true         //
 #endif                            //
+////////////// All /////////////////
 ////////////////////////////////////
 
 // Layout values

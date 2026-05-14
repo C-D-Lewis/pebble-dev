@@ -102,7 +102,7 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
 #if defined(PBL_PLATFORM_APLITE)
         "Use a watchface that ticks each minute.\n\nFilter notifications from noisy apps.\n\nDisable the motion backlight & lower intensity.",
 #else
-        "Use a watchface that ticks each minute.\n\nFilter notifications from noisy apps.\n\nDisable the motion backlight & lower intensity.\n\nIncrease HRM interval.\n\nDisable touch.",
+        "Use a watchface that ticks each minute.\n\nFilter notifications from noisy apps.\n\nDisable the motion backlight & lower intensity.\n\nIncrease HRM interval.\n\nDisable touch backlight.",
 #endif
         false,
         false

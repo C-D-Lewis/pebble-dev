@@ -74,14 +74,14 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
         ctx,
         s_t_d_buff,
         scl_get_font(SFI_Medium),
-        GRect(scl_x(30), scl_y_pp({.o = 5, .e = 22}), PS_DISP_W, 50),
+        GRect(scl_x_pp({.o = 30, .c = 60}), scl_y_pp({.o = 5, .e = 22}), PS_DISP_W, 50),
         GTextOverflowModeTrailingEllipsis,
         GTextAlignmentLeft,
         NULL
       );
 
       // Filling up rect progressbar
-      const int bar_x = scl_x(480);
+      const int bar_x = scl_x_pp({.o = 480, .c = 450});
       const int bar_y = scl_y(30);
       const int bar_w = scl_x(490);
       const int bar_h = scl_y(70);
@@ -97,7 +97,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
       );
 
       // Percentage text label beneath progress bar
-      char perc_buff[8];
+      char perc_buff[10];
       snprintf(perc_buff, sizeof(perc_buff), "%d%% full", sync_perc);
       graphics_draw_text(
         ctx,
@@ -146,11 +146,18 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
       );
       break;
     case MI_UPLOAD:
-      util_menu_cell_draw(
+      graphics_draw_text(
         ctx,
-        cell_layer,
-        "View All Data",
-        "Open mobile Settings"
+#ifdef PBL_PLATFORM_CHALK
+        "Open Muninn mobile\nSettings for all data",
+#else
+        "Open Muninn mobile app Settings to see all data",
+#endif
+        scl_get_font(SFI_Small),
+        GRect(0, scl_y_pp({.o = 0, .c = -20, .g = -20}), PS_DISP_W, 100),
+        GTextOverflowModeTrailingEllipsis,
+        GTextAlignmentCenter,
+        NULL
       );
       break;
     default: break;
@@ -166,6 +173,13 @@ static int16_t get_cell_height_callback(struct MenuLayer *menu_layer, MenuIndex 
   }
 }
 
+void selection_will_change_callback(struct MenuLayer *menu_layer, MenuIndex *new_index, MenuIndex old_index, void *context) {
+  // Last item isn't selectable
+  if (new_index->row == MI_MAX - 1) {
+    new_index->row = old_index.row;
+  }
+}
+
 static void window_load(Window *window) {
   Layer *root_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(root_layer);
@@ -178,7 +192,8 @@ static void window_load(Window *window) {
   menu_layer_set_callbacks(s_menu_layer, NULL, (MenuLayerCallbacks) {
     .get_num_rows = (MenuLayerGetNumberOfRowsInSectionsCallback)get_num_rows_callback,
     .draw_row = (MenuLayerDrawRowCallback)draw_row_callback,
-    .get_cell_height = (MenuLayerGetCellHeightCallback)get_cell_height_callback
+    .get_cell_height = (MenuLayerGetCellHeightCallback)get_cell_height_callback,
+    .selection_will_change = selection_will_change_callback,
   });
   layer_add_child(root_layer, menu_layer_get_layer(s_menu_layer));
 }
