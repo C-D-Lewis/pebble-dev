@@ -8,15 +8,15 @@ import {
   Annotation,
   Text,
   Separator,
-  StatsList,
   ShareLink,
   GlobalStatsView,
   AppButton,
   AppLoader,
-  InfoChips,
 } from './index.ts';
 import { downloadChartImage, downloadHistoryCsv, getParam } from '../util.ts';
 import { fetchGlobalStats } from '../api.ts';
+import { StatsList } from './stats.ts';
+import { InfoChips } from './info.ts';
 
 declare const fabricate: Fabricate<AppState>;
 

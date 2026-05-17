@@ -376,6 +376,30 @@ int data_calculate_avg_discharge_rate_x100(bool ignore_no_change) {
   return rate_100x;
 }
 
+// This is a conservative estimate, rounding up the rate first
+// Would this be too aggressive?
+// int data_calculate_days_remaining_cons(bool tenx) {
+//   // Use live battery level, not last reading
+//   const BatteryChargeState state = battery_state_service_peek();
+//   const int current_level = state.charge_percent;
+
+//   // Round up to nearest whole number
+//   const int rate_100x = data_calculate_avg_discharge_rate_x100(false);
+//   const int rate_rounded = ((rate_100x + 99) / 100);
+
+//   // If not enough data
+//   if (data_get_valid_samples_count() < MIN_SAMPLES) return STATUS_EMPTY;
+//   // Data not available yet
+//   if (!util_is_not_status(rate_rounded)) return STATUS_EMPTY;
+//   // Only ever charged, or rate is zero ('return 1' above should prevent this)
+//   if (rate_rounded <= 0) return STATUS_EMPTY;
+
+//   // Multiply by x10 if tenx for decimal display
+//   const int level = current_level * (tenx ? 10 : 1);
+
+//   return level / rate_rounded;
+// }
+
 int data_calculate_days_remaining(bool tenx) {
   // Use live battery level, not last reading
   const BatteryChargeState state = battery_state_service_peek();
