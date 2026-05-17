@@ -125,10 +125,24 @@ void inbox_received_handler(DictionaryIterator *iter, void *context) {
     if (t) app_state->stat_total_days = t->value->int32;
 
     t = dict_find(iter, MESSAGE_KEY_STAT_ALL_TIME_RATE);
-    if (t) app_state->stat_all_time_rate = t->value->int32;
+    if (t) {
+      snprintf(
+        app_state->stat_all_time_rate,
+        sizeof(app_state->stat_all_time_rate),
+        "%s",
+        t->value->cstring
+      );
+    }
 
     t = dict_find(iter, MESSAGE_KEY_STAT_LAST_WEEK_RATE);
-    if (t) app_state->stat_last_week_rate = t->value->int32;
+    if (t) {
+      snprintf(
+        app_state->stat_last_week_rate,
+        sizeof(app_state->stat_last_week_rate),
+        "%s",
+        t->value->cstring
+      );
+    }
 
     t = dict_find(iter, MESSAGE_KEY_STAT_BATTERY_LIFE);
     if (t) app_state->stat_battery_life = t->value->int32;

@@ -156,11 +156,11 @@ const testCalculateDischargeRate = () => {
       result: STATUS_NO_CHANGE,
     }];
 
-    return [calculateDischargeRate(history), 5];
+    return [calculateDischargeRate(history), 5.1];
   });
 
   test('calculateDischargeRate > correct with real world data', () => {
-    return [calculateDischargeRate(SAMPLE_DATA), 6];
+    return [calculateDischargeRate(SAMPLE_DATA), 5.7];
   });
 
   test('calculateDischargeRate > correct if no discharges', () => {
@@ -192,7 +192,7 @@ const testCalculateLastWeekRate = () => {
       const timestamp = now - (i * 6 * SECONDS_PER_HOUR);
       return { ...p, timestamp };
     })
-    return [calculateLastWeekRate(data), 7];
+    return [calculateLastWeekRate(data), 6.9];
   });
 
   test('calculateLastWeekRate > correct with not enough samples', () => {

@@ -35,16 +35,23 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
   // snprintf(s_t_d_buff, sizeof(s_t_d_buff), "16 days (4%%)");
 
   static char s_a_t_r_buff[16];
-  if (util_is_not_status(app_state->stat_all_time_rate)) {
-    snprintf(s_a_t_r_buff, sizeof(s_a_t_r_buff), "%d%% per day", app_state->stat_all_time_rate);
+  if (
+    strlen(app_state->stat_all_time_rate) != 0 &&
+    strcmp(app_state->stat_all_time_rate, "-1") != 0
+  ) {
+    snprintf(s_a_t_r_buff, sizeof(s_a_t_r_buff), "%s%% per day", app_state->stat_all_time_rate);
   } else {
     snprintf(s_a_t_r_buff, sizeof(s_a_t_r_buff), "-");
   }
   // snprintf(s_a_t_r_buff, sizeof(s_a_t_r_buff), "5%% per day");
 
   static char s_l_w_r_buff[16];
-  if (util_is_not_status(app_state->stat_last_week_rate)) {
-    snprintf(s_l_w_r_buff, sizeof(s_l_w_r_buff), "%d%% per day", app_state->stat_last_week_rate);
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "stat_last_week_rate %s", app_state->stat_last_week_rate);
+  if (
+    strlen(app_state->stat_last_week_rate) != 0 &&
+    strcmp(app_state->stat_last_week_rate, "-1") != 0
+  ) {
+    snprintf(s_l_w_r_buff, sizeof(s_l_w_r_buff), "%s%% per day", app_state->stat_last_week_rate);
   } else {
     snprintf(s_l_w_r_buff, sizeof(s_l_w_r_buff), "-");
   }

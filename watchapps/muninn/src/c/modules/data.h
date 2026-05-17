@@ -58,16 +58,14 @@ typedef struct {
 
 // NOT persisted data
 typedef struct {
-  int sync_count;          // Count of synchronized items to the phone
-  int stat_total_days;     // Days covered by JS history
-  int stat_all_time_rate;  // All-time avg discharge rate
-  int stat_last_week_rate; // Last week avg discharge rate
-  // char stat_all_time_rate[6];  // All-time avg discharge rate
-  // char stat_last_week_rate[6]; // Last week avg discharge rate
-  int stat_battery_life;   // Estimated battery life
-  int stat_mtbc;           // Mean time between charges
+  int sync_count;              // Count of synchronized items to the phone
+  int stat_total_days;         // Days covered by JS history
+  char stat_all_time_rate[8];  // All-time avg discharge rate
+  char stat_last_week_rate[8]; // Last week avg discharge rate
+  int stat_battery_life;       // Estimated battery life
+  int stat_mtbc;               // Mean time between charges
 
-  char upload_id[8];       // Upload ID issued by the API
+  char upload_id[8];           // Upload ID issued by the API
 
   // Singleton, adding new fields OK, removing from middle is NOT OK
 } AppState;
