@@ -35,6 +35,7 @@ static void save_all() {
   }
 }
 
+// These include default settings for new app users
 static void init_data_fields() {
   s_persist_data.last_sample_time = STATUS_EMPTY;
   s_persist_data.last_charge_perc = STATUS_EMPTY;
@@ -46,8 +47,8 @@ static void init_data_fields() {
   s_persist_data.last_charge_time = STATUS_EMPTY;
   s_persist_data.one_day_alert = true;
   s_persist_data.one_day_notified = false;
-  s_persist_data.auto_upload = true;
   s_persist_data.reverse_dates = false;
+  s_persist_data.auto_upload_v2 = AUTO_UPLOAD_ENABLED;
 
   for (int i = 0; i < NUM_SAMPLES; i++) {
     Sample *s = &s_samples[i];
@@ -140,7 +141,7 @@ static void test_data_generator() {
   s_persist_data.one_day_notified = false;
   s_persist_data.last_charge_time = base - (3 * SECONDS_PER_DAY);
   s_persist_data.one_day_alert = false;
-  s_persist_data.auto_upload = false;
+  s_persist_data.auto_upload_v2 = AUTO_UPLOAD_DISABLED;
   s_persist_data.reverse_dates = false;
 
   for (int i = 0; i < NUM_SAMPLES; i++) {
@@ -187,17 +188,21 @@ static void test_data_generator() {
 
 // Handle new fields with default values
 static void handle_new_fields() {
+  // If last charge time not set (though this is VERY OLD!) set to empty
   if (s_persist_data.last_charge_time == 0) {
     s_persist_data.last_charge_time = STATUS_EMPTY;
+  }
+
+  // If auto_upload_v2 not used yet, set to enabled
+  // This keeps existing Aplite users feature-parity when finally enabling sync support
+  // as bool type can't show this tri-state
+  if (s_persist_data.auto_upload_v2 == 0) {
+    s_persist_data.auto_upload_v2 = AUTO_UPLOAD_ENABLED;
   }
 }
 
 void data_init() {
-  // Before anything else, check if we should reset data
-  // if (!persist_exists(SK_Migration_1)) {
-  //   data_reset_all();
-  //   persist_write_int(SK_Migration_1, 1);
-  // }
+  // Place future migrations here
 
 #if defined(USE_TEST_DATA)
   init_data_fields();

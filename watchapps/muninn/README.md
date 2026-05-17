@@ -23,7 +23,6 @@ Features:
 - Upload and view all your data in web config page*
 - Set an AppGlance to show estimate in the launcher menu
 - View general battery tips
-- Completely delete and reset all app data
 
 Options:
 - Custom low battery threshold notification (50%/20%/10%)

@@ -70,7 +70,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
         ctx,
         cell_layer,
         "Daily Web Update",
-        persist_data->auto_upload ? "Enabled" : "Disabled"
+        persist_data->auto_upload_v2 == AUTO_UPLOAD_ENABLED ? "Enabled" : "Disabled"
       );
       break;
 #endif
@@ -112,12 +112,14 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
       break;
 #ifdef FEATURE_SYNC
     case MI_AUTO_UPLOAD: {
-      const bool new_state = !persist_data->auto_upload;
-      persist_data->auto_upload = new_state;
+      const int new_state = persist_data->auto_upload_v2 == AUTO_UPLOAD_ENABLED
+        ? AUTO_UPLOAD_DISABLED
+        : AUTO_UPLOAD_ENABLED;
+      persist_data->auto_upload_v2 = new_state;
 
 // VERY LOW MEMORY
 #ifndef PBL_PLATFORM_APLITE
-      if (new_state) {
+      if (new_state == AUTO_UPLOAD_ENABLED) {
         message_window_push(
           "If available, history will be uploaded daily at noon for viewing in the Pebble mobile app Settings for Muninn.",
           false,

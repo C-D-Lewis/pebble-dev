@@ -14,6 +14,10 @@
 // If this sample looked like it was higher than the last
 #define STATUS_CHARGED -103
 
+// If auto upload (v2) is enabled or disabled (avoid uninit 0 value)
+#define AUTO_UPLOAD_ENABLED 1
+#define AUTO_UPLOAD_DISABLED 2
+
 // NOTE: APPEND ONLY - Changing keys will affect existing users!
 typedef enum {
   // App data key
@@ -22,7 +26,7 @@ typedef enum {
   SK_SampleBase = 10,
   // Wipe - adding new fields to Sample struct and expanding number of samples
   // Removed: 1.36
-  SK_Migration_1 = 50,
+  _SK_Migration_1 = 50,
 
   // Max storage value used
   SK_Max = 51
@@ -36,22 +40,24 @@ typedef enum {
 } AlertLevel;
 
 // Persisted app data - be careful changing this!
+// To remove fields, add '__' prefix and leave in place (for struct packing)
 typedef struct {
   int last_sample_time;     // Last sample timestamp
   int last_charge_perc;     // Last sample charge percentage
   int wakeup_id;            // Current wakeup ID
   bool seen_first_launch;   // Has the app been launched before?
-  bool _vibe_on_sample;
+  bool __vibe_on_sample;
   int custom_alert_level;   // Custom alert level
   bool ca_has_notified;     // Has notified for custom alert
-  bool _push_timeline_pins;
+  bool __push_timeline_pins;
   bool elevated_rate_alert; // Elevated rate alert
-  int _unused_pin_set_time; 
+  int __unused_pin_set_time;
   bool one_day_notified;    // One day remaining alert has notified
   int last_charge_time;     // Timestamp of last charge
   bool one_day_alert;       // Show 'one day remaining' alert
-  bool auto_upload;         // If uploading history on schedule
+  bool __auto_upload;
   bool reverse_dates;       // If MM/DD instead of DD/MM
+  int auto_upload_v2;       // Auto-upload, allowing existing Aplite auto-enable (tri-state)
 
   // Singleton, adding new fields OK, removing from middle is NOT OK
 } PersistData;
@@ -67,20 +73,25 @@ typedef struct {
 
   char upload_id[8];           // Upload ID issued by the API
 
-  // Singleton, adding new fields OK, removing from middle is NOT OK
+  // Singleton, adding new fields OK, removing from middle IS OK
 } AppState;
 
 // A full wakeup sample
+// To remove fields, add '__' prefix and leave in place (for struct packing)
 typedef struct {
-  int timestamp;        // This sample
-  int charge_perc;      //
-  int last_sample_time; // Previous values used in the calculation
-  int last_charge_perc; //
-  int time_diff;        // Comparison values
-  int charge_diff;      //
-  int result;           // Result - or special status!  
-  int days_remaining;   // Interesting for analysis
-  int rate;             //
+  int timestamp;        // | This sample
+  int charge_perc;      // |
+
+  int last_sample_time; // | Previous values used in the calculation
+  int last_charge_perc; // |
+
+  int time_diff;        // | Comparison values
+  int charge_diff;      // |
+
+  int result;           // Result - or special status!
+
+  int days_remaining;   // | Interesting for analysis
+  int rate;             // |
 
   // Saved per sample, adding new fields okay, removing from middle is NOT OK
   // NOTE: Consider how to update JS model
