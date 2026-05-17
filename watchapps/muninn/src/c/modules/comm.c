@@ -166,6 +166,7 @@ void inbox_received_handler(DictionaryIterator *iter, void *context) {
     return;
   }
 
+#ifndef PBL_PLATFORM_APLITE
   // Response to upload request
   t = dict_find(iter, MESSAGE_KEY_UPLOAD_STATUS);
   if (t) {
@@ -182,6 +183,7 @@ void inbox_received_handler(DictionaryIterator *iter, void *context) {
     }
     return;
   }
+#endif
 #endif
 }
 

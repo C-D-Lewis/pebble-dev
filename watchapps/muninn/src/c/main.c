@@ -43,11 +43,14 @@ static void init() {
   }
 
   if (first_launch) {
+// VERY LOW MEMORY
+#ifndef PBL_PLATFORM_APLITE
     message_window_push(
       "Welcome to Muninn!\n\nEstimates will appear after 3 samples.\n\nLaunch me if the watch is off when a sample is missed.",
       false,
       false
     );
+#endif
     persist_data->seen_first_launch = true;
   }
 }
