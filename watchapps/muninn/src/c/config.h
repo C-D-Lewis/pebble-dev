@@ -14,7 +14,7 @@
 //////////////////////////////////////////////////
 
 // ! MUST match package.json
-// ! Check Aplite works before releasing
+// ! Check Aplite works (at least 3545B static / 1996B on main window disappear)
 // ! Comment out INFO logs
 // ! Check TS test flags
 #define VERSION "1.38.0"
@@ -58,9 +58,9 @@
 /////////// Feature Flags //////////
 #if !defined(PBL_PLATFORM_APLITE) //
 #define FEATURE_ANIMATIONS true   //
-#define FEATURE_SYNC true         //
 #endif                            //
 ////////////// All /////////////////
+#define FEATURE_SYNC true         //
 ////////////////////////////////////
 
 // Layout values

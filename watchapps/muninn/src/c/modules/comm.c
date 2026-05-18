@@ -92,8 +92,6 @@ void out_sent_handler(DictionaryIterator *iterator, void *context) {
 }
 
 void inbox_received_handler(DictionaryIterator *iter, void *context) {
-  PersistData *persist_data = data_get_persist_data();
-
   // Things to do when JS is ready
   // We can only respond with one AppMessage at a time it seems
   Tuple *t = dict_find(iter, MESSAGE_KEY_READY);

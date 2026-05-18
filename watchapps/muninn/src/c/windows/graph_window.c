@@ -145,8 +145,10 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     graphics_context_set_fill_color(ctx, GColorBlack);
     graphics_fill_circle(ctx, GPoint(x, y), POINT_S);
 
-    if (i % 2 == 0) {
-      // Draw its notch on the X axis
+    // Draw its notch on the X if midnight
+    time_t ts = s->timestamp;
+    struct tm *s_time = localtime(&ts);
+    if (s_time->tm_hour == 0) {
       graphics_fill_rect(
         ctx,
         GRect(x - (LINE_W / 2), ROOT_Y + GRAPH_H, LINE_W, NOTCH_S),

@@ -22,7 +22,6 @@ static uint16_t get_num_rows_callback(MenuLayer *menu_layer, uint16_t section_in
 }
 
 static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_index, void *context) {
-  GRect bounds = layer_get_bounds(cell_layer);
   AppState *app_state = data_get_app_state();
 
   // Format buffers
@@ -46,7 +45,6 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
   // snprintf(s_a_t_r_buff, sizeof(s_a_t_r_buff), "5%% per day");
 
   static char s_l_w_r_buff[16];
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "stat_last_week_rate %s", app_state->stat_last_week_rate);
   if (
     strlen(app_state->stat_last_week_rate) != 0 &&
     strcmp(app_state->stat_last_week_rate, "-1") != 0
@@ -65,11 +63,11 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
   }
   // snprintf(s_e_b_l_buff, sizeof(s_e_b_l_buff), "20 days");
 
-  static char s_mtbc_buff[12];
+  static char s_mtbc_buff[16];
   if (util_is_not_status(app_state->stat_mtbc)) {
     snprintf(s_mtbc_buff, sizeof(s_mtbc_buff), "%d days", app_state->stat_mtbc);
   } else {
-    snprintf(s_mtbc_buff, sizeof(s_mtbc_buff), "-");
+    snprintf(s_mtbc_buff, sizeof(s_mtbc_buff), "Req. 2 charges");
   }
   // snprintf(s_mtbc_buff, sizeof(s_mtbc_buff), "12 days");
 
@@ -191,7 +189,7 @@ static void window_load(Window *window) {
   Layer *root_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(root_layer);
 
-  s_header_layer = util_create_header_layer(PBL_IF_ROUND_ELSE("Phone Stats", "Phone Sync Stats"), 32);
+  s_header_layer = util_create_header_layer(PBL_IF_ROUND_ELSE("Sync Stats", "Phone Sync Stats"), 32);
   layer_add_child(root_layer, s_header_layer);
 
   s_menu_layer = menu_layer_create(grect_inset(bounds, GEdgeInsets(HEADER_INSET, 0, 0, 0)));

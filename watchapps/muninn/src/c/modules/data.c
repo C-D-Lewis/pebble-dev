@@ -77,6 +77,7 @@ static int result_from_gap(int gap) {
   } else if (gap == 0) {
     return STATUS_NO_CHANGE;
   } else {
+    // Result is a prediction of a daily drain rate, so *4 for 6 hour samples
     return (gap * 4);
   }
 }
@@ -91,12 +92,9 @@ static void test_data_generator() {
   // 2 - Should show 10 days at 8% per day
   // const int changes[NUM_SAMPLES] = {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
   //
-  // 3 - Should show 11 days at 7% (two other events are ignored)
+  // 3 - Should show 10 days at 7.4% (two other events are ignored)
   //     Note: includes the two special statuses
   // const int changes[NUM_SAMPLES] = {-20, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
-  //
-  // 4 - Should result in 4.4% per day to test change from 4 -> 5 having large impact
-  // const int changes[NUM_SAMPLES] = {2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
   //
   // 4 - Should show 6.7 days at 12% per day
   // const int changes[NUM_SAMPLES] = {3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
@@ -114,10 +112,13 @@ static void test_data_generator() {
   // const int changes[NUM_SAMPLES] = {0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0};
   //
   // 7 - Big charge half way through
-  const int changes[NUM_SAMPLES] = {3, 0, 3, 3, 0, 3, 3, 3, -30, 3, 3, 3, 3, 3, 3, 3};
+  // const int changes[NUM_SAMPLES] = {3, 0, 3, 3, 0, 3, 3, 3, -30, 3, 3, 3, 3, 3, 3, 3};
   //
   // 8 - Should show graph with minimum points
   // const int changes[NUM_SAMPLES] = {3, 1, 2, 3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
+  //
+  // 9 - Try to emulate old watch discharge - should be 5.7 days at 14% from 80%
+  const int changes[NUM_SAMPLES] = {0, 0, 10, 0, 0, 0, 10, 0, 0, 0, 10, 0, 0, 0, 10, 0};
 
   const int interval_s = WAKEUP_MOD_H * SECONDS_PER_HOUR;
 
@@ -329,9 +330,8 @@ int data_calculate_avg_discharge_rate_x100(bool ignore_no_change) {
   const int total = data_get_valid_samples_count();
   if (total < MIN_SAMPLES) return STATUS_EMPTY;
 
-  int total_x2 = 0;
-  int weight_x2 = 0;
-  int count = 0;
+  int total_drops_x100 = 0;
+  int total_time = 0;
 
   for (int i = 0; i < NUM_SAMPLES; i++) {
     const Sample *s = &s_samples[i];
@@ -339,6 +339,8 @@ int data_calculate_avg_discharge_rate_x100(bool ignore_no_change) {
 
     // Log ends here, we never skip a slot when adding to it
     if (result == STATUS_EMPTY) break;
+    // Tricky - decision to ignore this time period for now (not discharging time)
+    if (result == STATUS_CHARGED) continue;
     // No charge change but we still count the time period elapsed
     if (result == STATUS_NO_CHANGE) {
       result = 0;
@@ -346,31 +348,22 @@ int data_calculate_avg_discharge_rate_x100(bool ignore_no_change) {
       // We are re-counting because the last rate was very low
       if (ignore_no_change) continue;
     }
-    // Tricky - decision to ignore this time period for now (not discharging time)
-    if (result == STATUS_CHARGED) continue;
 
-    count++;
-
-    // Weight the most recent 4 samples (last day) more heavily
-    if (count <= 4) {
-      total_x2 += result * 2;
-      weight_x2 += 2;
-    } else {
-      total_x2 += result * 1;
-      weight_x2 += 1;
+    // Count this sample
+    total_time += s->time_diff;
+    // Could includes STATUS_NO_CHANGE time
+    if (s->result > 0) {
+      // Multiple numerator by the time it represents before division
+      total_drops_x100 += (s->result * s->time_diff * 100) / SECONDS_PER_DAY;
     }
   }
 
   // We didn't count anything - empty log?
-  if (weight_x2 == 0) return STATUS_EMPTY;
+  if (total_time == 0 || total_drops_x100 == 0) return STATUS_EMPTY;
 
-  // If the majority samples are no-change, we may have a zero rate average
-  // This case is a problem: 90% charge becomes 90 days at 1% rate...
-  if (total_x2 == 0) total_x2 = 1;
-
-  const int rate_100x = (total_x2 * 100) / weight_x2;
+  const int rate_100x = (total_drops_x100 * SECONDS_PER_DAY) / total_time;
   if (rate_100x <= 200 && !ignore_no_change) {
-    // Count again, but this time ignore 'no change' time periods
+    // <2% per day, count again, but this time ignore 'no change' time periods
     return data_calculate_avg_discharge_rate_x100(true);
   }
 
@@ -380,30 +373,6 @@ int data_calculate_avg_discharge_rate_x100(bool ignore_no_change) {
 
   return rate_100x;
 }
-
-// This is a conservative estimate, rounding up the rate first
-// Would this be too aggressive?
-// int data_calculate_days_remaining_cons(bool tenx) {
-//   // Use live battery level, not last reading
-//   const BatteryChargeState state = battery_state_service_peek();
-//   const int current_level = state.charge_percent;
-
-//   // Round up to nearest whole number
-//   const int rate_100x = data_calculate_avg_discharge_rate_x100(false);
-//   const int rate_rounded = ((rate_100x + 99) / 100);
-
-//   // If not enough data
-//   if (data_get_valid_samples_count() < MIN_SAMPLES) return STATUS_EMPTY;
-//   // Data not available yet
-//   if (!util_is_not_status(rate_rounded)) return STATUS_EMPTY;
-//   // Only ever charged, or rate is zero ('return 1' above should prevent this)
-//   if (rate_rounded <= 0) return STATUS_EMPTY;
-
-//   // Multiply by x10 if tenx for decimal display
-//   const int level = current_level * (tenx ? 10 : 1);
-
-//   return level / rate_rounded;
-// }
 
 int data_calculate_days_remaining(bool tenx) {
   // Use live battery level, not last reading
@@ -422,7 +391,7 @@ int data_calculate_days_remaining(bool tenx) {
   const int level = current_level * (tenx ? 1000 : 100);
 
   // Rounding using half the divisor for the nearest whole day
-  return (level + (rate_100x / 2)) / rate_100x;
+  return level / rate_100x;
 }
 
 bool data_get_rate_is_elevated() {
