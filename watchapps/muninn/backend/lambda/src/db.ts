@@ -11,6 +11,7 @@ import {
   type DynamoDBDocumentClient,
 } from '@aws-sdk/lib-dynamodb';
 import type { DbDocument, GetGlobalStatsResponse } from './types.js';
+import { ConditionalCheckFailedException } from '@aws-sdk/client-dynamodb';
 
 /**
  * Get ID for this watch token.
@@ -55,9 +56,21 @@ export const getIfIdExists = async (docClient: DynamoDBDocumentClient, id: strin
  * @param {string} watchToken - Submitted watch token.
  */
 export const saveId = async (docClient: DynamoDBDocumentClient, id: string, watchToken: string) => {
-  return docClient.send(
-    new PutCommand({ TableName: IDS_TABLE_NAME, Item: { id, watchToken } }),
-  );
+  try {
+    return docClient.send(
+      new PutCommand({
+        TableName: IDS_TABLE_NAME,
+        Item: { id, watchToken },
+        ConditionExpression: 'attribute_not_exists(watchToken)',
+      }),
+    );
+  } catch (err) {
+    if (err instanceof ConditionalCheckFailedException) {
+      console.log(`WatchToken ${watchToken} already exists. Skipping.`);
+      return;
+    }
+    throw err;
+  }
 };
 
 /**
