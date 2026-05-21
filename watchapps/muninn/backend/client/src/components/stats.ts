@@ -83,7 +83,7 @@ export const StatsList = () => fabricate('Column')
       let operator = diffDays >= 0 ? 'above' : 'below';
       compareDaysStr = `${Math.abs(diffDays)} ${operator} average for this model`;
 
-      const diffRate = allTimeRate - modelStats.avgRate;
+      const diffRate = Math.round((allTimeRate - modelStats.avgRate) * 10) / 10;
       operator = diffRate >= 0 ? 'above' : 'below';
       compareRateStr = `${Math.abs(diffRate)}% ${operator} average for this model`;
     }
@@ -121,7 +121,7 @@ export const StatsList = () => fabricate('Column')
         ]),
       fabricate('Row')
         .setChildren([
-          StatView({ label: 'Charge Events', value: `${numCharges} events` }),
+          StatView({ label: 'Charge Events', value: `${numCharges} event${numCharges !== 1 ? 's' : ''}` }),
           StatView({ label: 'Avg. Charge Interval', value: mtbcValue }),
         ]),
     ]);

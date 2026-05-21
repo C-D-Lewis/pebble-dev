@@ -33,7 +33,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
   } else {
     // Not enough yet, or first sync is in progress
     if (sync_count < MIN_SAMPLES_FOR_WEB) {
-      snprintf(s_sync_buff, sizeof(s_sync_buff), "Req. %d samples", MIN_SAMPLES_FOR_WEB);
+      snprintf(s_sync_buff, sizeof(s_sync_buff), "(Req. %d samples)", MIN_SAMPLES_FOR_WEB);
     } else {
       snprintf(s_sync_buff, sizeof(s_sync_buff), "%d samples saved", sync_count);
     }
@@ -49,7 +49,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
       util_menu_cell_draw(
         ctx,
         cell_layer,
-        "Sync to Phone",
+        "Phone Storage",
         s_sync_buff
       );
       break;

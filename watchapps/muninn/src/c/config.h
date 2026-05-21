@@ -36,23 +36,14 @@
 #define MAX_GAP_SECONDS (12 * SECONDS_PER_HOUR)
 
 ///////////// Testing area ////////////////
-//                                       //
-// #define USE_TEST_DATA true            //
-//                                       //
-// #define SAVE_TEST_DATA true           //
-//                                       //
-// #define SYNC_TEST_DATA true           //
-//                                       //
-// #define LOG_STATE true                //
-//                                       //
+// #define USE_TEST_DATA      true       //
+// #define SAVE_TEST_DATA     true       //
+// #define SYNC_TEST_DATA     true       //
+// #define LOG_STATE          true       //
 // #define WAKEUP_NEXT_MINUTE true       //
-//                                       //
-// #define TEST_COLLISION true           //
-//                                       //
-// #define TEST_TIMELINE_PIN true        //
-//                                       //
-// #define TEST_IS_NIGHT true            //
-//                                       //
+// #define TEST_COLLISION     true       //
+// #define TEST_TIMELINE_PIN  true       //
+// #define TEST_IS_NIGHT      true       //
 ///////////////////////////////////////////
 
 /////////// Feature Flags //////////
@@ -75,7 +66,7 @@
 // Action bar hint height
 #define HINT_H scl_y_pp({.o = 200, .c = 80, .e = 200, .g = 80})
 // Header inset
-#define HEADER_INSET scl_y(115)
+#define HEADER_INSET scl_y(120)
 
 // Per-platform layout values
 #if defined(PBL_PLATFORM_EMERY) || defined(PBL_PLATFORM_GABBRO)

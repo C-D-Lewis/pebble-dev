@@ -63,11 +63,11 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
   }
   // snprintf(s_e_b_l_buff, sizeof(s_e_b_l_buff), "20 days");
 
-  static char s_mtbc_buff[16];
+  static char s_mtbc_buff[20];
   if (util_is_not_status(app_state->stat_mtbc)) {
     snprintf(s_mtbc_buff, sizeof(s_mtbc_buff), "%d days", app_state->stat_mtbc);
   } else {
-    snprintf(s_mtbc_buff, sizeof(s_mtbc_buff), "Req. 2 charges");
+    snprintf(s_mtbc_buff, sizeof(s_mtbc_buff), "(Req. 2 charges)");
   }
   // snprintf(s_mtbc_buff, sizeof(s_mtbc_buff), "12 days");
 
@@ -103,7 +103,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
 
       // Percentage text label beneath progress bar
       char perc_buff[10];
-      snprintf(perc_buff, sizeof(perc_buff), "%d%% full", sync_perc);
+      snprintf(perc_buff, sizeof(perc_buff), "%d%% used", sync_perc);
       graphics_draw_text(
         ctx,
         perc_buff,
@@ -126,7 +126,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
       util_menu_cell_draw(
         ctx,
         cell_layer,
-        "Weekly Avg. Rate",
+        "Last Week Rate",
         s_l_w_r_buff
       );
       break;
