@@ -38,6 +38,17 @@ describe('API', () => {
       id = json.id;
     });
 
+    it('should return the same ID for the same token', async () => {
+      const { status, json } = await apiRequest(
+        '/id',
+        'POST',
+        { watchToken: TEST_WATCH_TOKEN },
+      );
+
+      expect(status).to.equal(200);
+      expect(json.id).to.equal(id);
+    });
+
     it('should return 400 for a bad request (invalid token)', async () => {
       const { status, json } = await apiRequest('/id', 'POST', { watchToken: 'wrong' });
 
