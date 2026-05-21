@@ -10,6 +10,7 @@ import { aggregateAllByKey } from '../src/aggregations.ts';
 import { TEST_UPLOAD, TEST_WATCH_TOKEN } from './constants.mjs';
 import { ScanCommand } from '@aws-sdk/lib-dynamodb';
 import { describe } from 'node:test';
+import { generateStableId } from '../src/util.ts';
 
 /** Mock origin value */
 const MOCK_ORIGIN = 'http://localhost:8080';
@@ -266,6 +267,10 @@ describe('Unit tests', () => {
           avgBatteryLife: 10,
           avgRate: 10,
           medianBatteryLife: 10,
+          batteryLifeRange: 0,
+          minBatteryLife: 10,
+          maxBatteryLife: 10,
+          values: [10, 10],
         }, {
           groupName: 'Pebble Time Steel',
           names: ['pebble_time_steel_silver'],
@@ -273,8 +278,12 @@ describe('Unit tests', () => {
           avgBatteryLife: 4,
           avgRate: 30,
           medianBatteryLife: 5,
+          batteryLifeRange: 3,
+          minBatteryLife: 3,
+          maxBatteryLife: 5,
+          values: [3, 5],
         }];
-        
+
         expect(res).to.deep.equal(expected);
       });
 
@@ -310,6 +319,10 @@ describe('Unit tests', () => {
           groupName: 'Pebble 2 Duo',
           names: ['pebble_2_duo_black'],
           medianBatteryLife: 10,
+          batteryLifeRange: 0,
+          minBatteryLife: 10,
+          maxBatteryLife: 10,
+          values: [10],
         }, {
           avgBatteryLife: 10,
           avgRate: 10,
@@ -317,6 +330,10 @@ describe('Unit tests', () => {
           groupName: 'Pebble 2 HR',
           names: ['pebble_2_hr_charcoal_red'],
           medianBatteryLife: 10,
+          batteryLifeRange: 0,
+          minBatteryLife: 10,
+          maxBatteryLife: 10,
+          values: [10],
         }, {
           avgBatteryLife: 10,
           avgRate: 10,
@@ -324,6 +341,10 @@ describe('Unit tests', () => {
           groupName: 'Pebble 2',
           names: ['pebble_2_se_black_charcoal'],
           medianBatteryLife: 10,
+          batteryLifeRange: 0,
+          minBatteryLife: 10,
+          maxBatteryLife: 10,
+          values: [10],
         }, {
           avgBatteryLife: 10,
           avgRate: 10,
@@ -331,6 +352,10 @@ describe('Unit tests', () => {
           groupName: 'Pebble Time',
           names: ['pebble_time_red'],
           medianBatteryLife: 10,
+          batteryLifeRange: 0,
+          minBatteryLife: 10,
+          maxBatteryLife: 10,
+          values: [10],
         }, {
           avgBatteryLife: 10,
           avgRate: 10,
@@ -338,6 +363,10 @@ describe('Unit tests', () => {
           groupName: 'Pebble Time 2',
           names: ['pebble_time_2_black_gray'],
           medianBatteryLife: 10,
+          batteryLifeRange: 0,
+          minBatteryLife: 10,
+          maxBatteryLife: 10,
+          values: [10],
         }, {
           avgBatteryLife: 3,
           avgRate: 40,
@@ -345,6 +374,10 @@ describe('Unit tests', () => {
           groupName: 'Pebble Time Round',
           names: ['pebble_time_round_silver_20'],
           medianBatteryLife: 3,
+          batteryLifeRange: 0,
+          minBatteryLife: 3,
+          maxBatteryLife: 3,
+          values: [3],
         }, {
           avgBatteryLife: 5,
           avgRate: 20,
@@ -352,8 +385,12 @@ describe('Unit tests', () => {
           groupName: 'Pebble Time Steel',
           names: ['pebble_time_steel_silver'],
           medianBatteryLife: 5,
+          batteryLifeRange: 0,
+          minBatteryLife: 5,
+          maxBatteryLife: 5,
+          values: [5],
         }];
-        
+
         expect(res).to.deep.equal(expected);
       });
 
@@ -382,6 +419,10 @@ describe('Unit tests', () => {
             avgBatteryLife: 10,
             avgRate: 10,
             medianBatteryLife: 10,
+            batteryLifeRange: 0,
+            minBatteryLife: 10,
+            maxBatteryLife: 10,
+            values: [10],
           },
           {
             groupName: 'emery',
@@ -390,10 +431,32 @@ describe('Unit tests', () => {
             avgBatteryLife: 4,
             avgRate: 30,
             medianBatteryLife: 5,
+            batteryLifeRange: 3,
+            minBatteryLife: 3,
+            maxBatteryLife: 5,
+            values: [3, 5],
           },
         ];
-        
+
         expect(res).to.deep.equal(expected);
+      });
+    });
+  });
+
+  describe('util.js', () => {
+    describe('generateStableId', () => {
+      it('should generate stable IDs', () => {
+        const id = generateStableId(TEST_WATCH_TOKEN, 0);
+        const id2 = generateStableId(TEST_WATCH_TOKEN, 0);
+
+        expect(id).to.equal(id2);
+      });
+
+      it('should generate stable IDs with multiple slices', () => {
+        const id = generateStableId(TEST_WATCH_TOKEN, 0);
+        const id2 = generateStableId(TEST_WATCH_TOKEN, 1);
+        expect(id).to.equal('45620d');
+        expect(id2).to.equal('d10c8b');
       });
     });
   });

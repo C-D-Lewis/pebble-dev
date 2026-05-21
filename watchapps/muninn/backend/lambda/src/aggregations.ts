@@ -1,4 +1,4 @@
-import { GetCommand, PutCommand, type DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
+import { GetCommand, PutCommand, type DynamoDBDocumentClient, type ScanCommandOutput } from '@aws-sdk/lib-dynamodb';
 import { ScanCommand } from '@aws-sdk/lib-dynamodb';
 import { AGGREGATION_DOC_ID, HISTORY_TABLE_NAME, METADATA_TABLE_NAME } from './constants.ts';
 import type { AggregateItem, DbDocument, GlobalStatItem, MetadataDocument } from './types.js';
@@ -12,7 +12,7 @@ import { sortByName } from './util.ts';
  */
 const getBatteryLife = (row: DbDocument) => {
   const rate = row.stats?.allTimeRate;
-  if (!rate || rate === 0) return 0; 
+  if (!rate || rate === 0) return 0;
 
   // Don't round here to preserve accuracy at the end
   return 100 / rate;
@@ -47,7 +47,7 @@ const getGroupName = (name: string): string => {
  */
 export const aggregateAllByKey = (rows: DbDocument[], key: keyof DbDocument): GlobalStatItem[] => {
   const buckets: Record<string, AggregateItem> = {};
-  
+
   for (const row of rows) {
     const name = (row[key] ?? '').toString().trim() || 'Unknown';
     const groupName = name.includes('pebble_') ? getGroupName(name) : name;
@@ -99,7 +99,7 @@ export const aggregateAllByKey = (rows: DbDocument[], key: keyof DbDocument): Gl
         b.values.reduce((acc, v) => acc + Math.pow(v - avgBatteryLife, 2), 0) / b.count
       );
       const finalValues = sortedValues.filter(v => Math.abs(v - avgBatteryLife) <= 2 * stdDev);
-    
+
       // Median as alternative to average, less affected by outliers
       const medianBatteryLife = finalValues.length ? finalValues[Math.floor(finalValues.length / 2)] || 0  : 0;
 
@@ -168,15 +168,25 @@ export const updateAggregations = async (docClient: DynamoDBDocumentClient) => {
     return;
   }
 
-  // Get all uploaded records
-  const res = await docClient.send(
-    // Likely okay until about 5000, then pagination will be needed
-    new ScanCommand({ TableName: HISTORY_TABLE_NAME, Limit: 5000 }),
-  );
-  if (!res.Items?.length) throw new Error('Failed to get records for aggregations');
-  console.log(`Scanned ${res.Items?.length} items`);
+  // Get all uploaded records (paginated due to 1MB limit)
+  const allItems = [];
+  let lastEvaluatedKey;
+  do {
+    const res: ScanCommandOutput = await docClient.send(
+      new ScanCommand({
+        TableName: HISTORY_TABLE_NAME,
+        Limit: 5000,
+        ExclusiveStartKey: lastEvaluatedKey
+      }),
+    );
+    if (res.Items) {
+      allItems.push(...res.Items);
+    }
+    lastEvaluatedKey = res.LastEvaluatedKey;
+  } while (lastEvaluatedKey);
+  console.log(`Fetched ${allItems.length} records for aggregation`);
 
-  const allRows: DbDocument[] = res.Items as unknown as DbDocument[];
+  const allRows: DbDocument[] = allItems as unknown as DbDocument[];
   const doc = performAggregations(allRows);
 
   await docClient.send(

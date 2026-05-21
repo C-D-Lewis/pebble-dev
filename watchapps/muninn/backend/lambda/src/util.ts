@@ -1,3 +1,4 @@
+import { createHash } from 'crypto';
 import { ALLOWED_ORIGINS, DEFAULT_RES_HEADERS } from './constants.ts';
 import type { HistoryItem, ApiGwEvent, PostHistoryBody, WatchStats, GlobalStatItem } from './types.ts';
 
@@ -12,6 +13,20 @@ export const generateId = () =>
     .toString(16)
     .padStart(6, '0')
     .toUpperCase();
+
+/**
+ * Generate a stable 6-character hexadecimal ID based on the watch token and attempt number.
+ *
+ * @return {string} The generated ID.
+ */
+export const generateStableId = (watchToken: string, attempt: number) => {
+  const fullHashHex = createHash('sha256')
+    .update(watchToken)
+    .digest('hex');
+
+  const startIdx = attempt * 6;
+  return fullHashHex.slice(startIdx, startIdx + 6);
+};
 
 /**
  * Create a bad request response.

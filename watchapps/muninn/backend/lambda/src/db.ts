@@ -1,4 +1,3 @@
-import { ScanCommand } from '@aws-sdk/lib-dynamodb';
 import {
   AGGREGATION_DOC_ID,
   HISTORY_TABLE_NAME,
@@ -12,20 +11,6 @@ import {
   type DynamoDBDocumentClient,
 } from '@aws-sdk/lib-dynamodb';
 import type { DbDocument, GetGlobalStatsResponse } from './types.js';
-
-/**
- * Get history table row count.
- *
- * @param {DynamoDBDocumentClient} docClient - DynamoDB document client.
- * @returns {Promise<number | undefined>} Count result if available.
- */
-export const getHistoryCount = async (docClient: DynamoDBDocumentClient) => {
-  const res = await docClient.send(
-    new ScanCommand({ TableName: HISTORY_TABLE_NAME, Select: 'COUNT' }),
-  );
-
-  return res.Count;
-};
 
 /**
  * Get ID for this watch token.
