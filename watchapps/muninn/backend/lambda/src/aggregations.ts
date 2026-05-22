@@ -34,6 +34,7 @@ const getGroupName = (name: string): string => {
   if (name.includes('pebble_time')) return 'Pebble Time';
   if (name.includes('pebble_round_2')) return 'Pebble Round 2';
   if (name.includes('pebble_steel')) return 'Pebble Steel';
+  if (name.includes('pebble_black') || name.includes('pebble_white')) return 'Pebble (Original)';
 
   return name;
 };

@@ -57,8 +57,6 @@ export const LoginCard = () => AppCard()
         SearchBox(),
         SubmitButton(),
       ]),
-    Separator(),
-    // Annotation().setText('(not available for original Pebble due to memory constraints)'),
   ]);
 
 /**

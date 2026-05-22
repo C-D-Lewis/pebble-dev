@@ -23,11 +23,12 @@ const TableHeader = ({ textAlign }: { textAlign: string }) => fabricate('th')
  *
  * @param {object} props - Component props.
  * @param {string} props.textAlign - textAlign value to use.
+ * @param {boolean} props.muted - Whether to use muted styles.
  * @returns {FabricateComponent} TableCell component.
  */
-const TableCell = ({ textAlign }: { textAlign: string }) => fabricate('td')
+const TableCell = ({ textAlign, muted }: { textAlign: string, muted: boolean }) => fabricate('td')
   .setStyles({
-    color: '#ccc',
+    color: muted ? '#777' : '#ccc',
     fontSize: '0.9rem',
     textAlign,
     fontFamily: textAlign === 'left' ? 'monospace' : 'sans-serif',
@@ -59,14 +60,18 @@ export const GlobalStatsTable = (
       const data = state.globalStats[field];
 
       el.addChildren(
-        data.map((item: GlobalStatItem) => fabricate('tr')
-          .setChildren([
-            TableCell({ textAlign: 'left' }).setText(item.groupName),
-            TableCell({ textAlign: 'center' }).setText(String(item.count)),
-            TableCell({ textAlign: 'center' }).setText(`${item.avgBatteryLife} days`),
-            // TableCell({ textAlign: 'center' }).setText(`${item.medianBatteryLife} days`),
-            TableCell({ textAlign: 'center' }).setText(`${item.avgRate}%`),
-          ])),
+        data.map((item: GlobalStatItem) => {
+          // Muted styles for low sample sizes
+          const muted = item.count < 5;
+          return fabricate('tr')
+            .setChildren([
+              TableCell({ textAlign: 'left', muted }).setText(item.groupName),
+              TableCell({ textAlign: 'center', muted }).setText(String(item.count)),
+              TableCell({ textAlign: 'center', muted }).setText(`${item.avgBatteryLife} days`),
+              // TableCell({ textAlign: 'center' }).setText(`${item.medianBatteryLife} days`),
+              TableCell({ textAlign: 'center', muted }).setText(`${item.avgRate}%`),
+            ]);
+        }),
       );
     });
 };

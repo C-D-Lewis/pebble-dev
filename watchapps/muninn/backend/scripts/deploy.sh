@@ -49,7 +49,7 @@ printf "\n\n>>> Updating infrastructure\n\n"
 cd terraform
 
 terraform init
-terraform apply -auto-approve
+terraform apply #-auto-approve
 
 cd -
 
