@@ -58,7 +58,7 @@ export const LoginCard = () => AppCard()
         SubmitButton(),
       ]),
     Separator(),
-    Annotation().setText('(not available for original Pebble due to memory constraints)'),
+    // Annotation().setText('(not available for original Pebble due to memory constraints)'),
   ]);
 
 /**

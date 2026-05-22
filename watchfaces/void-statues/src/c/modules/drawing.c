@@ -1,13 +1,13 @@
 #include "drawing.h"
 
-static GColor s_box_color, s_shadow_color, s_clarity_color;
+static GColor s_block_color, s_shadow_color, s_void_color;
 static bool s_is_connected = false;
 
 static void draw_box(Vec3 pos) {
   if (s_is_connected) {
-    isometric_fill_box(Vec3(pos.x, pos.y, pos.z), BOX_SIZE, B_H, s_box_color);
+    isometric_fill_box(Vec3(pos.x, pos.y, pos.z), BOX_SIZE, B_H, s_block_color);
   } else {
-    isometric_draw_box(Vec3(pos.x, pos.y, pos.z), BOX_SIZE, B_H, s_box_color, false);
+    isometric_draw_box(Vec3(pos.x, pos.y, pos.z), BOX_SIZE, B_H, s_block_color, false);
   }
 }
 
@@ -47,22 +47,22 @@ static void draw_digit_blocks(GPoint pos, int cells[15], int number) {
   if (cells[11] == 1) draw_box(get_block_position(11, pos));
   if (cells[10] == 1) draw_box(get_block_position(10, pos));
   if (number == 0 || number == 6 || number == 8) {
-    isometric_fill_box_faces(get_block_position(10, pos), BOX_SIZE, B_H, s_clarity_color, false, true, false);
-    isometric_draw_box(get_block_position(10, pos), BOX_SIZE, B_H, s_box_color, true);
+    isometric_fill_box_faces(get_block_position(10, pos), BOX_SIZE, B_H, s_void_color, false, true, false);
+    isometric_draw_box(get_block_position(10, pos), BOX_SIZE, B_H, s_block_color, true);
   }
   if (cells[9] == 1) draw_box(get_block_position(9, pos));
   if (cells[8] == 1) draw_box(get_block_position(8, pos));
   if (cells[7] == 1) draw_box(get_block_position(7, pos));
   if (number == 0) {
-    isometric_fill_box_faces(get_block_position(7, pos), BOX_SIZE, B_H, s_clarity_color, false, true, false);
-    isometric_draw_box(get_block_position(7, pos), BOX_SIZE, B_H, s_box_color, true);
+    isometric_fill_box_faces(get_block_position(7, pos), BOX_SIZE, B_H, s_void_color, false, true, false);
+    isometric_draw_box(get_block_position(7, pos), BOX_SIZE, B_H, s_block_color, true);
   }
   if (cells[6] == 1) draw_box(get_block_position(6, pos));
   if (cells[5] == 1) draw_box(get_block_position(5, pos));
   if (cells[4] == 1) draw_box(get_block_position(4, pos));
   if (number == 0 || number == 8 || number == 9) {
-    isometric_fill_box_faces(get_block_position(4, pos), BOX_SIZE, B_H, s_clarity_color, false, true, false);
-    isometric_draw_box(get_block_position(4, pos), BOX_SIZE, B_H, s_box_color, true);
+    isometric_fill_box_faces(get_block_position(4, pos), BOX_SIZE, B_H, s_void_color, false, true, false);
+    isometric_draw_box(get_block_position(4, pos), BOX_SIZE, B_H, s_block_color, true);
   }
   if (cells[3] == 1) draw_box(get_block_position(3, pos));
   if (cells[2] == 1) draw_box(get_block_position(2, pos));
@@ -215,10 +215,10 @@ void drawing_draw_number(int number, GPoint pos) {
   }
 }
 
-void drawing_set_colors(GColor box_color, GColor shadow_color, GColor clarity_color) {
-  s_box_color = box_color;
+void drawing_set_colors(GColor block_color, GColor shadow_color, GColor void_color) {
+  s_block_color = block_color;
   s_shadow_color = shadow_color;
-  s_clarity_color = clarity_color;
+  s_void_color = void_color;
 }
 
 void drawing_set_is_connected(bool is_connected) {

@@ -3,7 +3,9 @@
   "author": "Chris Lewis",
   "private": true,
   "dependencies": {
-    "pebble-isometric": "^1.4.0"
+    "@rebble/clay": "^1.0.10",
+    "pebble-isometric": "^1.4.0",
+    "pebble-packet": "^1.6.0"
   },
   "keywords": [
     "pebble-app"
@@ -22,9 +24,16 @@
     },
     "projectType": "native",
     "uuid": "9b4b2204-cffc-4b25-9049-c5de3eecb565",
-    "messageKeys": {
-      "dummy": 0
-    },
+    "messageKeys": [
+      "DAY_BG_COLOR",
+      "DAY_BLOCK_COLOR",
+      "DAY_SHADOW_COLOR",
+      "DAY_VOID_COLOR",
+      "NIGHT_BG_COLOR",
+      "NIGHT_BLOCK_COLOR",
+      "NIGHT_SHADOW_COLOR",
+      "NIGHT_VOID_COLOR"
+    ],
     "enableMultiJS": true,
     "displayName": "void-statues",
     "watchapp": {
@@ -42,5 +51,11 @@
     ],
     "capabilities": []
   },
-  "name": "void-statues"
+  "name": "void-statues",
+  "devDependencies": {
+    "pkts": "^0.3.0-beta.1"
+  },
+  "scripts": {
+    "build": "pkts build"
+  }
 }

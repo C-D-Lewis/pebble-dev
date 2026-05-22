@@ -5,6 +5,7 @@
 // Comment before release!
 // #define TEST
 
+// TODO: Use pebble-scalable here
 #if defined(PBL_PLATFORM_EMERY)
   #define DISPLAY_W 200
   #define DISPLAY_H 228
@@ -42,5 +43,5 @@
 // Testing purposes
 #define T_HOURS 18
 #define T_MINUTES 24
-#define T_IS_DAY true
-#define T_IS_CONNECTED false
+#define T_IS_DAY false
+#define T_IS_CONNECTED true

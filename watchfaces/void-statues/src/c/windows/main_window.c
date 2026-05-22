@@ -79,7 +79,9 @@ static void anim_update(Animation *anim, AnimationProgress dist_normalized) {
 }
 
 static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
-  int hours = tick_time->tm_hour;
+  PersistData *persist_data = data_get_persist_data();
+
+  const int hours = tick_time->tm_hour;
   s_current_time.hour_tens = hours / 10;
   s_current_time.hour_units = hours % 10;
   s_current_time.minute_tens = tick_time->tm_min / 10;
@@ -87,16 +89,24 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
 
   // Colors update for day and night
 #ifdef TEST
-  bool is_day = T_IS_DAY;
+  const bool is_day = T_IS_DAY;
 #else
-  bool is_day = tick_time->tm_hour >= 6 && tick_time->tm_hour < 18;
+  const bool is_day = tick_time->tm_hour >= 6 && tick_time->tm_hour < 18;
 #endif
   if (is_day) {
-    drawing_set_colors(GColorBlack, GColorLightGray, PBL_IF_COLOR_ELSE(GColorDarkGray, GColorWhite));
-    window_set_background_color(s_window, GColorWhite);
+    drawing_set_colors(
+      persist_data->day_block_color,
+      persist_data->day_shadow_color,
+      persist_data->day_void_color 
+    );
+    window_set_background_color(s_window, persist_data->day_bg_color);
   } else {
-    drawing_set_colors(GColorWhite, GColorDarkGray, PBL_IF_COLOR_ELSE(GColorLightGray, GColorBlack));
-    window_set_background_color(s_window, GColorBlack);
+    drawing_set_colors(
+      persist_data->night_block_color,
+      persist_data->night_shadow_color,
+      persist_data->night_void_color
+    );
+    window_set_background_color(s_window, persist_data->night_bg_color);
   }
 
   layer_mark_dirty(s_canvas_layer);
@@ -128,6 +138,8 @@ static void window_unload(Window *window) {
 }
 
 void main_window_push() {
+  PersistData *persist_data = data_get_persist_data();
+
   // Show initial time
   time_t t = time(NULL);
   struct tm *tm_now = localtime(&t);
@@ -136,16 +148,19 @@ void main_window_push() {
   s_current_time.minute_tens = tm_now->tm_min / 10;
   s_current_time.minute_units = tm_now->tm_min % 10;
 
-  bool is_day = tm_now->tm_hour >= 6 && tm_now->tm_hour < 18;
+  const bool is_day = tm_now->tm_hour >= 6 && tm_now->tm_hour < 18;
   drawing_set_colors(
-    is_day ? GColorBlack : GColorWhite,
-    is_day ? GColorLightGray : GColorDarkGray,
-    is_day ? PBL_IF_COLOR_ELSE(GColorDarkGray, GColorWhite) : PBL_IF_COLOR_ELSE(GColorLightGray, GColorBlack)
+    is_day ? persist_data->day_block_color : persist_data->night_block_color,
+    is_day ? persist_data->day_shadow_color : persist_data->night_shadow_color,
+    is_day ? persist_data->day_void_color : persist_data->night_void_color
   );
 
   if (!s_window) {
     s_window = window_create();
-    window_set_background_color(s_window, is_day ? GColorWhite : GColorBlack);
+    window_set_background_color(
+      s_window,
+      is_day ? persist_data->day_bg_color : persist_data->night_bg_color
+    );
     window_set_window_handlers(s_window, (WindowHandlers) {
       .load = window_load,
       .unload = window_unload,
@@ -164,4 +179,23 @@ void main_window_push() {
   // Begin smooth animation
   static AnimationImplementation anim_implementation = { .update = anim_update };
   animate(1500, 200, &anim_implementation, true);
+}
+
+void main_window_reload() {
+  PersistData *persist_data = data_get_persist_data();
+
+  time_t t = time(NULL);
+  struct tm *tm_now = localtime(&t);
+  const bool is_day = tm_now->tm_hour >= 6 && tm_now->tm_hour < 18;
+
+  drawing_set_colors(
+    is_day ? persist_data->day_block_color : persist_data->night_block_color,
+    is_day ? persist_data->day_shadow_color : persist_data->night_shadow_color,
+    is_day ? persist_data->day_void_color : persist_data->night_void_color
+  );
+  window_set_background_color(
+    s_window,
+    is_day ? persist_data->day_bg_color : persist_data->night_bg_color
+  );
+  layer_mark_dirty(s_canvas_layer);
 }
