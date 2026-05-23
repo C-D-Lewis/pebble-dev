@@ -25,6 +25,13 @@ const getBatteryLife = (row: DbDocument) => {
  * @returns {string} Mapped group name
  */
 const getGroupName = (name: string): string => {
+  // Explicit names in case a 'pebble_' catchall is too aggresive
+  const ogNames = [
+    'pebble_black',
+    'pebble_white',
+    'pebble_red',
+  ];
+
   if (name.includes('pebble_2_duo')) return 'Pebble 2 Duo';
   if (name.includes('pebble_2_hr')) return 'Pebble 2 HR';
   if (name.includes('pebble_2')) return 'Pebble 2';
@@ -34,7 +41,7 @@ const getGroupName = (name: string): string => {
   if (name.includes('pebble_time')) return 'Pebble Time';
   if (name.includes('pebble_round_2')) return 'Pebble Round 2';
   if (name.includes('pebble_steel')) return 'Pebble Steel';
-  if (name.includes('pebble_black') || name.includes('pebble_white')) return 'Pebble (Original)';
+  if (ogNames.some(p => name.includes(p))) return 'Pebble (original)';
 
   return name;
 };
@@ -102,7 +109,9 @@ export const aggregateAllByKey = (rows: DbDocument[], key: keyof DbDocument): Gl
       const finalValues = sortedValues.filter(v => Math.abs(v - avgBatteryLife) <= 2 * stdDev);
 
       // Median as alternative to average, less affected by outliers
-      const medianBatteryLife = finalValues.length ? finalValues[Math.floor(finalValues.length / 2)] || 0  : 0;
+      const medianBatteryLife = finalValues.length
+        ? finalValues[Math.floor(finalValues.length / 2)] || 0
+        : 0;
 
       return {
         groupName: b.groupName,

@@ -309,6 +309,9 @@ describe('Unit tests', () => {
         }, {
           stats: { allTimeRate: 20 },
           model: 'pebble_time_steel_silver',
+        }, {
+          stats: { allTimeRate: 20 },
+          model: 'pebble_black',
         }];
         const res = await aggregateAllByKey(mockRows, 'model');
 
@@ -384,6 +387,17 @@ describe('Unit tests', () => {
           count: 1,
           groupName: 'Pebble Time Steel',
           names: ['pebble_time_steel_silver'],
+          medianBatteryLife: 5,
+          batteryLifeRange: 0,
+          minBatteryLife: 5,
+          maxBatteryLife: 5,
+          values: [5],
+        }, {
+          avgBatteryLife: 5,
+          avgRate: 20,
+          count: 1,
+          groupName: 'Pebble (original)',
+          names: ['pebble_black'],
           medianBatteryLife: 5,
           batteryLifeRange: 0,
           minBatteryLife: 5,

@@ -54,6 +54,12 @@ resource "aws_apigatewayv2_stage" "default" {
       status    = "$context.status"
     })
   }
+
+  default_route_settings {
+    detailed_metrics_enabled = true
+    throttling_rate_limit = 1000
+    throttling_burst_limit = 5000
+  }
 }
 
 resource "aws_cloudwatch_log_group" "api_gw" {
