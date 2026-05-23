@@ -5,9 +5,10 @@ with battery wisdom._
 
 <table>
   <tr>
-    <td><img src="screenshots/diorite.png" /></td>
-    <td><img src="screenshots/diorite-graph.png" /></td>
-    <td><img src="screenshots/diorite-log.png" /></td>
+    <td><img src="screenshots/emery.png" /></td>
+    <td><img src="screenshots/emery-graph.png" /></td>
+    <td><img src="screenshots/emery-log.png" /></td>
+    <td><img src="screenshots/emery-stats.png" /></td>
   </tr>
 </table>
 
