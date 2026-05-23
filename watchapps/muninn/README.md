@@ -1,6 +1,7 @@
 # muninn :zap: :bird:
 
-_Odin tasked Muninn with memory of the land... Over time, he will provide you with battery wisdom._
+_Odin tasked Muninn with memory of the land... Over time, he will provide you
+with battery wisdom._
 
 <table>
   <tr>
@@ -19,8 +20,8 @@ Features:
 - Days remaining and drain rate estimation
 - Last observed charge and predicted next charge date
 - Graph and detailed log of recent samples, up to 4 days
-- Sync up to 120 days of data to the phone for long-term insights*
-- Upload and view all your data in web config page*
+- Sync up to 120 days of data to the phone for long-term insights
+- Upload and view all your data in web config page
 - Set an AppGlance to show estimate in the launcher menu
 - View general battery tips
 
@@ -29,9 +30,7 @@ Options:
 - Timeline pin at noon on the last day remaining
 - High (above average) rate of drain notification
 - One day left notification
-- Auto-update of web config page stats (noon daily)*
-
-*Pebble Time and newer only
+- Auto-update of web config page stats (noon daily)
 
 Important notes:
 - If the watch is off at the next sample time, the app must be launched to allow wakeups to be resumed.
@@ -39,19 +38,11 @@ Important notes:
 
 ## Backend
 
-For Basalt and above, the extended sample history saved in JS-side storage can
-be uploaded to the backend, which assigns a 6-character short code for each
-watch token, and allows viewing of all the data with charts and longer-term
-statistics. It's built with TypeScript, Vite, and deployed with Terraform into
-AWS. See [backend](./backend/) for more information.
-
-## Challenges:
-
-- Detecting charging: charge level goes up or is constant
-- Extremely short charge: use elapsed period instead
-- Handling partial discharges: use calculated rate instead of all samples
-- Handling changing demands/watchface etc: moving rate
-- Zero change since last sample (<1% per hour) - ignore
+The extended sample history saved in JS-side storage can be uploaded to the
+backend, which assigns a 6-character short code for each watch token, and allows
+viewing of all the data with charts and longer-term statistics. It's built with
+TypeScript, Vite, and deployed with Terraform into AWS. See
+[backend](./backend/) for more information.
 
 ## Bugs
 
