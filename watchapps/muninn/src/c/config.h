@@ -36,9 +36,9 @@
 #define MAX_GAP_SECONDS (12 * SECONDS_PER_HOUR)
 
 ///////////// Testing area ////////////////
-// #define USE_TEST_DATA      true       //
+#define USE_TEST_DATA      true       //
 // #define SAVE_TEST_DATA     true       //
-// #define SYNC_TEST_DATA     true       //
+#define SYNC_TEST_DATA     true       //
 // #define LOG_STATE          true       //
 // #define WAKEUP_NEXT_MINUTE true       //
 // #define TEST_COLLISION     true       //

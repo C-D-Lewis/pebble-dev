@@ -1,10 +1,13 @@
-#include "log_window.h"
+#include "graph_window.h"
 
-#define ROOT_Y scl_y_pp({.o = 160, .c = 200, .e = 160, .g = 200})
-#define GRAPH_MARGIN scl_x_pp({.o = 65, .c = 130, .e = 65, .g = 130})
-#define GRAPH_W scl_x_pp({.o = 820, .c = 760, .e = 830, .g = 760})
-#define GRAPH_H scl_y_pp({.o = 550, .c = 430, .e = 550, .g = 430})
-#define NOTCH_S scl_x(35)
+#define ROOT_Y scl_y_pp({.o = 110, .c = 200, .e = 115, .g = 200})
+#define GRAPH_MARGIN scl_x_pp({.o = 25, .c = 130, .g = 130})
+#define GRAPH_W scl_x_pp({.o = 860, .c = 760, .e = 870, .g = 760})
+#define GRAPH_H scl_y_pp({.o = 500, .c = 430, .g = 430})
+#define NOTCH_S scl_x(25)
+#define LOG_Y scl_y_pp({.o = 660, .e = 680})
+#define LOG_X_START scl_x_pp({.o = 20, .c = 70, .g = 70})
+#define LOG_X_END (PS_DISP_W - scl_x(30))
 
 // Not scaled
 #if defined(PBL_PLATFORM_EMERY) || defined(PBL_PLATFORM_GABBRO)
@@ -14,7 +17,6 @@
 #endif
 
 static Window *s_window;
-static TextLayer *s_desc_layer;
 static Layer *s_canvas_layer, *s_header_layer;
 
 static int s_selection = 0;
@@ -32,6 +34,107 @@ static void anim_update(Animation *anim, AnimationProgress dist_normalized) {
 }
 #endif
 
+////////////////////////////////////////////// Drawing /////////////////////////////////////////////
+
+static void draw_changes(GContext *ctx, const GRect bounds, const Sample *s) {
+  // Adjust timestamp back by a minute so it's within the interval
+  int adj_ts = s->timestamp - SECONDS_PER_MINUTE;
+
+  // Time diff
+  static char s_fmt_lst_buff[8];
+  static char s_fmt_ts_buff[8];
+  util_fmt_time(s->last_sample_time, &s_fmt_lst_buff[0], sizeof(s_fmt_lst_buff));
+  util_fmt_time(adj_ts, &s_fmt_ts_buff[0], sizeof(s_fmt_ts_buff));
+  static char s_lst_buff[16];
+  snprintf(s_lst_buff, sizeof(s_lst_buff), "%s -> %s", s_fmt_lst_buff, s_fmt_ts_buff);
+  graphics_draw_text(
+    ctx,
+    s_lst_buff,
+    scl_get_font(SFI_Medium),
+    GRect(LOG_X_START, LOG_Y + scl_y(80), PS_DISP_W, 100),
+    GTextOverflowModeTrailingEllipsis,
+    GTextAlignmentLeft,
+    NULL
+  );
+
+  // Charge diff
+  static char s_lcp_buff[16];
+  snprintf(s_lcp_buff, sizeof(s_lcp_buff), "%d%% -> %d%%", s->last_charge_perc, s->charge_perc);
+  graphics_draw_text(
+    ctx,
+    s_lcp_buff,
+    scl_get_font(SFI_Medium),
+    GRect(LOG_X_START, LOG_Y + scl_y(180), PS_DISP_W, 100),
+    GTextOverflowModeTrailingEllipsis,
+    GTextAlignmentLeft,
+    NULL
+  );
+
+  // Right-aligned amounts
+  static char s_ts_diff_buff[8];
+  util_fmt_time_unit(s->time_diff, &s_ts_diff_buff[0], sizeof(s_ts_diff_buff));
+  graphics_draw_text(
+    ctx,
+    s_ts_diff_buff,
+    scl_get_font(SFI_Medium),
+    GRect(0, LOG_Y + scl_y(80), LOG_X_END, 100),
+    GTextOverflowModeTrailingEllipsis,
+    GTextAlignmentRight,
+    NULL
+  );
+
+  static char s_perc_diff_buff[8];
+  snprintf(s_perc_diff_buff, sizeof(s_perc_diff_buff), "%d%%", s->charge_diff);
+  graphics_draw_text(
+    ctx,
+    s_perc_diff_buff,
+    scl_get_font(SFI_Medium),
+    GRect(0, LOG_Y + scl_y(180), LOG_X_END, 100),
+    GTextOverflowModeTrailingEllipsis,
+    GTextAlignmentRight,
+    NULL
+  );
+}
+
+static void draw_result_and_datetime(GContext *ctx, const GRect bounds, const Sample *s) {
+  static char s_datetime_buff[16];
+  time_t ts_time = s->timestamp;
+
+  // We subtract a minute so the date is within the majority of the interval
+  ts_time -= SECONDS_PER_MINUTE;
+
+  const struct tm *ts_info = localtime(&ts_time);
+  strftime(s_datetime_buff, sizeof(s_datetime_buff), "%d %b", ts_info);
+
+  static char s_result_buff[16];
+  if (s->result == STATUS_NO_CHANGE) {
+    snprintf(s_result_buff, sizeof(s_result_buff), "No change");
+  } else if (s->result == STATUS_CHARGED) {
+    snprintf(s_result_buff, sizeof(s_result_buff), "Charged up");
+  } else {
+    snprintf(s_result_buff, sizeof(s_result_buff), "Discharged");
+  }
+
+  graphics_draw_text(
+    ctx,
+    s_datetime_buff,
+    scl_get_font(SFI_Small),
+    GRect(LOG_X_START, LOG_Y - scl_y(10), PS_DISP_W, 100),
+    GTextOverflowModeTrailingEllipsis,
+    GTextAlignmentLeft,
+    NULL
+  );
+  graphics_draw_text(
+    ctx,
+    s_result_buff,
+    scl_get_font(SFI_Small),
+    GRect(0, LOG_Y - scl_y(10), LOG_X_END, 100),
+    GTextOverflowModeTrailingEllipsis,
+    GTextAlignmentRight,
+    NULL
+  );
+}
+
 ////////////////////////////////////////////// Layout //////////////////////////////////////////////
 
 static bool graph_is_available() {
@@ -39,8 +142,7 @@ static bool graph_is_available() {
 }
 
 static void canvas_update_proc(Layer *layer, GContext *ctx) {
-  // Button hints
-  util_draw_button_hints(ctx, (bool[3]){false, true, false});
+  const GRect bounds = layer_get_bounds(layer);
 
   graphics_context_set_fill_color(ctx, GColorBlack);
   graphics_context_set_text_color(ctx, GColorBlack);
@@ -117,7 +219,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
       ctx,
       "Not enough data (yet!)",
       scl_get_font(SFI_Medium),
-      GRect(20, scl_y(180), PS_DISP_W - ACTION_BAR_W - 40, 300),
+      GRect(20, scl_y(180), PS_DISP_W - 40, 300),
       GTextOverflowModeWordWrap,
       GTextAlignmentCenter,
       NULL
@@ -204,39 +306,12 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     }
   }
 
-  // Box around date
-  const int box_h = scl_y(100);
-  const int date_box_y = ROOT_Y + GRAPH_H + scl_y(60);
-  const GRect box_rect = scl_center_x(
-    GRect(0, date_box_y, scl_x_pp({.o = 630, .c = 580, .e = 580, .g = 580}), box_h)
-  );
-  graphics_context_set_stroke_color(ctx, GColorBlack);
-  graphics_draw_rect(ctx, box_rect);
-
-  // Draw 'DD MMM' box of selected point
-  Sample *sel_s = data_get_sample(s_selection);
-  if (sel_s && util_is_not_status(sel_s->timestamp)) {
-    time_t ts = sel_s->timestamp;
-
-    static char s_date_buff[18];
-    struct tm *time_info = localtime(&ts);
-    strftime(s_date_buff, sizeof(s_date_buff), "%d %b - %H:%M", time_info);
-
-    graphics_draw_text(
-      ctx,
-      s_date_buff,
-      scl_get_font(SFI_Small),
-      GRect(0, date_box_y - scl_y_pp({.o = 25, .c = 20, .e = 25, .g = 20}), PS_DISP_W, 300),
-      GTextOverflowModeTrailingEllipsis,
-      GTextAlignmentCenter,
-      NULL
-    );
-  }
-
   // Draw sample's value in box, on either side
+  Sample *sel_s = data_get_sample(s_selection);
   if (sel_s && util_is_not_status(sel_s->charge_perc)) {
     const int sel_y = ROOT_Y + GRAPH_H - (((sel_s->charge_perc - low_v) * GRAPH_H) / y_range);
     const int box_w = scl_x(210);
+    const int box_h = scl_y(100);
     const int box_x = flip ? PS_DISP_W - box_w : 0;
     const int box_y = sel_y - (box_h / 2);
     const GRect box_rect = GRect(box_x, box_y, box_w, box_h);
@@ -264,6 +339,33 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
       NULL
     );
   }
+
+  // Divider
+  graphics_fill_rect(
+    ctx,
+    GRect(scl_x(300), LOG_Y, GRAPH_W - scl_x(300), LINE_W),
+    0,
+    GCornerNone
+  );
+
+  // Sample details that were in the log window
+  if (log_len == 0) {
+    graphics_draw_text(
+      ctx,
+      "---",
+      scl_get_font(SFI_Medium),
+      scl_grect(0, 20, 1000, 280),
+      GTextOverflowModeTrailingEllipsis,
+      GTextAlignmentCenter,
+      NULL
+    );
+    return;
+  }
+
+  // FIXME: Handle between MIN_SAMPLES and MIN_SAMPLES_FOR_GRAPH - graph always?
+
+  draw_result_and_datetime(ctx, bounds, sel_s);
+  draw_changes(ctx, bounds, sel_s);
 }
 
 static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
@@ -271,10 +373,6 @@ static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
   if (s_selection < count - 1) s_selection++;
 
   layer_mark_dirty(s_canvas_layer);
-}
-
-static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
-  log_window_push(s_selection);
 }
 
 static void down_click_handler(ClickRecognizerRef recognizer, void *context) {
@@ -285,58 +383,22 @@ static void down_click_handler(ClickRecognizerRef recognizer, void *context) {
 
 static void click_config_provider(void *context) {
   window_single_click_subscribe(BUTTON_ID_UP, up_click_handler);
-  window_single_click_subscribe(BUTTON_ID_SELECT, select_click_handler);
   window_single_click_subscribe(BUTTON_ID_DOWN, down_click_handler);
 }
 
 static void main_window_load(Window *window) {
   Layer *root_layer = window_get_root_layer(window);
-  GRect bounds = layer_get_bounds(root_layer);
 
   s_header_layer = util_create_header_layer(PBL_IF_ROUND_ELSE("Graph", "Change over time"), 32);
   layer_add_child(root_layer, s_header_layer);
 
-  s_canvas_layer = layer_create(
-    GRect(0, 0, PS_DISP_W, bounds.size.h)
-  );
+  s_canvas_layer = layer_create(GRect(0, 0, PS_DISP_W, PS_DISP_H));
   layer_set_update_proc(s_canvas_layer, canvas_update_proc);
   layer_add_child(root_layer, s_canvas_layer);
-
-  s_desc_layer = util_make_text_layer(
-    GRect(0, scl_y_pp({.o = 860, .c = 770, .e = 860, .g = 770}), PS_DISP_W, 100),
-    scl_get_font(SFI_Small)
-  );
-  text_layer_set_text_alignment(s_desc_layer, GTextAlignmentCenter);
-  text_layer_set_overflow_mode(s_desc_layer, GTextOverflowModeWordWrap);
-  layer_add_child(root_layer, text_layer_get_layer(s_desc_layer));;
-
-  // Show drain vs trend (accumulation of changes mult. by instanteneous rates)
-  if (graph_is_available()) {
-    const int acc = data_calculate_accuracy();
-    static char s_desc_buff[32];
-    char *sign = acc > 0 ? ">" : "<";
-    if (acc == 0) {
-      sign = "=";
-    }
-    snprintf(
-      s_desc_buff,
-      sizeof(s_desc_buff),
-#if defined(PBL_PLATFORM_EMERY) || defined(PBL_PLATFORM_GABBRO)
-      "Drain %s expected (%s%d%%)",
-#else
-      "Drain %s expd. (%s%d%%)",
-#endif
-      sign,
-      acc >= 0 ? "+" : "",
-      acc
-    );
-    text_layer_set_text(s_desc_layer, s_desc_buff);
-  }
 }
 
 static void window_unload(Window *window) {
   layer_destroy(s_header_layer);
-  text_layer_destroy(s_desc_layer);
   layer_destroy(s_canvas_layer);
 
   window_destroy(window);
