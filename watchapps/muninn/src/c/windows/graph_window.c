@@ -2,8 +2,8 @@
 
 #define ROOT_Y scl_y_pp({.o = 110, .c = 200, .e = 115, .g = 200})
 #define GRAPH_MARGIN scl_x_pp({.o = 25, .c = 130, .g = 130})
-#define GRAPH_W scl_x_pp({.o = 860, .c = 760, .e = 870, .g = 760})
-#define GRAPH_H scl_y_pp({.o = 500, .c = 430, .g = 430})
+#define GRAPH_W scl_x_pp({.o = 950, .c = 760, .g = 760})
+#define GRAPH_H scl_y_pp({.o = 530, .c = 430, .e = 540, .g = 430})
 #define NOTCH_S scl_x(25)
 #define LOG_Y scl_y_pp({.o = 660, .e = 680})
 #define LOG_X_START scl_x_pp({.o = 20, .c = 70, .g = 70})
@@ -217,10 +217,22 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   if (!graph_is_available()) {
     graphics_draw_text(
       ctx,
-      "Not enough data (yet!)",
+      "Not enough data\n(yet!)",
       scl_get_font(SFI_Medium),
-      GRect(20, scl_y(180), PS_DISP_W - 40, 300),
+      GRect(0, scl_y(220), PS_DISP_W, 300),
       GTextOverflowModeWordWrap,
+      GTextAlignmentCenter,
+      NULL
+    );
+
+    static char s_no_data_buff[20];
+    snprintf(s_no_data_buff, sizeof(s_no_data_buff), "(Req. %d samples)", MIN_SAMPLES_FOR_GRAPH);
+    graphics_draw_text(
+      ctx,
+      s_no_data_buff,
+      scl_get_font(SFI_Medium),
+      GRect(0, LOG_Y + scl_y(80), PS_DISP_W, 150),
+      GTextOverflowModeTrailingEllipsis,
       GTextAlignmentCenter,
       NULL
     );
@@ -253,7 +265,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     if (s_time->tm_hour == 0) {
       graphics_fill_rect(
         ctx,
-        GRect(x - (LINE_W / 2), ROOT_Y + GRAPH_H, LINE_W, NOTCH_S),
+        GRect(x - (LINE_W / 2), ROOT_Y + GRAPH_H + LINE_W, LINE_W, NOTCH_S),
         0,
         GCornerNone
       );
@@ -298,7 +310,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
         const int est_val = prev_s->charge_perc - est_drop;
         const int est_y = ROOT_Y + GRAPH_H - (((est_val - low_v) * GRAPH_H) / y_range);
 
-        if (est_y != y && s->result != STATUS_CHARGED) {
+        if (est_y != y && s->result != STATUS_CHARGED && est_y < ROOT_Y + GRAPH_H) {
           // Draw prediction circle
           graphics_draw_circle(ctx, GPoint(x, est_y), POINT_S);
         }
@@ -341,29 +353,15 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   }
 
   // Divider
+  graphics_context_set_fill_color(ctx, GColorBlack);
   graphics_fill_rect(
     ctx,
-    GRect(scl_x(300), LOG_Y, GRAPH_W - scl_x(300), LINE_W),
+    GRect(0, LOG_Y, PS_DISP_W, LINE_W),
     0,
     GCornerNone
   );
 
-  // Sample details that were in the log window
-  if (log_len == 0) {
-    graphics_draw_text(
-      ctx,
-      "---",
-      scl_get_font(SFI_Medium),
-      scl_grect(0, 20, 1000, 280),
-      GTextOverflowModeTrailingEllipsis,
-      GTextAlignmentCenter,
-      NULL
-    );
-    return;
-  }
-
-  // FIXME: Handle between MIN_SAMPLES and MIN_SAMPLES_FOR_GRAPH - graph always?
-
+  // Log details
   draw_result_and_datetime(ctx, bounds, sel_s);
   draw_changes(ctx, bounds, sel_s);
 }
