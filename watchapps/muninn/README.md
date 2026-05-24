@@ -20,7 +20,7 @@ Features:
 - Negligible battery impact
 - Days remaining and drain rate estimation
 - Last observed charge and predicted next charge date
-- Graph and detailed log of recent samples, up to 4 days
+- Graph log of recent samples, up to 4 days
 - Sync up to 120 days of data to the phone for long-term insights
 - Upload and view all your data in web config page
 - Set an AppGlance to show estimate in the launcher menu

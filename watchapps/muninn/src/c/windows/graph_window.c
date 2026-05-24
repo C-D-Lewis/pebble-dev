@@ -2,18 +2,20 @@
 
 #define ROOT_Y scl_y_pp({.o = 110, .c = 200, .e = 115, .g = 200})
 #define GRAPH_MARGIN scl_x_pp({.o = 25, .c = 130, .g = 130})
-#define GRAPH_W scl_x_pp({.o = 950, .c = 760, .g = 760})
-#define GRAPH_H scl_y_pp({.o = 530, .c = 430, .e = 540, .g = 430})
+#define GRAPH_W scl_x_pp({.o = 930, .c = 760, .g = 760})
+#define GRAPH_H scl_y_pp({.o = 480, .c = 400, .e = 490, .g = 430})
 #define NOTCH_S scl_x(25)
-#define LOG_Y scl_y_pp({.o = 660, .e = 680})
+#define LOG_Y scl_y_pp({.o = 615, .c = 630, .e = 635})
 #define LOG_X_START scl_x_pp({.o = 20, .c = 70, .g = 70})
 #define LOG_X_END (PS_DISP_W - scl_x(30))
 
 // Not scaled
 #if defined(PBL_PLATFORM_EMERY) || defined(PBL_PLATFORM_GABBRO)
-#define POINT_S 3
+  #define POINT_S 3
+  #define DIV_H 3
 #else
-#define POINT_S 2
+  #define POINT_S 2
+  #define DIV_H 2
 #endif
 
 static Window *s_window;
@@ -36,101 +38,68 @@ static void anim_update(Animation *anim, AnimationProgress dist_normalized) {
 
 ////////////////////////////////////////////// Drawing /////////////////////////////////////////////
 
-static void draw_changes(GContext *ctx, const GRect bounds, const Sample *s) {
-  // Adjust timestamp back by a minute so it's within the interval
-  int adj_ts = s->timestamp - SECONDS_PER_MINUTE;
-
-  // Time diff
-  static char s_fmt_lst_buff[8];
-  static char s_fmt_ts_buff[8];
-  util_fmt_time(s->last_sample_time, &s_fmt_lst_buff[0], sizeof(s_fmt_lst_buff));
-  util_fmt_time(adj_ts, &s_fmt_ts_buff[0], sizeof(s_fmt_ts_buff));
-  static char s_lst_buff[16];
-  snprintf(s_lst_buff, sizeof(s_lst_buff), "%s -> %s", s_fmt_lst_buff, s_fmt_ts_buff);
+static void draw_datetime(GContext *ctx, const GRect bounds, const Sample *s) {
+  time_t ts_time = s->timestamp;
+  const struct tm *ts_info = localtime(&ts_time);
+  static char s_datetime_buff[16];
+  strftime(s_datetime_buff, sizeof(s_datetime_buff), "%b %d - %H:%M", ts_info);
   graphics_draw_text(
     ctx,
-    s_lst_buff,
-    scl_get_font(SFI_Medium),
-    GRect(LOG_X_START, LOG_Y + scl_y(80), PS_DISP_W, 100),
+    s_datetime_buff,
+    scl_get_font(SFI_Small),
+    GRect(LOG_X_START, LOG_Y - scl_y(5), PS_DISP_W, 100),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentLeft,
     NULL
   );
 
-  // Charge diff
-  static char s_lcp_buff[16];
-  snprintf(s_lcp_buff, sizeof(s_lcp_buff), "%d%% -> %d%%", s->last_charge_perc, s->charge_perc);
+  const int log_len = data_get_log_length();
+  static char s_pos_buff[8];
+  snprintf(s_pos_buff, sizeof(s_pos_buff), "%d/%d", s_selection + 1, log_len);
   graphics_draw_text(
     ctx,
-    s_lcp_buff,
-    scl_get_font(SFI_Medium),
-    GRect(LOG_X_START, LOG_Y + scl_y(180), PS_DISP_W, 100),
-    GTextOverflowModeTrailingEllipsis,
-    GTextAlignmentLeft,
-    NULL
-  );
-
-  // Right-aligned amounts
-  static char s_ts_diff_buff[8];
-  util_fmt_time_unit(s->time_diff, &s_ts_diff_buff[0], sizeof(s_ts_diff_buff));
-  graphics_draw_text(
-    ctx,
-    s_ts_diff_buff,
-    scl_get_font(SFI_Medium),
-    GRect(0, LOG_Y + scl_y(80), LOG_X_END, 100),
-    GTextOverflowModeTrailingEllipsis,
-    GTextAlignmentRight,
-    NULL
-  );
-
-  static char s_perc_diff_buff[8];
-  snprintf(s_perc_diff_buff, sizeof(s_perc_diff_buff), "%d%%", s->charge_diff);
-  graphics_draw_text(
-    ctx,
-    s_perc_diff_buff,
-    scl_get_font(SFI_Medium),
-    GRect(0, LOG_Y + scl_y(180), LOG_X_END, 100),
+    s_pos_buff,
+    scl_get_font(SFI_Small),
+    GRect(LOG_X_START, LOG_Y - scl_y(5), PS_DISP_W - PBL_IF_ROUND_ELSE(30, 5), 100),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentRight,
     NULL
   );
 }
 
-static void draw_result_and_datetime(GContext *ctx, const GRect bounds, const Sample *s) {
-  static char s_datetime_buff[16];
-  time_t ts_time = s->timestamp;
+static void draw_log_detail(GContext *ctx, const GRect bounds, const Sample *s) {
+  const int hours = s->time_diff / 3600;
+  static char s_result_buff[32];
 
-  // We subtract a minute so the date is within the majority of the interval
-  ts_time -= SECONDS_PER_MINUTE;
-
-  const struct tm *ts_info = localtime(&ts_time);
-  strftime(s_datetime_buff, sizeof(s_datetime_buff), "%d %b", ts_info);
-
-  static char s_result_buff[16];
+#ifdef PBL_ROUND
   if (s->result == STATUS_NO_CHANGE) {
-    snprintf(s_result_buff, sizeof(s_result_buff), "No change");
+    snprintf(s_result_buff, sizeof(s_result_buff), "No change (%dh)", hours);
   } else if (s->result == STATUS_CHARGED) {
-    snprintf(s_result_buff, sizeof(s_result_buff), "Charged up");
+    snprintf(s_result_buff, sizeof(s_result_buff), "Charged %d%% (%dh)", -(s->charge_diff), hours);
   } else {
-    snprintf(s_result_buff, sizeof(s_result_buff), "Discharged");
+    snprintf(s_result_buff, sizeof(s_result_buff), "Drained %d%% (%dh)", s->charge_diff, hours);
   }
+#else
+  if (s->result == STATUS_NO_CHANGE) {
+    snprintf(s_result_buff, sizeof(s_result_buff), "No change over %d hours", hours);
+  } else if (s->result == STATUS_CHARGED) {
+    snprintf(s_result_buff, sizeof(s_result_buff), "Charged %d%% over %d hours", -(s->charge_diff), hours);
+  } else {
+    snprintf(s_result_buff, sizeof(s_result_buff), "Discharged %d%% over %d hours", s->charge_diff, hours);
+  }
+#endif
 
-  graphics_draw_text(
-    ctx,
-    s_datetime_buff,
-    scl_get_font(SFI_Small),
-    GRect(LOG_X_START, LOG_Y - scl_y(10), PS_DISP_W, 100),
-    GTextOverflowModeTrailingEllipsis,
-    GTextAlignmentLeft,
-    NULL
-  );
   graphics_draw_text(
     ctx,
     s_result_buff,
-    scl_get_font(SFI_Small),
-    GRect(0, LOG_Y - scl_y(10), LOG_X_END, 100),
-    GTextOverflowModeTrailingEllipsis,
-    GTextAlignmentRight,
+    scl_get_font(SFI_Medium),
+    GRect(LOG_X_START, LOG_Y + scl_y_pp({.o = 80, .e = 90}), PS_DISP_W - LOG_X_START, 200),
+    GTextOverflowModeWordWrap,
+#ifdef PBL_ROUND
+    GTextAlignmentCenter,
+#else
+    GTextAlignmentLeft,
+#endif
     NULL
   );
 }
@@ -259,10 +228,11 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     graphics_context_set_fill_color(ctx, GColorBlack);
     graphics_fill_circle(ctx, GPoint(x, y), POINT_S);
 
-    // Draw its notch on the X if midnight
+    // Draw its notch on the X axis
     time_t ts = s->timestamp;
     struct tm *s_time = localtime(&ts);
-    if (s_time->tm_hour == 0) {
+    const int x_notch_mod = log_len < 8 ? 6 : 12;
+    if (s_time->tm_hour % x_notch_mod == 0) {
       graphics_fill_rect(
         ctx,
         GRect(x - (LINE_W / 2), ROOT_Y + GRAPH_H + LINE_W, LINE_W, NOTCH_S),
@@ -352,18 +322,20 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     );
   }
 
+#ifndef PBL_ROUND
   // Divider
   graphics_context_set_fill_color(ctx, GColorBlack);
   graphics_fill_rect(
     ctx,
-    GRect(0, LOG_Y, PS_DISP_W, LINE_W),
+    GRect(0, LOG_Y, PS_DISP_W, DIV_H),
     0,
     GCornerNone
   );
+#endif
 
   // Log details
-  draw_result_and_datetime(ctx, bounds, sel_s);
-  draw_changes(ctx, bounds, sel_s);
+  draw_datetime(ctx, bounds, sel_s);
+  draw_log_detail(ctx, bounds, sel_s);
 }
 
 static void up_click_handler(ClickRecognizerRef recognizer, void *context) {

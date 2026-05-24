@@ -14,10 +14,10 @@
 //////////////////////////////////////////////////
 
 // ! MUST match package.json
-// ! Check Aplite works (at least 3545B static / 1996B on main window disappear)
+// ! Check Aplite works (at least 4.8kB static / 3.3kB on main window disappear)
 // ! Comment out INFO logs
 // ! Check TS test flags
-#define VERSION "1.39.0"
+#define VERSION "1.40.0"
 // Minimum samples before providing estimations
 #define MIN_SAMPLES 2
 // Min samples before graph is shown
@@ -36,9 +36,9 @@
 #define MAX_GAP_SECONDS (12 * SECONDS_PER_HOUR)
 
 ///////////// Testing area ////////////////
-#define USE_TEST_DATA      true       //
+// #define USE_TEST_DATA      true       //
 // #define SAVE_TEST_DATA     true       //
-#define SYNC_TEST_DATA     true       //
+// #define SYNC_TEST_DATA     true       //
 // #define LOG_STATE          true       //
 // #define WAKEUP_NEXT_MINUTE true       //
 // #define TEST_COLLISION     true       //
@@ -47,11 +47,13 @@
 ///////////////////////////////////////////
 
 /////////// Feature Flags //////////
+// Not on Aplite:                 //
 #if !defined(PBL_PLATFORM_APLITE) //
-#define FEATURE_ANIMATIONS true   //
+  #define FEATURE_ANIMATIONS true //
 #endif                            //
-////////////// All /////////////////
+// On every platform:             //
 #define FEATURE_SYNC true         //
+#define FEATURE_MANY_IMAGES true  //
 ////////////////////////////////////
 
 // Layout values
@@ -66,7 +68,7 @@
 // Action bar hint height
 #define HINT_H scl_y_pp({.o = 200, .c = 80, .e = 200, .g = 80})
 // Header inset
-#define HEADER_INSET scl_y(120)
+#define HEADER_INSET scl_y_pp({.o = 115, .e = 120})
 
 // Per-platform layout values
 #if defined(PBL_PLATFORM_EMERY) || defined(PBL_PLATFORM_GABBRO)

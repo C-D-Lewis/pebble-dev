@@ -321,7 +321,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   int text_x = icon_x + ICON_SIZE + scl_x(10);
   int text_y = icon_y - scl_y_pp({.o = 40, .e = 15});
 
-#if !defined(PBL_PLATFORM_APLITE)
+#ifdef FEATURE_MANY_IMAGES
   graphics_draw_bitmap_in_rect(
     ctx,
     bitmaps_get(RESOURCE_ID_REMAINING),
@@ -329,7 +329,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   );
 #endif
   int row1_text_x = text_x;
-#ifdef PBL_PLATFORM_APLITE
+#ifndef FEATURE_MANY_IMAGES
   row1_text_x -= scl_x(110);
 #endif
   draw_text(ctx, s_remaining_buff, SFI_LargeBold, row1_text_x, text_y);
@@ -337,7 +337,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   icon_y = scl_y_pp({.o = 560, .e = 560});
   text_y = icon_y - scl_y_pp({.o = 25, .e = 20});
 
-#if !defined(PBL_PLATFORM_APLITE)
+#ifdef FEATURE_MANY_IMAGES
   graphics_draw_bitmap_in_rect(
     ctx,
     bitmaps_get(RESOURCE_ID_LAST_CHARGE),
@@ -345,7 +345,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   );
 #endif
   int row2_text_x = text_x;
-#ifdef PBL_PLATFORM_APLITE
+#ifndef FEATURE_MANY_IMAGES
   row2_text_x -= scl_x(85);
 #endif
   draw_text(ctx, s_fmt_lc_buff, SFI_Medium, row2_text_x, text_y);
@@ -368,7 +368,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   text_x = icon_x + ICON_SIZE + scl_x(10);
   text_y = icon_y - scl_y_pp({.o = 40, .e = 15});
 
-#if !defined(PBL_PLATFORM_APLITE)
+#ifdef FEATURE_MANY_IMAGES
   graphics_draw_bitmap_in_rect(
     ctx,
     bitmaps_get(RESOURCE_ID_RATE),
@@ -376,7 +376,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   );
 #endif
   row1_text_x = text_x;
-#ifdef PBL_PLATFORM_APLITE
+#ifndef FEATURE_MANY_IMAGES
   row1_text_x -= scl_x(30);
 #endif
   draw_text(ctx, s_rate_buff, SFI_LargeBold, row1_text_x, text_y);
@@ -386,7 +386,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   text_x = icon_x + ICON_SIZE - scl_x(10);
   text_y = icon_y - scl_y_pp({.o = 25, .e = 20});
   
-#if !defined(PBL_PLATFORM_APLITE)
+#ifdef FEATURE_MANY_IMAGES
   graphics_draw_bitmap_in_rect(
     ctx,
     bitmaps_get(RESOURCE_ID_NEXT_CHARGE),
@@ -394,7 +394,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   );
 #endif
   row2_text_x = text_x;
-#ifdef PBL_PLATFORM_APLITE
+#ifndef FEATURE_MANY_IMAGES
   row2_text_x -= scl_x(40);
 #endif
   draw_text(ctx, s_nc_buff, SFI_Medium, row2_text_x, text_y);

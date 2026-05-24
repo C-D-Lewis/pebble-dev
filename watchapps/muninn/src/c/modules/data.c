@@ -362,8 +362,8 @@ int data_calculate_avg_discharge_rate_x100(bool ignore_no_change) {
   if (total_time == 0 || total_drops_x100 == 0) return STATUS_EMPTY;
 
   const int rate_100x = (total_drops_x100 * SECONDS_PER_DAY) / total_time;
-  if (rate_100x <= 200 && !ignore_no_change) {
-    // <2% per day, count again, but this time ignore 'no change' time periods
+  if (rate_100x <= 300 && !ignore_no_change) {
+    // <3% per day, count again, but this time ignore 'no change' time periods
     return data_calculate_avg_discharge_rate_x100(true);
   }
 
@@ -388,10 +388,9 @@ int data_calculate_days_remaining(bool tenx) {
   if (rate_100x <= 0) return STATUS_EMPTY;
 
   // Multiply by 100 for FP maths and x10 if tenx for decimal display
-  const int level = current_level * (tenx ? 1000 : 100);
+  const int level_100x = current_level * (tenx ? 1000 : 100);
 
-  // Rounding using half the divisor for the nearest whole day
-  return level / rate_100x;
+  return level_100x / rate_100x;
 }
 
 bool data_get_rate_is_elevated() {

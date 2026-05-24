@@ -232,7 +232,7 @@ void util_draw_skyline(GContext *ctx, bool is_nighttime) {
 
   if (is_nighttime) {
     graphics_context_set_fill_color(ctx, GColorWhite);
-#if !defined(PBL_PLATFORM_APLITE)
+#ifdef FEATURE_MANY_IMAGES
     // Draw a couple of stars in black
     const GPoint stars[] = {
       GPoint(scl_x(40), scl_y(50)),
@@ -261,7 +261,7 @@ void util_draw_skyline(GContext *ctx, bool is_nighttime) {
       GPoint(PS_DISP_W - ACTION_BAR_W - 1, skyline_y)
     );
   } else {
-#if !defined(PBL_PLATFORM_APLITE)
+#ifdef FEATURE_MANY_IMAGES
     // Clouds
     graphics_draw_bitmap_in_rect(
       ctx,
