@@ -68,7 +68,7 @@ static void draw_datetime(GContext *ctx, const GRect bounds, const Sample *s) {
 }
 
 static void draw_log_detail(GContext *ctx, const GRect bounds, const Sample *s) {
-  const int hours = s->time_diff / 3600;
+  const int hours = (s->time_diff + 1800) / 3600;
   static char s_result_buff[32];
 
 #ifdef PBL_ROUND
