@@ -24,6 +24,7 @@ export type GlobalStatItem = {
   avgRate: number;
   count: number;
   medianBatteryLife: number;
+  values: number[];
 };
 
 /** Global API data */
