@@ -80,11 +80,11 @@ static void draw_log_detail(GContext *ctx, const GRect bounds, const Sample *s) 
   }
 #else
   if (s->result == STATUS_NO_CHANGE) {
-    snprintf(s_result_buff, sizeof(s_result_buff), "No change over %d hours", hours);
+    snprintf(s_result_buff, sizeof(s_result_buff), "No change in %d hrs", hours);
   } else if (s->result == STATUS_CHARGED) {
-    snprintf(s_result_buff, sizeof(s_result_buff), "Charged %d%% over %d hours", -(s->charge_diff), hours);
+    snprintf(s_result_buff, sizeof(s_result_buff), "Charged %d%% in %d hrs", -(s->charge_diff), hours);
   } else {
-    snprintf(s_result_buff, sizeof(s_result_buff), "Discharged %d%% over %d hours", s->charge_diff, hours);
+    snprintf(s_result_buff, sizeof(s_result_buff), "Drained %d%% in %d hrs", s->charge_diff, hours);
   }
 #endif
 
@@ -101,6 +101,49 @@ static void draw_log_detail(GContext *ctx, const GRect bounds, const Sample *s) 
 #endif
     NULL
   );
+
+#ifndef PBL_ROUND
+  // Divider
+  graphics_context_set_fill_color(ctx, GColorBlack);
+  graphics_fill_rect(
+    ctx,
+    GRect(0, LOG_Y + scl_y_pp({.o = 260, .e = 250}), PS_DISP_W, 1),
+    0,
+    GCornerNone
+  );
+
+  // Drain since 24h ago
+  time_t now = time(NULL);
+  Sample *last_s = data_get_sample(0);
+  if (!last_s) return;
+
+  Sample *s_24h = NULL;
+  for (int i = 0; i < data_get_log_length(); i++) {
+    Sample *find_s = data_get_sample(i);
+    if (!find_s) break;
+    if (find_s->timestamp <= now - SECONDS_PER_DAY) {
+      s_24h = find_s;
+      break;
+    }
+  }
+  if (!s_24h) return;
+
+  static char s_24h_buff[25];
+  snprintf(
+    s_24h_buff,
+    sizeof(s_24h_buff),
+    "24h change: %d%%", last_s->charge_perc - s_24h->charge_perc
+  );
+  graphics_draw_text(
+    ctx,
+    s_24h_buff,
+    scl_get_font(SFI_Small),
+    GRect(LOG_X_START, LOG_Y + scl_y_pp({.o = 250, .e = 235}), PS_DISP_W, 200),
+    GTextOverflowModeWordWrap,
+    GTextAlignmentCenter,
+    NULL
+  );
+#endif
 }
 
 ////////////////////////////////////////////// Layout //////////////////////////////////////////////
