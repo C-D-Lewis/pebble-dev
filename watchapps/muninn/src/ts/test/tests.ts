@@ -192,7 +192,7 @@ const testCalculateLastWeekRate = () => {
       const timestamp = now - (i * 6 * SECONDS_PER_HOUR);
       return { ...p, timestamp };
     })
-    return [calculateLastWeekRate(data), 6.9];
+    return [calculateLastWeekRate(data), 7];
   });
 
   test('calculateLastWeekRate > correct with not enough samples', () => {

@@ -29,6 +29,7 @@ const getUploadId = async (): Promise<string> => {
     return UPLOAD_ID_EMPTY;
   }
 
+  console.log(`Fetching upload ID for watchToken: ${watchToken}`);
   const res = await fetch(`${UPLOAD_API_URL}/id`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -51,8 +52,8 @@ export const ensureUploadId = async () => {
   let uploadId = localStorage.getItem(buildUploadKey());
   if (!uploadId || uploadId === UPLOAD_ID_EMPTY) {
     uploadId = await getUploadId();
+    localStorage.setItem(buildUploadKey(), uploadId);
   }
-  localStorage.setItem(buildUploadKey(), uploadId);
   return uploadId;
 };
 

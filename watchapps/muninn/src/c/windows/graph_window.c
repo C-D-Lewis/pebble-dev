@@ -7,7 +7,6 @@
 #define NOTCH_S scl_x(25)
 #define LOG_Y scl_y_pp({.o = 615, .c = 630, .e = 635})
 #define LOG_X_START scl_x_pp({.o = 20, .c = 70, .g = 70})
-#define LOG_X_END (PS_DISP_W - scl_x(30))
 
 // Not scaled
 #if defined(PBL_PLATFORM_EMERY) || defined(PBL_PLATFORM_GABBRO)
@@ -60,7 +59,7 @@ static void draw_datetime(GContext *ctx, const GRect bounds, const Sample *s) {
     ctx,
     s_pos_buff,
     scl_get_font(SFI_Small),
-    GRect(LOG_X_START, LOG_Y - scl_y(5), PS_DISP_W - PBL_IF_ROUND_ELSE(30, 5), 100),
+    GRect(LOG_X_START, LOG_Y - scl_y(5), PS_DISP_W - PBL_IF_ROUND_ELSE(30, 8), 100),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentRight,
     NULL

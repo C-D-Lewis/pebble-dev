@@ -8,7 +8,7 @@ import { buildHistoryKey, generateTestData } from './util';
 export const saveHistory = (history: HistoryItem[]) => {
   const start = Date.now();
   localStorage.setItem(buildHistoryKey(), JSON.stringify(history));
-  console.log(`saveHistory: ${history.length} items in ${Date.now() - start}ms`);
+  // console.log(`saveHistory: ${history.length} items in ${Date.now() - start}ms`);
 };
 
 /**
@@ -21,7 +21,7 @@ export const loadHistory = (): HistoryItem[] => {
     const start = Date.now();
     const arr = JSON.parse(localStorage.getItem(buildHistoryKey()) || '[]');
     // console.log(JSON.stringify(arr));
-    console.log(`loadHistory: ${arr.length} items in ${Date.now() - start}ms`);
+    // console.log(`loadHistory: ${arr.length} items in ${Date.now() - start}ms`);
     return arr;
   } catch (e) {
     console.error('Failed to load history');

@@ -37,10 +37,10 @@ static char s_nc_buff[16];
 static char s_reading_buff[8];
 static char s_row_1_labels_buff[40];
 static int s_blink_budget, s_days_remaining, s_rate, s_anim_days, s_anim_rate;
-static bool s_is_enabled, s_anim_started;
+static bool s_is_enabled;
 #ifdef FEATURE_ANIMATIONS
 static AppTimer *s_blink_timer;
-static bool s_is_blinking;
+static bool s_is_blinking, s_anim_started;
 #endif
 
 static void update_labels(int days) {
