@@ -25,7 +25,7 @@ char* data_get_line_name(int type) {
     case LineTypeMetropolitan:       return "Metropolitan";
     case LineTypeMildmay:            return "Mildmay";
     case LineTypeNorthern:           return "Northern";
-    case LineTypePicadilly:          return "Picadilly";
+    case LineTypePiccadilly:         return "Piccadilly";
     case LineTypeSuffragette:        return "Suffragette";
     case LineTypeVictoria:           return "Victoria";
     case LineTypeWaterlooAndCity:    return "W'loo & City";
@@ -51,7 +51,7 @@ GColor data_get_line_color(int type) {
     case LineTypeMetropolitan:       return GColorFromHEX(0x9B0056);
     case LineTypeMildmay:            return GColorCobaltBlue;
     case LineTypeNorthern:           return GColorBlack;
-    case LineTypePicadilly:          return GColorFromHEX(0x003688);
+    case LineTypePiccadilly:         return GColorFromHEX(0x003688);
     case LineTypeSuffragette:        return GColorMayGreen;
     case LineTypeWaterlooAndCity:    return GColorFromHEX(0x95CDBA);
     case LineTypeWeaver:             return GColorFromHEX(0xA12860);
