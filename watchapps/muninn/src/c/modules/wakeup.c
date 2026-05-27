@@ -90,17 +90,15 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
 
   // First ever sample - nothing to compare to
   if (!util_is_not_status(last_sample_time)) {
-    // APP_LOG(APP_LOG_LEVEL_INFO, "First sample!");
-
     // Record state and wait for next time
     persist_data->last_charge_perc = charge_percent;
     persist_data->last_sample_time = ts_now;
   } else {
     const int time_diff_s = ts_now - last_sample_time;
-    const int discharge_perc = last_charge_perc - charge_percent;
-    // APP_LOG(APP_LOG_LEVEL_INFO, "Time diff: %d, Charge diff: %d", time_diff_s, discharge_perc);
+    const int charge_diff = last_charge_perc - charge_percent;
+    // APP_LOG(APP_LOG_LEVEL_INFO, "Time diff: %d, Charge diff: %d", time_diff_s, charge_diff);
 
-    const bool battery_bumped = discharge_perc < 0 && discharge_perc > -MIN_CHARGE_AMOUNT;
+    const bool battery_bumped = charge_diff < 0 && charge_diff > -MIN_CHARGE_AMOUNT;
     if (!battery_bumped) {
       // If a significant event, note the new conditions
       persist_data->last_charge_perc = charge_percent;
@@ -113,7 +111,7 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
       result = STATUS_EMPTY;
     } else {
       // Close enough to last sample, calculate result as normal
-      if (discharge_perc < 0) {
+      if (charge_diff < 0) {
         // Charged up
         // Can't combine with the 'if' above due to the 'else' otherwise being taken
         if (!battery_bumped) {
@@ -121,12 +119,12 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
           result = STATUS_CHARGED;
           persist_data->last_charge_time = ts_now;
         }
-      } else if (discharge_perc == 0) {
+      } else if (charge_diff == 0) {
         // No change since last sample - probably on full-charge or very low drain
         result = STATUS_NO_CHANGE;
       } else {
         // Calculate new daily discharge rate estimate!
-        result = (discharge_perc * SECONDS_PER_DAY) / time_diff_s;
+        result = (charge_diff * SECONDS_PER_DAY) / time_diff_s;
         // APP_LOG(APP_LOG_LEVEL_INFO, "estimate: %d", result);
       }
     }
@@ -137,7 +135,7 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
         last_sample_time,
         last_charge_perc,
         time_diff_s,
-        discharge_perc,
+        charge_diff,
         result
       );
     }

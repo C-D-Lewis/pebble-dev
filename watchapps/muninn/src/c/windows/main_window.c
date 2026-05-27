@@ -2,10 +2,10 @@
 
 // Not scaled
 #if defined(PBL_PLATFORM_GABBRO)
-  #define EYE_RECT GRect(96, 11, 3, 3)
+  #define EYE_RECT GRect(126, 17, 5, 5)
   #define BRAID_H 18
-  #define ICON_SIZE 28
-  #define ROW_2_LABEL "         Last charge          Next charge"
+  #define ICON_SIZE 32
+  #define ROW_2_LABEL "       Last charge        Next charge"
 #elif defined(PBL_PLATFORM_EMERY)
   #define EYE_RECT GRect(96, 11, 3, 3)
   #define BRAID_H 18
@@ -40,12 +40,12 @@ static int s_blink_budget, s_days_remaining, s_rate, s_anim_days, s_anim_rate;
 static bool s_is_enabled;
 #ifdef FEATURE_ANIMATIONS
 static AppTimer *s_blink_timer;
-static bool s_is_blinking, s_anim_started;
+static bool s_is_blinking, s_anim_started, s_force_anim;
 #endif
 
 static void update_labels(int days) {
 #if defined(PBL_PLATFORM_GABBRO)
-  const char *template = "      Day%s left            %% per day";
+  const char *template = "       Day%s left             %% per day";
 #elif defined(PBL_PLATFORM_EMERY)
   const char *template = "  Day%s left        %% per day";
 #elif defined(PBL_PLATFORM_CHALK)
@@ -60,7 +60,7 @@ static void update_labels(int days) {
 
 static void update_anim_text() {
 #ifdef FEATURE_ANIMATIONS
-  const bool animating = util_is_animating();
+  const bool animating = util_is_animating() || s_force_anim;
 #else
   const bool animating = false;
 #endif
@@ -96,6 +96,7 @@ static void update_anim_text() {
 #ifdef FEATURE_ANIMATIONS
 static void anim_update(Animation *anim, AnimationProgress dist_normalized) {
   s_anim_started = true;
+  s_force_anim = false;
   s_anim_days = util_anim_percentage(dist_normalized, s_days_remaining);
   s_anim_rate = util_anim_percentage(dist_normalized, s_rate);
 
@@ -171,7 +172,11 @@ static void update_data() {
   snprintf(
     s_battery_buff,
     sizeof(s_battery_buff),
+#ifdef PBL_PLATFORM_GABBRO
+    state.charge_percent < 10 ? "%d%%" : "%d",
+#else
     state.charge_percent == 100 ? "%d" : "%d%%",
+#endif
     state.charge_percent
   );
 
@@ -272,7 +277,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     s_mascot_bitmap,
     GRect(
       scl_x_pp({.o = 400, .c = 430, .e = 400, .g = 430}),
-      scl_y_pp({.o = 20, .c = 25, .e = 25, .g = 25}),
+      scl_y_pp({.o = 20, .c = 25, .e = 25, .g = 50}),
       MASCOT_SIZE,
       MASCOT_SIZE
     )
@@ -319,7 +324,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   int icon_x = scl_x_pp({.o = 40, .c = 100, .e = 50, .g = 100});
   int icon_y = scl_y_pp({.o = 275, .e = 285});
   int text_x = icon_x + ICON_SIZE + scl_x(10);
-  int text_y = icon_y - scl_y_pp({.o = 40, .e = 15});
+  int text_y = icon_y - scl_y_pp({.o = 40, .e = 15, .g = 5});
 
 #ifdef FEATURE_MANY_IMAGES
   graphics_draw_bitmap_in_rect(
@@ -335,7 +340,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   draw_text(ctx, s_remaining_buff, SFI_LargeBold, row1_text_x, text_y);
 
   icon_y = scl_y_pp({.o = 560, .e = 560});
-  text_y = icon_y - scl_y_pp({.o = 25, .e = 20});
+  text_y = icon_y - scl_y_pp({.o = 25, .e = 20, .g = 10});
 
 #ifdef FEATURE_MANY_IMAGES
   graphics_draw_bitmap_in_rect(
@@ -351,22 +356,24 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   draw_text(ctx, s_fmt_lc_buff, SFI_Medium, row2_text_x, text_y);
 
 #if !defined(PBL_PLATFORM_CHALK)
-  icon_y = scl_y_pp({.o = 850, .e = 870});
-  text_y = icon_y - scl_y_pp({.o = 30, .e = 20});
+  icon_x = scl_x_pp({.o = 40, .e = 50, .g = 230});
+  icon_y = scl_y_pp({.o = 850, .e = 870, .g = 820});
+  text_x = icon_x + ICON_SIZE + scl_x_pp({.o = 5, .g = -15});
+  text_y = icon_y - scl_y_pp({.o = 30, .e = 20, .g = 10});
 
   graphics_draw_bitmap_in_rect(
     ctx,
     s_batt_bitmap,
-    GRect(icon_x - scl_x(15), icon_y, ICON_SIZE, ICON_SIZE)
+    GRect(icon_x, icon_y, ICON_SIZE, ICON_SIZE)
   );
-  draw_text(ctx, s_battery_buff, SFI_Medium, text_x - scl_x(20), text_y);
+  draw_text(ctx, s_battery_buff, SFI_Medium, text_x, text_y);
 #endif
 
   // Right column
   icon_x = scl_x_pp({.o = 480, .c = 500, .g = 500});
   icon_y = scl_y_pp({.o = 275, .e = 285});
   text_x = icon_x + ICON_SIZE + scl_x(10);
-  text_y = icon_y - scl_y_pp({.o = 40, .e = 15});
+  text_y = icon_y - scl_y_pp({.o = 40, .e = 15, .g = 5});
 
 #ifdef FEATURE_MANY_IMAGES
   graphics_draw_bitmap_in_rect(
@@ -384,7 +391,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   icon_x = scl_x_pp({.o = 460, .c = 500, .g = 500});
   icon_y = scl_y_pp({.o = 560, .e = 560});
   text_x = icon_x + ICON_SIZE - scl_x(10);
-  text_y = icon_y - scl_y_pp({.o = 25, .e = 20});
+  text_y = icon_y - scl_y_pp({.o = 25, .e = 20, .g = 10});
   
 #ifdef FEATURE_MANY_IMAGES
   graphics_draw_bitmap_in_rect(
@@ -399,10 +406,10 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
 #endif
   draw_text(ctx, s_nc_buff, SFI_Medium, row2_text_x, text_y);
 
-  icon_x = scl_x_pp({.o = 460, .c = 320, .g = 320});
+  icon_x = scl_x_pp({.o = 460, .c = 320, .g = 450});
   icon_y = scl_y_pp({.o = 850, .c = 830, .e = 870, .g = 830});
   text_x = icon_x + ICON_SIZE;
-  text_y = icon_y - scl_y_pp({.o = 30, .e = 20});
+  text_y = icon_y - scl_y_pp({.o = 30, .e = 20, .g = 20});
 
 #if defined(PBL_PLATFORM_APLITE)
   // Draw clock instead of bitmap for 'next sample'
@@ -501,8 +508,6 @@ static void window_load(Window *window) {
   layer_set_update_proc(s_canvas_layer, canvas_update_proc);
   layer_add_child(root_layer, s_canvas_layer);
 
-  update_data();
-
   if (util_is_not_status(data_calculate_avg_discharge_rate_x100(false))) {
 #ifdef FEATURE_ANIMATIONS
     // If data to show, begin smooth animation
@@ -513,6 +518,8 @@ static void window_load(Window *window) {
     util_animate(600, 0, &anim_implementation, true);
 #endif
   }
+
+  update_data();
 
   APP_LOG(APP_LOG_LEVEL_INFO, "wl %dB", heap_bytes_free());
 }
@@ -562,6 +569,9 @@ void main_window_push() {
     window_set_click_config_provider(s_window, click_config_provider);
 
     s_blink_budget = 5;
+#ifdef FEATURE_ANIMATIONS
+    s_force_anim = true;
+#endif
   }
 
   window_stack_push(s_window, true);

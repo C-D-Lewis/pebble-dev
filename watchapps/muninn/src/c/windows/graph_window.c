@@ -5,8 +5,8 @@
 #define GRAPH_W scl_x_pp({.o = 930, .c = 760, .g = 760})
 #define GRAPH_H scl_y_pp({.o = 480, .c = 400, .e = 490, .g = 430})
 #define NOTCH_S scl_x(25)
-#define LOG_Y scl_y_pp({.o = 615, .c = 630, .e = 635})
-#define LOG_X_START scl_x_pp({.o = 20, .c = 70, .g = 70})
+#define LOG_Y scl_y_pp({.o = 615, .c = 630, .e = 635, .g = 650})
+#define LOG_X_START scl_x_pp({.o = 20, .c = 70, .g = 80})
 
 // Not scaled
 #if defined(PBL_PLATFORM_EMERY) || defined(PBL_PLATFORM_GABBRO)
@@ -59,7 +59,7 @@ static void draw_datetime(GContext *ctx, const GRect bounds, const Sample *s) {
     ctx,
     s_pos_buff,
     scl_get_font(SFI_Small),
-    GRect(LOG_X_START, LOG_Y - scl_y(5), PS_DISP_W - PBL_IF_ROUND_ELSE(30, 8), 100),
+    GRect(LOG_X_START, LOG_Y - scl_y(5), PS_DISP_W - PBL_IF_ROUND_ELSE(40, 8), 100),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentRight,
     NULL
@@ -92,7 +92,7 @@ static void draw_log_detail(GContext *ctx, const GRect bounds, const Sample *s) 
     ctx,
     s_result_buff,
     scl_get_font(SFI_Medium),
-    GRect(LOG_X_START, LOG_Y + scl_y_pp({.o = 80, .e = 90}), PS_DISP_W - LOG_X_START, 200),
+    GRect(LOG_X_START, LOG_Y + scl_y_pp({.o = 80, .c = 70, .e = 90, .g = 90}), PS_DISP_W - LOG_X_START, 200),
     GTextOverflowModeWordWrap,
 #ifdef PBL_ROUND
     GTextAlignmentCenter,
@@ -107,10 +107,11 @@ static void draw_log_detail(GContext *ctx, const GRect bounds, const Sample *s) 
   graphics_context_set_fill_color(ctx, GColorBlack);
   graphics_fill_rect(
     ctx,
-    GRect(0, LOG_Y + scl_y_pp({.o = 260, .e = 250}), PS_DISP_W, 1),
+    GRect(0, LOG_Y + scl_y_pp({.o = 260, .e = 250, .g = 190}), PS_DISP_W, 1),
     0,
     GCornerNone
   );
+#endif
 
   // Drain since 24h ago
   time_t now = time(NULL);
@@ -132,18 +133,23 @@ static void draw_log_detail(GContext *ctx, const GRect bounds, const Sample *s) 
   snprintf(
     s_24h_buff,
     sizeof(s_24h_buff),
-    "24h change: %d%%", last_s->charge_perc - s_24h->charge_perc
+    "24h change: %d%%",
+    last_s->charge_perc - s_24h->charge_perc
   );
   graphics_draw_text(
     ctx,
     s_24h_buff,
     scl_get_font(SFI_Small),
-    GRect(LOG_X_START, LOG_Y + scl_y_pp({.o = 250, .e = 235}), PS_DISP_W, 200),
+    GRect(
+      LOG_X_START,
+      LOG_Y + scl_y_pp({.o = 250, .c = 190, .e = 235, .g = 190}),
+      PS_DISP_W - (2 * LOG_X_START),
+      200
+    ),
     GTextOverflowModeWordWrap,
     GTextAlignmentCenter,
     NULL
   );
-#endif
 }
 
 ////////////////////////////////////////////// Layout //////////////////////////////////////////////
@@ -178,8 +184,8 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
       high_v = vs->charge_perc;
     }
   }
-  low_v = ((low_v / 10) * 10) - 5;
-  high_v = (((high_v + 9) / 10) * 10) + 5;
+  low_v = ((low_v / 10) * 10) - 3;
+  high_v = (((high_v + 9) / 10) * 10) + 3;
 
   // Dummy values for illustrative purposes
   if (!graph_is_available()) {
@@ -250,6 +256,8 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     return;
   }
 
+  const int box_w = scl_x_pp({.o = 210, .c = 170, .g = 150});
+
   const bool flip = count - s_selection < (count / 2);
   int prev_x = -1, prev_y = -1;
 
@@ -291,7 +299,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
           graphics_draw_line(ctx, GPoint(lx, y), GPoint(lx + 3, y));
         }
       } else {
-        for (int lx = x; lx <= GRAPH_W; lx += 8) {
+        for (int lx = x; lx <= GRAPH_W + box_w; lx += 8) {
           graphics_draw_line(ctx, GPoint(lx, y), GPoint(lx + 3, y));
         }
       }
@@ -334,9 +342,12 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   Sample *sel_s = data_get_sample(s_selection);
   if (sel_s && util_is_not_status(sel_s->charge_perc)) {
     const int sel_y = ROOT_Y + GRAPH_H - (((sel_s->charge_perc - low_v) * GRAPH_H) / y_range);
-    const int box_w = scl_x(210);
     const int box_h = scl_y(100);
+#ifdef PBL_ROUND
+    const int box_x = flip ? PS_DISP_W - ((3 * box_w) / 2) : (box_w / 2);
+#else
     const int box_x = flip ? PS_DISP_W - box_w : 0;
+#endif
     const int box_y = sel_y - (box_h / 2);
     const GRect box_rect = GRect(box_x, box_y, box_w, box_h);
 
@@ -357,7 +368,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
       ctx,
       s_value_buff,
       scl_get_font(SFI_Small),
-      GRect(box_x, box_y - scl_y(25), box_w, box_h),
+      GRect(box_x, box_y - scl_y_pp({.o = 25, .c = 15, .g = 15}), box_w, box_h),
       GTextOverflowModeTrailingEllipsis,
       GTextAlignmentCenter,
       NULL

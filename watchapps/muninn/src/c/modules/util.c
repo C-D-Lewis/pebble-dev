@@ -136,7 +136,7 @@ void util_draw_braid(GContext *ctx, GRect rect) {
 // Like menu_cell_basic_draw but with larger subtitle
 void util_menu_cell_draw(GContext *ctx, Layer *layer, char *title, char *desc) {
   const int text_x = scl_x_pp({.o = 30, .c = -20, .g = -20});
-  GRect title_rect = GRect(text_x, scl_y_pp({.o = -30, .e = -10, .g = -10}), PS_DISP_W, 100);
+  GRect title_rect = GRect(text_x, scl_y_pp({.o = -30, .e = -10, .g = -1}), PS_DISP_W, 100);
 
   // Title only
   if (desc == NULL) title_rect.origin.y += scl_y(30);
@@ -160,7 +160,7 @@ void util_menu_cell_draw(GContext *ctx, Layer *layer, char *title, char *desc) {
       ctx,
       desc,
       scl_get_font(SFI_Medium),
-      GRect(text_x, scl_y_pp({.o = 110, .e = 130, .g = 130}), PS_DISP_W, 100),
+      GRect(text_x, scl_y_pp({.o = 110, .e = 130, .g = 140}), PS_DISP_W, 100),
       GTextOverflowModeTrailingEllipsis,
       alignment,
       NULL
@@ -168,59 +168,89 @@ void util_menu_cell_draw(GContext *ctx, Layer *layer, char *title, char *desc) {
   }
 }
 
-void util_draw_button_hints(GContext *ctx, bool hints[3]) {
+void draw_rect_button_hints(GContext *ctx, GRect rect, bool hints[3]) {
   // Actions BG
   graphics_context_set_fill_color(ctx, PBL_IF_COLOR_ELSE(GColorDarkCandyAppleRed, GColorLightGray));
   GRect actions_rect = GRect(PS_DISP_W - ACTION_BAR_W, 0, ACTION_BAR_W, PS_DISP_H);
   graphics_fill_rect(ctx, actions_rect, 0, GCornerNone);
 
-#if !defined(PBL_PLATFORM_CHALK)
   const int hint_x = PS_DISP_W - (HINT_W / 2);
-#else
-  const int hint_x = PS_DISP_W - ((2 * HINT_W) / 3);
-#endif
 
   if (hints[0]) {
     // Top hint
-#if !defined(PBL_PLATFORM_CHALK)
     const int top_y = PS_DISP_H / 6 - (HINT_H / 2);
-#else
-    const int top_y = ((3 * PS_DISP_H) / 8) - (HINT_H / 2);
-#endif
     graphics_context_set_fill_color(ctx, GColorBlack);
     graphics_fill_rect(ctx, GRect(hint_x, top_y, HINT_W, HINT_H), 3, GCornersAll);
 
     // TODO: Ugly, can't configure long press emphasis but only used in one place for now.
     graphics_context_set_fill_color(ctx, GColorWhite);
     int select_x = hint_x + (HINT_W / 2);
-#ifdef PBL_PLATFORM_CHALK
-    select_x -= 2;
-#endif
     const GPoint select_center = { .x = select_x, .y = top_y + (HINT_H / 2) };
     graphics_fill_circle(ctx, select_center, scl_x_pp({.o = 20, .c = 10, .g = 10}));
   }
 
   if (hints[1]) {
     // Middle hint
-#if !defined(PBL_PLATFORM_CHALK)
     const int middle_y = (PS_DISP_H / 2) - (HINT_H / 2);
-#else
-    const int middle_y = (PS_DISP_H / 2) - (HINT_H / 2);
-#endif
     graphics_context_set_fill_color(ctx, GColorBlack);
     graphics_fill_rect(ctx, GRect(hint_x, middle_y, HINT_W, HINT_H), 3, GCornersAll);
   }
 
   if (hints[2]) {
     // Bottom hint
-#if !defined(PBL_PLATFORM_CHALK)
     const int bottom_y = ((5 * PS_DISP_H) / 6) - (HINT_H / 2);
-#else
-    const int bottom_y = ((5 * PS_DISP_H) / 8) - (HINT_H / 2);
-#endif
     graphics_context_set_fill_color(ctx, GColorBlack);
     graphics_fill_rect(ctx, GRect(hint_x, bottom_y, HINT_W, HINT_H), 3, GCornersAll);
   }
+}
+
+#ifdef PBL_ROUND
+void draw_round_button_hints(GContext *ctx, bool hints[3]) {
+  graphics_context_set_fill_color(ctx, GColorDarkCandyAppleRed);
+  graphics_fill_radial(
+    ctx,
+    grect_inset(GRect(0, 0, PS_DISP_W, PS_DISP_H), GEdgeInsets(-(ACTION_BAR_W / 3))),
+    GOvalScaleModeFitCircle,
+#ifdef PBL_PLATFORM_CHALK
+    ACTION_BAR_W - 2,
+#else
+    ACTION_BAR_W,
+#endif
+    DEG_TO_TRIGANGLE(60),
+    DEG_TO_TRIGANGLE(120)
+  );
+
+  const int hint_radius = scl_x_pp({.c = 50, .g = 50});
+  if (hints[0]) {
+    // Top hint
+    graphics_context_set_fill_color(ctx, GColorBlack);
+    graphics_fill_circle(ctx, GPoint(scl_x_pp({.c = 995, .g = 1000}), scl_y(340)), hint_radius);
+  }
+
+  if (hints[1]) {
+    // Middle
+    graphics_context_set_fill_color(ctx, GColorBlack);
+    graphics_fill_circle(
+      ctx,
+      GPoint(scl_x_pp({.c = 1010, .g = 1025}), scl_y_pp({.c = 495, .g = 495})),
+      hint_radius
+    );
+  }
+
+  if (hints[2]) {
+    // Top hint
+    graphics_context_set_fill_color(ctx, GColorBlack);
+    graphics_fill_circle(ctx, GPoint(scl_x_pp({.c = 995, .g = 1000}), scl_y(650)), hint_radius);
+  }
+}
+#endif
+
+void util_draw_button_hints(GContext *ctx, bool hints[3]) {
+#ifdef PBL_ROUND
+  draw_round_button_hints(ctx, hints);
+#else
+  draw_rect_button_hints(ctx, GRect(PS_DISP_W - ACTION_BAR_W, 0, ACTION_BAR_W, PS_DISP_H), hints);
+#endif
 }
 
 void util_draw_skyline(GContext *ctx, bool is_nighttime) {
@@ -271,7 +301,7 @@ void util_draw_skyline(GContext *ctx, bool is_nighttime) {
     graphics_draw_bitmap_in_rect(
       ctx,
       bitmaps_get(RESOURCE_ID_CLOUD),
-      GRect(scl_x(680), scl_y(50), CLOUD_SIZE.w, CLOUD_SIZE.h)
+      GRect(scl_x_pp({.o = 680, .g = 650}), scl_y(50), CLOUD_SIZE.w, CLOUD_SIZE.h)
     );
 #if !(defined(PBL_PLATFORM_CHALK) || defined(PBL_PLATFORM_GABBRO))
     // Huginn

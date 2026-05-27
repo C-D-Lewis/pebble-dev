@@ -177,6 +177,7 @@ static void test_data_generator() {
     s->charge_diff = gap;
     s->time_diff = interval_s;
     s->result = result_from_gap(gap);
+
     // Make this deliberately incorrect for testing
     if (util_is_not_status(s->result)) {
       const int result = s->result;
@@ -319,8 +320,7 @@ void data_push_sample(int charge_perc, int last_sample_time, int last_charge_per
 }
 
 /**
- * This _should_ place twice as much emphasis on the most recent four values,
- * so recent changes in watchface or activity are more quickly reflected.
+ * Calculate the average drain for all on-board samples.
  *
  * Important: count all time periods in the log, not just those with a drop!
  *
@@ -330,12 +330,13 @@ int data_calculate_avg_discharge_rate_x100(bool ignore_no_change) {
   const int total = data_get_valid_samples_count();
   if (total < MIN_SAMPLES) return STATUS_EMPTY;
 
-  int total_drops_x100 = 0;
+  int total_drops = 0;
   int total_time = 0;
 
   for (int i = 0; i < NUM_SAMPLES; i++) {
     const Sample *s = &s_samples[i];
     int result = s->result;
+    // APP_LOG(APP_LOG_LEVEL_DEBUG, "sample %d: result %d, charge_diff %d, time_diff %d", i, result, s->charge_diff, s->time_diff);
 
     // Log ends here, we never skip a slot when adding to it
     if (result == STATUS_EMPTY) break;
@@ -352,23 +353,24 @@ int data_calculate_avg_discharge_rate_x100(bool ignore_no_change) {
     // Count this sample
     total_time += s->time_diff;
     // Could includes STATUS_NO_CHANGE time
-    if (s->result > 0) {
-      // Multiple numerator by the time it represents before division
-      total_drops_x100 += (s->result * s->time_diff * 100) / SECONDS_PER_DAY;
+    if (s->charge_diff > 0) {
+      // Include this change
+      total_drops += s->charge_diff;
     }
   }
 
   // We didn't count anything - empty log?
-  if (total_time == 0 || total_drops_x100 == 0) return STATUS_EMPTY;
+  if (total_time == 0 || total_drops == 0) return STATUS_EMPTY;
 
-  const int rate_100x = (total_drops_x100 * SECONDS_PER_DAY) / total_time;
+  // Use nearest-integer rounding to be conservative
+  const int rate_100x = ((total_drops * SECONDS_PER_DAY * 100) + (total_time / 2)) / total_time;
   if (rate_100x <= 300 && !ignore_no_change) {
     // <3% per day, count again, but this time ignore 'no change' time periods
     return data_calculate_avg_discharge_rate_x100(true);
   }
 
   // Ignore extremely low estimates and hence extremely high battery life over-estimates
-  // This will improve on day 2
+  // This will improve after another full day of data
   if (ignore_no_change && rate_100x <= 200) return 300;
 
   return rate_100x;
@@ -378,7 +380,7 @@ int data_calculate_days_remaining(bool tenx) {
   // Use live battery level, not last reading
   const BatteryChargeState state = battery_state_service_peek();
   const int current_level = state.charge_percent;
-  const int rate_100x = data_calculate_avg_discharge_rate_x100(false);
+  int rate_100x = data_calculate_avg_discharge_rate_x100(false);
 
   // If not enough data
   if (data_get_valid_samples_count() < MIN_SAMPLES) return STATUS_EMPTY;
@@ -387,9 +389,11 @@ int data_calculate_days_remaining(bool tenx) {
   // Only ever charged, or rate is zero ('return 1' above should prevent this)
   if (rate_100x <= 0) return STATUS_EMPTY;
 
+  // Best to be conservative here - nearest whole number
+  rate_100x = ((rate_100x + 50) / 100) * 100;
+
   // Multiply by 100 for FP maths and x10 if tenx for decimal display
   const int level_100x = current_level * (tenx ? 1000 : 100);
-
   return level_100x / rate_100x;
 }
 

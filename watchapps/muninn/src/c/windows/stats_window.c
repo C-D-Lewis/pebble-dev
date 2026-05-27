@@ -21,7 +21,7 @@ static uint16_t get_num_rows_callback(MenuLayer *menu_layer, uint16_t section_in
   return MI_MAX;
 }
 
-static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_index, void *context) {
+static void draw_row_callback(GContext *ctx, Layer *layer, MenuIndex *cell_index, void *context) {
   AppState *app_state = data_get_app_state();
 
   // Format buffers
@@ -31,7 +31,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
   } else {
     snprintf(s_t_d_buff, sizeof(s_t_d_buff), "-");
   }
-  // snprintf(s_t_d_buff, sizeof(s_t_d_buff), "16 days (4%%)");
+  // snprintf(s_t_d_buff, sizeof(s_t_d_buff), "16 days");
 
   static char s_a_t_r_buff[16];
   if (
@@ -55,11 +55,11 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
   }
   // snprintf(s_l_w_r_buff, sizeof(s_l_w_r_buff), "8%% per day");
 
-  static char s_e_b_l_buff[16];
+  static char s_e_b_l_buff[18];
   if (util_is_not_status(app_state->stat_battery_life)) {
     snprintf(s_e_b_l_buff, sizeof(s_e_b_l_buff), "%d days", app_state->stat_battery_life);
   } else {
-    snprintf(s_e_b_l_buff, sizeof(s_e_b_l_buff), "-");
+    snprintf(s_e_b_l_buff, sizeof(s_e_b_l_buff), "(Req. week rate)");
   }
   // snprintf(s_e_b_l_buff, sizeof(s_e_b_l_buff), "20 days");
 
@@ -73,7 +73,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
 
   switch(cell_index->row) {
     case MI_TOTAL_DURATION: {
-      const GColor fg_color = menu_cell_layer_is_highlighted(cell_layer) ? GColorWhite : GColorBlack;
+      const GColor fg_color = menu_cell_layer_is_highlighted(layer) ? GColorWhite : GColorBlack;
       graphics_context_set_text_color(ctx, fg_color);
       graphics_draw_text(
         ctx,
@@ -117,7 +117,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
     case MI_ALL_TIME_RATE:
       util_menu_cell_draw(
         ctx,
-        cell_layer,
+        layer,
         "Average Rate",
         s_a_t_r_buff
       );
@@ -125,7 +125,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
     case MI_LAST_WEEK_RATE:
       util_menu_cell_draw(
         ctx,
-        cell_layer,
+        layer,
         "Last Week Rate",
         s_l_w_r_buff
       );
@@ -133,7 +133,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
     case MI_EST_BATTERY_LIFE:
       util_menu_cell_draw(
         ctx,
-        cell_layer,
+        layer,
         "Est. Battery Life",
         s_e_b_l_buff
       );
@@ -141,7 +141,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
     case MI_MTBC:
       util_menu_cell_draw(
         ctx,
-        cell_layer,
+        layer,
 #if defined(PBL_PLATFORM_EMERY) || defined(PBL_PLATFORM_GABBRO)
         "Avg. Charge Interval",
 #else
@@ -153,7 +153,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
     case MI_UPLOAD:
       graphics_draw_text(
         ctx,
-#ifdef PBL_PLATFORM_CHALK
+#ifdef PBL_ROUND
         "Open Muninn mobile\nSettings for all data",
 #else
         "Open Muninn mobile app Settings to see all data",

@@ -17,7 +17,7 @@
 // ! Check Aplite works (at least 4.8kB static / 3.3kB on main window disappear)
 // ! Comment out INFO logs
 // ! Check TS test flags
-#define VERSION "1.40.0"
+#define VERSION "1.41.0"
 // Minimum samples before providing estimations
 #define MIN_SAMPLES 2
 // Min samples before graph is shown
@@ -62,7 +62,7 @@
 // MenuLayer two row height
 #define ROW_HEIGHT_LARGE scl_y(300)
 // Action bar width
-#define ACTION_BAR_W scl_x_pp({.o = 60, .c = 90, .e = 70, .g = 90})
+#define ACTION_BAR_W scl_x_pp({.o = 60, .c = 90, .e = 70, .g = 70})
 // Action bar hint width
 #define HINT_W ACTION_BAR_W
 // Action bar hint height
