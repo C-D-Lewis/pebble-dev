@@ -3,12 +3,12 @@
 #ifdef FEATURE_SYNC
 
 typedef enum {
-  MI_TOTAL_DURATION,
-  MI_ALL_TIME_RATE,
-  MI_LAST_WEEK_RATE,
-  MI_EST_BATTERY_LIFE,
-  MI_MTBC,
-  MI_UPLOAD,
+  MenuItemTotalDuration,
+  MenuItemAllTimeRate,
+  MenuItemLastWeekRate,
+  MenuItemEstBatteryLife,
+  MenuItemMTBC,
+  MenuItemUpload,
 
   MI_MAX,
 } MenuItems;
@@ -72,7 +72,7 @@ static void draw_row_callback(GContext *ctx, Layer *layer, MenuIndex *cell_index
   // snprintf(s_mtbc_buff, sizeof(s_mtbc_buff), "12 days");
 
   switch(cell_index->row) {
-    case MI_TOTAL_DURATION: {
+    case MenuItemTotalDuration: {
       const GColor fg_color = menu_cell_layer_is_highlighted(layer) ? GColorWhite : GColorBlack;
       graphics_context_set_text_color(ctx, fg_color);
       graphics_draw_text(
@@ -114,31 +114,16 @@ static void draw_row_callback(GContext *ctx, Layer *layer, MenuIndex *cell_index
         NULL
       );
     } break;
-    case MI_ALL_TIME_RATE:
-      util_menu_cell_draw(
-        ctx,
-        layer,
-        "Average Rate",
-        s_a_t_r_buff
-      );
+    case MenuItemAllTimeRate:
+      util_menu_cell_draw(ctx, layer, "Average Rate", s_a_t_r_buff);
       break;
-    case MI_LAST_WEEK_RATE:
-      util_menu_cell_draw(
-        ctx,
-        layer,
-        "Last Week Rate",
-        s_l_w_r_buff
-      );
+    case MenuItemLastWeekRate:
+      util_menu_cell_draw(ctx, layer, "Last Week Rate", s_l_w_r_buff);
       break;
-    case MI_EST_BATTERY_LIFE:
-      util_menu_cell_draw(
-        ctx,
-        layer,
-        "Est. Battery Life",
-        s_e_b_l_buff
-      );
+    case MenuItemEstBatteryLife:
+      util_menu_cell_draw(ctx, layer, "Est. Battery Life", s_e_b_l_buff);
       break;
-    case MI_MTBC:
+    case MenuItemMTBC:
       util_menu_cell_draw(
         ctx,
         layer,
@@ -150,7 +135,7 @@ static void draw_row_callback(GContext *ctx, Layer *layer, MenuIndex *cell_index
         s_mtbc_buff
       );
       break;
-    case MI_UPLOAD:
+    case MenuItemUpload:
       graphics_draw_text(
         ctx,
 #ifdef PBL_ROUND
@@ -171,7 +156,7 @@ static void draw_row_callback(GContext *ctx, Layer *layer, MenuIndex *cell_index
 
 static int16_t get_cell_height_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) {
   switch(cell_index->row) {
-    case MI_TOTAL_DURATION:
+    case MenuItemTotalDuration:
       return ROW_HEIGHT_SMALL;
     default:
       return ROW_HEIGHT_LARGE;

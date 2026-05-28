@@ -5,12 +5,12 @@ static MenuLayer *s_menu_layer;
 static Layer *s_header_layer;
 
 typedef enum {
-  MI_CUSTOM_ALERT_LEVEL,
-  MI_ELEVATED_RATE_ALERT,
-  MI_ONE_DAY_ALERT,
-  MI_REVERSE_DATES,
+  MenuItemCustomAlertLevel,
+  MenuItemElevatedRateAlert,
+  MenuItemOneDayAlert,
+  MenuItemReverseDates,
 #ifdef FEATURE_SYNC
-  MI_AUTO_UPLOAD,
+  MenuItemAutoUpload,
 #endif
 
   MI_MAX,
@@ -32,7 +32,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
   }
 
   switch(cell_index->row) {
-    case MI_CUSTOM_ALERT_LEVEL:
+    case MenuItemCustomAlertLevel:
       util_menu_cell_draw(
         ctx,
         cell_layer,
@@ -40,7 +40,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
         alert_disabled ? "Disabled" : s_alert_buff
       );
       break;
-    case MI_ELEVATED_RATE_ALERT:
+    case MenuItemElevatedRateAlert:
       util_menu_cell_draw(
         ctx,
         cell_layer,
@@ -48,7 +48,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
         persist_data->elevated_rate_alert ? "Enabled" : "Disabled"
       );
       break;
-    case MI_ONE_DAY_ALERT:
+    case MenuItemOneDayAlert:
       util_menu_cell_draw(
         ctx,
         cell_layer,
@@ -56,7 +56,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
         persist_data->one_day_alert ? "Enabled" : "Disabled"
       );
       break;
-    case MI_REVERSE_DATES:
+    case MenuItemReverseDates:
       util_menu_cell_draw(
         ctx,
         cell_layer,
@@ -65,7 +65,7 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
       );
       break;
 #ifdef FEATURE_SYNC
-    case MI_AUTO_UPLOAD:
+    case MenuItemAutoUpload:
       util_menu_cell_draw(
         ctx,
         cell_layer,
@@ -80,12 +80,12 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
 
 static int16_t get_cell_height_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) {
   switch(cell_index->row) {
-    case MI_CUSTOM_ALERT_LEVEL:
-    case MI_ELEVATED_RATE_ALERT:
-    case MI_ONE_DAY_ALERT:
-    case MI_REVERSE_DATES:
+    case MenuItemCustomAlertLevel:
+    case MenuItemElevatedRateAlert:
+    case MenuItemOneDayAlert:
+    case MenuItemReverseDates:
 #ifdef FEATURE_SYNC
-    case MI_AUTO_UPLOAD:
+    case MenuItemAutoUpload:
 #endif
       return ROW_HEIGHT_LARGE;
     default:
@@ -98,20 +98,20 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
 
   switch(cell_index->row) {
     // Options
-    case MI_CUSTOM_ALERT_LEVEL:
+    case MenuItemCustomAlertLevel:
       data_cycle_custom_alert_level();
       break;
-    case MI_ELEVATED_RATE_ALERT:
+    case MenuItemElevatedRateAlert:
       persist_data->elevated_rate_alert = !persist_data->elevated_rate_alert;
       break;
-    case MI_ONE_DAY_ALERT:
+    case MenuItemOneDayAlert:
       persist_data->one_day_alert = !persist_data->one_day_alert;
       break;
-    case MI_REVERSE_DATES:
+    case MenuItemReverseDates:
       persist_data->reverse_dates = !persist_data->reverse_dates;
       break;
 #ifdef FEATURE_SYNC
-    case MI_AUTO_UPLOAD: {
+    case MenuItemAutoUpload: {
       const int new_state = persist_data->auto_upload_v2 == AUTO_UPLOAD_ENABLED
         ? AUTO_UPLOAD_DISABLED
         : AUTO_UPLOAD_ENABLED;

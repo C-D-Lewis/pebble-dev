@@ -5,12 +5,12 @@ static MenuLayer *s_menu_layer;
 static Layer *s_header_layer;
 
 typedef enum {
-  MI_SETTINGS,
+  MenuItemSettings,
 #ifdef FEATURE_SYNC
-  MI_SYNC_INFO,
+  MenuItemSyncInfo,
 #endif
-  MI_BATTERY_TIPS,
-  MI_VERSION,
+  MenuItemBatteryTips,
+  MenuItemVersion,
 
   MI_MAX,
 } MenuItems;
@@ -41,11 +41,11 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
 #endif
 
   switch(cell_index->row) {
-    case MI_SETTINGS:
+    case MenuItemSettings:
       util_menu_cell_draw(ctx, cell_layer, "Settings", NULL);
       break;
 #ifdef FEATURE_SYNC
-    case MI_SYNC_INFO:
+    case MenuItemSyncInfo:
       util_menu_cell_draw(
         ctx,
         cell_layer,
@@ -54,10 +54,10 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
       );
       break;
 #endif
-    case MI_BATTERY_TIPS:
+    case MenuItemBatteryTips:
       util_menu_cell_draw(ctx, cell_layer, "Battery Tips", NULL);
       break;
-    case MI_VERSION: {
+    case MenuItemVersion: {
       static char s_v_buff[16];
       snprintf(s_v_buff, sizeof(s_v_buff), "Version %s", VERSION);
       util_menu_cell_draw(
@@ -75,9 +75,9 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
 static int16_t get_cell_height_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) {
   switch(cell_index->row) {
 #ifdef FEATURE_SYNC
-    case MI_SYNC_INFO:
+    case MenuItemSyncInfo:
 #endif
-    case MI_VERSION:
+    case MenuItemVersion:
       return ROW_HEIGHT_LARGE;
     default:
       return ROW_HEIGHT_SMALL;
@@ -87,17 +87,17 @@ static int16_t get_cell_height_callback(struct MenuLayer *menu_layer, MenuIndex 
 static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) {
 
   switch(cell_index->row) {
-    case MI_SETTINGS:
+    case MenuItemSettings:
       settings_window_push();
       break;
 #ifdef FEATURE_SYNC
-    case MI_SYNC_INFO: {
+    case MenuItemSyncInfo: {
       AppState *app_state = data_get_app_state();
       const bool enough_data = data_get_log_length() >= MIN_SAMPLES_FOR_WEB;
       if (enough_data && app_state->sync_count > 0) stats_window_push();
     } break;
 #endif
-    case MI_BATTERY_TIPS:
+    case MenuItemBatteryTips:
       message_window_push(
 #if defined(PBL_PLATFORM_APLITE)
         "Use a watchface that ticks each minute.\n\nFilter notifications from noisy apps.\n\nDisable the motion backlight & lower intensity.",
@@ -109,7 +109,7 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
       );
       break;
 #if !defined(PBL_PLATFORM_APLITE)
-    case MI_VERSION:
+    case MenuItemVersion:
       message_window_push(
         "Samples are taken every 6 hours.\n\nThe main screen shows:\n- Days remaining and rate.\n- Last detected & next predicted charge.\n- Current battery and next sample time.\n\nGraph shows each reading, outlined circles for predicted levels.\n\nIf watch is off during a sample, launch the app again to resume.",
         false,

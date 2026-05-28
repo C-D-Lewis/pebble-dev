@@ -68,31 +68,36 @@ static void draw_datetime(GContext *ctx, const GRect bounds, const Sample *s) {
 
 static void draw_log_detail(GContext *ctx, const GRect bounds, const Sample *s) {
   const int hours = (s->time_diff + 1800) / 3600;
-  static char s_result_buff[32];
+  static char s_res_buff[32];
 
 #ifdef PBL_ROUND
   if (s->result == STATUS_NO_CHANGE) {
-    snprintf(s_result_buff, sizeof(s_result_buff), "No change (%dh)", hours);
+    snprintf(s_res_buff, sizeof(s_res_buff), "No change (%dh)", hours);
   } else if (s->result == STATUS_CHARGED) {
-    snprintf(s_result_buff, sizeof(s_result_buff), "Charged %d%% (%dh)", -(s->charge_diff), hours);
+    snprintf(s_res_buff, sizeof(s_res_buff), "Charged %d%% (%dh)", -(s->charge_diff), hours);
   } else {
-    snprintf(s_result_buff, sizeof(s_result_buff), "Drained %d%% (%dh)", s->charge_diff, hours);
+    snprintf(s_res_buff, sizeof(s_res_buff), "Drained %d%% (%dh)", s->charge_diff, hours);
   }
 #else
   if (s->result == STATUS_NO_CHANGE) {
-    snprintf(s_result_buff, sizeof(s_result_buff), "No change in %d hrs", hours);
+    snprintf(s_res_buff, sizeof(s_res_buff), "No change in %d hrs", hours);
   } else if (s->result == STATUS_CHARGED) {
-    snprintf(s_result_buff, sizeof(s_result_buff), "Charged %d%% in %d hrs", -(s->charge_diff), hours);
+    snprintf(s_res_buff, sizeof(s_res_buff), "Charged %d%% in %d hrs", -(s->charge_diff), hours);
   } else {
-    snprintf(s_result_buff, sizeof(s_result_buff), "Drained %d%% in %d hrs", s->charge_diff, hours);
+    snprintf(s_res_buff, sizeof(s_res_buff), "Drained %d%% in %d hrs", s->charge_diff, hours);
   }
 #endif
 
   graphics_draw_text(
     ctx,
-    s_result_buff,
+    s_res_buff,
     scl_get_font(SFI_Medium),
-    GRect(LOG_X_START, LOG_Y + scl_y_pp({.o = 80, .c = 70, .e = 90, .g = 90}), PS_DISP_W - LOG_X_START, 200),
+    GRect(
+      LOG_X_START,
+      LOG_Y + scl_y_pp({.o = 80, .c = 70, .e = 90, .g = 90}),
+      PS_DISP_W - LOG_X_START,
+      200
+    ),
     GTextOverflowModeWordWrap,
 #ifdef PBL_ROUND
     GTextAlignmentCenter,
@@ -184,8 +189,8 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
       high_v = vs->charge_perc;
     }
   }
-  low_v = ((low_v / 10) * 10) - 3;
-  high_v = (((high_v + 9) / 10) * 10) + 3;
+  low_v = ((low_v / 10) * 10) - 5;
+  high_v = (((high_v + 9) / 10) * 10) + 5;
 
   // Dummy values for illustrative purposes
   if (!graph_is_available()) {
@@ -204,18 +209,8 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
 
   // Draw Y and X axes
   graphics_context_set_fill_color(ctx, GColorBlack);
-  graphics_fill_rect(
-    ctx,
-    GRect(GRAPH_MARGIN, ROOT_Y, LINE_W, GRAPH_H),
-    0,
-    GCornerNone
-  );
-  graphics_fill_rect(
-    ctx,
-    GRect(GRAPH_MARGIN, ROOT_Y + GRAPH_H, GRAPH_W, LINE_W),
-    0,
-    GCornerNone
-  );
+  graphics_fill_rect(ctx, GRect(GRAPH_MARGIN, ROOT_Y, LINE_W, GRAPH_H), 0, GCornerNone);
+  graphics_fill_rect(ctx, GRect(GRAPH_MARGIN, ROOT_Y + GRAPH_H, GRAPH_W, LINE_W), 0, GCornerNone);
 
   // Draw Y axis notches every 10 units within the range
   int y_range = high_v - low_v;
@@ -257,7 +252,6 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   }
 
   const int box_w = scl_x_pp({.o = 210, .c = 170, .g = 150});
-
   const bool flip = count - s_selection < (count / 2);
   int prev_x = -1, prev_y = -1;
 
@@ -378,12 +372,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
 #ifndef PBL_ROUND
   // Divider
   graphics_context_set_fill_color(ctx, GColorBlack);
-  graphics_fill_rect(
-    ctx,
-    GRect(0, LOG_Y, PS_DISP_W, DIV_H),
-    0,
-    GCornerNone
-  );
+  graphics_fill_rect(ctx, GRect(0, LOG_Y, PS_DISP_W, DIV_H), 0, GCornerNone);
 #endif
 
   // Log details
