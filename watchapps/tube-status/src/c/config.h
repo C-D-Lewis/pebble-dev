@@ -17,7 +17,7 @@ typedef enum {
   LineTypeMetropolitan,
   LineTypeMildmay,
   LineTypeNorthern,
-  LineTypePicadilly,
+  LineTypePiccadilly,
   LineTypeSuffragette,
   LineTypeVictoria,
   LineTypeWaterlooAndCity,
