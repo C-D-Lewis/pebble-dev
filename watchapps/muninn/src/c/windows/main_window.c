@@ -59,7 +59,7 @@ static void update_labels(int days) {
 //////////////////////////////////////////// Animations ////////////////////////////////////////////
 
 static void update_anim_text() {
-#ifdef FEATURE_ANIMATIONS
+#ifdef FEATURE_ANIMATIONS 
   const bool animating = util_is_animating() || s_force_anim;
 #else
   const bool animating = false;
@@ -68,7 +68,8 @@ static void update_anim_text() {
   const int rate = animating ? s_anim_rate : s_rate;
 
   // Not enough data yet
-  if (!util_is_not_status(days) || !util_is_not_status(rate)) {
+  // If s_force_anim, uninitialized s_rate would show '0' (FIXME: declutter initial animation frame logic)
+  if (!util_is_not_status(days) || !util_is_not_status(rate) || rate == 0) {
     snprintf(s_remaining_buff, sizeof(s_remaining_buff), "--");
     snprintf(s_rate_buff, sizeof(s_rate_buff), "--");
     return;

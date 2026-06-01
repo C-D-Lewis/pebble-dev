@@ -17,7 +17,7 @@
 // ! Check Aplite works (at least 4.8kB static / 3.3kB on main window disappear)
 // ! Comment out INFO logs
 // ! Check TS test flags
-#define VERSION "1.42.0"
+#define VERSION "1.43.0"
 // Minimum samples before providing estimations
 #define MIN_SAMPLES 2
 // Min samples before graph is shown
