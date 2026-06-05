@@ -384,7 +384,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   );
 #endif
   row1_text_x = text_x;
-#ifndef PBL_PLATFORM_APLITE
+#ifdef PBL_PLATFORM_APLITE
   row1_text_x -= scl_x(30);
 #endif
   draw_text(ctx, s_rate_buff, SFI_MediumBold, row1_text_x, text_y);
