@@ -325,9 +325,9 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   int icon_x = scl_x_pp({.o = 40, .c = 100, .e = 50, .g = 100});
   int icon_y = scl_y_pp({.o = 275, .e = 285});
   int text_x = icon_x + ICON_SIZE + scl_x(10);
-  int text_y = icon_y - scl_y_pp({.o = 40, .e = 15, .g = 5});
+  int text_y = icon_y - scl_y_pp({.o = 30, .e = 15, .g = 5});
 
-#ifdef FEATURE_MANY_IMAGES
+#ifndef PBL_PLATFORM_APLITE
   graphics_draw_bitmap_in_rect(
     ctx,
     bitmaps_get(RESOURCE_ID_REMAINING),
@@ -335,10 +335,10 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   );
 #endif
   int row1_text_x = text_x;
-#ifndef FEATURE_MANY_IMAGES
+#ifdef PBL_PLATFORM_APLITE
   row1_text_x -= scl_x(110);
 #endif
-  draw_text(ctx, s_remaining_buff, SFI_LargeBold, row1_text_x, text_y);
+  draw_text(ctx, s_remaining_buff, SFI_MediumBold, row1_text_x, text_y);
 
   icon_y = scl_y_pp({.o = 560, .e = 560});
   text_y = icon_y - scl_y_pp({.o = 25, .e = 20, .g = 10});
@@ -374,9 +374,9 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   icon_x = scl_x_pp({.o = 480, .c = 500, .g = 500});
   icon_y = scl_y_pp({.o = 275, .e = 285});
   text_x = icon_x + ICON_SIZE + scl_x(10);
-  text_y = icon_y - scl_y_pp({.o = 40, .e = 15, .g = 5});
+  text_y = icon_y - scl_y_pp({.o = 30, .e = 15, .g = 5});
 
-#ifdef FEATURE_MANY_IMAGES
+#ifndef PBL_PLATFORM_APLITE
   graphics_draw_bitmap_in_rect(
     ctx,
     bitmaps_get(RESOURCE_ID_RATE),
@@ -384,10 +384,10 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   );
 #endif
   row1_text_x = text_x;
-#ifndef FEATURE_MANY_IMAGES
+#ifndef PBL_PLATFORM_APLITE
   row1_text_x -= scl_x(30);
 #endif
-  draw_text(ctx, s_rate_buff, SFI_LargeBold, row1_text_x, text_y);
+  draw_text(ctx, s_rate_buff, SFI_MediumBold, row1_text_x, text_y);
 
   icon_x = scl_x_pp({.o = 460, .c = 500, .g = 500});
   icon_y = scl_y_pp({.o = 560, .e = 560});

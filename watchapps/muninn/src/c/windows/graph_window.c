@@ -237,13 +237,19 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
       NULL
     );
 
-    static char s_no_data_buff[20];
-    snprintf(s_no_data_buff, sizeof(s_no_data_buff), "(Req. %d samples)", MIN_SAMPLES_FOR_GRAPH);
+    static char s_no_data_buff[28];
+    const int remaining = MIN_SAMPLES_FOR_GRAPH - data_get_log_length();
+    snprintf(
+      s_no_data_buff,
+      sizeof(s_no_data_buff),
+      "Waiting for %d more samples",
+      remaining
+    );
     graphics_draw_text(
       ctx,
       s_no_data_buff,
       scl_get_font(SFI_Medium),
-      GRect(0, LOG_Y + scl_y(80), PS_DISP_W, 150),
+      GRect(0, LOG_Y + scl_y(30), PS_DISP_W, 150),
       GTextOverflowModeTrailingEllipsis,
       GTextAlignmentCenter,
       NULL

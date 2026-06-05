@@ -16,11 +16,9 @@ void wakeup_schedule_next() {
   // For faster testing of wakeups
   const time_t future = ts_now + 60;
 #else
-  // Find next interval hour based on WAKEUP_MOD_H
+  // Find next exact interval hour based on WAKEUP_MOD_H
   const struct tm *now = localtime(&ts_now);
   const int hours_rem = WAKEUP_MOD_H - (now->tm_hour % WAKEUP_MOD_H);
-
-  // Ensure it's exactly an interval of WAKEUP_MOD_H
   struct tm tm_future = *now;
   tm_future.tm_hour += hours_rem;
   tm_future.tm_min = 0;

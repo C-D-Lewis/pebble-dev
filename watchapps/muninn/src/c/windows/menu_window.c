@@ -31,8 +31,8 @@ static void draw_row_callback(GContext *ctx, Layer *cell_layer, MenuIndex *cell_
   if (sync_count == STATUS_EMPTY) {
     snprintf(s_sync_buff, sizeof(s_sync_buff), "Loading...");
   } else {
-    // Not enough yet, or first sync is in progress
-    if (sync_count < MIN_SAMPLES_FOR_WEB) {
+    // Not enough yet, or first sync is in progress (both locally and remote)
+    if (sync_count < MIN_SAMPLES_FOR_WEB || data_get_log_length() < MIN_SAMPLES_FOR_WEB) {
       snprintf(s_sync_buff, sizeof(s_sync_buff), "(Req. %d samples)", MIN_SAMPLES_FOR_WEB);
     } else {
       snprintf(s_sync_buff, sizeof(s_sync_buff), "%d samples saved", sync_count);

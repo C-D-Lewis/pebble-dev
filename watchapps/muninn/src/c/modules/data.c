@@ -263,14 +263,12 @@ void data_log_state() {
   // App state
   APP_LOG(
     APP_LOG_LEVEL_INFO,
-    "lst:%d lcp:%d wi:%d wts:%d sfl:%s vos:%s cal:%d chn:%s",
+    "lst:%d lcp:%d wi:%d wts:%d sfl:%s",
     s_persist_data.last_sample_time,
     s_persist_data.last_charge_perc,
     s_persist_data.wakeup_id,
     (int)wakeup_ts,
-    s_persist_data.seen_first_launch == 1 ? "T" : "F",
-    s_persist_data.custom_alert_level,
-    s_persist_data.ca_has_notified == 1 ? "T" : "F"
+    s_persist_data.seen_first_launch == 1 ? "T" : "F"
   );
 
   // Sample history
