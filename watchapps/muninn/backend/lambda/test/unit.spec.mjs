@@ -269,6 +269,7 @@ describe('Unit tests', () => {
           medianBatteryLife: 10,
           batteryLifeRange: 0,
           minBatteryLife: 10,
+          modeBatteryLife: 10,
           maxBatteryLife: 10,
           values: [10, 10],
         }, {
@@ -278,8 +279,9 @@ describe('Unit tests', () => {
           avgBatteryLife: 4,
           avgRate: 30,
           medianBatteryLife: 5,
-          batteryLifeRange: 3,
+          batteryLifeRange: 2,
           minBatteryLife: 3,
+          modeBatteryLife: 3,
           maxBatteryLife: 5,
           values: [3, 5],
         }];
@@ -325,6 +327,7 @@ describe('Unit tests', () => {
           batteryLifeRange: 0,
           minBatteryLife: 10,
           maxBatteryLife: 10,
+          modeBatteryLife: 10,
           values: [10],
         }, {
           avgBatteryLife: 10,
@@ -336,6 +339,7 @@ describe('Unit tests', () => {
           batteryLifeRange: 0,
           minBatteryLife: 10,
           maxBatteryLife: 10,
+          modeBatteryLife: 10,
           values: [10],
         }, {
           avgBatteryLife: 10,
@@ -347,6 +351,7 @@ describe('Unit tests', () => {
           batteryLifeRange: 0,
           minBatteryLife: 10,
           maxBatteryLife: 10,
+          modeBatteryLife: 10,
           values: [10],
         }, {
           avgBatteryLife: 10,
@@ -358,6 +363,7 @@ describe('Unit tests', () => {
           batteryLifeRange: 0,
           minBatteryLife: 10,
           maxBatteryLife: 10,
+          modeBatteryLife: 10,
           values: [10],
         }, {
           avgBatteryLife: 10,
@@ -369,6 +375,7 @@ describe('Unit tests', () => {
           batteryLifeRange: 0,
           minBatteryLife: 10,
           maxBatteryLife: 10,
+          modeBatteryLife: 10,
           values: [10],
         }, {
           avgBatteryLife: 3,
@@ -376,9 +383,10 @@ describe('Unit tests', () => {
           count: 1,
           groupName: 'Pebble Time Round',
           names: ['pebble_time_round_silver_20'],
-          medianBatteryLife: 3,
+          medianBatteryLife: 2.5,
           batteryLifeRange: 0,
           minBatteryLife: 3,
+          modeBatteryLife: 3,
           maxBatteryLife: 3,
           values: [3],
         }, {
@@ -390,6 +398,7 @@ describe('Unit tests', () => {
           medianBatteryLife: 5,
           batteryLifeRange: 0,
           minBatteryLife: 5,
+          modeBatteryLife: 5,
           maxBatteryLife: 5,
           values: [5],
         }, {
@@ -401,6 +410,7 @@ describe('Unit tests', () => {
           medianBatteryLife: 5,
           batteryLifeRange: 0,
           minBatteryLife: 5,
+          modeBatteryLife: 5,
           maxBatteryLife: 5,
           values: [5],
         }];
@@ -435,6 +445,7 @@ describe('Unit tests', () => {
             medianBatteryLife: 10,
             batteryLifeRange: 0,
             minBatteryLife: 10,
+            modeBatteryLife: 10,
             maxBatteryLife: 10,
             values: [10],
           },
@@ -445,8 +456,9 @@ describe('Unit tests', () => {
             avgBatteryLife: 4,
             avgRate: 30,
             medianBatteryLife: 5,
-            batteryLifeRange: 3,
+            batteryLifeRange: 2,
             minBatteryLife: 3,
+            modeBatteryLife: 3,
             maxBatteryLife: 5,
             values: [3, 5],
           },
