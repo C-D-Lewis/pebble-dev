@@ -94,39 +94,59 @@ export const aggregateAllByKey = (rows: DbDocument[], key: keyof DbDocument): Gl
     }
   }
 
+  const getMedian = (arr: number[]): number => {
+    if (!arr.length) return 0;
+  
+    const sorted = [...arr].sort((a, b) => a - b);
+    const index = Math.floor(sorted.length / 2);
+    return sorted[index] as number;
+  };
+
   // Round sums at the end to avoid losing all the cumulated remainders
   return Object
     .values(buckets)
     .map(b => {
-      const avgBatteryLife = Math.round(b.totalBatteryLife / b.count);
+      // Note: this is calculated before outliers are removed...
       const avgRate = Math.round(b.totalRate / b.count);
-      const sortedValues = b.values.map(v => Math.round(v)).sort((a, b) => a - b);
 
-      // Remove outliers beyond 2 standard deviations
-      // Formula: https://en.wikipedia.org/wiki/Standard_deviation
-      const stdDev = Math.sqrt(
-        b.values.reduce((acc, v) => acc + Math.pow(v - avgBatteryLife, 2), 0) / b.count
-      );
-      const finalValues = sortedValues.filter(v => Math.abs(v - avgBatteryLife) <= 2 * stdDev);
+      // Remove outliers using Median Absolute Deviation (MAD)
+      // Standard deviation is more sensitive to extreme outliers but used to filter outliers
+      const median = getMedian(b.values);
+      const mad = getMedian(b.values.map(v => Math.abs(v - median)));
+      const madCutoff = Math.max(3 * mad, 1.5);
+
+      const filtered = b.values.filter(v => Math.abs(v - median) <= madCutoff);
+      const sorted = filtered.map(v => Math.round(v)).sort((a, b) => a - b);
+
+      const totalBatteryLife = filtered.reduce((sum, v) => sum + v, 0);
+      const avgBatteryLife = filtered.length ? totalBatteryLife / filtered.length : 0;
 
       // Median as alternative to average, less affected by outliers
-      const medianBatteryLife = finalValues.length
-        ? finalValues[Math.floor(finalValues.length / 2)] || 0
-        : 0;
+      const medianBatteryLife = getMedian(filtered);
+
+      // Find most common battery life, but not as useful
+      const modeBatteryLife = sorted.reduce((mode, value, _, arr) => {
+        const count = arr.filter(v => v === value).length;
+        return count > mode.count ? { value, count } : mode;
+      }, { value: 0, count: 0 }).value;
+
+      const minBatteryLife = sorted.length ? sorted[0]! : 0;
+      const maxBatteryLife = sorted.length ? sorted[sorted.length - 1]! : 0;
 
       return {
         groupName: b.groupName,
         names: b.names,
-        count: b.count,
-        avgBatteryLife,
+        count: filtered.length,
+        avgBatteryLife: Math.round(avgBatteryLife),
         avgRate,
         medianBatteryLife,
 
         // Not yet used in UI, just for testing in localAggregations.mjs
-        minBatteryLife: Math.round(b.minBatteryLife),
-        maxBatteryLife: Math.round(b.maxBatteryLife),
-        batteryLifeRange: Math.round(b.batteryLifeRange),
-        values: finalValues,
+        minBatteryLife,
+        maxBatteryLife,
+        batteryLifeRange: sorted.length ? (maxBatteryLife - minBatteryLife) : 0,
+        values: sorted,
+        modeBatteryLife,
       };
     });
 };
