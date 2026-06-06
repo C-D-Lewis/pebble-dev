@@ -3,7 +3,6 @@ import { AppState } from '../types.ts';
 import { fetchWatchHistory } from '../api.ts';
 import Theme from '../theme.ts';
 import { UI_URL } from '../constants.ts';
-import { GlobalStatsTable } from './table.ts';
 
 declare const fabricate: Fabricate<AppState>;
 
@@ -216,32 +215,6 @@ export const AppLoader = () => fabricate('Loader', {
   backgroundColor: Theme.palette.grey(7),
 })
   .setStyles({ margin: 'auto', marginTop: '15px' });
-
-/**
- * GlobalStatsView component.
- *
- * @returns {FabricateComponent} Fabricate component.
- */
-export const GlobalStatsView = () => fabricate('Column')
-  .onUpdate(async (el, state) => {
-    const { globalStats } = state;
-    const { historyCount, updatedAt  } = globalStats;
-
-    const date = new Date(updatedAt);
-
-    el.setChildren([
-      fabricate('Column')
-        .setChildren([
-          Subtitle().setText('By Model Name'),
-          GlobalStatsTable({ field: 'models' }),
-          Separator(),
-          Subtitle().setText('By Platform'),
-          GlobalStatsTable({ field: 'platforms' }),
-          Separator(),
-          Annotation().setText(`From ${historyCount} users, last updated: ${date.toLocaleString()}`),
-        ]),
-    ]);
-  }, [fabricate.StateKeys.Created, 'globalStats']);
 
 /**
  * ShareLink component.

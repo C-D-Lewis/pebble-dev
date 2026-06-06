@@ -9,7 +9,6 @@ import {
   Text,
   Separator,
   ShareLink,
-  GlobalStatsView,
   AppButton,
   AppLoader,
 } from './index.ts';
@@ -17,6 +16,7 @@ import { downloadChartImage, downloadHistoryCsv, getParam } from '../util.ts';
 import { fetchGlobalStats } from '../api.ts';
 import { StatsList } from './stats.ts';
 import { InfoChips } from './info.ts';
+import { GlobalStatsView } from './globalStats.ts';
 
 declare const fabricate: Fabricate<AppState>;
 
@@ -46,7 +46,7 @@ const AppCard = () => fabricate('Card')
  * @returns {FabricateComponent} Fabricate component.
  */
 export const LoginCard = () => AppCard()
-  .setStyles({ marginTop: '28px' })
+  .setStyles({ marginTop: '16px' })
   .setChildren([
     CardTitle()
       .setText('Welcome!'),
@@ -172,9 +172,8 @@ export const GlobalStatsCard = () => AppCard()
   .setStyles({ marginTop: '25px' })
   .setChildren([
     CardTitle().setText('Global Stats'),
-    Text().setText('These averages are derived from all Muninn users who upload their history. Over time, more users will increase data accuracy.'),
+    Text().setText('These averages are derived from all Muninn users who upload their history. Over time, more users should help increase data accuracy.'),
     Annotation().setText('Accuracy may vary if data issues are present such as long gaps, missing samples, large outliers etc.'),
-    Separator(),
     fabricate.conditional(
       (state) => state.globalStats.historyCount !== 0,
       GlobalStatsView,

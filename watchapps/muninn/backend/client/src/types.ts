@@ -56,4 +56,7 @@ export type AppState = {
 
   // Global API data
   globalStats: GetGlobalStatsResponse;
+
+  // buildKey items
+  [key: `expanded-${string}`]: boolean;
 };

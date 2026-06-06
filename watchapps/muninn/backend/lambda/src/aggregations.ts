@@ -30,6 +30,7 @@ const getGroupName = (name: string): string => {
     'pebble_black',
     'pebble_white',
     'pebble_red',
+    'pebble_blue',
   ];
 
   if (name.includes('pebble_2_duo')) return 'Pebble 2 Duo';
