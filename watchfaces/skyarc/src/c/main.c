@@ -11,6 +11,10 @@ static void init() {
   comm_init(256, 256);
   scalable_init();
 
+#ifdef TEST
+  light_enable(true);
+#endif
+
   main_window_push();
 }
 

@@ -5,7 +5,7 @@
 #pragma once
 
 // Disable before release!
-// #define TEST
+#define TEST
 
 #if defined(PBL_PLATFORM_APLITE) || defined(PBL_PLATFORM_BASALT) || defined(PBL_PLATFORM_CHALK) || defined(PBL_PLATFORM_FLINT)
   #define OUTER_RING_W 2

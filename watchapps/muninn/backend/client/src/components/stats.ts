@@ -68,7 +68,7 @@ export const StatsList = () => fabricate('Column')
       mtbc,
     } = stats;
 
-    // ROund these to one decimal place
+    // Round these to one decimal place
     const batteryDays = Math.floor(100 / allTimeRate);
     const lastWeekBatteryDays = Math.floor(100 / lastWeekRate);
 
@@ -77,9 +77,8 @@ export const StatsList = () => fabricate('Column')
     let compareDaysStr = '-';
     let compareRateStr = '-';
     if (modelStats) {
-      // TODO: Clean this up
-      // const diffDays = batteryDays - modelStats.avgBatteryLife;
-      const diffDays = batteryDays - modelStats.medianBatteryLife;
+      const diffDays = Math.round((batteryDays - modelStats.avgBatteryLife) * 10) / 10;
+      // const diffDays = batteryDays - modelStats.medianBatteryLife;
       let operator = diffDays >= 0 ? 'above' : 'below';
       compareDaysStr = `${Math.abs(diffDays)} ${operator} average for this model`;
 
