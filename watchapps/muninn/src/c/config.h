@@ -46,15 +46,16 @@
 // #define TEST_IS_NIGHT      true       //
 ///////////////////////////////////////////
 
-/////////// Feature Flags //////////
-// Not on Aplite:                 //
-#if !defined(PBL_PLATFORM_APLITE) //
-  #define FEATURE_ANIMATIONS true //
-#endif                            //
-// On every platform:             //
-#define FEATURE_SYNC true         //
-#define FEATURE_MANY_IMAGES true  //
-////////////////////////////////////
+/////////// Feature Flags /////////////
+// Not on Aplite:                    //
+#if !defined(PBL_PLATFORM_APLITE)    //
+  #define FEATURE_ANIMATIONS true    //
+  #define FEATURE_SPEECH_BUBBLE true //
+#endif                               //
+// On every platform:                //
+#define FEATURE_SYNC true            //
+#define FEATURE_MANY_IMAGES true     //
+///////////////////////////////////////
 
 // Layout values
 // MenuLayer single row height

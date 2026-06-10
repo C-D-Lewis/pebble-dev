@@ -87,10 +87,10 @@ static void test_data_generator() {
   // Test data scenarios - all at 80% battery
   //
   // 1 - Arbitrary scenario
-  // const int changes[NUM_SAMPLES] = {0, 2, 2, 2, 2, 2, 2, -1, -1, -1, -1, -1, -1, -1, -1, -1};
+  // const int changes[NUM_SAMPLES] = {2, 2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
   //
   // 2 - Should show 10 days at 8% per day
-  // const int changes[NUM_SAMPLES] = {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
+  const int changes[NUM_SAMPLES] = {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
   //
   // 3 - Should show 10 days at 7.4% (two other events are ignored)
   //     Note: includes the two special statuses
@@ -105,14 +105,14 @@ static void test_data_generator() {
   // const int changes[NUM_SAMPLES] = {2, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
   //     or: Should await 2 samples if charged and 'no change'
   // const int changes[NUM_SAMPLES] = {0, -10, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
-  //     or: Should await 1 sample
+  //     or: Should await 1 sample (assuming min. 2)
   // const int changes[NUM_SAMPLES] = {2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
   //
   // 6 - Should show 20 days at 4% when the majority of events are 'no change' (extreme battery life)
   // const int changes[NUM_SAMPLES] = {0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0};
   //
   // 7 - Big charge half way through
-  const int changes[NUM_SAMPLES] = {3, 0, 3, 3, 0, 3, 3, 3, -30, 3, 3, 3, 3, 3, 3, 3};
+  // const int changes[NUM_SAMPLES] = {3, 0, 3, 3, 0, 3, 3, 3, -30, 3, 3, 3, 3, 3, 3, 3};
   //
   // 8 - Should show graph with minimum points
   // const int changes[NUM_SAMPLES] = {3, 1, 2, 3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};

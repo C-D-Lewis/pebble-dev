@@ -70,8 +70,8 @@ typedef struct {
   char stat_last_week_rate[8]; // Last week avg discharge rate
   int stat_battery_life;       // Estimated battery life
   int stat_mtbc;               // Mean time between charges
-
   char upload_id[8];           // Upload ID issued by the API
+  bool missed_sample;          // Flag set if a sample was missed
 
   // Singleton, adding new fields OK, removing from middle IS OK
 } AppState;

@@ -54,7 +54,8 @@ static void draw_datetime(GContext *ctx, const GRect bounds, const Sample *s) {
 
   const int log_len = data_get_log_length();
   static char s_pos_buff[8];
-  snprintf(s_pos_buff, sizeof(s_pos_buff), "%d/%d", s_selection + 1, log_len);
+  const int display_pos = log_len - s_selection;
+  snprintf(s_pos_buff, sizeof(s_pos_buff), "%d/%d", display_pos, log_len);
   graphics_draw_text(
     ctx,
     s_pos_buff,
@@ -407,7 +408,7 @@ static void click_config_provider(void *context) {
 static void main_window_load(Window *window) {
   Layer *root_layer = window_get_root_layer(window);
 
-  s_header_layer = util_create_header_layer(PBL_IF_ROUND_ELSE("Graph", "Change over time"), 32);
+  s_header_layer = util_create_header_layer(PBL_IF_ROUND_ELSE("Graph", "Change over time"), 18);
   layer_add_child(root_layer, s_header_layer);
 
   s_canvas_layer = layer_create(GRect(0, 0, PS_DISP_W, PS_DISP_H));

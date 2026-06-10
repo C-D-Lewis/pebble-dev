@@ -13,6 +13,7 @@
 #include "windows/message_window.h"
 
 static void init() {
+  AppState *app_state = data_get_app_state();
   PersistData *persist_data = data_get_persist_data();
 
   data_init();
@@ -27,21 +28,20 @@ static void init() {
     return;
   }
   
-  const bool missed = wakeup_handle_missed();
-  const bool first_launch = !persist_data->seen_first_launch;
+
+  if (wakeup_handle_missed()) {
+    // Test data won't have valid wakeup ID
+#if !defined(USE_TEST_DATA)
+    app_state->missed_sample = true;
+#endif
+  }
 
   main_window_push();
 
   // In case an event comes when the app is open
   wakeup_service_subscribe(wakeup_handler);
 
-  if (missed) {
-    // Test data won't have valid wakeup ID
-#if !defined(USE_TEST_DATA)
-    message_window_push("Muninn missed a sample, but will continue.", true, false);
-#endif
-  }
-
+  const bool first_launch = !persist_data->seen_first_launch;
   if (first_launch) {
 // VERY LOW MEMORY
 #ifndef PBL_PLATFORM_APLITE

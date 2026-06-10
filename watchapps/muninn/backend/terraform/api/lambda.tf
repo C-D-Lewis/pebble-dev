@@ -24,7 +24,7 @@ resource "aws_lambda_function" "api_lambda" {
   runtime          = "nodejs24.x"
   source_code_hash = data.archive_file.lambda_zip.output_base64sha256
   memory_size      = 256
-  timeout          = 15
+  timeout          = 60
 }
 
 resource "null_resource" "cleanup_lambda_zip" {

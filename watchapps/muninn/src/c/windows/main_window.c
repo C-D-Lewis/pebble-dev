@@ -42,6 +42,11 @@ static bool s_is_enabled;
 static AppTimer *s_blink_timer;
 static bool s_is_blinking, s_anim_started, s_force_anim;
 #endif
+#ifdef FEATURE_SPEECH_BUBBLE
+static AppTimer *s_speech_timer;
+static bool s_bubble_visible = true;
+static char s_bubble_buff[64];
+#endif
 
 static void update_labels(int days) {
 #if defined(PBL_PLATFORM_GABBRO)
@@ -239,6 +244,29 @@ static void update_data() {
 
   // Next reading
   util_fmt_time(wakeup_ts, &s_reading_buff[0], sizeof(s_reading_buff));
+
+#ifdef FEATURE_SPEECH_BUBBLE
+  AppState *app_state = data_get_app_state();
+  const int log_length = data_get_valid_samples_count();
+  const int alert_level = persist_data->custom_alert_level;
+  const bool is_low = alert_level != AL_OFF && state.charge_percent <= alert_level;
+
+  if (!util_is_not_status(persist_data->last_sample_time)) {
+    snprintf(s_bubble_buff, sizeof(s_bubble_buff), "Need 1st reading...");
+  } else if (log_length < MIN_SAMPLES) {
+    const int diff = MIN_SAMPLES - log_length;
+    snprintf(s_bubble_buff, sizeof(s_bubble_buff), "Need %d sample%s...", diff, diff == 1 ? "" : "s");
+  } else if (app_state->missed_sample) {
+    snprintf(s_bubble_buff, sizeof(s_bubble_buff), "Missed last sample!");
+  } else if (is_low) {
+    snprintf(s_bubble_buff, sizeof(s_bubble_buff), "Battery below %d%%!", alert_level);
+  } else {
+    // Don't obstruct if nothing interesting to say
+    s_bubble_visible = false;
+  }
+
+  // Waited longer - "Skipped last sample"
+#endif
 }
 
 static void draw_text(GContext *ctx, char *ptr, int font_id, int x, int y) {
@@ -252,6 +280,44 @@ static void draw_text(GContext *ctx, char *ptr, int font_id, int x, int y) {
     NULL
   );
 }
+
+#ifdef FEATURE_SPEECH_BUBBLE
+static void draw_speech_bubble(GContext *ctx) {
+  const GRect bubble_rect = GRect(scl_x(10), scl_y(190), PS_DISP_W - scl_x(20), scl_y(150));
+  graphics_context_set_fill_color(ctx, GColorBlack);
+  graphics_fill_rect(ctx, bubble_rect, 3, GCornersAll);
+  graphics_context_set_fill_color(ctx, GColorWhite);
+  graphics_fill_rect(ctx, grect_inset(bubble_rect, GEdgeInsets(2)), 3, GCornersAll);
+
+  graphics_context_set_compositing_mode(ctx, GCompOpSet);
+  graphics_draw_bitmap_in_rect(
+    ctx,
+    bitmaps_get(RESOURCE_ID_BUBBLE_ARROW),
+    GRect(
+      scl_x(500) - (24 / 2),
+      bubble_rect.origin.y - 10,
+      24,
+      12
+    )
+  );
+
+  graphics_context_set_text_color(ctx, GColorBlack);
+  graphics_draw_text(
+    ctx,
+    s_bubble_buff,
+    scl_get_font(SFI_Medium),
+    GRect(
+      scl_x(10),
+      bubble_rect.origin.y - scl_y_pp({.o = 30, .e = 10}),
+      PS_DISP_W - scl_x(20),
+      100
+    ),
+    GTextOverflowModeTrailingEllipsis,
+    GTextAlignmentCenter,
+    NULL
+  );
+}
+#endif
 
 static void canvas_update_proc(Layer *layer, GContext *ctx) {
   graphics_context_set_antialiased(ctx, false);
@@ -446,6 +512,13 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   // Row labels
   draw_text(ctx, s_row_1_labels_buff, SFI_Small, 0, scl_y_pp({.o = 390, .e = 390}));
   draw_text(ctx, ROW_2_LABEL, SFI_Small, 0, scl_y_pp({.o = 680, .c = 665, .e = 660, .g = 665}));
+
+#ifdef FEATURE_SPEECH_BUBBLE
+  // Speech bubble over everything
+  if (s_bubble_visible) {
+    draw_speech_bubble(ctx);
+  }
+#endif
 }
 
 ////////////////////////////////////////////// Clicks //////////////////////////////////////////////
@@ -465,7 +538,7 @@ static void up_long_click_handler(ClickRecognizerRef recognizer, void *context) 
     // New user, tell them to wait
     if (data_get_log_length() == 0) {
       message_window_push(
-        "Data will begin to appear after a few samples have been taken.",
+        "Data will begin to appear after a few samples have been taken (~1 day).",
         false,
         false
       );
@@ -499,6 +572,13 @@ static void click_config_provider(void *context) {
   window_single_click_subscribe(BUTTON_ID_DOWN, down_click_handler);
 }
 
+#ifdef FEATURE_SPEECH_BUBBLE
+static void speech_disappear_handler(void *context) {
+  s_bubble_visible = false;
+  layer_mark_dirty(s_canvas_layer);
+}
+#endif
+
 ////////////////////////////////////////////// Window //////////////////////////////////////////////
 
 static void window_load(Window *window) {
@@ -522,6 +602,12 @@ static void window_load(Window *window) {
 
   update_data();
 
+#ifdef FEATURE_SPEECH_BUBBLE
+  if (s_is_enabled) {
+    s_speech_timer = app_timer_register(3000, speech_disappear_handler, NULL);
+  }
+#endif
+
   APP_LOG(APP_LOG_LEVEL_INFO, "wl %dB", heap_bytes_free());
 }
 
@@ -537,7 +623,7 @@ static void window_appear(Window *window) {
   if (!s_canvas_layer) return;
   
 #ifdef FEATURE_ANIMATIONS
-  // Only show data if returning to this window
+  // Only show data immediately if returning to this window
   if (s_anim_started) {
 #endif
     update_data();
@@ -572,6 +658,9 @@ void main_window_push() {
     s_blink_budget = 5;
 #ifdef FEATURE_ANIMATIONS
     s_force_anim = true;
+#endif
+#ifdef FEATURE_SPEECH_BUBBLE
+    s_bubble_visible = true;
 #endif
   }
 

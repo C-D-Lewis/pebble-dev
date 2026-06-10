@@ -115,6 +115,11 @@
           "file": "images/bird.png"
         },
         {
+          "type": "bitmap",
+          "name": "BUBBLE_ARROW",
+          "file": "images/bubble-arrow.png"
+        },
+        {
           "type": "font",
           "name": "GOTCHA_GOTHIC_30",
           "file": "fonts/Gotcha-Gothic.ttf"
