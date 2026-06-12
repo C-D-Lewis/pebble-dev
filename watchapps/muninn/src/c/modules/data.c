@@ -362,14 +362,14 @@ int data_calculate_avg_discharge_rate_x100(bool ignore_no_change) {
 
   // Use nearest-integer rounding to be conservative
   const int rate_100x = ((total_drops * SECONDS_PER_DAY * 100) + (total_time / 2)) / total_time;
-  if (rate_100x <= 300 && !ignore_no_change) {
+  if (rate_100x <= MIN_RATE_X100 && !ignore_no_change) {
     // <3% per day, count again, but this time ignore 'no change' time periods
     return data_calculate_avg_discharge_rate_x100(true);
   }
 
   // Ignore extremely low estimates and hence extremely high battery life over-estimates
   // This will improve after another full day of data
-  if (ignore_no_change && rate_100x <= 200) return 300;
+  if (ignore_no_change && rate_100x <= MIN_RATE_X100) return 300;
 
   return rate_100x;
 }

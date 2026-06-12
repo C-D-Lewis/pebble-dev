@@ -142,8 +142,7 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
   wakeup_schedule_next();
 
   // Should we advise battery is low?
-  const int alert_level = persist_data->custom_alert_level;
-  const bool is_low = alert_level != AL_OFF && last_charge_perc <= alert_level;
+  const bool is_low = util_is_battery_low(charge_percent);
   const bool ca_has_notified = persist_data->ca_has_notified;
 
   // If we have data, and it's lower, and we haven't notified

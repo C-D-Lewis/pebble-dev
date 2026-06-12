@@ -34,6 +34,8 @@
 #define MAX_SYNC_ITEMS 480
 // Max time since last sample before being ignored
 #define MAX_GAP_SECONDS (12 * SECONDS_PER_HOUR)
+// Minimum rate estimation before backup pass
+#define MIN_RATE_X100 200
 
 ///////////// Testing area ////////////////
 // #define USE_TEST_DATA      true       //

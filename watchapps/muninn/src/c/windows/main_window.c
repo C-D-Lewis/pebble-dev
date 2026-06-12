@@ -45,7 +45,7 @@ static bool s_is_blinking, s_anim_started, s_force_anim;
 #ifdef FEATURE_SPEECH_BUBBLE
 static AppTimer *s_speech_timer;
 static bool s_bubble_visible = true;
-static char s_bubble_buff[64];
+static char s_bubble_buff[24];
 #endif
 
 static void update_labels(int days) {
@@ -248,8 +248,7 @@ static void update_data() {
 #ifdef FEATURE_SPEECH_BUBBLE
   AppState *app_state = data_get_app_state();
   const int log_length = data_get_valid_samples_count();
-  const int alert_level = persist_data->custom_alert_level;
-  const bool is_low = alert_level != AL_OFF && state.charge_percent <= alert_level;
+  const bool is_low = util_is_battery_low(state.charge_percent);
 
   if (!util_is_not_status(persist_data->last_sample_time)) {
     snprintf(s_bubble_buff, sizeof(s_bubble_buff), "Need 1st reading...");
@@ -259,6 +258,7 @@ static void update_data() {
   } else if (app_state->missed_sample) {
     snprintf(s_bubble_buff, sizeof(s_bubble_buff), "Missed last sample!");
   } else if (is_low) {
+    const int alert_level = persist_data->custom_alert_level;
     snprintf(s_bubble_buff, sizeof(s_bubble_buff), "Battery below %d%%!", alert_level);
   } else {
     // Don't obstruct if nothing interesting to say
@@ -293,12 +293,7 @@ static void draw_speech_bubble(GContext *ctx) {
   graphics_draw_bitmap_in_rect(
     ctx,
     bitmaps_get(RESOURCE_ID_BUBBLE_ARROW),
-    GRect(
-      scl_x(500) - (24 / 2),
-      bubble_rect.origin.y - 10,
-      24,
-      12
-    )
+    GRect(scl_x(500) - (24 / 2), bubble_rect.origin.y - 10, 24, 12)
   );
 
   graphics_context_set_text_color(ctx, GColorBlack);

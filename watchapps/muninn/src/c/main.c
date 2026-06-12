@@ -28,15 +28,22 @@ static void init() {
     return;
   }
   
-
-  if (wakeup_handle_missed()) {
-    // Test data won't have valid wakeup ID
-#if !defined(USE_TEST_DATA)
+  const bool missed = wakeup_handle_missed();
+  if (missed) {
+    // Use speech bubble hint
+#if defined(FEATURE_SPEECH_BUBBLE) && !defined(USE_TEST_DATA)
     app_state->missed_sample = true;
 #endif
   }
 
   main_window_push();
+
+  // Show window if speech bubble not used, after main window
+#if !defined(FEATURE_SPEECH_BUBBLE) && !defined(USE_TEST_DATA)
+  if (missed) {
+    message_window_push("Muninn missed a sample, but will continue.", true, false);
+  }
+#endif
 
   // In case an event comes when the app is open
   wakeup_service_subscribe(wakeup_handler);

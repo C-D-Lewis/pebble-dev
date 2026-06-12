@@ -291,7 +291,7 @@ void util_draw_skyline(GContext *ctx, bool is_nighttime) {
       GPoint(PS_DISP_W - ACTION_BAR_W - 1, skyline_y)
     );
   } else {
-#ifdef FEATURE_MANY_IMAGES
+#ifndef PBL_PLATFORM_APLITE
     // Clouds
     graphics_draw_bitmap_in_rect(
       ctx,
@@ -357,6 +357,12 @@ Layer* util_create_header_layer(char *title, int title_size) {
   layer_set_update_proc(l, underline_update_proc);
   snprintf((char*)layer_get_data(l), title_size, "%s", title);
   return l;
+}
+
+bool util_is_battery_low(int charge_percent) {
+  PersistData *persist_data = data_get_persist_data();
+  const int alert_level = persist_data->custom_alert_level;
+  return alert_level != AL_OFF && charge_percent <= alert_level;
 }
 
 ////////////////////////////////////////// Animation Utils /////////////////////////////////////////
