@@ -283,7 +283,12 @@ static void draw_text(GContext *ctx, char *ptr, int font_id, int x, int y) {
 
 #ifdef FEATURE_SPEECH_BUBBLE
 static void draw_speech_bubble(GContext *ctx) {
-  const GRect bubble_rect = GRect(scl_x(10), scl_y(190), PS_DISP_W - scl_x(20), scl_y(150));
+  const GRect bubble_rect = GRect(
+    scl_x_pp({.o = 10, .c = 60, .g = 70}),
+    scl_y(190),
+    PS_DISP_W - scl_x_pp({.o = 20, .c = 120, .g = 140}),
+    scl_y(150)
+  );
   graphics_context_set_fill_color(ctx, GColorBlack);
   graphics_fill_rect(ctx, bubble_rect, 3, GCornersAll);
   graphics_context_set_fill_color(ctx, GColorWhite);
@@ -302,9 +307,9 @@ static void draw_speech_bubble(GContext *ctx) {
     s_bubble_buff,
     scl_get_font(SFI_Medium),
     GRect(
-      scl_x(10),
-      bubble_rect.origin.y - scl_y_pp({.o = 30, .e = 10}),
-      PS_DISP_W - scl_x(20),
+      bubble_rect.origin.x,
+      bubble_rect.origin.y - scl_y_pp({.o = 30, .e = 10, .g = -5}),
+      bubble_rect.size.w,
       100
     ),
     GTextOverflowModeTrailingEllipsis,

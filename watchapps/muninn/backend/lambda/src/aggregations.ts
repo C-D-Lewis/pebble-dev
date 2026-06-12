@@ -214,6 +214,7 @@ export const updateAggregations = async (docClient: DynamoDBDocumentClient) => {
       allItems.push(...res.Items);
     }
     lastEvaluatedKey = res.LastEvaluatedKey;
+    console.log({ fetched: allItems.length, lastEvaluatedKey });
   } while (lastEvaluatedKey);
   console.log(`Fetched ${allItems.length} records for aggregation`);
 

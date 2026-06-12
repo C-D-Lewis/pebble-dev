@@ -1,7 +1,6 @@
 import { Fabricate, FabricateComponent } from 'fabricate.js';
 import { AppState, GlobalStatItem } from '../types.ts';
 import { Annotation, ImageButton } from './index.ts';
-import Theme from '../theme.ts';
 
 declare const fabricate: Fabricate<AppState>;
 
@@ -21,6 +20,7 @@ const StatView = ({ label, value }: { label: string, value: string }) => fabrica
         fontSize: '1.2rem',
         textAlign: 'center',
         marginBottom: '0px',
+        fontWeight: 'bold',
       }))
       .setText(value),
     fabricate('Text')
@@ -82,13 +82,14 @@ const GlobalStatsList = (
           });
 
         const statsRow = fabricate('Row')
-          .setStyles({
+          .setStyles(({ palette }) => ({
             justifyContent: 'space-around',
-            borderTop: `1px solid ${Theme.palette.grey(4)}`,
+            borderTop: `1px solid ${palette.grey(4)}`,
             transition: '0.3s',
             height: '0px',
             overflow: 'hidden',
-          })
+            backgroundColor: palette.grey(4),
+          }))
           .setChildren([
             StatView({ label: 'Users', value: String(count) }),
             StatView({ label: 'Avg. Life', value: `${avgBatteryLife} days` }),
