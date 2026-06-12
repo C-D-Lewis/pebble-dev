@@ -7,7 +7,6 @@ with battery wisdom._
   <tr>
     <td><img src="screenshots/emery.png" /></td>
     <td><img src="screenshots/emery-graph.png" /></td>
-    <td><img src="screenshots/emery-log.png" /></td>
     <td><img src="screenshots/emery-stats.png" /></td>
   </tr>
 </table>
