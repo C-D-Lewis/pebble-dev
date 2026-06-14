@@ -121,7 +121,7 @@ static void bg_update_proc(Layer *layer, GContext *ctx) {
             graphics_context_set_stroke_color(ctx, notch_color);
           } else {
             // Empty segment
-            graphics_context_set_stroke_color(ctx, bg_color);
+            graphics_context_set_stroke_color(ctx, PBL_IF_COLOR_ELSE(GColorDarkGray, GColorBlack));
           }
         } else {
           // No battery indicator, show all
