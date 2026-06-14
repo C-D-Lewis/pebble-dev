@@ -12,6 +12,8 @@ This is the backend to Muninn's web reporting feature. Components are:
 > The sharing of watch charge history samples is voluntary and Muninn can
 > provide 90% of its value without ever using this feature.
 
+![](../assets/MuninnBackend.drawio.png)
+
 ## Overview
 
 Data is send to the API when the user selects the upload option in the webapp
