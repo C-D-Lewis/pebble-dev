@@ -40,9 +40,14 @@ Important notes:
 
 The extended sample history saved in JS-side storage can be uploaded to the
 backend, which assigns a 6-character short code for each watch token, and allows
-viewing of all the data with charts and longer-term statistics. It's built with
-TypeScript, Vite, and deployed with Terraform into AWS. See
-[backend](./backend/) for more information.
+viewing of all the data with charts and longer-term statistics. Each day,
+aggregations build a global picture of typical battery life across models and
+usage patterns.
+
+It's built with TypeScript, Vite, Node.js, and deployed with Terraform into AWS.
+See [backend](./backend/) for more information.
+
+![](assets/MuninnBackend.drawio.png)
 
 ## Bugs
 
