@@ -3,8 +3,8 @@
 static PersistData s_persist_data;
 
 void data_init() {
-  // Test - always start fresh
-  persist_delete(SK_PersistData);
+  // TEST - always start fresh
+  // persist_delete(SK_PersistData);
 
   // Set defaults
   s_persist_data.day_bg_color = GColorWhite;

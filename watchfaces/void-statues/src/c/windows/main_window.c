@@ -13,6 +13,16 @@ typedef struct {
 static SimpleTime s_current_time, s_anim_time;
 static bool s_animating = true;
 
+static bool get_is_day() {
+#ifdef TEST
+  return T_IS_DAY;
+#else
+  time_t t = time(NULL);
+  struct tm *tm_now = localtime(&t);
+  return tm_now->tm_hour >= 6 && tm_now->tm_hour < 18;
+#endif
+}
+
 /*********************************** Drawing **********************************/
 
 static void canvas_layer_update_proc(Layer *layer, GContext *ctx) {
@@ -88,11 +98,7 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
   s_current_time.minute_units = tick_time->tm_min % 10;
 
   // Colors update for day and night
-#ifdef TEST
-  const bool is_day = T_IS_DAY;
-#else
-  const bool is_day = tick_time->tm_hour >= 6 && tick_time->tm_hour < 18;
-#endif
+  const bool is_day = get_is_day();
   if (is_day) {
     drawing_set_colors(
       persist_data->day_block_color,
@@ -148,7 +154,7 @@ void main_window_push() {
   s_current_time.minute_tens = tm_now->tm_min / 10;
   s_current_time.minute_units = tm_now->tm_min % 10;
 
-  const bool is_day = tm_now->tm_hour >= 6 && tm_now->tm_hour < 18;
+  const bool is_day = get_is_day();
   drawing_set_colors(
     is_day ? persist_data->day_block_color : persist_data->night_block_color,
     is_day ? persist_data->day_shadow_color : persist_data->night_shadow_color,
@@ -184,10 +190,7 @@ void main_window_push() {
 void main_window_reload() {
   PersistData *persist_data = data_get_persist_data();
 
-  time_t t = time(NULL);
-  struct tm *tm_now = localtime(&t);
-  const bool is_day = tm_now->tm_hour >= 6 && tm_now->tm_hour < 18;
-
+  const bool is_day = get_is_day();
   drawing_set_colors(
     is_day ? persist_data->day_block_color : persist_data->night_block_color,
     is_day ? persist_data->day_shadow_color : persist_data->night_shadow_color,
