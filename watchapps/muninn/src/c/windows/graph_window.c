@@ -81,11 +81,11 @@ static void draw_log_detail(GContext *ctx, const GRect bounds, const Sample *s) 
   }
 #else
   if (s->result == STATUS_NO_CHANGE) {
-    snprintf(s_res_buff, sizeof(s_res_buff), "No change in %d hrs", hours);
+    snprintf(s_res_buff, sizeof(s_res_buff), "No change in %dh", hours);
   } else if (s->result == STATUS_CHARGED) {
-    snprintf(s_res_buff, sizeof(s_res_buff), "Charged %d%% in %d hrs", -(s->charge_diff), hours);
+    snprintf(s_res_buff, sizeof(s_res_buff), "Charged %d%% in %dh", -(s->charge_diff), hours);
   } else {
-    snprintf(s_res_buff, sizeof(s_res_buff), "Drained %d%% in %d hrs", s->charge_diff, hours);
+    snprintf(s_res_buff, sizeof(s_res_buff), "Drained %d%% in %dh", s->charge_diff, hours);
   }
 #endif
 

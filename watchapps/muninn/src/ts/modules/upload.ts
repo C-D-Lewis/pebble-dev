@@ -81,11 +81,12 @@ export const uploadHistory = async () => {
     return;
   }
 
+  const now = new Date().getTime();
   const stats = {
     count: history.length,
     totalDays: Math.floor(history.length / 4),
     allTimeRate: calculateDischargeRate(history),
-    lastWeekRate: calculateLastWeekRate(history),
+    lastWeekRate: calculateLastWeekRate(history, now),
     numCharges: calculateNumCharges(history),
     mtbc: calculateMeanTimeBetweenCharges(history),
   };

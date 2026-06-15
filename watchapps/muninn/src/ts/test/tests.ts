@@ -8,6 +8,7 @@ import {
 import { MULTI_CHARGE_SAMPLE_DATA, SAMPLE_DATA } from './sample-data';
 import {
   calculateDischargeRate,
+  calculateEstimatedBatteryLife,
   calculateLastWeekRate,
   calculateMeanTimeBetweenCharges,
   calculateNumCharges,
@@ -23,7 +24,7 @@ const test = (label: string, cb: Function) => {
   const [result, expected] = cb();
   const ok = result === expected;
   if (ok) {
-    if (TEST_LOG_OK_TESTS) console.log(`[OK] "${label}"`);
+    if (TEST_LOG_OK_TESTS) console.log(`[OK] "${label}" ${expected} == ${result}`);
   } else {
     console.log(`[FAIL] "${label}": ${JSON.stringify(result)} != ${JSON.stringify(expected)}`);
   }
@@ -191,8 +192,8 @@ const testCalculateLastWeekRate = () => {
       // Update timestamps using test time, not ideal but avoids mock Date.now()
       const timestamp = now - (i * 6 * SECONDS_PER_HOUR);
       return { ...p, timestamp };
-    })
-    return [calculateLastWeekRate(data), 7];
+    });
+    return [calculateLastWeekRate(data, now), 5.7];
   });
 
   test('calculateLastWeekRate > correct with not enough samples', () => {
@@ -225,14 +226,21 @@ const testCalculateLastWeekRate = () => {
       rate: 5,
       result: 4,
     }];
-
-    return [calculateLastWeekRate(history), STATUS_EMPTY];
+    const start = new Date(history[0].timestamp * 1000).getTime();
+    return [calculateLastWeekRate(history, start), STATUS_EMPTY];
   });
 };
 
 const testCalculateMeanTimeBetweenCharges = () => {
   test('calculateMeanTimeBetweenCharges > correct with example data', () => {
     return [calculateMeanTimeBetweenCharges(MULTI_CHARGE_SAMPLE_DATA), 4];
+  });
+};
+
+const testCalculateEstimatedBatteryLife = () => {
+  test('calculateEstimatedBatteryLife > correct with example data', () => {
+    const start = new Date(SAMPLE_DATA[0].timestamp * 1000).getTime();
+    return [calculateEstimatedBatteryLife(SAMPLE_DATA, start), 14];
   });
 };
 
@@ -243,5 +251,6 @@ export const testStats = () => {
   testCalculateDischargeRate();
   testCalculateLastWeekRate();
   testCalculateMeanTimeBetweenCharges();
+  testCalculateEstimatedBatteryLife();
   console.log(`[Completed ${numTests} JS tests]`);
 };

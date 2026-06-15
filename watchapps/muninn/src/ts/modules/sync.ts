@@ -22,15 +22,15 @@ export const handleGetSyncInfo = async () => {
     lastTs = history[0].timestamp;
   }
 
+  const now = new Date().getTime();
   const uploadId = await ensureUploadId();
-
   const res = {
     SYNC_TIMESTAMP: lastTs,
     SYNC_COUNT: history.length,
     STAT_TOTAL_DAYS: Math.floor(history.length / 4),
     STAT_ALL_TIME_RATE: String(calculateDischargeRate(history)),
-    STAT_LAST_WEEK_RATE: String(calculateLastWeekRate(history)),
-    STAT_BATTERY_LIFE: calculateEstimatedBatteryLife(history),
+    STAT_LAST_WEEK_RATE: String(calculateLastWeekRate(history, now)),
+    STAT_BATTERY_LIFE: calculateEstimatedBatteryLife(history, now),
     STAT_MTBC: calculateMeanTimeBetweenCharges(history),
     UPLOAD_ID: uploadId,
   };

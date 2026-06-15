@@ -144,9 +144,10 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
   // Should we advise battery is low?
   const bool is_low = util_is_battery_low(charge_percent);
   const bool ca_has_notified = persist_data->ca_has_notified;
+  const bool min_samples = data_get_valid_samples_count() > MIN_SAMPLES;
 
   // If we have data, and it's lower, and we haven't notified
-  if (data_get_valid_samples_count() > MIN_SAMPLES && is_low && !ca_has_notified) {
+  if (min_samples && is_low && !ca_has_notified) {
     persist_data->ca_has_notified = true;
 
     if (!quiet_time_is_active()) vibes_double_pulse();
@@ -156,7 +157,7 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
   if (!is_low && ca_has_notified) persist_data->ca_has_notified = false;
 
   // Rate is unusually high
-  if (data_get_rate_is_elevated() && persist_data->elevated_rate_alert) {
+  if (min_samples && data_get_rate_is_elevated() && persist_data->elevated_rate_alert) {
     if (!quiet_time_is_active()) vibes_double_pulse();
     message_window_push("Muninn advises the battery is draining faster than usual.", true, false);
     return;

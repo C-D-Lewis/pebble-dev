@@ -37,16 +37,15 @@ export const calculateDischargeRate = (history: HistoryItem[]): number => {
 /**
  * Calculate the average discharge rate for the last week only.
  */
-export const calculateLastWeekRate = (history: HistoryItem[]): number => {
+export const calculateLastWeekRate = (history: HistoryItem[], start: number): number => {
   // Assumes 4 samples per day, we need a whole week's worth to start
   if (history.length < 28) return STATUS_EMPTY;
 
   // Use a subset of items for the last week only
-  const now = new Date().getTime();
   const subset = history.filter((p) => {
     const itemDate = new Date(p.timestamp * 1000).getTime();
-    const diffD = (now - itemDate) / (SECONDS_PER_DAY * 1000);
-    // console.log({ itemDate, diffD, now });
+    const diffD = (start - itemDate) / (SECONDS_PER_DAY * 1000);
+    // console.log({ itemDate, diffD, start });
     return diffD <= 7;
   });
 
@@ -107,10 +106,11 @@ export const calculateMeanTimeBetweenCharges = (history: HistoryItem[]): number 
 /**
  * Calculate the days using floating point accuracy.
  */
-export const calculateEstimatedBatteryLife = (history: HistoryItem[]): number => {
+export const calculateEstimatedBatteryLife = (history: HistoryItem[], start: number): number => {
   // Could use weekly rate but it takes 7 days to populate
-  const rateWDecimal = calculateLastWeekRate(history);
+  const rateWDecimal = calculateLastWeekRate(history, start);
   if (rateWDecimal <= 0) return STATUS_EMPTY;
 
-  return Math.floor(100 / rateWDecimal);
+  // Round the rate to be slightly more conservative
+  return Math.floor(100 / Math.round(rateWDecimal));
 };
