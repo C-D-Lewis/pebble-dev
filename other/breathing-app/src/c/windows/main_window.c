@@ -19,7 +19,7 @@ static void schedule_next_wakeup() {
   time_t next_wakeup = mktime(tick_time);
   int id = wakeup_schedule(next_wakeup, 0, true);
 
-  if (id < 0) {
+  if (id < 0 && s_text_layer != NULL) {
     text_layer_set_text(s_text_layer, "Failed to schedule wakeup");
   }
 }
@@ -76,8 +76,17 @@ void main_window_push() {
     window_set_click_config_provider(s_window, click_config_provider);
   }
 
-  window_stack_push(s_window, true);
-
-  vibes_long_pulse();
+  // Always schedule
   schedule_next_wakeup();  
+
+  // Only wake between 9AM and 11PM
+  time_t now = time(NULL);
+  struct tm *tick_time = localtime(&now);
+  if (tick_time->tm_hour < 9 || tick_time->tm_hour >= 22) {
+    window_stack_pop_all(true);
+    return;
+  }
+
+  window_stack_push(s_window, true);
+  vibes_long_pulse();
 }
