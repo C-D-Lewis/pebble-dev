@@ -396,14 +396,39 @@ int data_calculate_days_remaining(bool tenx) {
 }
 
 bool data_get_rate_is_elevated() {
-  // Return true if the most recent value is much higher than usual
   const int avg = data_calculate_avg_discharge_rate_x100(false) / 100;
-  const int last = s_samples[0].result;
+  if (!util_is_not_status(avg)) return false;
 
-  // Last value wasn't a significant one of discharge
-  if (!util_is_not_status(avg) || !util_is_not_status(last)) return false;
+  // Minimum number of samples to compare against - a decent amount
+  if (data_get_valid_samples_count() < MIN_SAMPLES_FOR_GRAPH) return false;
 
-  return last >= avg * EVEVATED_RATE_MULT;
+  // Instead of comparing to just the last value (could be 10% on older watches)
+  // Calculate the most recent 24h average and use that
+  int tfh_drops = 0;
+  int tfh_time = 0;
+  for (int i = 0; i < NUM_SAMPLES; i++) {
+    Sample *s = &s_samples[i];
+
+    // End of log
+    if (s->result == STATUS_EMPTY) break;
+    // Ignore charging samples
+    if (s->result == STATUS_CHARGED) continue;
+
+    // Count discharge and no-change samples
+    tfh_time += s->time_diff;
+    if (s->charge_diff > 0) {
+      tfh_drops += s->charge_diff;
+    }
+
+    // Stop when we reach 24h of samples that dropped
+    if (tfh_time >= SECONDS_PER_DAY) break;
+  }
+
+  // Ensure we have at least 12h of data, and at least some drain happened
+  if (tfh_time < (SECONDS_PER_DAY / 2) || tfh_drops == 0) return false;
+
+  const int tfh_rate = (tfh_drops * SECONDS_PER_DAY) / tfh_time;
+  return tfh_rate >= avg * ELEVATED_RATE_MULT;
 }
 
 void data_cycle_custom_alert_level() {

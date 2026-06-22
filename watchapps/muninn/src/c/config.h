@@ -27,7 +27,7 @@
 // Maximum number of extra minutes if a collision
 #define WAKEUP_WINDOW_M 10
 // Multipler for elevated rate alarm
-#define EVEVATED_RATE_MULT 3
+#define ELEVATED_RATE_MULT 2
 // Minimum negative charge_diff to count as charging
 #define MIN_CHARGE_AMOUNT 10
 // Maximum synced items - 120 days / 4 months (must match constants.ts)
