@@ -36,15 +36,3 @@ uint32_t util_get_mascot_res_id(bool is_enabled, bool is_night);
 Layer* util_create_header_layer(char *title, int title_length);
 
 bool util_is_battery_low(int charge_percent);
-
-#ifdef FEATURE_ANIMATIONS
-void util_animate(int duration, int delay, AnimationImplementation *implementation, bool handlers);
-
-int util_anim_percentage(AnimationProgress dist_normalized, int max);
-
-void util_stop_animation();
-
-bool util_is_animating();
-
-void util_stop_animation();
-#endif

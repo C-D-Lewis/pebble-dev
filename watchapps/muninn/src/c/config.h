@@ -51,7 +51,6 @@
 /////////// Feature Flags /////////////
 // Not on Aplite:                    //
 #if !defined(PBL_PLATFORM_APLITE)    //
-  #define FEATURE_ANIMATIONS true    //
   #define FEATURE_SPEECH_BUBBLE true //
 #endif                               //
 // On every platform:                //

@@ -13,7 +13,6 @@
 #include "windows/message_window.h"
 
 static void init() {
-  AppState *app_state = data_get_app_state();
   PersistData *persist_data = data_get_persist_data();
 
   data_init();
@@ -32,6 +31,7 @@ static void init() {
   if (missed) {
     // Use speech bubble hint
 #if defined(FEATURE_SPEECH_BUBBLE) && !defined(USE_TEST_DATA)
+    AppState *app_state = data_get_app_state();
     app_state->missed_sample = true;
 #endif
   }

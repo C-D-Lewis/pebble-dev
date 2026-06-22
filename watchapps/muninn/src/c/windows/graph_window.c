@@ -21,19 +21,6 @@ static Window *s_window;
 static Layer *s_canvas_layer, *s_header_layer;
 
 static int s_selection = 0;
-#ifdef FEATURE_ANIMATIONS
-static int s_anim_count = 0;
-#endif
-
-//////////////////////////////////////////// Animations ////////////////////////////////////////////
-
-#ifdef FEATURE_ANIMATIONS
-static void anim_update(Animation *anim, AnimationProgress dist_normalized) {
-  s_anim_count = util_anim_percentage(dist_normalized, data_get_log_length());
-
-  layer_mark_dirty(s_canvas_layer);
-}
-#endif
 
 ////////////////////////////////////////////// Drawing /////////////////////////////////////////////
 
@@ -170,17 +157,12 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   graphics_context_set_fill_color(ctx, GColorBlack);
   graphics_context_set_text_color(ctx, GColorBlack);
 
-  const int log_len = data_get_log_length();
-#ifdef FEATURE_ANIMATIONS
-  int count = util_is_animating() ? s_anim_count : log_len;
-#else
-  int count = log_len;
-#endif
-  if (count == 0) count = 1;
+  int log_len = data_get_log_length();
+  if (log_len == 0) log_len = 1;
 
   // Find Y ranges, rounded to nearest 10
   int low_v = 100, high_v = 0;
-  for (int i = 0; i < count; i++) {
+  for (int i = 0; i < log_len; i++) {
     const Sample *vs = data_get_sample(i);
     if (!vs) break; // No data yet, but we still want to render the skeleton
     if (vs->charge_perc < low_v) {
@@ -197,12 +179,12 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   if (!graph_is_available()) {
     low_v = 50;
     high_v = 80;
-    count = NUM_SAMPLES;
+    log_len = NUM_SAMPLES;
   }
 
   // Find total time and so the gap between intervals
   const Sample *newest_s = data_get_sample(0);
-  const Sample *oldest_s = data_get_sample(count - 1);
+  const Sample *oldest_s = data_get_sample(log_len - 1);
   long total_time = (newest_s && oldest_s)
     ? (newest_s->timestamp - oldest_s->timestamp)
     : SECONDS_PER_DAY;
@@ -259,12 +241,12 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   }
 
   const int box_w = scl_x_pp({.o = 210, .c = 170, .g = 150});
-  const bool flip = count - s_selection < (count / 2);
+  const bool flip = log_len - s_selection < (log_len / 2);
   int prev_x = -1, prev_y = -1;
 
   // Draw points from oldest to newest
-  for (int i = 0; i < count; i++) {
-    const int idx = count - i - 1;
+  for (int i = 0; i < log_len; i++) {
+    const int idx = log_len - i - 1;
     const Sample *s = data_get_sample(idx);
     if (!s || !util_is_not_status(s->charge_perc)) continue;
 
@@ -312,7 +294,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     graphics_context_set_stroke_width(ctx, 1);
     graphics_context_set_stroke_color(ctx, GColorBlack);
 
-    if (idx + 1 <= count) {
+    if (idx + 1 <= log_len) {
       // The next oldest sample is idx + 1
       const Sample *prev_s = data_get_sample(idx + 1);
       if (!prev_s) break;
@@ -388,8 +370,8 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
 }
 
 static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
-  const int count = data_get_log_length();
-  if (s_selection < count - 1) s_selection++;
+  const int log_len = data_get_log_length();
+  if (s_selection < log_len - 1) s_selection++;
 
   layer_mark_dirty(s_canvas_layer);
 }
@@ -424,29 +406,15 @@ static void window_unload(Window *window) {
   s_window = NULL;
 }
 
-static void window_disappear(Window *window) {
-#ifdef FEATURE_ANIMATIONS
-  util_stop_animation();
-#endif
-}
-
 void graph_window_push() {
   if (!s_window) {
     s_window = window_create();
     window_set_click_config_provider(s_window, click_config_provider);
     window_set_window_handlers(s_window, (WindowHandlers) {
       .load = main_window_load,
-      .unload = window_unload,
-      .disappear = window_disappear
+      .unload = window_unload
     });
   }
 
   window_stack_push(s_window, true);
-
-#ifdef FEATURE_ANIMATIONS
-  if (graph_is_available()) {
-    static AnimationImplementation anim_implementation = { .update = anim_update };
-    util_animate(500, 0, &anim_implementation, true);
-  }
-#endif
 }

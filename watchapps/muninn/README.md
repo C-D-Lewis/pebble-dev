@@ -15,6 +15,8 @@ with battery wisdom._
 
 Muninn is an extremely lightweight battery tracking and prediction app. It uses the Wakeup API (every 6 hours) instead of the Background Worker to monitor trends and provide insight without negatively affecting battery life, using a moving average of readings over time to estimate days left, rate of discharge, next charge date, and more!
 
+Note: the Settings page is used for web stats, available after a few days of samples have been collected.
+
 Features:
 - Negligible battery impact
 - Days remaining and drain rate estimation

@@ -36,12 +36,8 @@ static char s_battery_buff[8];
 static char s_nc_buff[16];
 static char s_reading_buff[8];
 static char s_row_1_labels_buff[40];
-static int s_blink_budget, s_days_remaining, s_rate, s_anim_days, s_anim_rate;
+static int s_days_remaining, s_rate;
 static bool s_is_enabled;
-#ifdef FEATURE_ANIMATIONS
-static AppTimer *s_blink_timer;
-static bool s_is_blinking, s_anim_started, s_force_anim;
-#endif
 #ifdef FEATURE_SPEECH_BUBBLE
 static AppTimer *s_speech_timer;
 static bool s_bubble_visible = true;
@@ -61,20 +57,9 @@ static void update_labels(int days) {
   snprintf(s_row_1_labels_buff, sizeof(s_row_1_labels_buff), template, days == 1 ? " " : "s");
 }
 
-//////////////////////////////////////////// Animations ////////////////////////////////////////////
-
-static void update_anim_text() {
-#ifdef FEATURE_ANIMATIONS 
-  const bool animating = util_is_animating() || s_force_anim;
-#else
-  const bool animating = false;
-#endif
-  const int days = animating ? s_anim_days : s_days_remaining;
-  const int rate = animating ? s_anim_rate : s_rate;
-
+static void update_text() {
   // Not enough data yet
-  // If s_force_anim, uninitialized s_rate would show '0' (FIXME: declutter initial animation frame logic)
-  if (!util_is_not_status(days) || !util_is_not_status(rate) || rate == 0) {
+  if (!util_is_not_status(s_days_remaining) || !util_is_not_status(s_rate)) {
     snprintf(s_remaining_buff, sizeof(s_remaining_buff), "--");
     snprintf(s_rate_buff, sizeof(s_rate_buff), "--");
     return;
@@ -83,77 +68,21 @@ static void update_anim_text() {
   // Separate tens and units for decimal point display
   const int days_10x = data_calculate_days_remaining(true);
   int tens = days_10x / 10;
-  if (animating || tens >= 10) {
-    snprintf(s_remaining_buff, sizeof(s_remaining_buff), "%d", days);
+  if (tens >= 10) {
+    snprintf(s_remaining_buff, sizeof(s_remaining_buff), "%d", s_days_remaining);
   } else {
-    // Show with more precision if not animating and less than 10 days remaining
+    // Show with more precision if less than 10 days remaining
     snprintf(s_remaining_buff, sizeof(s_remaining_buff), "%d.%d", tens, days_10x % 10);
   }
 
   const int rate_100x = data_calculate_avg_discharge_rate_x100(false);
   tens = rate_100x / 100;
-  if (animating || tens >= 10) {
-    snprintf(s_rate_buff, sizeof(s_rate_buff), "%d", rate);
+  if (tens >= 10) {
+    snprintf(s_rate_buff, sizeof(s_rate_buff), "%d", s_rate);
   } else {
     snprintf(s_rate_buff, sizeof(s_rate_buff), "%d.%d", tens, (rate_100x % 100) / 10);
   }
 }
-
-#ifdef FEATURE_ANIMATIONS
-static void anim_update(Animation *anim, AnimationProgress dist_normalized) {
-  s_anim_started = true;
-  s_force_anim = false;
-  s_anim_days = util_anim_percentage(dist_normalized, s_days_remaining);
-  s_anim_rate = util_anim_percentage(dist_normalized, s_rate);
-
-  update_anim_text();
-  layer_mark_dirty(s_canvas_layer);
-}
-
-static void anim_teardown(Animation *anim) {
-  update_anim_text();
-  layer_mark_dirty(s_canvas_layer);
-}
-
-///////////////////////////////////////////// Blinking /////////////////////////////////////////////
-
-static void schedule_blink();
-
-static void unblink_handler(void *context) {
-  s_is_blinking = false;
-  layer_mark_dirty(s_canvas_layer);
-
-  schedule_blink();
-}
-
-static void blink_handler(void *context) {
-  s_is_blinking = true;
-  layer_mark_dirty(s_canvas_layer);
-
-  s_blink_timer = app_timer_register(500, unblink_handler, NULL);
-}
-
-static void schedule_blink() {
-  // Only blink a few times in case app is left open
-  if (s_blink_budget == 0) {
-    s_blink_timer = NULL;
-    return;
-  }
-
-  s_blink_budget--;
-  s_blink_timer = app_timer_register(700 + (rand() % 3000), blink_handler, NULL);
-}
-
-static void cancel_blink() {
-  if (s_blink_timer) {
-    app_timer_cancel(s_blink_timer);
-    s_blink_timer = NULL;
-  }
-
-  s_is_blinking = false;
-  layer_mark_dirty(s_canvas_layer);
-}
-#endif
 
 ///////////////////////////////////////////// Handlers /////////////////////////////////////////////
 
@@ -168,10 +97,6 @@ static void update_data() {
   if (wakeup_id_set && !found) {
     data_set_error("Scheduled wakeup was not found");
   }
-
-#ifdef FEATURE_ANIMATIONS
-  cancel_blink();
-#endif
 
   // Battery now
   BatteryChargeState state = battery_state_service_peek();
@@ -194,15 +119,11 @@ static void update_data() {
     snprintf(s_nc_buff, sizeof(s_nc_buff), "--");
     return;
   }
-  
-#ifdef FEATURE_ANIMATIONS
-  schedule_blink();
-#endif
 
   // Days remaining
   s_days_remaining = data_calculate_days_remaining(false);
   if (util_is_not_status(s_days_remaining)) {
-    update_anim_text();
+    update_text();
   } else {
     snprintf(s_remaining_buff, sizeof(s_remaining_buff), "--");
   }
@@ -212,7 +133,7 @@ static void update_data() {
   // Rate per day
   s_rate = data_calculate_avg_discharge_rate_x100(false) / 100;
   if (util_is_not_status(s_rate)) {
-    update_anim_text();
+    update_text();
   } else {
     snprintf(s_rate_buff, sizeof(s_rate_buff), "--");
   }
@@ -349,14 +270,6 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
       MASCOT_SIZE
     )
   );
-
-#ifdef FEATURE_ANIMATIONS
-  // Blink Muninn's eye
-  if (s_is_blinking) {
-    graphics_context_set_fill_color(ctx, is_night ? GColorWhite : GColorBlack);
-    graphics_fill_rect(ctx, EYE_RECT, 0, GCornerNone);
-  }
-#endif
 
   // Bitmaps
   BatteryChargeState state = battery_state_service_peek();
@@ -528,11 +441,6 @@ static void up_long_click_handler(ClickRecognizerRef recognizer, void *context) 
 
   const bool should_enable = !util_is_not_status(persist_data->wakeup_id);
   if (should_enable) {
-    s_blink_budget = 5;
-
-#ifdef FEATURE_ANIMATIONS
-    schedule_blink();
-#endif
     wakeup_schedule_next();
 
     // New user, tell them to wait
@@ -553,17 +461,11 @@ static void up_long_click_handler(ClickRecognizerRef recognizer, void *context) 
 }
 
 static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
-#ifdef FEATURE_ANIMATIONS
-  if (!util_is_animating())
-#endif
-    menu_window_push();
+  menu_window_push();
 }
 
 static void down_click_handler(ClickRecognizerRef recognizer, void *context) {
-#ifdef FEATURE_ANIMATIONS
-  if (!util_is_animating())
-#endif
-    graph_window_push();
+  graph_window_push();
 }
 
 static void click_config_provider(void *context) {
@@ -589,17 +491,6 @@ static void window_load(Window *window) {
   layer_set_update_proc(s_canvas_layer, canvas_update_proc);
   layer_add_child(root_layer, s_canvas_layer);
 
-  if (util_is_not_status(data_calculate_avg_discharge_rate_x100(false))) {
-#ifdef FEATURE_ANIMATIONS
-    // If data to show, begin smooth animation
-    static AnimationImplementation anim_implementation = {
-      .update = anim_update,
-      .teardown = anim_teardown
-    };
-    util_animate(600, 0, &anim_implementation, true);
-#endif
-  }
-
   update_data();
 
 #ifdef FEATURE_SPEECH_BUBBLE
@@ -622,15 +513,8 @@ static void window_appear(Window *window) {
   // Some settings need redraw like date format
   if (!s_canvas_layer) return;
   
-#ifdef FEATURE_ANIMATIONS
-  // Only show data immediately if returning to this window
-  if (s_anim_started) {
-#endif
-    update_data();
-    layer_mark_dirty(s_canvas_layer);
-#ifdef FEATURE_ANIMATIONS
-  }
-#endif
+  update_data();
+  layer_mark_dirty(s_canvas_layer);
 }
 
 static void window_disappear(Window *window) {
@@ -655,10 +539,6 @@ void main_window_push() {
     });
     window_set_click_config_provider(s_window, click_config_provider);
 
-    s_blink_budget = 5;
-#ifdef FEATURE_ANIMATIONS
-    s_force_anim = true;
-#endif
 #ifdef FEATURE_SPEECH_BUBBLE
     s_bubble_visible = true;
 #endif
