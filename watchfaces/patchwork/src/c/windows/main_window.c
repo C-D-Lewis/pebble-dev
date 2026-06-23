@@ -99,7 +99,12 @@ static void canvas_layer_update_proc(Layer *layer, GContext *ctx) {
 
   // Draw time
   static char s_time_buff[6];
-  strftime(s_time_buff, sizeof(s_time_buff), "%H:%M", tick_time);
+  strftime(
+    s_time_buff,
+    sizeof(s_time_buff),
+    clock_is_24h_style() ? "%H:%M" : "%I:%M",
+    tick_time
+  );
   graphics_context_set_text_color(ctx, GColorBlack);
   int x = scl_x_pp({.o = 20, .e = 25, .g = 20});
   int y = scl_y_pp({.o = 180, .e = 180, .g = 210});
