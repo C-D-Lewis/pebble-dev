@@ -23,16 +23,7 @@ public class Root {
             Process process = java.lang.Runtime.getRuntime().exec("su");
             DataOutputStream out = new DataOutputStream(process.getOutputStream());
 
-            String cmd = "service call phone ";
-            int rootInt = getTransactionCode("com.android.internal.telephony.ITelephony", "setDataEnabled");
-            cmd += rootInt;
-            if(newState) {
-                cmd += " i32 1";
-            } else {
-                cmd += " i32 0";
-            }
-
-            Log.d(TAG, "Root int: " + rootInt);
+            String cmd = newState ? CMD_DATA_ENABLE : CMD_DATA_DISABLE;
 
             out.writeBytes(cmd + "\n");
             out.writeBytes("exit\n");
