@@ -203,7 +203,5 @@ export const NotFoundCard = () => AppCard()
     CardTitle().setText('Not Found'),
     Text()
       .setStyles({ maxWidth: '350px', margin: '5px auto' })
-      .setText('No data was found for this code. Use the upload option in the watchapp to start seeing data here.'),
-    Separator(),
-    Annotation().setText('Not available for Pebble classic/Pebble Steel due to memory constraints. Sorry!'),
+      .setText('No data was found for this code.\n\nOpen the Muninn settings in the Pebble mobile app after at least 8 samples to see your data here.'),
   ]);
