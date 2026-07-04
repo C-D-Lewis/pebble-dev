@@ -80,7 +80,7 @@ void packet_init() {
 
 bool packet_begin() {
   if (!init) {
-    APP_LOG(APP_LOG_LEVEL_ERROR, "%s: Must call packet_begin() first!", TAG);
+    APP_LOG(APP_LOG_LEVEL_ERROR, "%s: Must call packet_init() first!", TAG);
     return false;
   }
 
