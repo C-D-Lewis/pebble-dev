@@ -21,16 +21,17 @@ maintainability, and reusability.
   - [x] Phone free space
   - [ ] Watchapp minimum version check
   - [ ] Hard-coded Find Phone sound (and/or flash?)
-  - [ ] Change ringer mode? Requires one-time permissions popup
+  - [ ] Change ringer mode? (Requires one-time permissions popup)
 - [ ] Post-MVP:
   - [ ] Customizable toggle order
   - [ ] Customizable find phone sound
   - [ ] Find Watch with vibration?
   - [ ] Feature diagnostic page
-  - [ ] WiFi network name? Requires location access...
+  - [ ] WiFi network name? (Needs location permission)
 - [ ] Advanced (via [Shizuku](https://github.com/RikkaApps/Shizuku) or similar)
   - [ ] Toggle WiFi?
   - [ ] Toggle mobile data?
   - [ ] Lock phone?
 - [ ] New things!?
   - [ ] Change WiFi network?
+  - [ ] Next calendar event (needs calendar permission)
