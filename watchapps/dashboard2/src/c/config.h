@@ -2,6 +2,9 @@
 
 #include <pebble.h>
 
+// RELEASE CHECKLIST
+// Android min. version values changed?
+
 // AppMessage inbox size
 #define COMM_INBOX_SIZE 256
 // AppMessage outbox size
