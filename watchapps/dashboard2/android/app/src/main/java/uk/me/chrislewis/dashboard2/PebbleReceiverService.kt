@@ -11,10 +11,6 @@ import java.util.UUID
 
 private const val TAG = "PebbleReceiverService"
 
-private val APP_UUID = UUID.fromString("7606dabf-67cf-466a-92a7-5e62598a1436")
-private val MESSAGE_KEY_SYNC_REQUEST = 10000u
-private val MESSAGE_KEY_SYNC_DATA = 10001u
-
 class PebbleReceiverService : BasePebbleListenerService() {
     private val sender = DefaultPebbleSender(this)
 
@@ -25,17 +21,19 @@ class PebbleReceiverService : BasePebbleListenerService() {
     ): ReceiveResult {
         Log.d(TAG, "onMessageReceived: $data")
 
-        // SYNC_REQUEST
-        if (data.containsKey(MESSAGE_KEY_SYNC_REQUEST)) {
-            val dataToSend = mapOf(
-                MESSAGE_KEY_SYNC_DATA to PebbleDictionaryItem.Text("000102030405"),
-            )
-            val result = sender.sendDataToPebble(APP_UUID, dataToSend)
-            Log.d(TAG, "Message result: $result")
-            return ReceiveResult.Ack
-        }
+        // Settings and state sync
+        if (data.containsKey(MESSAGE_KEY_SYNC_REQUEST)) return handleSyncRequest()
 
         Log.e(TAG, "Unknown data: $data")
+        return ReceiveResult.Ack
+    }
+
+    suspend fun handleSyncRequest(): ReceiveResult {
+        val dataToSend = mapOf(
+            MESSAGE_KEY_SYNC_TOGGLE_ORDER to PebbleDictionaryItem.Text(Config.getToggleOrderString()),
+        )
+        val result = sender.sendDataToPebble(APP_UUID, dataToSend)
+        Log.d(TAG, "Message result: $result")
         return ReceiveResult.Ack
     }
 

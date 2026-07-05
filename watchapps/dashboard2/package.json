@@ -19,7 +19,7 @@
     "uuid": "7606dabf-67cf-466a-92a7-5e62598a1436",
     "messageKeys": [
       "SYNC_REQUEST",
-      "SYNC_DATA"
+      "SYNC_TOGGLE_ORDER"
     ],
     "enableMultiJS": true,
     "displayName": "Dashboard 2",

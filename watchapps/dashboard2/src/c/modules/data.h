@@ -23,7 +23,7 @@ typedef struct {
 
 // NOT persisted data
 typedef struct {
-  char sync_data[32];
+  char sync_toggle_order[32];
 
 } AppState;
 

@@ -1,20 +1,16 @@
 #include "comm.h"
 
-void set_fast(bool fast) {
-  app_comm_set_sniff_interval(fast ? SNIFF_INTERVAL_REDUCED: SNIFF_INTERVAL_NORMAL);
-}
-
 static void packet_failed_handler() {
   APP_LOG(APP_LOG_LEVEL_ERROR, "Packet failed");
 }
 
 static void inbox_received_handler(DictionaryIterator *iter, void *context) {
+  AppState *app_state = data_get_app_state();
   APP_LOG(APP_LOG_LEVEL_DEBUG, "Size: %d", packet_get_size(iter));
 
-  AppState *app_state = data_get_app_state();
-
-  // Sync data
-  snprintf(app_state->sync_data, 32, packet_get_string(iter, MESSAGE_KEY_SYNC_DATA));
+  if (packet_contains_key(iter, MESSAGE_KEY_SYNC_TOGGLE_ORDER)) {
+    snprintf(app_state->sync_toggle_order, 32, packet_get_string(iter, MESSAGE_KEY_SYNC_TOGGLE_ORDER));
+  }
 
   main_window_update();
 }
