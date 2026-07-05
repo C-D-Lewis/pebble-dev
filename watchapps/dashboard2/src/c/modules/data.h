@@ -23,9 +23,8 @@ typedef struct {
 
 // NOT persisted data
 typedef struct {
-  char test_message[32];
+  char sync_data[32];
 
-  // Singleton, adding new fields OK, removing from middle IS OK
 } AppState;
 
 void data_init();

@@ -18,8 +18,8 @@
     "projectType": "native",
     "uuid": "7606dabf-67cf-466a-92a7-5e62598a1436",
     "messageKeys": [
-      "TEST_MESSAGE",
-      "TEST_RESPONSE"
+      "SYNC_REQUEST",
+      "SYNC_DATA"
     ],
     "enableMultiJS": true,
     "displayName": "Dashboard 2",

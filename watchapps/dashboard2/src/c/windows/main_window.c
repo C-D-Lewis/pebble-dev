@@ -8,7 +8,7 @@ static void window_load(Window *window) {
   GRect bounds = layer_get_bounds(window_layer);
 
   s_text_layer = text_layer_create(bounds);
-  text_layer_set_text(s_text_layer, "waiting...");
+  text_layer_set_text(s_text_layer, "Waiting...");
   layer_add_child(window_layer, text_layer_get_layer(s_text_layer));
 }
 
@@ -28,11 +28,14 @@ void main_window_push() {
       .unload = window_unload
     });
   }
+
   window_stack_push(s_window, true);
+
+  comm_sync_data();
 }
 
 void main_window_update() {
   AppState *app_state = data_get_app_state();
 
-  text_layer_set_text(s_text_layer, app_state->test_message);
+  text_layer_set_text(s_text_layer, app_state->sync_data);
 }

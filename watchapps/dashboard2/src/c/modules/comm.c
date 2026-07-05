@@ -12,18 +12,11 @@ static void inbox_received_handler(DictionaryIterator *iter, void *context) {
   APP_LOG(APP_LOG_LEVEL_DEBUG, "Size: %d", packet_get_size(iter));
 
   AppState *app_state = data_get_app_state();
-  snprintf(app_state->test_message, 32, packet_get_string(iter, MESSAGE_KEY_TEST_MESSAGE));
+
+  // Sync data
+  snprintf(app_state->sync_data, 32, packet_get_string(iter, MESSAGE_KEY_SYNC_DATA));
+
   main_window_update();
-
-  // Respond
-  if (packet_begin()) {
-    packet_put_string(MESSAGE_KEY_TEST_RESPONSE, "Hello from Pebble!");
-    packet_send(packet_failed_handler);
-
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "Responded");
-  }
-
-  set_fast(false);
 }
 
 static void inbox_dropped_handler(AppMessageResult reason, void *context) {
@@ -36,10 +29,18 @@ void comm_init() {
   app_message_register_inbox_dropped(inbox_dropped_handler);
 
   packet_init();
-
-  // set_fast(true);
 }
 
 void comm_deinit() {
 
+}
+
+void comm_sync_data() {
+  // Sync current settings and states from Android
+  if (packet_begin()) {
+    packet_put_boolean(MESSAGE_KEY_SYNC_REQUEST, true);
+    packet_send(packet_failed_handler);
+  } else {
+    APP_LOG(APP_LOG_LEVEL_ERROR, "packet_begin() failed");
+  }
 }
