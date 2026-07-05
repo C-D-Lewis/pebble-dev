@@ -23,7 +23,11 @@ typedef struct {
 
 // NOT persisted data
 typedef struct {
-  char sync_toggle_order[32];
+  char toggle_order[33];   // 2c x 16 toggles + null
+  char device_name[32];
+  char battery_perc[4];    // '100'
+  char free_space[12];     // '999.99 GB'
+  char free_space_perc[4]; // '100'
 
 } AppState;
 

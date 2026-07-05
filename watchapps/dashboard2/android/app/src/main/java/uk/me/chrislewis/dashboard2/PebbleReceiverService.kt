@@ -1,6 +1,5 @@
 package uk.me.chrislewis.dashboard2
 
-import android.content.Context
 import android.util.Log
 import io.rebble.pebblekit2.client.BasePebbleListenerService
 import io.rebble.pebblekit2.client.DefaultPebbleSender
@@ -9,7 +8,6 @@ import io.rebble.pebblekit2.common.model.PebbleDictionaryItem
 import io.rebble.pebblekit2.common.model.ReceiveResult
 import io.rebble.pebblekit2.common.model.WatchIdentifier
 import java.util.UUID
-import android.provider.Settings
 
 private const val TAG = "PebbleReceiverService"
 
@@ -35,7 +33,9 @@ class PebbleReceiverService : BasePebbleListenerService() {
         val dict = mapOf(
             MESSAGE_KEY_SYNC_TOGGLE_ORDER to PebbleDictionaryItem.Text(Config.getToggleOrderString()),
             MESSAGE_KEY_SYNC_DEVICE_NAME to PebbleDictionaryItem.Text(Device.getDeviceName(this)),
-            MESSAGE_KEY_SYNC_BATTERY_LEVEL to PebbleDictionaryItem.Text(Device.getBatteryLevel(this).toString())
+            MESSAGE_KEY_SYNC_BATTERY_PERC to PebbleDictionaryItem.Text(Device.getBatteryLevel(this).toString()),
+            MESSAGE_KEY_SYNC_FREE_SPACE to PebbleDictionaryItem.Text(Device.getFreeDiskSpace(this)),
+            MESSAGE_KEY_SYNC_FREE_SPACE_PERC to PebbleDictionaryItem.Text(Device.getUsedDiskSpacePercentage().toString())
         )
         val result = sender.sendDataToPebble(APP_UUID, dict)
         Log.d(TAG, "Send $dict: $result")

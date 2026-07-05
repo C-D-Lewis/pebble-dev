@@ -8,8 +8,40 @@ static void inbox_received_handler(DictionaryIterator *iter, void *context) {
   AppState *app_state = data_get_app_state();
   APP_LOG(APP_LOG_LEVEL_DEBUG, "Size: %d", packet_get_size(iter));
 
-  if (packet_contains_key(iter, MESSAGE_KEY_SYNC_TOGGLE_ORDER)) {
-    snprintf(app_state->sync_toggle_order, 32, packet_get_string(iter, MESSAGE_KEY_SYNC_TOGGLE_ORDER));
+  if (packet_contains_key(iter, MESSAGE_KEY_TOGGLE_ORDER)) {
+    snprintf(
+      app_state->toggle_order,
+      sizeof(app_state->toggle_order),
+      packet_get_string(iter, MESSAGE_KEY_TOGGLE_ORDER)
+    );
+  }
+  if (packet_contains_key(iter, MESSAGE_KEY_DEVICE_NAME)) {
+    snprintf(
+      app_state->device_name,
+      sizeof(app_state->device_name),
+      packet_get_string(iter, MESSAGE_KEY_DEVICE_NAME)
+    );
+  }
+  if (packet_contains_key(iter, MESSAGE_KEY_BATTERY_PERC)) {
+    snprintf(
+      app_state->battery_perc,
+      sizeof(app_state->battery_perc),
+      packet_get_string(iter, MESSAGE_KEY_BATTERY_PERC)
+    );
+  }
+  if (packet_contains_key(iter, MESSAGE_KEY_FREE_SPACE)) {
+    snprintf(
+      app_state->free_space,
+      sizeof(app_state->free_space),
+      packet_get_string(iter, MESSAGE_KEY_FREE_SPACE)
+    );
+  }
+  if (packet_contains_key(iter, MESSAGE_KEY_FREE_SPACE_PERC)) {
+    snprintf(
+      app_state->free_space_perc,
+      sizeof(app_state->free_space_perc),
+      packet_get_string(iter, MESSAGE_KEY_FREE_SPACE_PERC)
+    );
   }
 
   main_window_update();

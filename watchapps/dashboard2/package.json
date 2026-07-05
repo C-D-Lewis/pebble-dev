@@ -20,7 +20,11 @@
     "uuid": "7606dabf-67cf-466a-92a7-5e62598a1436",
     "messageKeys": [
       "SYNC_REQUEST",
-      "SYNC_TOGGLE_ORDER"
+      "TOGGLE_ORDER",
+      "DEVICE_NAME",
+      "BATTERY_PERC",
+      "FREE_SPACE",
+      "FREE_SPACE_PERC"
     ],
     "enableMultiJS": true,
     "displayName": "Dashboard 2",

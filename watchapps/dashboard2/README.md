@@ -12,22 +12,25 @@ maintainability, and reusability.
 
 - [x] Basic comms with Android
 - [x] Running in background
-- [ ] Basic watch UI
 - [ ] MVP initial features:
-  - [ ] Hard-coded toggle order
+  - [ ] Basic watch UI
+  - [ ] Basic Android app UI
+  - [x] Hard-coded toggle order
   - [x] Phone name
   - [x] Phone battery level
-  - [ ] Phone free space?
+  - [x] Phone free space
+  - [ ] Watchapp minimum version check
   - [ ] Hard-coded Find Phone sound (and/or flash?)
-  - [ ] Change ringer mode?
+  - [ ] Change ringer mode? Requires one-time permissions popup
 - [ ] Post-MVP:
   - [ ] Customizable toggle order
   - [ ] Customizable find phone sound
   - [ ] Find Watch with vibration?
+  - [ ] Feature diagnostic page
   - [ ] WiFi network name? Requires location access...
 - [ ] Advanced (via [Shizuku](https://github.com/RikkaApps/Shizuku) or similar)
-  - [ ] WiFi?
-  - [ ] Mobile data?
+  - [ ] Toggle WiFi?
+  - [ ] Toggle mobile data?
   - [ ] Lock phone?
 - [ ] New things!?
   - [ ] Change WiFi network?

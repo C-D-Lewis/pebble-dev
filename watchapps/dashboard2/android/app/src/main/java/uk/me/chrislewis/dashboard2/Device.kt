@@ -4,7 +4,11 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.BatteryManager
+import android.os.Environment
+import android.os.StatFs
 import android.provider.Settings
+import android.text.format.Formatter
+import kotlin.math.roundToInt
 
 object Device {
     /**
@@ -31,5 +35,35 @@ object Device {
         } else {
             -1 // Indicates an error or unknown state
         }
+    }
+
+    /**
+     * Get readable free space.
+     */
+    fun getFreeDiskSpace(context: Context): String {
+        val path = Environment.getDataDirectory()
+        val stat = StatFs(path.path)
+        val freeBytes = stat.availableBlocksLong * stat.blockSizeLong
+        return Formatter.formatFileSize(context, freeBytes)
+    }
+
+    /**
+     * Get free disk space percentage.
+     *
+     * TODO: Some DRY with above function.
+     */
+    fun getUsedDiskSpacePercentage(): Int {
+        val path = Environment.getDataDirectory()
+        val stat = StatFs(path.path)
+        val blockSize = stat.blockSizeLong
+        val totalBytes = stat.blockCountLong * blockSize
+        if (totalBytes <= 0) return 0
+
+        // Get free percentage
+        val availableBytes = stat.availableBlocksLong * blockSize
+        val freePercentage = (availableBytes.toDouble() / totalBytes.toDouble()) * 100
+        val usedPercentage = 100 - freePercentage
+
+        return usedPercentage.roundToInt()
     }
 }
