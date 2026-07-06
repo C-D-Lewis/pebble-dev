@@ -383,7 +383,7 @@ describe('Unit tests', () => {
           count: 1,
           groupName: 'Pebble Time Round',
           names: ['pebble_time_round_silver_20'],
-          medianBatteryLife: 2.5,
+          medianBatteryLife: 3,
           batteryLifeRange: 0,
           minBatteryLife: 3,
           modeBatteryLife: 3,

@@ -1,6 +1,6 @@
 import { GetCommand, PutCommand, type DynamoDBDocumentClient, type ScanCommandOutput } from '@aws-sdk/lib-dynamodb';
 import { ScanCommand } from '@aws-sdk/lib-dynamodb';
-import { AGGREGATION_DOC_ID, HISTORY_TABLE_NAME, METADATA_TABLE_NAME } from './constants.ts';
+import { AGGREGATION_DOC_ID, HISTORY_TABLE_NAME, METADATA_TABLE_NAME, MIN_HISTORY_LENGTH } from './constants.ts';
 import type { AggregateItem, DbDocument, GlobalStatItem, MetadataDocument } from './types.js';
 import { sortByName } from './util.ts';
 
@@ -19,18 +19,18 @@ const getBatteryLife = (row: DbDocument) => {
 };
 
 /**
- * Groups: pebble_2_duo, pebble_2, pebble_time_steel, pebble_time_2, pebble_time_round, pebble_time
+ * Groups: pebble_2_duo, pebble_2, pebble_time_steel, etc.
  *
  * @param {string} name - Name to map and group.
  * @returns {string} Mapped group name
  */
 const getGroupName = (name: string): string => {
-  // Explicit names in case a 'pebble_' catchall is too aggresive
   const ogNames = [
     'pebble_black',
     'pebble_white',
     'pebble_red',
     'pebble_blue',
+    'pebble_orange',
   ];
 
   if (name.includes('pebble_2_duo')) return 'Pebble 2 Duo';
@@ -42,6 +42,8 @@ const getGroupName = (name: string): string => {
   if (name.includes('pebble_time')) return 'Pebble Time';
   if (name.includes('pebble_round_2')) return 'Pebble Round 2';
   if (name.includes('pebble_steel')) return 'Pebble Steel';
+
+  // Explicit names in case a 'pebble_' catchall is too aggresive
   if (ogNames.some(p => name.includes(p))) return 'Pebble (original)';
 
   return name;
@@ -99,7 +101,7 @@ export const aggregateAllByKey = (rows: DbDocument[], key: keyof DbDocument): Gl
   
     const sorted = [...arr].sort((a, b) => a - b);
     const index = Math.floor(sorted.length / 2);
-    return sorted[index] as number;
+    return Math.round(sorted[index] as number);
   };
 
   // Round sums at the end to avoid losing all the cumulated remainders
@@ -160,9 +162,16 @@ export const aggregateAllByKey = (rows: DbDocument[], key: keyof DbDocument): Gl
 export const performAggregations = (allRows: DbDocument[]): MetadataDocument => {
   // Filter out some rows (i.e: test data)
   const ignores = ['qemu', 'TEST', 'test'];
-  const rows = allRows.filter((p) => {
-    return !(ignores.some((q) => p.model.includes(q) || p.platform.includes(q)))
-  });
+  const rows = allRows
+    .filter((p) => {
+      // Filter out names
+      return !(ignores.some((q) => p.model.includes(q) || p.platform.includes(q)))
+    })
+    .filter((p) => {
+      // Min. 1 wk of data (28 samples)
+      return p.history.length >= MIN_HISTORY_LENGTH;
+    });
+  console.log(`Ignored ${allRows.length - rows.length} rows`);
 
   const models: GlobalStatItem[] = aggregateAllByKey(rows, 'model');
   const platforms: GlobalStatItem[] = aggregateAllByKey(rows, 'platform');

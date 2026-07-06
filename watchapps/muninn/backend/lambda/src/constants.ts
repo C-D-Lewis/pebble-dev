@@ -18,3 +18,6 @@ export const DEFAULT_RES_HEADERS = {
 
 /** DB id for aggregations document */
 export const AGGREGATION_DOC_ID = 'aggregations';
+
+/** Minimum data for inclusion in aggregations - 4 * 7 days */
+export const MIN_HISTORY_LENGTH = 28;
