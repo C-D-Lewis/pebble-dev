@@ -46,3 +46,38 @@ PersistData* data_get_persist_data() {
 AppState* data_get_app_state() {
   return &s_app_state;
 }
+
+#ifdef USE_TEST_DATA
+void data_test_data_handler() {
+  // Set higher than COMPAT_PROTOCOL_VERSION to simulate incompatability
+  s_app_state.compat_protocol_version = 2;
+
+  snprintf(
+    s_app_state.toggle_order,
+    sizeof(s_app_state.toggle_order),
+    "000102030405"
+  );
+  snprintf(
+    s_app_state.device_name,
+    sizeof(s_app_state.device_name),
+    "Test Device"
+  );
+  snprintf(
+    s_app_state.battery_perc,
+    sizeof(s_app_state.battery_perc),
+    "89"
+  );
+  snprintf(
+    s_app_state.free_space,
+    sizeof(s_app_state.free_space),
+    "117.38 GB"
+  );
+  snprintf(
+    s_app_state.free_space_perc,
+    sizeof(s_app_state.free_space_perc),
+    "76"
+  );
+
+  main_window_update();
+}
+#endif

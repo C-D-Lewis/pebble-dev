@@ -13,15 +13,16 @@ maintainability, and reusability.
 - [x] Basic comms with Android
 - [x] Running in background
 - [ ] MVP initial features:
-  - [ ] Basic watch UI
+  - [ ] Basic watch UI ()
   - [ ] Basic Android app UI
+  - [ ] Loading splash
   - [x] Hard-coded toggle order
   - [x] Phone name
   - [x] Phone battery level
   - [x] Phone free space
   - [ ] Watchapp minimum version check
   - [ ] Hard-coded Find Phone sound (and/or flash?)
-  - [ ] Change ringer mode? (Requires one-time permissions popup)
+  - [ ] Change ringer mode? (Requires notif policy one-time permissions popup)
 - [ ] Post-MVP:
   - [ ] Customizable toggle order
   - [ ] Customizable find phone sound
@@ -32,6 +33,13 @@ maintainability, and reusability.
   - [ ] Toggle WiFi?
   - [ ] Toggle mobile data?
   - [ ] Lock phone?
+  - [ ] Hotspot?
 - [ ] New things!?
   - [ ] Change WiFi network?
   - [ ] Next calendar event (needs calendar permission)
+  - [ ] Battery status / temperature / plugged?
+  - [ ] Free RAM
+  - [ ] Is WiFi vs is mobile data (may not require permission)
+  - [ ] Next alarm?
+- [ ] Summon phone things
+  - [ ] NFC payment

@@ -3,7 +3,18 @@
 #include <pebble.h>
 
 // RELEASE CHECKLIST
-// Android min. version values changed?
+// - Update defined versions
+// - Android min. version values changed?
+
+// Current watchapp version, always update
+#define COMPAT_PROTOCOL_VERSION 1
+
+///////////// TESTING AREA /////////////
+// Use test data                      //
+// #define USE_TEST_DATA true         //
+// Expand the tray automatically      //
+// #define TEST_EXPAND_TRAY true      //
+////////////////////////////////////////
 
 // AppMessage inbox size
 #define COMM_INBOX_SIZE 256

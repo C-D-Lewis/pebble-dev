@@ -22,7 +22,9 @@ class PebbleReceiverService : BasePebbleListenerService() {
         Log.d(TAG, "onMessageReceived: $data")
 
         // Settings and state sync
-        if (data.containsKey(MESSAGE_KEY_SYNC_REQUEST)) return handleSyncRequest()
+        if (data.containsKey(Constants.MESSAGE_KEY_SYNC_REQUEST)) return handleSyncRequest()
+
+        // Toggle requests
 
         Log.e(TAG, "Unknown data: $data")
         return ReceiveResult.Ack
@@ -31,13 +33,14 @@ class PebbleReceiverService : BasePebbleListenerService() {
     suspend fun handleSyncRequest(): ReceiveResult {
         // Assemble all sync data
         val dict = mapOf(
-            MESSAGE_KEY_SYNC_TOGGLE_ORDER to PebbleDictionaryItem.Text(Config.getToggleOrderString()),
-            MESSAGE_KEY_SYNC_DEVICE_NAME to PebbleDictionaryItem.Text(Device.getDeviceName(this)),
-            MESSAGE_KEY_SYNC_BATTERY_PERC to PebbleDictionaryItem.Text(Device.getBatteryLevel(this).toString()),
-            MESSAGE_KEY_SYNC_FREE_SPACE to PebbleDictionaryItem.Text(Device.getFreeDiskSpace(this)),
-            MESSAGE_KEY_SYNC_FREE_SPACE_PERC to PebbleDictionaryItem.Text(Device.getUsedDiskSpacePercentage().toString())
+            Constants.MESSAGE_KEY_COMPAT_PROTOCOL_VERSION to Constants.COMPATIBLE_PROTOCOL_VERSION,
+            Constants.MESSAGE_KEY_SYNC_TOGGLE_ORDER to PebbleDictionaryItem.Text(Config.getToggleOrderString()),
+            Constants.MESSAGE_KEY_SYNC_DEVICE_NAME to PebbleDictionaryItem.Text(Device.getDeviceName(this)),
+            Constants.MESSAGE_KEY_SYNC_BATTERY_PERC to PebbleDictionaryItem.Text(Device.getBatteryLevel(this).toString()),
+            Constants.MESSAGE_KEY_SYNC_FREE_SPACE to PebbleDictionaryItem.Text(Device.getFreeDiskSpace(this)),
+            Constants.MESSAGE_KEY_SYNC_FREE_SPACE_PERC to PebbleDictionaryItem.Text(Device.getFreeDiskSpacePercentage().toString())
         )
-        val result = sender.sendDataToPebble(APP_UUID, dict)
+        val result = sender.sendDataToPebble(Constants.APP_UUID, dict)
         Log.d(TAG, "Send $dict: $result")
         return ReceiveResult.Ack
     }

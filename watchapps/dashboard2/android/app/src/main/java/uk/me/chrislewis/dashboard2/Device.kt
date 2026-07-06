@@ -52,7 +52,7 @@ object Device {
      *
      * TODO: Some DRY with above function.
      */
-    fun getUsedDiskSpacePercentage(): Int {
+    fun getFreeDiskSpacePercentage(): Int {
         val path = Environment.getDataDirectory()
         val stat = StatFs(path.path)
         val blockSize = stat.blockSizeLong
@@ -62,8 +62,7 @@ object Device {
         // Get free percentage
         val availableBytes = stat.availableBlocksLong * blockSize
         val freePercentage = (availableBytes.toDouble() / totalBytes.toDouble()) * 100
-        val usedPercentage = 100 - freePercentage
 
-        return usedPercentage.roundToInt()
+        return freePercentage.roundToInt()
     }
 }

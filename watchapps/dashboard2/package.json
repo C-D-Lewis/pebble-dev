@@ -14,11 +14,49 @@
   "pebble": {
     "sdkVersion": "3",
     "resources": {
-      "media": []
+      "media": [
+        {
+          "menuIcon": true,
+          "type": "bitmap",
+          "name": "MENU_ICON",
+          "file": "images/menu_icon.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "APP_ICON",
+          "file": "images/app_icon.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "ARROW_DOWN",
+          "file": "images/arrow_down.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "ARROW_UP",
+          "file": "images/arrow_up.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "PHONE",
+          "file": "images/phone.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "BATTERY",
+          "file": "images/battery.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "DISK",
+          "file": "images/disk.png"
+        }
+      ]
     },
     "projectType": "native",
     "uuid": "7606dabf-67cf-466a-92a7-5e62598a1436",
     "messageKeys": [
+      "COMPAT_PROTOCOL_VERSION",
       "SYNC_REQUEST",
       "TOGGLE_ORDER",
       "DEVICE_NAME",

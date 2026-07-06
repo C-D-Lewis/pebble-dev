@@ -4,6 +4,8 @@
 
 #include "../config.h"
 
+#include "../windows/main_window.h"
+
 // NOTE: APPEND ONLY - Changing keys will affect existing users!
 typedef enum {
   // App data key
@@ -23,6 +25,7 @@ typedef struct {
 
 // NOT persisted data
 typedef struct {
+  int compat_protocol_version;
   char toggle_order[33];   // 2c x 16 toggles + null
   char device_name[32];
   char battery_perc[4];    // '100'
@@ -36,3 +39,7 @@ void data_deinit();
 
 PersistData* data_get_persist_data();
 AppState* data_get_app_state();
+
+#ifdef USE_TEST_DATA
+void data_test_data_handler();
+#endif
