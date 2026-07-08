@@ -76,6 +76,13 @@ const int x = scl_x_pp({.o = 110, .e = 120});
 const int y = scl_y_pp({.o = 450, .e = 480});
 ```
 
+If you need to select raw values based on platform, use `scl_pp()`:
+
+```c
+// Choose 5 or 3 literally if emery or otherwise
+const int margin = scl_pp({.o = 3, .e = 5});
+```
+
 ## Constants
 
 The library also exports constants for all platforms:

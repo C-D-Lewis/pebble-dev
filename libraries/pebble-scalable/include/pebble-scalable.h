@@ -44,6 +44,12 @@ int scl_x(int t_perc);
 int scl_y(int t_perc);
 
 /**
+ * Scale any values on a per-platform basis.
+ */
+int _scl_pp_impl(SV values);
+#define scl_pp(...) _scl_pp_impl((SV)__VA_ARGS__)
+
+/**
  * As scl_x, but with platform-specific values.
  */
 int _scl_x_pp_impl(SV values);

@@ -86,6 +86,17 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     NULL
   );
 
+  // Text Y per-plaform
+  graphics_draw_text(
+    ctx,
+    "Platform Y",
+    scl_get_font(FontId_Small),
+    GRect(0, scl_pp({.o = 30, .e = 150}), PS_DISP_W, 100),
+    GTextOverflowModeTrailingEllipsis,
+    GTextAlignmentCenter,
+    NULL
+  );
+
   // Draw image centered at the bottom - image is 24x24px as a base size, so about 15% width
   graphics_draw_bitmap_in_rect(
     ctx,

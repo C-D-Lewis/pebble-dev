@@ -30,6 +30,10 @@ int scl_y(int t_perc) {
   return scale(t_perc, PS_DISP_H);
 }
 
+int _scl_pp_impl(SV values) {
+  return _GET_SV(values);
+}
+
 int _scl_x_pp_impl(SV values) {
   return scale(_GET_SV(values), PS_DISP_W);
 }
