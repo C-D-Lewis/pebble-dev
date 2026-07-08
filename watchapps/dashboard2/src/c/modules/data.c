@@ -20,7 +20,7 @@ static void init_data_fields() {
 
 void data_init() {
   // Init AppState emphemeral fields
-  // s_app_state.sync_count = STATUS_EMPTY;
+  s_app_state.sync_state = SyncStateInitial;
 
   // Never used, write defaults
   if (!persist_exists(SK_PersistData)) {
@@ -49,13 +49,15 @@ AppState* data_get_app_state() {
 
 #ifdef USE_TEST_DATA
 void data_test_data_handler() {
+  s_app_state.sync_state = SyncStateSuccess;
   // Set higher than COMPAT_PROTOCOL_VERSION to simulate incompatability
   s_app_state.compat_protocol_version = 2;
 
   snprintf(
     s_app_state.toggle_order,
     sizeof(s_app_state.toggle_order),
-    "000102030405"
+    
+    "100000000000000000"
   );
   snprintf(
     s_app_state.device_name,
@@ -81,3 +83,14 @@ void data_test_data_handler() {
   main_window_update();
 }
 #endif
+
+int data_get_toggles_length() {
+  int count = 0;
+
+  // Go through [type, state] pairs until the last is rached
+  for (int i = 0; i < TOGGLES_STRLEN - 1; i += 2) {
+    if (s_app_state.toggle_order[i] == '0') break;
+    count++;
+  }
+  return count;
+}

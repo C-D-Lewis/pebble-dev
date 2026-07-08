@@ -6,7 +6,7 @@
   "private": true,
   "dependencies": {
     "pebble-packet": "^1.6.0",
-    "pebble-scalable": "^2.2.0"
+    "pebble-scalable": "^2.3.0"
   },
   "keywords": [
     "pebble-app"
@@ -38,6 +38,11 @@
         },
         {
           "type": "bitmap",
+          "name": "NOTHING",
+          "file": "images/nothing.png"
+        },
+        {
+          "type": "bitmap",
           "name": "PHONE",
           "file": "images/phone.png"
         },
@@ -62,7 +67,8 @@
       "DEVICE_NAME",
       "BATTERY_PERC",
       "FREE_SPACE",
-      "FREE_SPACE_PERC"
+      "FREE_SPACE_PERC",
+      "TOGGLE_TYPE"
     ],
     "enableMultiJS": true,
     "displayName": "Dashboard 2",

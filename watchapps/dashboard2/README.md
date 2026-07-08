@@ -8,21 +8,35 @@ starting with minimal features and adding more as they are deemed possible
 without to much special device access or root. The focus will be on modularity,
 maintainability, and reusability.
 
-## TODO
+## Permissions
+
+*Manifest Permissions*
+
+* `android.permission.WRITE_SYNC_SETTINGS` - Toggle AutoSync
+* `android.permission.READ_SYNC_SETTINGS`
+
+*Runtime Permissions*
+
+These permissions are opt-in if you want to enable the feature they enable.
+
+* None yet
+
+## Roadmap
 
 - [x] Basic comms with Android
 - [x] Running in background
 - [ ] MVP initial features:
-  - [ ] Basic watch UI ()
+  - [ ] Basic watch UI
   - [ ] Basic Android app UI
-  - [ ] Loading splash
+  - [x] Loading splash
+  - [x] Watchapp minimum version check
   - [x] Hard-coded toggle order
   - [x] Phone name
   - [x] Phone battery level
   - [x] Phone free space
-  - [ ] Watchapp minimum version check
-  - [ ] Hard-coded Find Phone sound (and/or flash?)
+  - [ ] Toggle AutoSync (background app updates)
   - [ ] Change ringer mode? (Requires notif policy one-time permissions popup)
+  - [ ] Hard-coded Find Phone sound (and/or flash?)
 - [ ] Post-MVP:
   - [ ] Customizable toggle order
   - [ ] Customizable find phone sound
@@ -41,5 +55,6 @@ maintainability, and reusability.
   - [ ] Free RAM
   - [ ] Is WiFi vs is mobile data (may not require permission)
   - [ ] Next alarm?
-- [ ] Summon phone things
+  - [ ] Custom webhook POST URL
+- [ ] Summon phone features as Activities?
   - [ ] NFC payment

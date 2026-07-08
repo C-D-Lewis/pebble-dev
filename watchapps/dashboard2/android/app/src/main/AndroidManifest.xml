@@ -2,6 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
+    <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -23,8 +28,9 @@
             </intent-filter>
         </activity>
 
-        <service android:name="uk.me.chrislewis.dashboard2.PebbleReceiverService"
+        <service android:name="uk.me.chrislewis.dashboard2.service.PebbleReceiverService"
             android:exported="true"
+            android:foregroundServiceType="dataSync"
             tools:ignore="ExportedService">
             <intent-filter>
                 <action android:name="io.rebble.pebblekit2.RECEIVE_DATA_FROM_WATCH"/>

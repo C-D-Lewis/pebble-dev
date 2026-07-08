@@ -11,8 +11,6 @@ static void inbox_received_handler(DictionaryIterator *iter, void *context) {
   APP_LOG(APP_LOG_LEVEL_DEBUG, "Size: %d", packet_get_size(iter));
 
   if (packet_contains_key(iter, MESSAGE_KEY_COMPAT_PROTOCOL_VERSION)) {
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "Compat protocol version: %d", packet_get_integer(iter, MESSAGE_KEY_COMPAT_PROTOCOL_VERSION));
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "Current protocol version: %d", COMPAT_PROTOCOL_VERSION);
     app_state->compat_protocol_version = packet_get_integer(
       iter,
       MESSAGE_KEY_COMPAT_PROTOCOL_VERSION
@@ -54,6 +52,13 @@ static void inbox_received_handler(DictionaryIterator *iter, void *context) {
     );
   }
 
+  app_state->sync_state = SyncStateSuccess;
+
+  // Is it compatible?
+  if (app_state->compat_protocol_version != COMPAT_PROTOCOL_VERSION) {
+    app_state->sync_state = SyncStateOutOfDate;
+  }
+
   // Min. delay for UX
   time_t now = time(NULL);
   if (now - s_sync_start < 1) {
@@ -91,6 +96,16 @@ void comm_sync_data() {
   // Sync current settings and states from Android
   if (packet_begin()) {
     packet_put_boolean(MESSAGE_KEY_SYNC_REQUEST, true);
+    packet_send(packet_failed_handler);
+  } else {
+    APP_LOG(APP_LOG_LEVEL_ERROR, "packet_begin() failed");
+  }
+}
+
+// Response should be entire new state
+void comm_toggle(ToggleType type) {
+  if (packet_begin()) {
+    packet_put_integer(MESSAGE_KEY_TOGGLE_TYPE, type);
     packet_send(packet_failed_handler);
   } else {
     APP_LOG(APP_LOG_LEVEL_ERROR, "packet_begin() failed");

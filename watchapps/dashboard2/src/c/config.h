@@ -20,11 +20,21 @@
 #define COMM_INBOX_SIZE 256
 // AppMessage outbox size
 #define COMM_OUTBOX_SIZE 128
+// Length of meaningful string in toggles_order
+#define TOGGLES_STRLEN 18
 
 // Lines up with main window selection index
 typedef enum {
-  ToggleFindPhone = 0,
+  ToggleTypeNothing = 0,
+  ToggleTypeAutoSync,
   ToggleCycleRinger,
+  ToggleFindPhone,
 
   TogglesMax
-} Toggle;
+} ToggleType;
+
+typedef enum {
+  SyncStateInitial = 0,
+  SyncStateOutOfDate,
+  SyncStateSuccess
+} SyncState;

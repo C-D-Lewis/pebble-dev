@@ -25,8 +25,9 @@ typedef struct {
 
 // NOT persisted data
 typedef struct {
+  SyncState sync_state;
   int compat_protocol_version;
-  char toggle_order[33];   // 2c x 16 toggles + null
+  char toggle_order[19];   // 2c x 9 toggles + null
   char device_name[32];
   char battery_perc[4];    // '100'
   char free_space[12];     // '999.99 GB'
@@ -43,3 +44,5 @@ AppState* data_get_app_state();
 #ifdef USE_TEST_DATA
 void data_test_data_handler();
 #endif
+
+int data_get_toggles_length();
