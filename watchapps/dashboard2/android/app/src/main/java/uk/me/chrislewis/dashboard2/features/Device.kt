@@ -1,9 +1,7 @@
-package uk.me.chrislewis.dashboard2
+package uk.me.chrislewis.dashboard2.features
 
+import android.app.ActivityManager
 import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
-import android.os.BatteryManager
 import android.os.Environment
 import android.os.StatFs
 import android.provider.Settings
@@ -20,7 +18,27 @@ object Device {
             ?: "Android Device"
     }
 
+    /**
+     * Get free RAM percentage.
+     */
+    fun getPercentageFreeRam(context: Context): Int {
+        val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        val memoryInfo = ActivityManager.MemoryInfo()
+        activityManager.getMemoryInfo(memoryInfo)
+        return ((memoryInfo.availMem.toDouble() / memoryInfo.totalMem.toDouble()) * 100).toInt()
+    }
 
+    /**
+     * Get free RAM in MB.
+     */
+    fun getFreeRamInMB(context: Context): Long {
+        val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        val memoryInfo = ActivityManager.MemoryInfo()
+        activityManager.getMemoryInfo(memoryInfo)
+
+        // Convert bytes to Megabytes (1 MB = 1024 * 1024 bytes)
+        return memoryInfo.availMem / (1024 * 1024)
+    }
 
     /**
      * Get readable free space.

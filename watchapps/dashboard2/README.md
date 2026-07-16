@@ -12,8 +12,10 @@ maintainability, and reusability.
 
 *Manifest Permissions*
 
-* `android.permission.WRITE_SYNC_SETTINGS` - Toggle AutoSync
-* `android.permission.READ_SYNC_SETTINGS`
+* `android.permission.ACCESS_FINE_LOCATION` - Get Wi-Fi network info
+* `android.permission.ACCESS_COARSE_LOCATION` - Get Wi-Fi network info
+* `android.permission.ACCESS_WIFI_STATE` - Get Wi-Fi network info
+* `android.permission.ACCESS_NETWORK_STATE` - Get network state
 
 *Runtime Permissions*
 
@@ -26,7 +28,7 @@ These permissions are opt-in if you want to enable the feature they enable.
 - [x] Basic comms with Android
 - [x] Running in background
 - [ ] MVP initial features:
-  - [ ] Basic watch UI
+  - [ ] Basic watch UI (info + tools)
   - [ ] Basic Android app UI
   - [x] Loading splash
   - [x] Watchapp minimum version check
@@ -34,27 +36,26 @@ These permissions are opt-in if you want to enable the feature they enable.
   - [x] Phone name
   - [x] Phone battery level
   - [x] Phone free space
-  - [ ] Toggle AutoSync (background app updates)
+  - [-] Next alarm
   - [ ] Change ringer mode? (Requires notif policy one-time permissions popup)
   - [ ] Hard-coded Find Phone sound (and/or flash?)
 - [ ] Post-MVP:
   - [ ] Customizable toggle order
   - [ ] Customizable find phone sound
-  - [ ] Find Watch with vibration?
-  - [ ] Feature diagnostic page
-  - [ ] WiFi network name? (Needs location permission)
+  - [ ] Find Watch with vibration/sound/light?
+  - [ ] WiFi network name? (Needs location permission - DOA due to Android...)
 - [ ] Advanced (via [Shizuku](https://github.com/RikkaApps/Shizuku) or similar)
   - [ ] Toggle WiFi?
   - [ ] Toggle mobile data?
   - [ ] Lock phone?
   - [ ] Hotspot?
+  - [ ] Toggle AutoSync (background app updates)
 - [ ] New things!?
   - [ ] Change WiFi network?
   - [ ] Next calendar event (needs calendar permission)
   - [ ] Battery status / temperature / plugged?
-  - [ ] Free RAM
+  - [ ] Free RAM (not useful as Linux uses it)
   - [ ] Is WiFi vs is mobile data (may not require permission)
-  - [ ] Next alarm?
   - [ ] Custom webhook POST URL
 - [ ] Summon phone features as Activities?
   - [ ] NFC payment

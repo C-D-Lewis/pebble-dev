@@ -9,9 +9,11 @@ import io.rebble.pebblekit2.common.model.ReceiveResult
 import io.rebble.pebblekit2.common.model.WatchIdentifier
 import uk.me.chrislewis.dashboard2.Config
 import uk.me.chrislewis.dashboard2.Constants
-import uk.me.chrislewis.dashboard2.Device
+import uk.me.chrislewis.dashboard2.features.Device
+import uk.me.chrislewis.dashboard2.features.Alarms
 import uk.me.chrislewis.dashboard2.features.AutoSync
 import uk.me.chrislewis.dashboard2.features.Battery
+import uk.me.chrislewis.dashboard2.features.WiFi
 import java.util.UUID
 
 private const val TAG = "PebbleReceiverService"
@@ -54,6 +56,10 @@ class PebbleReceiverService : BasePebbleListenerService() {
     }
 
     suspend fun handleSyncRequest(): ReceiveResult {
+        // TEST
+        Log.d(TAG, "Alarm: ${Alarms.getNextAlarmTime(this)}")
+        Log.d(TAG, "Wi-Fi name: ${WiFi.getWifiSSID(this)}")
+
         // Assemble all sync data
         val dict = mapOf(
             Constants.MESSAGE_KEY_COMPAT_PROTOCOL_VERSION to Constants.COMPATIBLE_PROTOCOL_VERSION,
