@@ -87,17 +87,17 @@ static void test_data_generator() {
   // Test data scenarios - all at 80% battery
   //
   // 1 - Arbitrary scenario
-  // const int changes[NUM_SAMPLES] = {2, 2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
+  // const int changes[NUM_SAMPLES] = {1, 1, 1, 0, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 0, 0};
   //
   // 2 - Should show 10 days at 8% per day
-  const int changes[NUM_SAMPLES] = {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
+  // const int changes[NUM_SAMPLES] = {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
   //
   // 3 - Should show 10 days at 7.4% (two other events are ignored)
   //     Note: includes the two special statuses
   // const int changes[NUM_SAMPLES] = {-20, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
   //
   // 4 - Should show 6.7 days at 12% per day
-  // const int changes[NUM_SAMPLES] = {3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
+  const int changes[NUM_SAMPLES] = {3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
   //
   // 5 - Should await 2 samples if both taken are 'no change'
   // const int changes[NUM_SAMPLES] = {0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
@@ -119,6 +119,9 @@ static void test_data_generator() {
   //
   // 9 - Try to emulate old watch discharge - should be 5.7 days at 14% from 80%
   // const int changes[NUM_SAMPLES] = {0, 0, 10, 0, 0, 0, 10, 0, 0, 0, 10, 0, 0, 0, 10, 0};
+  //
+  // 10 - Try and hit 1.1 day remaining from 100%
+  // const int changes[NUM_SAMPLES] = {15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15};
 
   const int interval_s = WAKEUP_MOD_H * SECONDS_PER_HOUR;
 
@@ -363,7 +366,8 @@ int data_calculate_avg_discharge_rate_x100(bool ignore_no_change) {
   // Use nearest-integer rounding to be conservative
   const int rate_100x = ((total_drops * SECONDS_PER_DAY * 100) + (total_time / 2)) / total_time;
   if (rate_100x <= MIN_RATE_X100 && !ignore_no_change) {
-    // <3% per day, count again, but this time ignore 'no change' time periods
+    // extremely low rate, count again, but this time ignore 'no change' time periods
+    // Should this be removed? It's here to prevent 1% making the outrageous 100 days claim...
     return data_calculate_avg_discharge_rate_x100(true);
   }
 
@@ -387,12 +391,11 @@ int data_calculate_days_remaining(bool tenx) {
   // Only ever charged, or rate is zero ('return 1' above should prevent this)
   if (rate_100x <= 0) return STATUS_EMPTY;
 
-  // Best to be conservative here - nearest whole number
-  rate_100x = ((rate_100x + 50) / 100) * 100;
-
   // Multiply by 100 for FP maths and x10 if tenx for decimal display
-  const int level_100x = current_level * (tenx ? 1000 : 100);
-  return level_100x / rate_100x;
+  const int level_scaled = current_level * 100 * (tenx ? 10 : 1);
+  const int dr = (level_scaled + (rate_100x / 2)) / rate_100x;
+  // APP_LOG(APP_LOG_LEVEL_DEBUG, "calc days remaining: level %d, rate %d, dr %d", current_level, rate_100x, dr);
+  return dr;
 }
 
 bool data_get_rate_is_elevated() {

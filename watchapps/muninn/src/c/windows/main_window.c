@@ -36,7 +36,7 @@ static char s_battery_buff[8];
 static char s_nc_buff[16];
 static char s_reading_buff[8];
 static char s_row_1_labels_buff[40];
-static int s_days_remaining, s_rate;
+static int s_days_remaining_10x, s_rate;
 static bool s_is_enabled;
 #ifdef FEATURE_SPEECH_BUBBLE
 static AppTimer *s_speech_timer;
@@ -44,7 +44,7 @@ static bool s_bubble_visible = true;
 static char s_bubble_buff[24];
 #endif
 
-static void update_labels(int days) {
+static void update_labels() {
 #if defined(PBL_PLATFORM_GABBRO)
   const char *template = "       Day%s left             %% per day";
 #elif defined(PBL_PLATFORM_EMERY)
@@ -54,25 +54,25 @@ static void update_labels(int days) {
 #else
   const char *template = " Day%s left      %% per day";
 #endif
-  snprintf(s_row_1_labels_buff, sizeof(s_row_1_labels_buff), template, days == 1 ? " " : "s");
+  snprintf(s_row_1_labels_buff, sizeof(s_row_1_labels_buff), template, s_days_remaining_10x == 10 ? " " : "s");
 }
 
 static void update_text() {
   // Not enough data yet
-  if (!util_is_not_status(s_days_remaining) || !util_is_not_status(s_rate)) {
+  if (!util_is_not_status(s_days_remaining_10x) || !util_is_not_status(s_rate)) {
     snprintf(s_remaining_buff, sizeof(s_remaining_buff), "--");
     snprintf(s_rate_buff, sizeof(s_rate_buff), "--");
     return;
   }
 
   // Separate tens and units for decimal point display
-  const int days_10x = data_calculate_days_remaining(true);
-  int tens = days_10x / 10;
+  int tens = s_days_remaining_10x / 10;
   if (tens >= 10) {
-    snprintf(s_remaining_buff, sizeof(s_remaining_buff), "%d", s_days_remaining);
+    // No decimal point
+    snprintf(s_remaining_buff, sizeof(s_remaining_buff), "%d", tens);
   } else {
     // Show with more precision if less than 10 days remaining
-    snprintf(s_remaining_buff, sizeof(s_remaining_buff), "%d.%d", tens, days_10x % 10);
+    snprintf(s_remaining_buff, sizeof(s_remaining_buff), "%d.%d", tens, s_days_remaining_10x % 10);
   }
 
   const int rate_100x = data_calculate_avg_discharge_rate_x100(false);
@@ -121,14 +121,14 @@ static void update_data() {
   }
 
   // Days remaining
-  s_days_remaining = data_calculate_days_remaining(false);
-  if (util_is_not_status(s_days_remaining)) {
+  s_days_remaining_10x = data_calculate_days_remaining(true);
+  if (util_is_not_status(s_days_remaining_10x)) {
     update_text();
   } else {
     snprintf(s_remaining_buff, sizeof(s_remaining_buff), "--");
   }
 
-  update_labels(s_days_remaining);
+  update_labels(s_days_remaining_10x);
 
   // Rate per day
   s_rate = data_calculate_avg_discharge_rate_x100(false) / 100;
@@ -164,7 +164,11 @@ static void update_data() {
   }
 
   // Next reading
-  util_fmt_time(wakeup_ts, &s_reading_buff[0], sizeof(s_reading_buff));
+#ifdef PBL_PLATFORM_GABBRO
+  util_fmt_time_ago(wakeup_ts, &s_reading_buff[0], sizeof(s_reading_buff)); // 6h style
+#else
+  util_fmt_time(wakeup_ts, &s_reading_buff[0], sizeof(s_reading_buff));  // 18:00 style
+#endif
 
 #ifdef FEATURE_SPEECH_BUBBLE
   AppState *app_state = data_get_app_state();
@@ -386,7 +390,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
 #endif
   draw_text(ctx, s_nc_buff, SFI_Medium, row2_text_x, text_y);
 
-  icon_x = scl_x_pp({.o = 460, .c = 320, .g = 450});
+  icon_x = scl_x_pp({.o = 460, .c = 320, .g = 500});
   icon_y = scl_y_pp({.o = 850, .c = 830, .e = 870, .g = 830});
   text_x = icon_x + ICON_SIZE;
   text_y = icon_y - scl_y_pp({.o = 30, .e = 20, .g = 20});

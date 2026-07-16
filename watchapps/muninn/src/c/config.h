@@ -17,7 +17,7 @@
 // ! Check Aplite works (at least 4.2kB static / 2.7kB on main window disappear)
 // ! Comment out INFO logs
 // ! Check TS test flags
-#define VERSION "1.49.0"
+#define VERSION "1.50.0"
 // Minimum samples before providing estimations
 #define MIN_SAMPLES 2
 // Min samples before graph is shown
@@ -35,7 +35,7 @@
 // Max time since last sample before being ignored
 #define MAX_GAP_SECONDS (12 * SECONDS_PER_HOUR)
 // Minimum rate estimation before backup pass
-#define MIN_RATE_X100 200
+#define MIN_RATE_X100 100
 
 ///////////// Testing area ////////////////
 // #define USE_TEST_DATA      true       //
