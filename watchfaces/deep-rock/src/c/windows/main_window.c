@@ -8,8 +8,8 @@
 #define SHIELD_BAR_COLOR PBL_IF_COLOR_ELSE(GColorVividCerulean, GColorWhite)
 #define HEALTH_BAR_COLOR PBL_IF_COLOR_ELSE(GColorRed, GColorWhite)
 
-#define CLASS_ICON_SIZE 40
-#define STATUS_ICON_SIZE 16
+#define CLASS_ICON_SIZE scl_pp({.o = 40, .e = 52})
+#define STATUS_ICON_SIZE scl_pp({.o = 16, .e = 20})
 #define X_ROOT scl_x(30)
 #define TIME_Y_ROOT scl_y(440)
 #define DATE_Y_ROOT scl_y(804)
@@ -239,6 +239,8 @@ static void tick_handler(struct tm *tick_time, TimeUnits changed) {
   // Class Icon
   if (s_class_icon_bitmap) gbitmap_destroy(s_class_icon_bitmap);
   s_class_icon_bitmap = gbitmap_create_with_resource(s_class_icon_id);
+  // TEST
+  // s_class_icon_bitmap = gbitmap_create_with_resource(RESOURCE_ID_CLASS_DRILLER);
   bitmap_layer_set_bitmap(s_class_icon_layer, s_class_icon_bitmap);
 
 #if defined(PBL_HEALTH)
@@ -294,7 +296,9 @@ static void window_load(Window *window) {
   layer_set_update_proc(s_shapes_layer, shapes_update_proc);
   layer_add_child(window_layer, s_shapes_layer);
 
-  s_time_layer = text_layer_create(GRect(X_ROOT + 4, TIME_Y_ROOT - 6, bounds.size.w, bounds.size.h));
+  s_time_layer = text_layer_create(
+    GRect(X_ROOT + 4, TIME_Y_ROOT - scl_y_pp({.o = 40, .e = 40}), bounds.size.w, bounds.size.h)
+  );
   text_layer_set_text_color(s_time_layer, TEXT_COLOR);
   text_layer_set_background_color(s_time_layer, GColorClear);
   text_layer_set_font(s_time_layer, scl_get_font(SFI_Time));
@@ -303,7 +307,7 @@ static void window_load(Window *window) {
   s_time_label_layer = text_layer_create(
     GRect(
       X_ROOT + scl_x(27),
-      TIME_Y_ROOT - LABEL_BG_HEIGHT - scl_y_pp({.o = 20, .e = 15}),
+      TIME_Y_ROOT - LABEL_BG_HEIGHT - scl_y_pp({.o = 15, .e = 17}),
       bounds.size.w,
       bounds.size.h
     )
@@ -321,7 +325,12 @@ static void window_load(Window *window) {
   layer_add_child(window_layer, text_layer_get_layer(s_date_layer));
 
   s_date_label_layer = text_layer_create(
-    GRect(X_ROOT + 4, DATE_Y_ROOT - LABEL_BG_HEIGHT - 3, bounds.size.w, bounds.size.h)
+    GRect(
+      X_ROOT + 4,
+      DATE_Y_ROOT - LABEL_BG_HEIGHT - scl_y_pp({.o = 15, .e = 17}),
+      bounds.size.w,
+      bounds.size.h
+    )
   );
   text_layer_set_text_color(s_date_label_layer, LABEL_TEXT_COLOR);
   text_layer_set_background_color(s_date_label_layer, GColorClear);
@@ -337,27 +346,48 @@ static void window_load(Window *window) {
   layer_add_child(window_layer, text_layer_get_layer(s_class_name_layer));
 
   s_class_icon_layer = bitmap_layer_create(
-    GRect(scl_x(10), STATUS_Y_ROOT + scl_y(24), CLASS_ICON_SIZE, CLASS_ICON_SIZE)
+    GRect(
+      scl_x_pp({.o = 10, .e = 25}),
+      STATUS_Y_ROOT + scl_y_pp({.o = 24, .e = 35}),
+      CLASS_ICON_SIZE,
+      CLASS_ICON_SIZE
+    )
   );
   bitmap_layer_set_compositing_mode(s_class_icon_layer, GCompOpSet);
   layer_add_child(window_layer, bitmap_layer_get_layer(s_class_icon_layer));
 
+  const int status_icon_x = scl_x_pp({.o = 299, .e = 308});
   s_shield_icon_layer = bitmap_layer_create(
-    GRect(scl_x(299), STATUS_Y_ROOT + scl_y(96), STATUS_ICON_SIZE, STATUS_ICON_SIZE)
+    GRect(
+      status_icon_x,
+      STATUS_Y_ROOT + scl_y_pp({.o = 96, .e = 100}),
+      STATUS_ICON_SIZE,
+      STATUS_ICON_SIZE
+    )
   );
   bitmap_layer_set_bitmap(s_shield_icon_layer, s_shield_icon_bitmap);
   bitmap_layer_set_compositing_mode(s_shield_icon_layer, GCompOpSet);
   layer_add_child(window_layer, bitmap_layer_get_layer(s_shield_icon_layer));
 
   s_health_icon_layer = bitmap_layer_create(
-    GRect(scl_x(299), STATUS_Y_ROOT + scl_y(192), STATUS_ICON_SIZE, STATUS_ICON_SIZE)
+    GRect(
+      status_icon_x,
+      STATUS_Y_ROOT + scl_y_pp({.o = 192, .e = 195}),
+      STATUS_ICON_SIZE,
+      STATUS_ICON_SIZE
+    )
   );
   bitmap_layer_set_bitmap(s_health_icon_layer, s_health_icon_bitmap);
   bitmap_layer_set_compositing_mode(s_health_icon_layer, GCompOpSet);
   layer_add_child(window_layer, bitmap_layer_get_layer(s_health_icon_layer));
 
   s_bt_icon_layer = bitmap_layer_create(
-    GRect(scl_x(875), STATUS_Y_ROOT, STATUS_ICON_SIZE, STATUS_ICON_SIZE)
+    GRect(
+      scl_x(875),
+      STATUS_Y_ROOT + scl_y_pp({.o = 5, .e = 10}),
+      STATUS_ICON_SIZE,
+      STATUS_ICON_SIZE
+    )
   );
   bitmap_layer_set_compositing_mode(s_bt_icon_layer, GCompOpSet);
   layer_add_child(window_layer, bitmap_layer_get_layer(s_bt_icon_layer));
@@ -410,6 +440,8 @@ void main_window_push() {
   bluetooth_connection_service_subscribe(bt_handler);
   bitmap_layer_set_bitmap(
     s_bt_icon_layer,
+    // TEST
+    // s_bt_icon_bitmap
     bluetooth_connection_service_peek() ? NULL : s_bt_icon_bitmap
   );
 
