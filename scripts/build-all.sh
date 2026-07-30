@@ -34,7 +34,7 @@ working_projects=$(cat <<EOF
 ./watchfaces/kitty-watchface/
 ./watchfaces/morndas/
 ./watchfaces/patchwork/
-./watchfaces/past-present-future/
+#./watchfaces/past-present-future/
 ./watchfaces/potential-divider/
 ./watchfaces/pseudotime/
 ./watchfaces/skyarc/
@@ -54,6 +54,12 @@ EOF
 )
 
 function build_project {
+  # Skip lines that are commented out in the projects list
+  if [[ "${1:0:1}" == "#" ]]; then
+    echo ">>> Skipping: $1"
+    return
+  fi
+
   echo ">>> Building $1"
   cd $1
 
