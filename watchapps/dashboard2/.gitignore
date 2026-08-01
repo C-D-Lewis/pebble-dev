@@ -7,3 +7,4 @@ node_modules
 assets
 pid
 ts-build
+android/app/release

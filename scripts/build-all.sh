@@ -47,6 +47,7 @@ working_projects=$(cat <<EOF
 
 ./watchapps/block-world/
 ./watchapps/dashboard/pebble/
+./watchapps/dashboard2/
 ./watchapps/news-headlines/
 ./watchapps/tube-status/
 ./watchapps/muninn/
