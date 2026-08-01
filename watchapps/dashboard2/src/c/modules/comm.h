@@ -2,6 +2,7 @@
 
 #include <pebble.h>
 #include <pebble-packet/pebble-packet.h>
+
 #include "../config.h"
 #include "../windows/main_window.h"
 #include "data.h"

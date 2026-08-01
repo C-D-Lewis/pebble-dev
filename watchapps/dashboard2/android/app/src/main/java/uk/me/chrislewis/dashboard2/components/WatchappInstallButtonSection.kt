@@ -45,6 +45,11 @@ fun WatchappInstallButtonSection() {
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.padding(0.dp, 8.dp)
             )
+            Text(
+                text = "ALPHA: Use the sideload file from Discord!",
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(0.dp, 8.dp)
+            )
             Row(
                 modifier = Modifier
                     .fillMaxWidth(),

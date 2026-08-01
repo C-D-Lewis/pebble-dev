@@ -27,16 +27,16 @@ class MainActivity : ComponentActivity() {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 
-    private val requestPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted: Boolean ->
-        if (isGranted) {
-            val ssid = WiFi.getWifiSSID(this)
-            showToast("SSID: $ssid")
-        } else {
-            showToast("Location permission is required to see the Wi-Fi network name.")
-        }
-    }
+//    private val requestPermissionLauncher = registerForActivityResult(
+//        ActivityResultContracts.RequestPermission()
+//    ) { isGranted: Boolean ->
+//        if (isGranted) {
+//            val ssid = WiFi.getWifiSSID(this)
+//            showToast("SSID: $ssid")
+//        } else {
+//            showToast("Location permission is required to see the Wi-Fi network name.")
+//        }
+//    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,22 +50,22 @@ class MainActivity : ComponentActivity() {
                         ForcePortraitOrientation()
                         TitleAppBar()
                         WatchappInstallButtonSection()
-                        GrantPermissionsSection(::getLocationPermission)
+//                        GrantPermissionsSection(::getLocationPermission)
                     }
                 }
             }
         }
     }
 
-    private fun getLocationPermission() {
-        val perm = Manifest.permission.ACCESS_FINE_LOCATION
-
-        if (ContextCompat.checkSelfPermission(this, perm) == PackageManager.PERMISSION_GRANTED) {
-            val ssid = WiFi.getWifiSSID(this)
-            showToast("SSID: $ssid")
-            return
-        }
-
-        requestPermissionLauncher.launch(perm)
-    }
+//    private fun getLocationPermission() {
+//        val perm = Manifest.permission.ACCESS_FINE_LOCATION
+//
+//        if (ContextCompat.checkSelfPermission(this, perm) == PackageManager.PERMISSION_GRANTED) {
+//            val ssid = WiFi.getWifiSSID(this)
+//            showToast("SSID: $ssid")
+//            return
+//        }
+//
+//        requestPermissionLauncher.launch(perm)
+//    }
 }

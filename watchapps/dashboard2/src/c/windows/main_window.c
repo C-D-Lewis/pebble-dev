@@ -1,6 +1,6 @@
 #include "main_window.h"
 
-#define TRAY_HEIGHT scl_y(750)
+#define TRAY_HEIGHT scl_y(500)
 #define TRAY_HINT_HEIGHT scl_y(100)
 
 #define ARROW_SIZE_W scl_pp({.o = 20})
@@ -10,8 +10,9 @@
 
 static Window *s_window;
 static Layer
+  *s_splash_layer,
   *s_tray_layer,
-  *s_toggles_layer;
+  *s_info_layer;
 
 static int s_selection = 0;
 static bool
@@ -40,12 +41,47 @@ static void toggle_tray() {
 
 /******************************************** Drawing *********************************************/
 
+static void splash_update_proc(Layer *layer, GContext *ctx) {
+  AppState *app_state = data_get_app_state();
+  GRect bounds = layer_get_bounds(layer);
+
+  graphics_context_set_fill_color(ctx, PBL_IF_COLOR_ELSE(GColorDarkCandyAppleRed, GColorLightGray));
+  graphics_fill_rect(ctx, bounds, 0, GCornerNone);
+
+  graphics_context_set_compositing_mode(ctx, GCompOpSet);
+  graphics_draw_bitmap_in_rect(
+    ctx,
+    bitmaps_get(RESOURCE_ID_APP_ICON),
+    GRect((bounds.size.w - 50) / 2, ((bounds.size.h - 50) / 2) - (TRAY_HINT_HEIGHT / 2), 50, 50)
+  );
+
+  if (app_state->sync_state == SyncStateOutOfDate) {
+    static char s_err_buff[32];
+    snprintf(
+      s_err_buff,
+      sizeof(s_err_buff),
+      "Out of date\n(watch %d, mobile %d)",
+      COMPAT_PROTOCOL_VERSION,
+      app_state->compat_protocol_version
+    );
+    graphics_context_set_text_color(ctx, GColorWhite);
+    graphics_draw_text(
+      ctx,
+      s_err_buff,
+      scl_get_font(SFI_Medium),
+      GRect(0, scl_y(500), bounds.size.w, 100),
+      GTextOverflowModeTrailingEllipsis,
+      GTextAlignmentCenter,
+      NULL
+    );
+  }
+}
+
 static void tray_update_proc(Layer *layer, GContext *ctx) {
   AppState *app_state = data_get_app_state();
   GRect bounds = layer_get_bounds(layer);
 
-  if (app_state->sync_state != SyncStateSuccess) return;
-
+  // Background shape
   graphics_context_set_fill_color(ctx, PBL_IF_COLOR_ELSE(GColorDarkCandyAppleRed, GColorLightGray));
   graphics_fill_rect(ctx, bounds, 4, GCornersAll);
   graphics_context_set_fill_color(ctx, PBL_IF_COLOR_ELSE(GColorBulgarianRose, GColorBlack));
@@ -55,6 +91,103 @@ static void tray_update_proc(Layer *layer, GContext *ctx) {
     0,
     GCornerNone
   );
+
+  // Not ready yet
+  if (app_state->sync_state != SyncStateSuccess) return;
+
+  // Toggle grid
+  const int cols = 3;
+  const int rows = 1;
+  const int grid_w = bounds.size.w;
+  const int grid_h = bounds.size.h - TRAY_HINT_HEIGHT;
+  const int cell_s = scl_x(230);
+  const int gap_x = (grid_w - (cols * cell_s)) / 4;
+  const int gap_y = (grid_h - (rows * cell_s)) / 4;
+
+  // Set row count here
+  for (int row = 0; row < rows; row++) {
+    for (int col = 0; col < cols; col++) {
+      const int idx = (row * cols) + col;
+
+      // If not configured, do not show
+      if (idx >= data_get_toggles_length()) continue;
+
+      GRect cell_r = GRect(
+        gap_x + col * (cell_s + gap_x),
+        gap_y + row * (cell_s + gap_y),
+        cell_s,
+        cell_s
+      );
+
+      // Draw border and background
+      GColor border_color = GColorBlack;
+      const bool is_active = data_is_toggle_active(idx);
+      if (is_active) {
+        border_color = GColorIslamicGreen;
+      }
+      graphics_context_set_fill_color(ctx, border_color);
+      graphics_fill_rect(ctx, cell_r, 0, GCornerNone);
+      graphics_context_set_fill_color(ctx, GColorBlack);
+      const int margin = 3;
+      graphics_fill_rect(ctx, grect_inset(cell_r, GEdgeInsets(margin)), 0, GCornerNone);
+
+      // Draw icon
+      graphics_context_set_compositing_mode(ctx, GCompOpSet);
+      graphics_draw_bitmap_in_rect(
+        ctx,
+        bitmaps_get(util_get_toggle_res_id(idx)),
+        GRect(
+          cell_r.origin.x + (cell_s - ICON_SIZE_W) / 2,
+          cell_r.origin.y + (cell_s - ICON_SIZE_H) / 2,
+          ICON_SIZE_W,
+          ICON_SIZE_H
+        )
+      );
+
+      // Selection is indicated by highlighting the bottom of the square in white
+      if (idx == s_selection) {
+        graphics_context_set_fill_color(ctx, GColorWhite);
+        GRect sel = GRect(
+          cell_r.origin.x + (2 * margin),
+          cell_r.origin.y + cell_r.size.h - margin,
+          cell_r.size.w - (4 * margin),
+          margin
+        );
+        graphics_fill_rect(ctx, sel, 0, GCornerNone);
+      }
+    }
+  }
+
+  // Current selection text at the bottom
+  graphics_context_set_text_color(ctx, GColorWhite);
+  graphics_draw_text(
+    ctx,
+    util_get_toggle_name(s_selection),
+    scl_get_font(SFI_Small),
+    GRect(0, bounds.size.h - scl_y(240), PS_DISP_W, 50),
+    GTextOverflowModeTrailingEllipsis,
+    GTextAlignmentCenter,
+    NULL
+  );
+
+  // Dashed white separator line
+  graphics_context_set_stroke_color(ctx, GColorWhite);
+  graphics_context_set_stroke_width(ctx, 1);
+  const int dash_y = bounds.size.h - TRAY_HINT_HEIGHT;
+  for (int x = 0; x < PS_DISP_W; x += 8) {
+    graphics_draw_line(ctx, GPoint(x, dash_y), GPoint(x + 4, dash_y));
+  }
+
+  // Arrow
+  graphics_draw_bitmap_in_rect(
+    ctx,
+    s_tray_visible ? bitmaps_get(RESOURCE_ID_ARROW_UP) : bitmaps_get(RESOURCE_ID_ARROW_DOWN),
+    GRect((PS_DISP_W - ARROW_SIZE_W) / 2, dash_y + scl_y(30), ARROW_SIZE_W, ARROW_SIZE_H)
+  );
+}
+
+static void info_update_proc(Layer *layer, GContext *ctx) {
+  AppState *app_state = data_get_app_state();
 
   const int x_margin = scl_x(160);
 
@@ -138,119 +271,6 @@ static void tray_update_proc(Layer *layer, GContext *ctx) {
     bitmaps_get(RESOURCE_ID_DISK),
     GRect(scl_x(5), scl_y(470), 28, 28)
   );
-
-  // Dashed white separator line
-  graphics_context_set_stroke_color(ctx, GColorWhite);
-  graphics_context_set_stroke_width(ctx, 1);
-  for (int x = 0; x < PS_DISP_W; x += 8) {
-    graphics_draw_line(ctx, GPoint(x, scl_y(640)), GPoint(x + 4, scl_y(640)));
-  }
-
-  // Arrow
-  graphics_draw_bitmap_in_rect(
-    ctx,
-    s_tray_visible ? bitmaps_get(RESOURCE_ID_ARROW_UP) : bitmaps_get(RESOURCE_ID_ARROW_DOWN),
-    GRect((PS_DISP_W - ARROW_SIZE_W) / 2, scl_y(670), ARROW_SIZE_W, ARROW_SIZE_H)
-  );
-}
-
-static void toggles_update_proc(Layer *layer, GContext *ctx) {
-  AppState *app_state = data_get_app_state();
-  GRect bounds = layer_get_bounds(layer);
-
-  // Splash screen conditions
-  const SyncState sync_state = app_state->sync_state;
-  if (sync_state == SyncStateInitial || sync_state == SyncStateOutOfDate) {
-    graphics_context_set_compositing_mode(ctx, GCompOpSet);
-    graphics_draw_bitmap_in_rect(
-      ctx,
-      bitmaps_get(RESOURCE_ID_APP_ICON),
-      GRect((bounds.size.w - 50) / 2, ((bounds.size.h - 50) / 2) - (TRAY_HINT_HEIGHT / 2), 50, 50)
-    );
-
-    if (app_state->sync_state == SyncStateOutOfDate) {
-      static char s_err_buff[32];
-      snprintf(
-        s_err_buff,
-        sizeof(s_err_buff),
-        "Out of date\n(watch %d, mobile %d)",
-        COMPAT_PROTOCOL_VERSION,
-        app_state->compat_protocol_version
-      );
-      graphics_context_set_text_color(ctx, GColorWhite);
-      graphics_draw_text(
-        ctx,
-        s_err_buff,
-        scl_get_font(SFI_Medium),
-        GRect(0, scl_y(500), bounds.size.w, 100),
-        GTextOverflowModeTrailingEllipsis,
-        GTextAlignmentCenter,
-        NULL
-      );
-    }
-    return;
-  }
-
-  // Toggle grid
-  const int grid_w = bounds.size.w;
-  const int grid_h = bounds.size.h - TRAY_HINT_HEIGHT;
-  const int grid_s = scl_x(230);
-  const int gap_x = (grid_w - (3 * grid_s)) / 4;
-  const int gap_y = (grid_h - (3 * grid_s)) / 4;
-
-  for (int row = 0; row < 3; row++) {
-    for (int col = 0; col < 3; col++) {
-      const int idx = (row * 3) + col;
-
-      // If not configured, do not show
-      if (idx >= data_get_toggles_length()) continue;
-
-      GRect r = GRect(
-        gap_x + col * (grid_s + gap_x),
-        gap_y + row * (grid_s + gap_y),
-        grid_s,
-        grid_s
-      );
-
-      const int margin = 3;
-      graphics_context_set_fill_color(ctx, GColorDarkGray);
-      graphics_fill_rect(ctx, r, 0, GCornerNone);
-      graphics_context_set_fill_color(ctx, GColorBlack);
-      graphics_fill_rect(ctx, grect_inset(r, GEdgeInsets(margin)), 0, GCornerNone);
-
-      // Draw icon
-      graphics_context_set_compositing_mode(ctx, GCompOpSet);
-      graphics_draw_bitmap_in_rect(
-        ctx,
-        bitmaps_get(util_get_toggle_res_id(idx)),
-        GRect(
-          r.origin.x + (grid_s - ICON_SIZE_W) / 2,
-          r.origin.y + (grid_s - ICON_SIZE_H) / 2,
-          ICON_SIZE_W,
-          ICON_SIZE_H
-        )
-      );
-
-      // Selection is indicated by highlighting the bottom of the square in white
-      if (idx == s_selection) {
-        graphics_context_set_fill_color(ctx, GColorWhite);
-        GRect sel = GRect(r.origin.x, r.origin.y + r.size.h - margin, r.size.w, margin);
-        graphics_fill_rect(ctx, sel, 0, GCornerNone);
-      }
-    }
-  }
-
-  // Current selection text at the bottom
-  graphics_context_set_text_color(ctx, GColorWhite);
-  graphics_draw_text(
-    ctx,
-    util_get_toggle_name(s_selection),
-    scl_get_font(SFI_Medium),
-    GRect(0, scl_y(730), PS_DISP_W, 50),
-    GTextOverflowModeTrailingEllipsis,
-    GTextAlignmentCenter,
-    NULL
-  );
 }
 
 /******************************************* Animations *******************************************/
@@ -288,7 +308,7 @@ void animate_delta_y(Layer *layer, int dy, int duration_ms) {
 static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
   if (s_selection > 0) {
     s_selection--;
-    layer_mark_dirty(s_toggles_layer);
+    layer_mark_dirty(s_info_layer);
     return;
   }
 
@@ -297,14 +317,17 @@ static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
 
 static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
   // Toggle selected
-  // 0 is nothing...
-  comm_toggle(s_selection + 1);
+  // 0 is empty toggle slot, so add one here
+  comm_toggle(s_selection);
 }
 
 static void down_click_handler(ClickRecognizerRef recognizer, void *context) {
-  if (s_selection < TogglesMax) {
+  // Only allow selection if tray is visible
+  if (!s_tray_visible) return;
+
+  if (s_selection < data_get_toggles_length() - 1) {
     s_selection++;
-    layer_mark_dirty(s_toggles_layer);
+    layer_mark_dirty(s_info_layer);
   }
 }
 
@@ -320,14 +343,14 @@ static void window_load(Window *window) {
   Layer *window_layer = window_get_root_layer(s_window);
   GRect bounds = layer_get_bounds(window_layer);
 
-  s_toggles_layer = layer_create(grect_inset(bounds, GEdgeInsets(TRAY_HINT_HEIGHT, 0, 0, 0)));
-  layer_set_update_proc(s_toggles_layer, toggles_update_proc);
-  layer_add_child(window_layer, s_toggles_layer);
+  s_info_layer = layer_create(grect_inset(bounds, GEdgeInsets(TRAY_HINT_HEIGHT, 0, 0, 0)));
+  layer_set_update_proc(s_info_layer, info_update_proc);
+  layer_add_child(window_layer, s_info_layer);
 
   // Initial position
   GRect tray_bounds = GRect(
     0,
-    -(TRAY_HEIGHT - TRAY_HINT_HEIGHT),
+    -(TRAY_HEIGHT) + TRAY_HINT_HEIGHT,
     bounds.size.w,
     TRAY_HEIGHT
   );
@@ -338,11 +361,17 @@ static void window_load(Window *window) {
 #ifdef TEST_EXPAND_TRAY
   toggle_tray();
 #endif
+
+  // On top
+  s_splash_layer = layer_create(bounds);
+  layer_set_update_proc(s_splash_layer, splash_update_proc);
+  layer_add_child(window_layer, s_splash_layer);
 }
 
 static void window_unload(Window *window) {
   layer_destroy(s_tray_layer);
-  layer_destroy(s_toggles_layer);
+  layer_destroy(s_info_layer);
+  layer_destroy(s_splash_layer);
 
   window_destroy(window);
   s_window = NULL;
@@ -351,7 +380,7 @@ static void window_unload(Window *window) {
 void main_window_push() {
   if (!s_window) {
     s_window = window_create();
-    window_set_background_color(s_window, GColorDarkCandyAppleRed);
+    window_set_background_color(s_window, GColorBlack);
     window_set_window_handlers(s_window, (WindowHandlers) {
       .load = window_load,
       .unload = window_unload
@@ -369,9 +398,9 @@ void main_window_update() {
   // Success
   if (app_state->sync_state == SyncStateSuccess) {
     window_set_click_config_provider(s_window, click_config_provider);
-    window_set_background_color(s_window, GColorBlack);
+    layer_set_hidden(s_splash_layer, true);
   }
 
   layer_mark_dirty(s_tray_layer);
-  layer_mark_dirty(s_toggles_layer);
+  layer_mark_dirty(s_info_layer);
 }

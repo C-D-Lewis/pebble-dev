@@ -15,19 +15,11 @@ typedef enum {
   SK_Max = 51
 } StorageKey;
 
-// Persisted app data - be careful changing this!
-// To remove fields, add '__' prefix and leave in place (for struct packing)
-typedef struct {
-  // Nothing yet
-
-  // Singleton, adding new fields OK, removing from middle is NOT OK
-} PersistData;
-
 // NOT persisted data
 typedef struct {
   SyncState sync_state;
   int compat_protocol_version;
-  char toggle_order[19];   // 2c x 9 toggles + null
+  char toggle_order[TOGGLES_STRLEN + 1];   // 2c x X toggles + null
   char device_name[32];
   char battery_perc[4];    // '100'
   char free_space[12];     // '999.99 GB'
@@ -38,7 +30,6 @@ typedef struct {
 void data_init();
 void data_deinit();
 
-PersistData* data_get_persist_data();
 AppState* data_get_app_state();
 
 #ifdef USE_TEST_DATA
@@ -46,3 +37,5 @@ void data_test_data_handler();
 #endif
 
 int data_get_toggles_length();
+
+bool data_is_toggle_active(int index);

@@ -26,5 +26,5 @@ object Constants {
     const val MESSAGE_KEY_TOGGLE_TYPE = 10007u
 
     // ToggleType (must match watch data.h)
-    const val TOGGLE_TYPE_AUTOSYNC = 1
+    const val TOGGLE_TYPE_FIND_PHONE = 0
 }

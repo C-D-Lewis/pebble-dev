@@ -20,15 +20,11 @@
 #define COMM_INBOX_SIZE 256
 // AppMessage outbox size
 #define COMM_OUTBOX_SIZE 128
-// Length of meaningful string in toggles_order
-#define TOGGLES_STRLEN 18
 
 // Lines up with main window selection index
 typedef enum {
-  ToggleTypeNothing = 0,
-  ToggleTypeAutoSync,
-  ToggleCycleRinger,
-  ToggleFindPhone,
+  ToggleTypeNothing = -1,
+  ToggleTypeFindPhone = 0,
 
   TogglesMax
 } ToggleType;
@@ -38,3 +34,12 @@ typedef enum {
   SyncStateOutOfDate,
   SyncStateSuccess
 } SyncState;
+
+// Toggle states, compared with strings so can't be enum
+#define TOGGLE_STATE_OFF '0'
+#define TOGGLE_STATE_ON '1'
+
+// Length of chars for each toggle's type+state
+#define TOGGLE_FMT_LEN 2
+// Length of meaningful string in toggles_order (2 * num toggles)
+#define TOGGLES_STRLEN TOGGLE_FMT_LEN * TogglesMax

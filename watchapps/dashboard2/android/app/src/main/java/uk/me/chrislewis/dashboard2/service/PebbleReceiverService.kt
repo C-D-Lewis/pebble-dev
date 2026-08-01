@@ -1,5 +1,9 @@
 package uk.me.chrislewis.dashboard2.service
 
+import android.media.AudioAttributes
+import android.media.Ringtone
+import android.media.RingtoneManager
+import android.os.Build
 import android.util.Log
 import io.rebble.pebblekit2.client.BasePebbleListenerService
 import io.rebble.pebblekit2.client.DefaultPebbleSender
@@ -13,6 +17,7 @@ import uk.me.chrislewis.dashboard2.features.Device
 import uk.me.chrislewis.dashboard2.features.Alarms
 import uk.me.chrislewis.dashboard2.features.AutoSync
 import uk.me.chrislewis.dashboard2.features.Battery
+import uk.me.chrislewis.dashboard2.features.FindPhone
 import uk.me.chrislewis.dashboard2.features.WiFi
 import java.util.UUID
 
@@ -42,11 +47,18 @@ class PebbleReceiverService : BasePebbleListenerService() {
             val type = item.value as Int
             Log.d(TAG, "Toggling type: $type ($item)")
 
-            if (type == Constants.TOGGLE_TYPE_AUTOSYNC) {
-                AutoSync.toggleAutoSync(AutoSync.isAutoSyncEnabled())
-                Log.d(TAG, "AutoSync now ${AutoSync.isAutoSyncEnabled()}")
+            // Find Phone
+            if (type == Constants.TOGGLE_TYPE_FIND_PHONE) {
+                FindPhone.handleFindPhone(this)
                 return handleSyncRequest()
             }
+
+            // AutoSync (does not work in background)
+//            if (type == Constants.TOGGLE_TYPE_AUTOSYNC) {
+//                AutoSync.toggleAutoSync(AutoSync.isAutoSyncEnabled())
+//                Log.d(TAG, "AutoSync now ${AutoSync.isAutoSyncEnabled()}")
+//                return handleSyncRequest()
+//            }
 
             Log.e(TAG, "Unknown toggle type: $type")
         }
@@ -58,7 +70,6 @@ class PebbleReceiverService : BasePebbleListenerService() {
     suspend fun handleSyncRequest(): ReceiveResult {
         // TEST
         Log.d(TAG, "Alarm: ${Alarms.getNextAlarmTime(this)}")
-        Log.d(TAG, "Wi-Fi name: ${WiFi.getWifiSSID(this)}")
 
         // Assemble all sync data
         val dict = mapOf(
@@ -85,5 +96,6 @@ class PebbleReceiverService : BasePebbleListenerService() {
     override fun onDestroy() {
         super.onDestroy()
         sender.close()
+        FindPhone.stopPlaying()
     }
 }

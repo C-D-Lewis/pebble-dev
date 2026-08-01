@@ -3,6 +3,7 @@
 #include <pebble.h>
 
 #include "../config.h"
+#include "./data.h"
 
 char* util_get_toggle_name(int index);
 
