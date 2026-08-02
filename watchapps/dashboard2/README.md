@@ -8,14 +8,19 @@ starting with minimal features and adding more as they are deemed possible
 without to much special device access or root. The focus will be on modularity,
 maintainability, and reusability.
 
+## Feature requests
+
+Please see [this issue](https://github.com/C-D-Lewis/pebble-dev/issues/18) for
+status of feature requests. If you think you can help implement a new feature
+(new info or tool/toggle), PRs are welcome!
+
 ## Permissions
 
 *Manifest Permissions*
 
-* `android.permission.ACCESS_FINE_LOCATION` - Get Wi-Fi network info
-* `android.permission.ACCESS_COARSE_LOCATION` - Get Wi-Fi network info
-* `android.permission.ACCESS_WIFI_STATE` - Get Wi-Fi network info
-* `android.permission.ACCESS_NETWORK_STATE` - Get network state
+These permissions are defined statically and always apply.
+
+* None yet
 
 *Runtime Permissions*
 
@@ -28,7 +33,7 @@ These permissions are opt-in if you want to enable the feature they enable.
 - [x] Basic comms with Android
 - [x] Running in background
 - [ ] MVP initial features:
-  - [ ] Basic watch UI (info + tools)
+  - [x] Basic watch UI (info + tools)
   - [ ] Basic Android app UI
   - [x] Loading splash
   - [x] Watchapp minimum version check
@@ -36,26 +41,25 @@ These permissions are opt-in if you want to enable the feature they enable.
   - [x] Phone name
   - [x] Phone battery level
   - [x] Phone free space
-  - [-] Next alarm
+  - [x] Hard-coded Find Phone sound (and/or flash?)
   - [ ] Change ringer mode? (Requires notif policy one-time permissions popup)
-  - [ ] Hard-coded Find Phone sound (and/or flash?)
 - [ ] Post-MVP:
   - [ ] Customizable toggle order
   - [ ] Customizable find phone sound
   - [ ] Find Watch with vibration/sound/light?
   - [ ] WiFi network name? (Needs location permission - DOA due to Android...)
+  - [ ] Next calendar event (needs calendar permission)
+  - [-] Next alarm?
+  - [ ] Custom webhook POST URL
 - [ ] Advanced (via [Shizuku](https://github.com/RikkaApps/Shizuku) or similar)
   - [ ] Toggle WiFi?
   - [ ] Toggle mobile data?
   - [ ] Lock phone?
   - [ ] Hotspot?
-  - [ ] Toggle AutoSync (background app updates)
-- [ ] New things!?
+  - [ ] Toggle AutoSync (background app updated not allowed DOA)
   - [ ] Change WiFi network?
-  - [ ] Next calendar event (needs calendar permission)
-  - [ ] Battery status / temperature / plugged?
+- [ ] New things!?
   - [ ] Free RAM (not useful as Linux uses it)
   - [ ] Is WiFi vs is mobile data (may not require permission)
-  - [ ] Custom webhook POST URL
 - [ ] Summon phone features as Activities?
   - [ ] NFC payment
