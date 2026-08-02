@@ -3,7 +3,7 @@
 #include <pebble.h>
 
 // RELEASE CHECKLIST
-// - Update defined versions
+// - Update defined versions below
 // - Android min. version values changed?
 
 // Current watchapp version, always update
@@ -11,7 +11,7 @@
 
 ///////////// TESTING AREA /////////////
 // Use test data                      //
-// #define USE_TEST_DATA true         //
+#define USE_TEST_DATA true         //
 // Expand the tray automatically      //
 // #define TEST_EXPAND_TRAY true      //
 ////////////////////////////////////////

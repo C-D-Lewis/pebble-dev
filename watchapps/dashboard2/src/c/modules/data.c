@@ -7,11 +7,18 @@ void data_init() {
   s_app_state.sync_state = SyncStateInitial;
 }
 
-void data_deinit() {
-}
+void data_deinit() {}
 
 AppState* data_get_app_state() {
   return &s_app_state;
+}
+
+bool data_is_toggle_active(int index) {
+  if (index < 0 || index >= TogglesMax) return false;
+
+  // Get the state character for this toggle
+  const char c = s_app_state.toggle_order[(index * TOGGLE_FMT_LEN) + 1];
+  return c == TOGGLE_STATE_ON;
 }
 
 #ifdef USE_TEST_DATA
@@ -23,7 +30,7 @@ void data_test_data_handler() {
   snprintf(
     s_app_state.toggle_order,
     sizeof(s_app_state.toggle_order),
-    
+    // Find Phone, ...
     "10"
   );
   snprintf(
@@ -50,22 +57,3 @@ void data_test_data_handler() {
   main_window_update();
 }
 #endif
-
-int data_get_toggles_length() {
-  int count = 0;
-
-  // Go through [type, state] pairs until the last is rached
-  for (int i = 0; i < TOGGLES_STRLEN - 1; i += TOGGLE_FMT_LEN) {
-    if (s_app_state.toggle_order[i] == '0') break;
-    count++;
-  }
-  return count;
-}
-
-bool data_is_toggle_active(int index) {
-  if (index < 0 || index >= data_get_toggles_length()) return false;
-
-  // Get the state character for this toggle
-  const char c = s_app_state.toggle_order[(index * TOGGLE_FMT_LEN) + 1];
-  return c == TOGGLE_STATE_ON;
-}

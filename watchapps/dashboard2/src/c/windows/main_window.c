@@ -8,6 +8,8 @@
 #define ICON_SIZE_W scl_pp({.o = 28})
 #define ICON_SIZE_H scl_pp({.o = 28})
 
+#define APP_ICON_SIZE 50
+
 static Window *s_window;
 static Layer
   *s_splash_layer,
@@ -52,15 +54,20 @@ static void splash_update_proc(Layer *layer, GContext *ctx) {
   graphics_draw_bitmap_in_rect(
     ctx,
     bitmaps_get(RESOURCE_ID_APP_ICON),
-    GRect((bounds.size.w - 50) / 2, ((bounds.size.h - 50) / 2) - (TRAY_HINT_HEIGHT / 2), 50, 50)
+    GRect(
+      (bounds.size.w - APP_ICON_SIZE) / 2,
+      ((bounds.size.h - APP_ICON_SIZE) / 2),
+      APP_ICON_SIZE,
+      APP_ICON_SIZE
+    )
   );
 
   if (app_state->sync_state == SyncStateOutOfDate) {
-    static char s_err_buff[32];
+    static char s_err_buff[48];
     snprintf(
       s_err_buff,
       sizeof(s_err_buff),
-      "Out of date\n(watch %d, mobile %d)",
+      "Out of date\n(watch v%d, mobile v%d)",
       COMPAT_PROTOCOL_VERSION,
       app_state->compat_protocol_version
     );
@@ -110,7 +117,7 @@ static void tray_update_proc(Layer *layer, GContext *ctx) {
       const int idx = (row * cols) + col;
 
       // If not configured, do not show
-      if (idx >= data_get_toggles_length()) continue;
+      if (idx >= TogglesMax) continue;
 
       GRect cell_r = GRect(
         gap_x + col * (cell_s + gap_x),
@@ -123,7 +130,7 @@ static void tray_update_proc(Layer *layer, GContext *ctx) {
       GColor border_color = GColorBlack;
       const bool is_active = data_is_toggle_active(idx);
       if (is_active) {
-        border_color = GColorIslamicGreen;
+        border_color = PBL_IF_COLOR_ELSE(GColorIslamicGreen, GColorLightGray);
       }
       graphics_context_set_fill_color(ctx, border_color);
       graphics_fill_rect(ctx, cell_r, 0, GCornerNone);
@@ -189,7 +196,7 @@ static void tray_update_proc(Layer *layer, GContext *ctx) {
 static void info_update_proc(Layer *layer, GContext *ctx) {
   AppState *app_state = data_get_app_state();
 
-  const int x_margin = scl_x(160);
+  const int x_margin = scl_x_pp({.o = 210, .e = 160});
 
   // Device name
   graphics_context_set_text_color(ctx, GColorWhite);
@@ -197,7 +204,7 @@ static void info_update_proc(Layer *layer, GContext *ctx) {
     ctx,
     "Device",
     scl_get_font(SFI_Small),
-    GRect(x_margin, scl_y(-20), PS_DISP_W, 100),
+    GRect(x_margin, scl_y_pp({.o = -10, .e = -20}), PS_DISP_W, 100),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentLeft,
     NULL
@@ -206,7 +213,7 @@ static void info_update_proc(Layer *layer, GContext *ctx) {
     ctx,
     app_state->device_name,
     scl_get_font(SFI_Medium),
-    GRect(x_margin, scl_y(65), PS_DISP_W, 100),
+    GRect(x_margin, scl_y_pp({.o = 75, .e = 65}), PS_DISP_W, 100),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentLeft,
     NULL
@@ -223,7 +230,7 @@ static void info_update_proc(Layer *layer, GContext *ctx) {
     ctx,
     "Battery",
     scl_get_font(SFI_Small),
-    GRect(x_margin, scl_y(190), PS_DISP_W, 100),
+    GRect(x_margin, scl_y_pp({.o = 210, .e = 190}), PS_DISP_W, 100),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentLeft,
     NULL
@@ -234,7 +241,7 @@ static void info_update_proc(Layer *layer, GContext *ctx) {
     ctx,
     battery_str,
     scl_get_font(SFI_Medium),
-    GRect(x_margin, scl_y(275), PS_DISP_W, 100),
+    GRect(x_margin, scl_y_pp({.o = 285, .e = 275}), PS_DISP_W, 100),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentLeft,
     NULL
@@ -250,7 +257,7 @@ static void info_update_proc(Layer *layer, GContext *ctx) {
     ctx,
     "Free Storage",
     scl_get_font(SFI_Small),
-    GRect(x_margin, scl_y(400), PS_DISP_W, 100),
+    GRect(x_margin, scl_y_pp({.o = 420, .e = 400}), PS_DISP_W, 100),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentLeft,
     NULL
@@ -261,7 +268,7 @@ static void info_update_proc(Layer *layer, GContext *ctx) {
     ctx,
     free_space_str,
     scl_get_font(SFI_Medium),
-    GRect(x_margin, scl_y(485), PS_DISP_W, 100),
+    GRect(x_margin, scl_y_pp({.o = 505, .e = 485}), PS_DISP_W, 100),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentLeft,
     NULL
@@ -317,7 +324,6 @@ static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
 
 static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
   // Toggle selected
-  // 0 is empty toggle slot, so add one here
   comm_toggle(s_selection);
 }
 
@@ -325,7 +331,7 @@ static void down_click_handler(ClickRecognizerRef recognizer, void *context) {
   // Only allow selection if tray is visible
   if (!s_tray_visible) return;
 
-  if (s_selection < data_get_toggles_length() - 1) {
+  if (s_selection < TogglesMax - 1) {
     s_selection++;
     layer_mark_dirty(s_info_layer);
   }
@@ -389,7 +395,7 @@ void main_window_push() {
 
   window_stack_push(s_window, true);
 
-  comm_sync_data();
+  comm_request_sync();
 }
 
 void main_window_update() {

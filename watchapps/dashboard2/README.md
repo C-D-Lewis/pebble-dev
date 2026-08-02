@@ -12,7 +12,7 @@ maintainability, and reusability.
 
 Please see [this issue](https://github.com/C-D-Lewis/pebble-dev/issues/18) for
 status of feature requests. If you think you can help implement a new feature
-(new info or tool/toggle), PRs are welcome!
+(new info or toggle), PRs are welcome!
 
 ## Permissions
 
@@ -33,7 +33,7 @@ These permissions are opt-in if you want to enable the feature they enable.
 - [x] Basic comms with Android
 - [x] Running in background
 - [ ] MVP initial features:
-  - [x] Basic watch UI (info + tools)
+  - [x] Basic watch UI (info + toggles)
   - [ ] Basic Android app UI
   - [x] Loading splash
   - [x] Watchapp minimum version check

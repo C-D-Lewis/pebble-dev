@@ -11,6 +11,6 @@ void comm_init();
 
 void comm_deinit();
 
-void comm_sync_data();
+void comm_request_sync();
 
 void comm_toggle(ToggleType type);

@@ -32,10 +32,8 @@ void data_deinit();
 
 AppState* data_get_app_state();
 
+bool data_is_toggle_active(int index);
+
 #ifdef USE_TEST_DATA
 void data_test_data_handler();
 #endif
-
-int data_get_toggles_length();
-
-bool data_is_toggle_active(int index);
