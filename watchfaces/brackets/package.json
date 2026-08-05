@@ -1,7 +1,7 @@
 {
   "name": "brackets",
   "author": "Chris Lewis",
-  "version": "2.8.0",
+  "version": "2.9.0",
   "private": true,
   "keywords": [
     "pebble-app"
@@ -18,7 +18,8 @@
     ],
     "enableMultiJS": true,
     "capabilities": [
-      "configurable"
+      "configurable",
+      "health"
     ],
     "projectType": "native",
     "displayName": "Brackets",
@@ -53,9 +54,9 @@
     "messageKeys": [
       "WeatherRequest",
       "WeatherString",
-      "BatteryAndBluetooth",
-      "WeatherStatus",
       "SecondTick",
+      "BatteryAndBluetooth",
+      "ComplicationType",
       "ColorBackground",
       "ColorBrackets",
       "ColorDateTime",

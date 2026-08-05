@@ -1,22 +1,13 @@
 module.exports = [
   {
     "type": "heading",
-    "defaultValue": "Brackets Configuration" ,
+    "defaultValue": "Brackets Configuration",
     "size": 3
   },
   {
     "type": "section",
     "items": [
-      {
-        "type": "heading",
-        "defaultValue": "Options"
-      },
-      {
-        "type": "toggle",
-        "messageKey": "BatteryAndBluetooth",
-        "label": "Show Battery & BT Status",
-        "defaultValue": true
-      },
+      { "type": "heading", "defaultValue": "Options" },
       {
         "type": "toggle",
         "messageKey": "SecondTick",
@@ -25,19 +16,27 @@ module.exports = [
       },
       {
         "type": "toggle",
-        "messageKey": "WeatherStatus",
-        "label": "Show Local Weather",
+        "messageKey": "BatteryAndBluetooth",
+        "label": "Show Battery & BT Status",
         "defaultValue": true
+      },
+      {
+        "type": "radiogroup",
+        "messageKey": "ComplicationType",
+        "label": "Complication",
+        "defaultValue": "weather",
+        "options": [
+          { "label": "Weather",    "value": "weather" },
+          { "label": "Step Count", "value": "step_count" },
+          { "label": "None",       "value": "none" }
+        ]
       }
     ]
   },
   {
     "type": "section",
     "items": [
-      {
-        "type": "heading",
-        "defaultValue": "Colors"
-      },
+      { "type": "heading", "defaultValue": "Colors" },
       {
         type: 'color',
         label: 'Background',
@@ -64,8 +63,5 @@ module.exports = [
       }
     ]
   },
-  {
-    "type": "submit",
-    "defaultValue": "Save"
-  }
+  { "type": "submit", "defaultValue": "Save" }
 ];

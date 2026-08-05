@@ -12,8 +12,12 @@
 #endif
 
 static Window *s_window;
-static TextLayer *s_date_layer, *s_time_layer, *s_batt_and_bt_layer, *s_weather_layer;
+static TextLayer *s_date_layer, *s_time_layer, *s_batt_and_bt_layer, *s_complication_layer;
 static Layer *s_canvas_layer;
+
+#ifdef PBL_HEALTH
+static int s_steps = 0;
+#endif
 
 static void update_batt_and_bt() {
   const bool connected = connection_service_peek_pebble_app_connection();
@@ -69,6 +73,8 @@ static char* zero_pad(int value) {
 }
 
 static void tick_handler(struct tm *tick_time, TimeUnits changed) {
+  PersistData *persist_data = data_get_persist_data();
+
   // Date
   static char date_buffer[16];
   snprintf(
@@ -83,7 +89,7 @@ static void tick_handler(struct tm *tick_time, TimeUnits changed) {
 
   // Time
   static char time_buffer[16];
-  if (data_get_boolean(MESSAGE_KEY_SecondTick)) {
+  if (persist_data->second_tick) {
     strftime(
       time_buffer,
       sizeof(time_buffer),
@@ -101,8 +107,8 @@ static void tick_handler(struct tm *tick_time, TimeUnits changed) {
   text_layer_set_text(s_time_layer, time_buffer);
 
   // Weather refresh
-  if ((tick_time->tm_min == 0 || tick_time->tm_min == 30) && tick_time->tm_sec == 0) {
-    if (data_get_boolean(MESSAGE_KEY_WeatherStatus)) {
+  if (strcmp(persist_data->complication_type, COMPLICATION_TYPE_WEATHER) == 0) {
+    if ((tick_time->tm_min == 0 || tick_time->tm_min == 30) && tick_time->tm_sec == 0) {
       comm_request_weather();
     }
   }
@@ -116,19 +122,22 @@ static TextLayer* make_text_layer(GRect frame) {
 }
 
 static bool any_complication_enabled() {
-  return data_get_boolean(MESSAGE_KEY_BatteryAndBluetooth) ||
-    data_get_boolean(MESSAGE_KEY_WeatherStatus);
+  PersistData *persist_data = data_get_persist_data();
+  return persist_data->battery_and_bluetooth ||
+    strcmp(persist_data->complication_type, COMPLICATION_TYPE_NONE) != 0;
 }
 
 static void draw_brackets(GContext *ctx, GRect bounds, int scl_y) {
+  PersistData *persist_data = data_get_persist_data();
+
   GRect rect = scl_grect(0, scl_y, 940, 270);
   const int bracket_w = scl_x(30);
   const int bracket_x_inset = scl_x(70);
 
-  graphics_context_set_fill_color(ctx, data_get_color(MESSAGE_KEY_ColorBrackets));
+  graphics_context_set_fill_color(ctx, persist_data->color_brackets);
   graphics_fill_rect(ctx, rect, GCornerNone, 0);
 
-  graphics_context_set_fill_color(ctx, data_get_color(MESSAGE_KEY_ColorBackground));
+  graphics_context_set_fill_color(ctx, persist_data->color_background);
   graphics_fill_rect(
     ctx,
     grect_inset(rect, GEdgeInsets(bracket_w)),
@@ -160,6 +169,8 @@ static GPoint get_root_point() {
 }
 
 static void layout() {
+  PersistData *persist_data = data_get_persist_data();
+
   Layer *root_layer = window_get_root_layer(s_window);
   GRect bounds = layer_get_bounds(root_layer);
 
@@ -179,19 +190,59 @@ static void layout() {
 
   y += scl_y_pp({.o = 195, .e =  200});
 
-  if (data_get_boolean(MESSAGE_KEY_BatteryAndBluetooth)) {
+  if (persist_data->battery_and_bluetooth) {
     frame = grect_inset(bounds, GEdgeInsets(y, 0, 0, text_x));
     layer_set_frame(text_layer_get_layer(s_batt_and_bt_layer), frame);
   }
 
-  if (data_get_boolean(MESSAGE_KEY_WeatherStatus)) {
+  if (any_complication_enabled()) {
     y += scl_y_pp({.o = 165, .e =  163});
     frame = grect_inset(bounds, GEdgeInsets(y, 0, 0, text_x));
-    layer_set_frame(text_layer_get_layer(s_weather_layer), frame);
+    layer_set_frame(text_layer_get_layer(s_complication_layer), frame);
   }
 
   layer_mark_dirty(s_canvas_layer);
 }
+
+#ifdef PBL_HEALTH
+static void update_step_count() {
+  PersistData *persist_data = data_get_persist_data();
+
+  if (strcmp(persist_data->complication_type, COMPLICATION_TYPE_STEP_COUNT) != 0) return;
+
+  HealthMetric metric = HealthMetricStepCount;
+  time_t start = time_start_of_today();
+  time_t end = time(NULL);
+
+  HealthServiceAccessibilityMask mask = health_service_metric_accessible(metric, start, end);
+  if (mask & HealthServiceAccessibilityMaskAvailable) {
+    s_steps = (int)health_service_sum_today(metric);
+  } else {
+    s_steps = 0;
+  }
+
+  // Keep string max 8 chars (crude but effective)
+  static char steps_buff[16];
+  if (s_steps < 10) {
+    snprintf(steps_buff, sizeof(steps_buff), "%d    STP", s_steps);
+  } else if (s_steps < 100) {
+    snprintf(steps_buff, sizeof(steps_buff), "%d   STP", s_steps);
+  } else if (s_steps < 1000) {
+    snprintf(steps_buff, sizeof(steps_buff), "%d  STP", s_steps);
+  } else if (s_steps < 10000) {
+    snprintf(steps_buff, sizeof(steps_buff), "%d STP", s_steps);
+  } else {
+    snprintf(steps_buff, sizeof(steps_buff), "%dSTP", s_steps);
+  }
+  text_layer_set_text(s_complication_layer, steps_buff);
+}
+
+static void health_handler(HealthEventType event, void *context) {
+  if (event != HealthEventMovementUpdate) return;
+
+  update_step_count();
+}
+#endif
 
 static void window_load(Window *window) {
   Layer *root_layer = window_get_root_layer(s_window);
@@ -211,15 +262,15 @@ static void window_load(Window *window) {
   s_batt_and_bt_layer = make_text_layer(GRectZero);
   layer_add_child(root_layer, text_layer_get_layer(s_batt_and_bt_layer));
 
-  s_weather_layer = make_text_layer(GRectZero);
-  layer_add_child(root_layer, text_layer_get_layer(s_weather_layer));
+  s_complication_layer = make_text_layer(GRectZero);
+  layer_add_child(root_layer, text_layer_get_layer(s_complication_layer));
 }
 
 static void window_unload(Window *window) {
   text_layer_destroy(s_date_layer);
   text_layer_destroy(s_time_layer);
   text_layer_destroy(s_batt_and_bt_layer);
-  text_layer_destroy(s_weather_layer);
+  text_layer_destroy(s_complication_layer);
 
   layer_destroy(s_canvas_layer);
 
@@ -228,6 +279,8 @@ static void window_unload(Window *window) {
 }
 
 void main_window_push() {
+  AppState *app_state = data_get_app_state();
+
   if (!s_window) {
     s_window = window_create();
     window_set_window_handlers(s_window, (WindowHandlers) {
@@ -241,15 +294,23 @@ void main_window_push() {
   struct tm *tick_now = localtime(&now);
   tick_handler(tick_now, SECOND_UNIT);
 
-  data_set_weather_string("...  ...");
+  snprintf(
+    app_state->weather_status,
+    sizeof(app_state->weather_status),
+    "%s",
+    "...  ..."
+  );
   main_window_reload();
 }
 
 void main_window_reload() {
+  PersistData *persist_data = data_get_persist_data();
+  AppState *app_state = data_get_app_state();
+
   layout();
 
   // Battery and Bluetooth
-  if (!data_get_boolean(MESSAGE_KEY_BatteryAndBluetooth)) {
+  if (!persist_data->battery_and_bluetooth) {
     layer_set_hidden(text_layer_get_layer(s_batt_and_bt_layer), true);
 
     connection_service_unsubscribe();
@@ -265,30 +326,46 @@ void main_window_reload() {
     update_batt_and_bt();
   }
 
-  // Weather
-  if (!data_get_boolean(MESSAGE_KEY_WeatherStatus)) {
-    layer_set_hidden(text_layer_get_layer(s_weather_layer), true);
+  // No complication
+  if (strcmp(persist_data->complication_type, COMPLICATION_TYPE_NONE) == 0) {
+    layer_set_hidden(text_layer_get_layer(s_complication_layer), true);
   } else {
-    layer_set_hidden(text_layer_get_layer(s_weather_layer), false);
-    text_layer_set_text(s_weather_layer, data_get_weather_string());
+    layer_set_hidden(text_layer_get_layer(s_complication_layer), false);
+
+    // Weather, else steps
+    if (strcmp(persist_data->complication_type, COMPLICATION_TYPE_WEATHER) == 0) {
+      text_layer_set_text(s_complication_layer, app_state->weather_status);
+    } else {
+#ifdef PBL_HEALTH
+      health_service_events_unsubscribe();
+      if (!health_service_events_subscribe(health_handler, NULL)) {
+        APP_LOG(APP_LOG_LEVEL_ERROR, "Health not available!");
+      }
+      update_step_count();
+#else
+      text_layer_set_text(s_complication_layer, "N/A");
+#endif
+    }
   }
 
   // Time
   tick_timer_service_unsubscribe();
   tick_timer_service_subscribe(
-    data_get_boolean(MESSAGE_KEY_SecondTick) ? SECOND_UNIT : MINUTE_UNIT,
+    persist_data->second_tick ? SECOND_UNIT : MINUTE_UNIT,
     tick_handler
   );
 
   // Colors
-  window_set_background_color(s_window, data_get_color(MESSAGE_KEY_ColorBackground));
-  text_layer_set_text_color(s_time_layer, data_get_color(MESSAGE_KEY_ColorDateTime));
-  text_layer_set_text_color(s_date_layer, data_get_color(MESSAGE_KEY_ColorDateTime));
-  text_layer_set_text_color(s_batt_and_bt_layer, data_get_color(MESSAGE_KEY_ColorComplications));
-  text_layer_set_text_color(s_weather_layer, data_get_color(MESSAGE_KEY_ColorComplications));
+  window_set_background_color(s_window, persist_data->color_background);
+  text_layer_set_text_color(s_time_layer, persist_data->color_datetime);
+  text_layer_set_text_color(s_date_layer, persist_data->color_datetime);
+  text_layer_set_text_color(s_batt_and_bt_layer, persist_data->color_complications);
+  text_layer_set_text_color(s_complication_layer, persist_data->color_complications);
 }
 
 /** Reload only data from JS, not all subscriptions */
 void main_window_update_data() {
-  text_layer_set_text(s_weather_layer, data_get_weather_string());
+  AppState *app_state = data_get_app_state();
+
+  text_layer_set_text(s_complication_layer, app_state->weather_status);
 }

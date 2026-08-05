@@ -1,40 +1,40 @@
 #include "comm.h"
 
 static void inbox_received_handler(DictionaryIterator *iter, void *context) {
+  PersistData *persist_data = data_get_persist_data();
+  AppState *app_state = data_get_app_state();
+
   if (packet_contains_key(iter, MESSAGE_KEY_BatteryAndBluetooth)) {
     // Clay sends all keys at once
-    data_set_boolean(
-      MESSAGE_KEY_BatteryAndBluetooth,
-      packet_get_boolean(iter, MESSAGE_KEY_BatteryAndBluetooth)
+    persist_data->second_tick = packet_get_boolean(iter, MESSAGE_KEY_SecondTick);
+    persist_data->battery_and_bluetooth = packet_get_boolean(iter, MESSAGE_KEY_BatteryAndBluetooth);
+    snprintf(
+      persist_data->complication_type,
+      sizeof(persist_data->complication_type),
+      "%s",
+      packet_get_string(iter, MESSAGE_KEY_ComplicationType)
     );
-    data_set_boolean(
-      MESSAGE_KEY_WeatherStatus,
-      packet_get_boolean(iter, MESSAGE_KEY_WeatherStatus)
+    persist_data->color_background = GColorFromHEX(
+      packet_get_integer(iter, MESSAGE_KEY_ColorBackground)
     );
-    data_set_boolean(
-      MESSAGE_KEY_SecondTick,
-      packet_get_boolean(iter, MESSAGE_KEY_SecondTick)
+    persist_data->color_brackets = GColorFromHEX(
+      packet_get_integer(iter, MESSAGE_KEY_ColorBrackets)
     );
-    data_set_color(
-      MESSAGE_KEY_ColorBackground,
-      GColorFromHEX(packet_get_integer(iter, MESSAGE_KEY_ColorBackground))
+    persist_data->color_datetime = GColorFromHEX(
+      packet_get_integer(iter, MESSAGE_KEY_ColorDateTime)
     );
-    data_set_color(
-      MESSAGE_KEY_ColorBrackets,
-      GColorFromHEX(packet_get_integer(iter, MESSAGE_KEY_ColorBrackets))
-    );
-    data_set_color(
-      MESSAGE_KEY_ColorDateTime,
-      GColorFromHEX(packet_get_integer(iter, MESSAGE_KEY_ColorDateTime))
-    );
-    data_set_color(
-      MESSAGE_KEY_ColorComplications,
-      GColorFromHEX(packet_get_integer(iter, MESSAGE_KEY_ColorComplications))
+    persist_data->color_complications = GColorFromHEX(
+      packet_get_integer(iter, MESSAGE_KEY_ColorComplications)
     );
   }
 
   if (packet_contains_key(iter, MESSAGE_KEY_WeatherString)) {
-    data_set_weather_string(packet_get_string(iter, MESSAGE_KEY_WeatherString));
+    snprintf(
+      app_state->weather_status,
+      sizeof(app_state->weather_status),
+      "%s",
+      packet_get_string(iter, MESSAGE_KEY_WeatherString)
+    );
   }
 
   main_window_reload();
