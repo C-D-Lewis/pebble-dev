@@ -70,6 +70,7 @@ class PebbleReceiverService : BasePebbleListenerService() {
     suspend fun handleSyncRequest(): ReceiveResult {
         // TEST
         Log.d(TAG, "Alarm: ${Alarms.getNextAlarmTime(this)}")
+        Log.d(TAG, "Charging: ${Battery.isCharging(this)}")
 
         // Assemble all sync data
         val dict = mapOf(

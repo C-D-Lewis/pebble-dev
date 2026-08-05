@@ -43,13 +43,14 @@ These permissions are opt-in if you want to enable the feature they enable.
   - [x] Phone free space
   - [x] Hard-coded Find Phone sound (and/or flash?)
   - [ ] Change ringer mode? (Requires notif policy one-time permissions popup)
+  - [ ] Next alarm
+  - [ ] Is battery charging?
 - [ ] Post-MVP:
   - [ ] Customizable toggle order
   - [ ] Customizable find phone sound
   - [ ] Find Watch with vibration/sound/light?
   - [ ] WiFi network name? (Needs location permission - DOA due to Android...)
   - [ ] Next calendar event (needs calendar permission)
-  - [-] Next alarm?
   - [ ] Custom webhook POST URL
 - [ ] Advanced (via [Shizuku](https://github.com/RikkaApps/Shizuku) or similar)
   - [ ] Toggle WiFi?

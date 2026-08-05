@@ -22,4 +22,18 @@ object Battery {
             -1 // Indicates an error or unknown state
         }
     }
+
+    fun isCharging(context: Context): Boolean {
+        val intent = context.registerReceiver(
+            null,
+            IntentFilter(Intent.ACTION_BATTERY_CHANGED)
+        ) ?: return false
+
+        val status = intent.getIntExtra(BatteryManager.EXTRA_STATUS, -1)
+        return when (status) {
+            BatteryManager.BATTERY_STATUS_CHARGING,
+            BatteryManager.BATTERY_STATUS_FULL -> true
+            else -> false
+        }
+    }
 }
