@@ -14,40 +14,53 @@ static void inbox_received_handler(DictionaryIterator *iter, void *context) {
       MESSAGE_KEY_COMPAT_PROTOCOL_VERSION
     );
   }
-  if (packet_contains_key(iter, MESSAGE_KEY_TOGGLE_ORDER)) {
+  if (packet_contains_key(iter, MESSAGE_KEY_SYNC_TOGGLE_ORDER)) {
     snprintf(
       app_state->toggle_order,
       sizeof(app_state->toggle_order),
-      packet_get_string(iter, MESSAGE_KEY_TOGGLE_ORDER)
+      packet_get_string(iter, MESSAGE_KEY_SYNC_TOGGLE_ORDER)
     );
   }
-  if (packet_contains_key(iter, MESSAGE_KEY_DEVICE_NAME)) {
+  if (packet_contains_key(iter, MESSAGE_KEY_SYNC_DEVICE_NAME)) {
     snprintf(
       app_state->device_name,
       sizeof(app_state->device_name),
-      packet_get_string(iter, MESSAGE_KEY_DEVICE_NAME)
+      packet_get_string(iter, MESSAGE_KEY_SYNC_DEVICE_NAME)
     );
   }
-  if (packet_contains_key(iter, MESSAGE_KEY_BATTERY_PERC)) {
+  if (packet_contains_key(iter, MESSAGE_KEY_SYNC_BATTERY_PERC)) {
     snprintf(
       app_state->battery_perc,
       sizeof(app_state->battery_perc),
-      packet_get_string(iter, MESSAGE_KEY_BATTERY_PERC)
+      packet_get_string(iter, MESSAGE_KEY_SYNC_BATTERY_PERC)
     );
   }
-  if (packet_contains_key(iter, MESSAGE_KEY_FREE_SPACE)) {
+  if (packet_contains_key(iter, MESSAGE_KEY_SYNC_FREE_SPACE)) {
     snprintf(
       app_state->free_space,
       sizeof(app_state->free_space),
-      packet_get_string(iter, MESSAGE_KEY_FREE_SPACE)
+      packet_get_string(iter, MESSAGE_KEY_SYNC_FREE_SPACE)
     );
   }
-  if (packet_contains_key(iter, MESSAGE_KEY_FREE_SPACE_PERC)) {
+  if (packet_contains_key(iter, MESSAGE_KEY_SYNC_FREE_SPACE_PERC)) {
     snprintf(
       app_state->free_space_perc,
       sizeof(app_state->free_space_perc),
-      packet_get_string(iter, MESSAGE_KEY_FREE_SPACE_PERC)
+      packet_get_string(iter, MESSAGE_KEY_SYNC_FREE_SPACE_PERC)
     );
+  }
+  if (packet_contains_key(iter, MESSAGE_KEY_SYNC_NEXT_ALARM)) {
+    snprintf(
+      app_state->next_alarm,
+      sizeof(app_state->next_alarm),
+      packet_get_string(iter, MESSAGE_KEY_SYNC_NEXT_ALARM)
+    );
+  }
+  if (packet_contains_key(iter, MESSAGE_KEY_SYNC_IS_CHARGING)) {
+    app_state->is_charging = packet_get_integer(
+      iter,
+      MESSAGE_KEY_SYNC_IS_CHARGING
+    ) == 1;
   }
 
   app_state->sync_state = SyncStateSuccess;

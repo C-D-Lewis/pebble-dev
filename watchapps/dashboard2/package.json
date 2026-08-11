@@ -1,6 +1,6 @@
 {
   "name": "dashboard2",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "_note": "Check list in config.h!",
   "author": "Chris Lewis",
   "private": true,
@@ -55,20 +55,28 @@
           "type": "bitmap",
           "name": "DISK",
           "file": "images/disk.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "ALARM",
+          "file": "images/alarm.png"
         }
       ]
     },
     "projectType": "native",
     "uuid": "7606dabf-67cf-466a-92a7-5e62598a1436",
+    "_messageKeysNote": "Do not change order without updating Android Constants.kt!",
     "messageKeys": [
       "COMPAT_PROTOCOL_VERSION",
+      "TOGGLE_TYPE",
       "SYNC_REQUEST",
-      "TOGGLE_ORDER",
-      "DEVICE_NAME",
-      "BATTERY_PERC",
-      "FREE_SPACE",
-      "FREE_SPACE_PERC",
-      "TOGGLE_TYPE"
+      "SYNC_TOGGLE_ORDER",
+      "SYNC_DEVICE_NAME",
+      "SYNC_BATTERY_PERC",
+      "SYNC_FREE_SPACE",
+      "SYNC_FREE_SPACE_PERC",
+      "SYNC_NEXT_ALARM",
+      "SYNC_IS_CHARGING"
     ],
     "enableMultiJS": true,
     "displayName": "Dashboard 2",

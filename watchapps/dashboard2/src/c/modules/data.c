@@ -53,6 +53,12 @@ void data_test_data_handler() {
     sizeof(s_app_state.free_space_perc),
     "76"
   );
+  snprintf(
+    s_app_state.next_alarm,
+    sizeof(s_app_state.next_alarm),
+    "Wed 08:00"
+  );
+  s_app_state.is_charging = true;
 
   main_window_update();
 }

@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import uk.me.chrislewis.dashboard2.Constants
 
 @Composable
-fun WatchappInstallButtonSection() {
+fun InstallSection() {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -41,12 +41,12 @@ fun WatchappInstallButtonSection() {
                 fontWeight = FontWeight.Bold
             )
             Text(
-                text = "Select which appstore to install from",
+                text = "Select which appstore to install from:",
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.padding(0.dp, 8.dp)
             )
             Text(
-                text = "ALPHA: Use the sideload file from Discord!",
+                text = "BETA: Use the sideload PBW from Discord!",
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.padding(0.dp, 8.dp)
             )
@@ -61,7 +61,8 @@ fun WatchappInstallButtonSection() {
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.secondary,
                         contentColor = MaterialTheme.colorScheme.onPrimary
-                    )
+                    ),
+                    enabled = false
                 ) {
                     Text(text = "Rebble")
                 }
@@ -71,7 +72,8 @@ fun WatchappInstallButtonSection() {
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.secondary,
                         contentColor = MaterialTheme.colorScheme.onPrimary
-                    )
+                    ),
+                    enabled = false
                 ) {
                     Text(text = "RePebble")
                 }

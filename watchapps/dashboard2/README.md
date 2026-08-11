@@ -34,7 +34,7 @@ These permissions are opt-in if you want to enable the feature they enable.
 - [x] Running in background
 - [ ] MVP initial features:
   - [x] Basic watch UI (info + toggles)
-  - [ ] Basic Android app UI
+  - [x] Basic Android app UI
   - [x] Loading splash
   - [x] Watchapp minimum version check
   - [x] Hard-coded toggle order
@@ -42,9 +42,10 @@ These permissions are opt-in if you want to enable the feature they enable.
   - [x] Phone battery level
   - [x] Phone free space
   - [x] Hard-coded Find Phone sound (and/or flash?)
+  - [x] Next alarm
+  - [x] Is battery charging?
+  - [ ] Check all layouts
   - [ ] Change ringer mode? (Requires notif policy one-time permissions popup)
-  - [ ] Next alarm
-  - [ ] Is battery charging?
 - [ ] Post-MVP:
   - [ ] Customizable toggle order
   - [ ] Customizable find phone sound

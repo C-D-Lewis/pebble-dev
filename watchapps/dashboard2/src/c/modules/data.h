@@ -6,15 +6,6 @@
 
 #include "../windows/main_window.h"
 
-// NOTE: APPEND ONLY - Changing keys will affect existing users!
-typedef enum {
-  // App data key
-  SK_PersistData = 1,
-
-  // Max storage value used
-  SK_Max = 51
-} StorageKey;
-
 // NOT persisted data
 typedef struct {
   SyncState sync_state;
@@ -24,6 +15,8 @@ typedef struct {
   char battery_perc[4];    // '100'
   char free_space[12];     // '999.99 GB'
   char free_space_perc[4]; // '100'
+  char next_alarm[16];     // 'Wed 08:00'
+  bool is_charging;
 
 } AppState;
 

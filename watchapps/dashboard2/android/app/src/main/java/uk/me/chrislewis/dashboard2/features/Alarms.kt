@@ -10,9 +10,7 @@ object Alarms {
     fun getNextAlarmTime(context: Context): String {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val nextAlarm = alarmManager.nextAlarmClock ?: return "-"
-        val triggerTimeMs = nextAlarm.triggerTime
-        val date = Date(triggerTimeMs)
-        val formatter = SimpleDateFormat("EE HH:mm", Locale.getDefault())
-        return formatter.format(date)
+        val date = Date(nextAlarm.triggerTime)
+        return SimpleDateFormat("EE HH:mm", Locale.getDefault()).format(date)
     }
 }

@@ -3,11 +3,11 @@
 #include <pebble.h>
 
 // RELEASE CHECKLIST
-// - Update defined versions below
-// - Android min. version values changed?
+// - Check compatible protocol version is correct
+// - Disable TEST flags
 
-// Current watchapp version, always update
-#define COMPAT_PROTOCOL_VERSION 1
+// Compatible protocol version, set in Android when protocol changes
+#define COMPAT_PROTOCOL_VERSION 2
 
 ///////////// TESTING AREA /////////////
 // Use test data                      //

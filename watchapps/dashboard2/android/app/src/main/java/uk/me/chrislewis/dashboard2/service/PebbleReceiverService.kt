@@ -1,9 +1,5 @@
 package uk.me.chrislewis.dashboard2.service
 
-import android.media.AudioAttributes
-import android.media.Ringtone
-import android.media.RingtoneManager
-import android.os.Build
 import android.util.Log
 import io.rebble.pebblekit2.client.BasePebbleListenerService
 import io.rebble.pebblekit2.client.DefaultPebbleSender
@@ -15,10 +11,8 @@ import uk.me.chrislewis.dashboard2.Config
 import uk.me.chrislewis.dashboard2.Constants
 import uk.me.chrislewis.dashboard2.features.Device
 import uk.me.chrislewis.dashboard2.features.Alarms
-import uk.me.chrislewis.dashboard2.features.AutoSync
 import uk.me.chrislewis.dashboard2.features.Battery
 import uk.me.chrislewis.dashboard2.features.FindPhone
-import uk.me.chrislewis.dashboard2.features.WiFi
 import java.util.UUID
 
 private const val TAG = "PebbleReceiverService"
@@ -69,7 +63,6 @@ class PebbleReceiverService : BasePebbleListenerService() {
 
     suspend fun handleSyncRequest(): ReceiveResult {
         // TEST
-        Log.d(TAG, "Alarm: ${Alarms.getNextAlarmTime(this)}")
         Log.d(TAG, "Charging: ${Battery.isCharging(this)}")
 
         // Assemble all sync data
@@ -79,7 +72,9 @@ class PebbleReceiverService : BasePebbleListenerService() {
             Constants.MESSAGE_KEY_SYNC_DEVICE_NAME to PebbleDictionaryItem.Text(Device.getDeviceName(this)),
             Constants.MESSAGE_KEY_SYNC_BATTERY_PERC to PebbleDictionaryItem.Text(Battery.getBatteryLevel(this).toString()),
             Constants.MESSAGE_KEY_SYNC_FREE_SPACE to PebbleDictionaryItem.Text(Device.getFreeDiskSpace(this)),
-            Constants.MESSAGE_KEY_SYNC_FREE_SPACE_PERC to PebbleDictionaryItem.Text(Device.getFreeDiskSpacePercentage().toString())
+            Constants.MESSAGE_KEY_SYNC_FREE_SPACE_PERC to PebbleDictionaryItem.Text(Device.getFreeDiskSpacePercentage().toString()),
+            Constants.MESSAGE_KEY_SYNC_NEXT_ALARM to PebbleDictionaryItem.Text(Alarms.getNextAlarmTime(this)),
+            Constants.MESSAGE_KEY_SYNC_IS_CHARGING to PebbleDictionaryItem.Int32(if (Battery.isCharging(this)) 1 else 0)
         )
         val result = sender.sendDataToPebble(Constants.APP_UUID, dict)
         Log.d(TAG, "Send $dict: $result")

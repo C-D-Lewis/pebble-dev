@@ -12,19 +12,19 @@ object Constants {
     val REPEBBLE_APPSTORE_URL = "apps.repebble.com/dashboard_53ec8d840c3036447e000109"
 
     // Compatible watchapp protocol version minimum
-    // Increment when protocol has breaking changes
-    val COMPATIBLE_PROTOCOL_VERSION = PebbleDictionaryItem.Int32(1)
-
+    // IMPORTANT NOTE: Increment when protocol has breaking changes
+    val COMPATIBLE_PROTOCOL_VERSION = PebbleDictionaryItem.Int32(2)
     // AppMessage keys
     const val MESSAGE_KEY_COMPAT_PROTOCOL_VERSION = 10000u
-    const val MESSAGE_KEY_SYNC_REQUEST = 10001u
-    const val MESSAGE_KEY_SYNC_TOGGLE_ORDER = 10002u
-    const val MESSAGE_KEY_SYNC_DEVICE_NAME = 10003u
-    const val MESSAGE_KEY_SYNC_BATTERY_PERC = 10004u
-    const val MESSAGE_KEY_SYNC_FREE_SPACE = 10005u
-    const val MESSAGE_KEY_SYNC_FREE_SPACE_PERC = 10006u
-    const val MESSAGE_KEY_TOGGLE_TYPE = 10007u
-
-    // ToggleType (must match watch data.h)
+    const val MESSAGE_KEY_TOGGLE_TYPE = 10001u
+    const val MESSAGE_KEY_SYNC_REQUEST = 10002u
+    const val MESSAGE_KEY_SYNC_TOGGLE_ORDER = 10003u
+    const val MESSAGE_KEY_SYNC_DEVICE_NAME = 10004u
+    const val MESSAGE_KEY_SYNC_BATTERY_PERC = 10005u
+    const val MESSAGE_KEY_SYNC_FREE_SPACE = 10006u
+    const val MESSAGE_KEY_SYNC_FREE_SPACE_PERC = 10007u
+    const val MESSAGE_KEY_SYNC_NEXT_ALARM = 10008u
+    const val MESSAGE_KEY_SYNC_IS_CHARGING = 10009u
+    // ToggleTypes (must match watch data.h)
     const val TOGGLE_TYPE_FIND_PHONE = 0
 }

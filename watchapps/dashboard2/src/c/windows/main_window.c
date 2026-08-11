@@ -1,10 +1,10 @@
 #include "main_window.h"
 
-#define TRAY_HEIGHT scl_y(500)
+#define TRAY_HEIGHT scl_y_pp({.o = 500, .c = 750, .g = 750})
 #define TRAY_HINT_HEIGHT scl_y(100)
 
-#define ARROW_SIZE_W scl_pp({.o = 20})
-#define ARROW_SIZE_H scl_pp({.o = 10})
+#define ARROW_SIZE_W scl_pp({.o = 18, .e = 20, .g = 20})
+#define ARROW_SIZE_H scl_pp({.o = 9, .e = 10, .g = 10})
 #define ICON_SIZE_W scl_pp({.o = 28})
 #define ICON_SIZE_H scl_pp({.o = 28})
 
@@ -75,8 +75,8 @@ static void splash_update_proc(Layer *layer, GContext *ctx) {
     graphics_draw_text(
       ctx,
       s_err_buff,
-      scl_get_font(SFI_Medium),
-      GRect(0, scl_y(500), bounds.size.w, 100),
+      scl_get_font(SFI_Small),
+      GRect(0, scl_y(700), bounds.size.w, 100),
       GTextOverflowModeTrailingEllipsis,
       GTextAlignmentCenter,
       NULL
@@ -111,6 +111,8 @@ static void tray_update_proc(Layer *layer, GContext *ctx) {
   const int gap_x = (grid_w - (cols * cell_s)) / 4;
   const int gap_y = (grid_h - (rows * cell_s)) / 4;
 
+  const int root_y = scl_y_pp({.o = 0, .c = 170, .g = 170});
+
   // Set row count here
   for (int row = 0; row < rows; row++) {
     for (int col = 0; col < cols; col++) {
@@ -121,7 +123,7 @@ static void tray_update_proc(Layer *layer, GContext *ctx) {
 
       GRect cell_r = GRect(
         gap_x + col * (cell_s + gap_x),
-        gap_y + row * (cell_s + gap_y),
+        root_y + gap_y + row * (cell_s + gap_y),
         cell_s,
         cell_s
       );
@@ -196,7 +198,8 @@ static void tray_update_proc(Layer *layer, GContext *ctx) {
 static void info_update_proc(Layer *layer, GContext *ctx) {
   AppState *app_state = data_get_app_state();
 
-  const int x_margin = scl_x_pp({.o = 210, .e = 160});
+  const int icon_x = scl_x_pp({.o = -5, .c = 200, .g = 200});
+  const int text_x = scl_x_pp({.o = 195, .c = 360, .e = 145, .g = 360});
 
   // Device name
   graphics_context_set_text_color(ctx, GColorWhite);
@@ -204,7 +207,7 @@ static void info_update_proc(Layer *layer, GContext *ctx) {
     ctx,
     "Device",
     scl_get_font(SFI_Small),
-    GRect(x_margin, scl_y_pp({.o = -10, .e = -20}), PS_DISP_W, 100),
+    GRect(text_x, scl_y_pp({.o = -10, .e = -20, .g = -20}), PS_DISP_W, 100),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentLeft,
     NULL
@@ -213,7 +216,7 @@ static void info_update_proc(Layer *layer, GContext *ctx) {
     ctx,
     app_state->device_name,
     scl_get_font(SFI_Medium),
-    GRect(x_margin, scl_y_pp({.o = 75, .e = 65}), PS_DISP_W, 100),
+    GRect(text_x, scl_y_pp({.o = 60, .e = 65, .g = 65}), PS_DISP_W, 100),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentLeft,
     NULL
@@ -222,15 +225,15 @@ static void info_update_proc(Layer *layer, GContext *ctx) {
   graphics_draw_bitmap_in_rect(
     ctx,
     bitmaps_get(RESOURCE_ID_PHONE),
-    GRect(scl_x(5), scl_y(50), 28, 28)
+    GRect(icon_x, scl_y(50), 28, 28)
   );
 
   // Battery percentage
   graphics_draw_text(
     ctx,
-    "Battery",
+    app_state->is_charging ? "Battery (charging)" : "Battery",
     scl_get_font(SFI_Small),
-    GRect(x_margin, scl_y_pp({.o = 210, .e = 190}), PS_DISP_W, 100),
+    GRect(text_x, scl_y_pp({.o = 210, .e = 190, .g = 190}), PS_DISP_W, 100),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentLeft,
     NULL
@@ -241,7 +244,7 @@ static void info_update_proc(Layer *layer, GContext *ctx) {
     ctx,
     battery_str,
     scl_get_font(SFI_Medium),
-    GRect(x_margin, scl_y_pp({.o = 285, .e = 275}), PS_DISP_W, 100),
+    GRect(text_x, scl_y_pp({.o = 280, .e = 275, .g = 275}), PS_DISP_W, 100),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentLeft,
     NULL
@@ -249,7 +252,7 @@ static void info_update_proc(Layer *layer, GContext *ctx) {
   graphics_draw_bitmap_in_rect(
     ctx,
     bitmaps_get(RESOURCE_ID_BATTERY),
-    GRect(scl_x(5), scl_y(260), 28, 28)
+    GRect(icon_x, scl_y(260), 28, 28)
   );
 
   // Free space (perc)
@@ -257,18 +260,24 @@ static void info_update_proc(Layer *layer, GContext *ctx) {
     ctx,
     "Free Storage",
     scl_get_font(SFI_Small),
-    GRect(x_margin, scl_y_pp({.o = 420, .e = 400}), PS_DISP_W, 100),
+    GRect(text_x, scl_y_pp({.o = 420, .e = 400, .g = 400}), PS_DISP_W, 100),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentLeft,
     NULL
   );
   static char free_space_str[32];
-  snprintf(free_space_str, sizeof(free_space_str), "%s (%s%%)", app_state->free_space, app_state->free_space_perc);
+  snprintf(
+    free_space_str,
+    sizeof(free_space_str),
+    "%s (%s%%)",
+    app_state->free_space,
+    app_state->free_space_perc
+  );
   graphics_draw_text(
     ctx,
     free_space_str,
     scl_get_font(SFI_Medium),
-    GRect(x_margin, scl_y_pp({.o = 505, .e = 485}), PS_DISP_W, 100),
+    GRect(text_x, scl_y_pp({.o = 490, .e = 485, .g = 485}), PS_DISP_W, 100),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentLeft,
     NULL
@@ -276,7 +285,32 @@ static void info_update_proc(Layer *layer, GContext *ctx) {
   graphics_draw_bitmap_in_rect(
     ctx,
     bitmaps_get(RESOURCE_ID_DISK),
-    GRect(scl_x(5), scl_y(470), 28, 28)
+    GRect(icon_x, scl_y(470), 28, 28)
+  );
+
+  // Next alarm
+  graphics_draw_text(
+    ctx,
+    "Next Alarm",
+    scl_get_font(SFI_Small),
+    GRect(text_x, scl_y_pp({.o = 640, .e = 620, .g = 620}), PS_DISP_W, 100),
+    GTextOverflowModeTrailingEllipsis,
+    GTextAlignmentLeft,
+    NULL
+  );
+  graphics_draw_text(
+    ctx,
+    app_state->next_alarm,
+    scl_get_font(SFI_Medium),
+    GRect(text_x, scl_y_pp({.o = 710, .e = 705, .g = 705}), PS_DISP_W, 100),
+    GTextOverflowModeTrailingEllipsis,
+    GTextAlignmentLeft,
+    NULL
+  );
+  graphics_draw_bitmap_in_rect(
+    ctx,
+    bitmaps_get(RESOURCE_ID_ALARM),
+    GRect(icon_x, scl_y(690), 28, 28)
   );
 }
 
