@@ -357,6 +357,8 @@ static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
 }
 
 static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
+  if (!s_tray_visible) return;
+
   // Toggle selected
   comm_toggle(s_selection);
 }

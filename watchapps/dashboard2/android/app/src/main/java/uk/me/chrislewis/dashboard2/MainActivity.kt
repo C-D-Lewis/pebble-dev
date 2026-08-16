@@ -6,6 +6,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import uk.me.chrislewis.dashboard2.components.ForcePortraitOrientation
@@ -21,12 +23,17 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+
         enableEdgeToEdge()
 
         setContent {
             Dashboard2Theme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { padding ->
-                    Column(modifier = Modifier.fillMaxSize()) {
+                    val scrollState = rememberScrollState()
+                    Column(
+                        modifier = Modifier.fillMaxSize()
+                            .verticalScroll(scrollState)
+                    ) {
                         ForcePortraitOrientation()
                         TitleAppBar()
                         InformationSection()
