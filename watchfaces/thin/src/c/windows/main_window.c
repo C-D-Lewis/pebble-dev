@@ -303,9 +303,9 @@ static void window_load(Window *window) {
 
   s_day_in_month_layer = text_layer_create(
     GRect(
-      x_offset - scl_x_pp({.o = 20, .e = 10, .g = -5}),
+      x_offset - scl_x_pp({.o = 60, .e = 35, .g = 15}),
       y_offset + scl_y_pp({.o = 105, .e = 120, .g = 130}),
-      28,
+      40,
       text_s
     )
   );
