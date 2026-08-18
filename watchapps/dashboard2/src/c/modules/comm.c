@@ -89,8 +89,7 @@ void comm_deinit() {}
 
 void comm_request_sync() {
 #ifdef USE_TEST_DATA
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "Using test data");
-  app_timer_register(1500, data_test_data_handler, NULL);
+  app_timer_register(1000, data_test_data_handler, NULL);
   return;
 #endif
 

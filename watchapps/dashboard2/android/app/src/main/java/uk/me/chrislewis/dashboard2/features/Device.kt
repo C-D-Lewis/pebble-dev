@@ -6,6 +6,7 @@ import android.os.Environment
 import android.os.StatFs
 import android.provider.Settings
 import android.text.format.Formatter
+import java.util.Locale
 import kotlin.math.roundToInt
 
 object Device {
@@ -43,11 +44,12 @@ object Device {
     /**
      * Get readable free space.
      */
-    fun getFreeDiskSpace(context: Context): String {
+    fun getFreeDiskSpace(): String {
         val path = Environment.getDataDirectory()
         val stat = StatFs(path.path)
         val freeBytes = stat.availableBlocksLong * stat.blockSizeLong
-        return Formatter.formatFileSize(context, freeBytes)
+        val freeGb = freeBytes.toDouble() / (1024 * 1024 * 1024)
+        return String.format(Locale.getDefault(), "%.1f GB", freeGb)
     }
 
     /**

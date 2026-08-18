@@ -36,7 +36,7 @@ void data_test_data_handler() {
   snprintf(
     s_app_state.device_name,
     sizeof(s_app_state.device_name),
-    "Test Device"
+    "Pixel 9a"
   );
   snprintf(
     s_app_state.battery_perc,
@@ -46,7 +46,7 @@ void data_test_data_handler() {
   snprintf(
     s_app_state.free_space,
     sizeof(s_app_state.free_space),
-    "117.38 GB"
+    "117.4 GB"
   );
   snprintf(
     s_app_state.free_space_perc,

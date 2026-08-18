@@ -71,7 +71,7 @@ class PebbleReceiverService : BasePebbleListenerService() {
             Constants.MESSAGE_KEY_SYNC_TOGGLE_ORDER to PebbleDictionaryItem.Text(Config.getToggleOrderString()),
             Constants.MESSAGE_KEY_SYNC_DEVICE_NAME to PebbleDictionaryItem.Text(Device.getDeviceName(this)),
             Constants.MESSAGE_KEY_SYNC_BATTERY_PERC to PebbleDictionaryItem.Text(Battery.getBatteryLevel(this).toString()),
-            Constants.MESSAGE_KEY_SYNC_FREE_SPACE to PebbleDictionaryItem.Text(Device.getFreeDiskSpace(this)),
+            Constants.MESSAGE_KEY_SYNC_FREE_SPACE to PebbleDictionaryItem.Text(Device.getFreeDiskSpace()),
             Constants.MESSAGE_KEY_SYNC_FREE_SPACE_PERC to PebbleDictionaryItem.Text(Device.getFreeDiskSpacePercentage().toString()),
             Constants.MESSAGE_KEY_SYNC_NEXT_ALARM to PebbleDictionaryItem.Text(Alarms.getNextAlarmTime(this)),
             Constants.MESSAGE_KEY_SYNC_IS_CHARGING to PebbleDictionaryItem.Int32(if (Battery.isCharging(this)) 1 else 0)
