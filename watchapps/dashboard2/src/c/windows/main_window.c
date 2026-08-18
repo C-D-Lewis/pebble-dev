@@ -199,51 +199,71 @@ static void info_update_proc(Layer *layer, GContext *ctx) {
   AppState *app_state = data_get_app_state();
 
   const int icon_x = scl_x_pp({.o = -5, .c = 200, .g = 200});
-  const int text_x = scl_x_pp({.o = 200, .c = 360, .e = 145, .g = 360});
-
-  const int row_1_text_y = scl_y_pp({.o = 35, .e = 30, .g = 30});
+  const int text_x = scl_x_pp({.o = 210, .c = 360, .e = 150, .g = 360});
 
   // Device name
-  graphics_context_set_compositing_mode(ctx, GCompOpSet);
-  graphics_draw_bitmap_in_rect(
-    ctx,
-    bitmaps_get(RESOURCE_ID_PHONE),
-    GRect(icon_x, scl_y(50), ICON_SIZE_W, ICON_SIZE_H)
-  );
   graphics_context_set_text_color(ctx, GColorWhite);
+  graphics_draw_text(
+    ctx,
+    "Device",
+    scl_get_font(SFI_Small),
+    GRect(text_x, scl_y_pp({.o = -10, .e = -20, .g = -20}), PS_DISP_W, 100),
+    GTextOverflowModeTrailingEllipsis,
+    GTextAlignmentLeft,
+    NULL
+  );
   graphics_draw_text(
     ctx,
     app_state->device_name,
     scl_get_font(SFI_Medium),
-    GRect(text_x, row_1_text_y, PS_DISP_W, 100),
+    GRect(text_x, scl_y_pp({.o = 60, .e = 65, .g = 65}), PS_DISP_W, 100),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentLeft,
     NULL
   );
-
-  // Battery percentage
+  graphics_context_set_compositing_mode(ctx, GCompOpSet);
   graphics_draw_bitmap_in_rect(
     ctx,
-    bitmaps_get(RESOURCE_ID_BATTERY),
-    GRect(scl_x_pp({.o = 610, .e = 640}), scl_y(50), ICON_SIZE_W, ICON_SIZE_H)
+    bitmaps_get(RESOURCE_ID_PHONE),
+    GRect(icon_x, scl_y(50), 28, 28)
+  );
+
+  // Battery percentage
+  graphics_draw_text(
+    ctx,
+    app_state->is_charging ? "Battery (charging)" : "Battery",
+    scl_get_font(SFI_Small),
+    GRect(text_x, scl_y_pp({.o = 210, .e = 190, .g = 190}), PS_DISP_W, 100),
+    GTextOverflowModeTrailingEllipsis,
+    GTextAlignmentLeft,
+    NULL
   );
   static char battery_str[16];
-  snprintf(battery_str, sizeof(battery_str), "100");//, app_state->battery_perc);
+  snprintf(battery_str, sizeof(battery_str), "%s%% left", app_state->battery_perc);
   graphics_draw_text(
     ctx,
     battery_str,
     scl_get_font(SFI_Medium),
-    GRect(scl_x(770), row_1_text_y, PS_DISP_W, 100),
+    GRect(text_x, scl_y_pp({.o = 280, .e = 275, .g = 275}), PS_DISP_W, 100),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentLeft,
     NULL
   );
-
-  // Free space (perc)
   graphics_draw_bitmap_in_rect(
     ctx,
-    bitmaps_get(RESOURCE_ID_DISK),
-    GRect(icon_x, scl_y(240), ICON_SIZE_W, ICON_SIZE_H)
+    bitmaps_get(RESOURCE_ID_BATTERY),
+    GRect(icon_x, scl_y(260), 28, 28)
+  );
+
+  // Free space (perc)
+  graphics_draw_text(
+    ctx,
+    "Free Storage",
+    scl_get_font(SFI_Small),
+    GRect(text_x, scl_y_pp({.o = 420, .e = 400, .g = 400}), PS_DISP_W, 100),
+    GTextOverflowModeTrailingEllipsis,
+    GTextAlignmentLeft,
+    NULL
   );
   static char free_space_str[32];
   snprintf(
@@ -257,17 +277,26 @@ static void info_update_proc(Layer *layer, GContext *ctx) {
     ctx,
     free_space_str,
     scl_get_font(SFI_Medium),
-    GRect(text_x, scl_y_pp({.o = 220, .e = 220, .g = 220}), PS_DISP_W, 100),
+    GRect(text_x, scl_y_pp({.o = 490, .e = 485, .g = 485}), PS_DISP_W, 100),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentLeft,
     NULL
   );
-
-  // Next alarm
   graphics_draw_bitmap_in_rect(
     ctx,
-    bitmaps_get(RESOURCE_ID_ALARM),
-    GRect(icon_x, scl_y(690), ICON_SIZE_W, ICON_SIZE_H)
+    bitmaps_get(RESOURCE_ID_DISK),
+    GRect(icon_x, scl_y(470), 28, 28)
+  );
+
+  // Next alarm
+  graphics_draw_text(
+    ctx,
+    "Next Alarm",
+    scl_get_font(SFI_Small),
+    GRect(text_x, scl_y_pp({.o = 640, .e = 620, .g = 620}), PS_DISP_W, 100),
+    GTextOverflowModeTrailingEllipsis,
+    GTextAlignmentLeft,
+    NULL
   );
   graphics_draw_text(
     ctx,
@@ -277,6 +306,11 @@ static void info_update_proc(Layer *layer, GContext *ctx) {
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentLeft,
     NULL
+  );
+  graphics_draw_bitmap_in_rect(
+    ctx,
+    bitmaps_get(RESOURCE_ID_ALARM),
+    GRect(icon_x, scl_y(690), 28, 28)
   );
 }
 
