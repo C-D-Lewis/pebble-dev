@@ -16,17 +16,12 @@ status of feature requests. If you think you can help implement a new feature
 
 ## Permissions
 
-*Manifest Permissions*
+These permissions are listed in the manifest and explained below. If you choose
+not to grant them, the corresponding feature will just not work.
 
-These permissions are defined statically and always apply.
-
-* None yet
-
-*Runtime Permissions*
-
-These permissions are opt-in if you want to enable the feature they enable.
-
-* None yet
+| Permission                                      | Feature           | Details                                               |
+|-------------------------------------------------|-------------------|-------------------------------------------------------|
+| `android.permission.ACCESS_NOTIFICATION_POLICY` | Cycle ringer mode | allow prompting access to notification policy / modes |
 
 ## Roadmap
 
@@ -44,8 +39,8 @@ These permissions are opt-in if you want to enable the feature they enable.
   - [x] Hard-coded Find Phone sound (and/or flash?)
   - [x] Next alarm
   - [x] Is battery charging?
+  - [x] Change ringer mode? (Requires notif policy one-time permissions popup)
   - [ ] Check all layouts
-  - [ ] Change ringer mode? (Requires notif policy one-time permissions popup)
 - [ ] Post-MVP:
   - [ ] Customizable toggle order
   - [ ] Customizable find phone sound

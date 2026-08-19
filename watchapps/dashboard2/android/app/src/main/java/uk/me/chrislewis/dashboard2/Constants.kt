@@ -13,8 +13,8 @@ object Constants {
 
     // Compatible watchapp protocol version minimum
     // IMPORTANT NOTE: Increment when protocol has breaking changes
-    val COMPATIBLE_PROTOCOL_VERSION = PebbleDictionaryItem.Int32(2)
-    // AppMessage keys
+    val COMPATIBLE_PROTOCOL_VERSION = PebbleDictionaryItem.Int32(3)
+    // AppMessage keys (same order as package.json)
     const val MESSAGE_KEY_COMPAT_PROTOCOL_VERSION = 10000u
     const val MESSAGE_KEY_TOGGLE_TYPE = 10001u
     const val MESSAGE_KEY_SYNC_REQUEST = 10002u
@@ -25,6 +25,13 @@ object Constants {
     const val MESSAGE_KEY_SYNC_FREE_SPACE_PERC = 10007u
     const val MESSAGE_KEY_SYNC_NEXT_ALARM = 10008u
     const val MESSAGE_KEY_SYNC_IS_CHARGING = 10009u
-    // ToggleTypes (must match watch data.h)
+    // ToggleTypes (must match watch constants.h)
     const val TOGGLE_TYPE_FIND_PHONE = 0
+    const val TOGGLE_TYPE_CYCLE_RINGER = 1
+    // Toggle states
+    const val TOGGLE_STATE_OFF = "0"
+    const val TOGGLE_STATE_ON = "1"
+    const val TOGGLE_STATE_RINGER_LOUD = "2"
+    const val TOGGLE_STATE_RINGER_VIBRATE = "3"
+    const val TOGGLE_STATE_RINGER_SILENT = "4"
 }

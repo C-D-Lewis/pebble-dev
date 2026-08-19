@@ -13,11 +13,15 @@ AppState* data_get_app_state() {
   return &s_app_state;
 }
 
-bool data_is_toggle_active(int index) {
-  if (index < 0 || index >= TogglesMax) return false;
+char data_get_toggle_state(int index) {
+  if (index < 0 || index >= TogglesMax) return TOGGLE_STATE_OFF;
 
-  // Get the state character for this toggle
-  const char c = s_app_state.toggle_order[(index * TOGGLE_FMT_LEN) + 1];
+  // Get the state character for this toggle - 2nd of each pair
+  return s_app_state.toggle_order[(index * TOGGLE_FMT_LEN) + 1];
+}
+
+bool data_is_toggle_active(int index) {
+  const char c = data_get_toggle_state(index);
   return c == TOGGLE_STATE_ON;
 }
 
@@ -31,7 +35,7 @@ void data_test_data_handler() {
     s_app_state.toggle_order,
     sizeof(s_app_state.toggle_order),
     // Find Phone, ...
-    "10"
+    "0014"
   );
   snprintf(
     s_app_state.device_name,

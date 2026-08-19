@@ -11,6 +11,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import uk.me.chrislewis.dashboard2.components.ForcePortraitOrientation
+import uk.me.chrislewis.dashboard2.components.GrantPermissionsSection
 import uk.me.chrislewis.dashboard2.components.InformationSection
 import uk.me.chrislewis.dashboard2.components.InstallSection
 import uk.me.chrislewis.dashboard2.components.LinksSection
@@ -22,7 +23,6 @@ private const val TAG = "MainActivity"
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
 
         enableEdgeToEdge()
 
@@ -38,8 +38,8 @@ class MainActivity : ComponentActivity() {
                         TitleAppBar()
                         InformationSection()
                         InstallSection()
+                        GrantPermissionsSection()
                         LinksSection()
-//                        GrantPermissionsSection(::getLocationPermission)
                     }
                 }
             }

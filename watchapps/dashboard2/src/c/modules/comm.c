@@ -20,6 +20,9 @@ static void inbox_received_handler(DictionaryIterator *iter, void *context) {
       sizeof(app_state->toggle_order),
       packet_get_string(iter, MESSAGE_KEY_SYNC_TOGGLE_ORDER)
     );
+
+    // Probably a toggle result
+    vibes_short_pulse();
   }
   if (packet_contains_key(iter, MESSAGE_KEY_SYNC_DEVICE_NAME)) {
     snprintf(

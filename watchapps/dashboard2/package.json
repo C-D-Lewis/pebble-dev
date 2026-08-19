@@ -1,6 +1,6 @@
 {
   "name": "dashboard2",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "_note": "Check list in config.h!",
   "author": "Chris Lewis",
   "private": true,
@@ -60,6 +60,21 @@
           "type": "bitmap",
           "name": "ALARM",
           "file": "images/alarm.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOUD",
+          "file": "images/loud.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "VIBRATE",
+          "file": "images/vibrate.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "SILENT",
+          "file": "images/silent.png"
         }
       ]
     },
