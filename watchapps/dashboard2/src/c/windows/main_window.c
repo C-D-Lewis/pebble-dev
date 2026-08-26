@@ -198,8 +198,8 @@ static void tray_update_proc(Layer *layer, GContext *ctx) {
 static void info_update_proc(Layer *layer, GContext *ctx) {
   AppState *app_state = data_get_app_state();
 
-  const int icon_x = scl_x_pp({.o = -5, .c = 200, .g = 200});
-  const int text_x = scl_x_pp({.o = 210, .c = 360, .e = 150, .g = 360});
+  const int icon_x = scl_x_pp({.o = -5, .c = 200, .e = 20, .g = 200});
+  const int text_x = scl_x_pp({.o = 210, .c = 360, .e = 180, .g = 360});
 
   // Device name
   graphics_context_set_text_color(ctx, GColorWhite);
@@ -225,7 +225,7 @@ static void info_update_proc(Layer *layer, GContext *ctx) {
   graphics_draw_bitmap_in_rect(
     ctx,
     bitmaps_get(RESOURCE_ID_PHONE),
-    GRect(icon_x, scl_y(50), 28, 28)
+    GRect(icon_x, scl_y(50), ICON_SIZE_W, ICON_SIZE_H)
   );
 
   // Battery percentage
@@ -252,7 +252,7 @@ static void info_update_proc(Layer *layer, GContext *ctx) {
   graphics_draw_bitmap_in_rect(
     ctx,
     bitmaps_get(RESOURCE_ID_BATTERY),
-    GRect(icon_x, scl_y(260), 28, 28)
+    GRect(icon_x, scl_y(260), ICON_SIZE_W, ICON_SIZE_H)
   );
 
   // Free space (perc)
@@ -285,7 +285,7 @@ static void info_update_proc(Layer *layer, GContext *ctx) {
   graphics_draw_bitmap_in_rect(
     ctx,
     bitmaps_get(RESOURCE_ID_DISK),
-    GRect(icon_x, scl_y(470), 28, 28)
+    GRect(icon_x, scl_y(470), ICON_SIZE_W, ICON_SIZE_H)
   );
 
   // Next alarm
@@ -310,7 +310,7 @@ static void info_update_proc(Layer *layer, GContext *ctx) {
   graphics_draw_bitmap_in_rect(
     ctx,
     bitmaps_get(RESOURCE_ID_ALARM),
-    GRect(icon_x, scl_y(690), 28, 28)
+    GRect(icon_x, scl_y(690), ICON_SIZE_W, ICON_SIZE_H)
   );
 }
 
