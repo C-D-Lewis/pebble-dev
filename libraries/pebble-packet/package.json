@@ -8,6 +8,9 @@
   "keywords": [
     "pebble-package"
   ],
+  "scripts": {
+    "prepublishOnly": "pebble clean && pebble build"
+  },
   "dependencies": {},
   "pebble": {
     "projectType": "package",

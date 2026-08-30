@@ -11,6 +11,9 @@
   "dependencies": {
     "pebble-universal-fb": "^1.10.0"
   },
+  "scripts": {
+    "prepublishOnly": "pebble clean && pebble build"
+  },
   "pebble": {
     "projectType": "package",
     "sdkVersion": "3",

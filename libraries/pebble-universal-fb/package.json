@@ -8,6 +8,9 @@
   "files": [
     "dist.zip"
   ],
+  "scripts": {
+    "prepublishOnly": "pebble clean && pebble build"
+  },
   "keywords": [
     "pebble-package",
     "framebuffer"
