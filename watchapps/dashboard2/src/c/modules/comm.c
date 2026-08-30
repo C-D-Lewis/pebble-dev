@@ -66,6 +66,7 @@ static void inbox_received_handler(DictionaryIterator *iter, void *context) {
     ) == 1;
   }
 
+  // All data received, mark as synced
   app_state->sync_state = SyncStateSuccess;
 
   // Is it compatible?

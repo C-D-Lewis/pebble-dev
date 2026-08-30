@@ -7,6 +7,7 @@
 #define ARROW_SIZE_H scl_pp({.o = 9, .e = 10, .g = 10})
 #define ICON_SIZE_W scl_pp({.o = 28})
 #define ICON_SIZE_H scl_pp({.o = 28})
+#define CORNER_RADIUS 5
 
 #define APP_ICON_SIZE 50
 
@@ -90,7 +91,7 @@ static void tray_update_proc(Layer *layer, GContext *ctx) {
 
   // Background shape
   graphics_context_set_fill_color(ctx, PBL_IF_COLOR_ELSE(GColorDarkCandyAppleRed, GColorLightGray));
-  graphics_fill_rect(ctx, bounds, 4, GCornersAll);
+  graphics_fill_rect(ctx, bounds, CORNER_RADIUS, GCornersAll);
   graphics_context_set_fill_color(ctx, PBL_IF_COLOR_ELSE(GColorBulgarianRose, GColorBlack));
   graphics_fill_rect(
     ctx,
@@ -113,7 +114,6 @@ static void tray_update_proc(Layer *layer, GContext *ctx) {
 
   const int root_y = scl_y_pp({.o = 0, .c = 170, .g = 170});
 
-  // Set row count here
   for (int row = 0; row < rows; row++) {
     for (int col = 0; col < cols; col++) {
       const int idx = (row * cols) + col;
@@ -135,10 +135,10 @@ static void tray_update_proc(Layer *layer, GContext *ctx) {
         border_color = PBL_IF_COLOR_ELSE(GColorIslamicGreen, GColorLightGray);
       }
       graphics_context_set_fill_color(ctx, border_color);
-      graphics_fill_rect(ctx, cell_r, 0, GCornerNone);
+      graphics_fill_rect(ctx, cell_r, CORNER_RADIUS, GCornersAll);
       graphics_context_set_fill_color(ctx, GColorBlack);
       const int margin = 3;
-      graphics_fill_rect(ctx, grect_inset(cell_r, GEdgeInsets(margin)), 0, GCornerNone);
+      graphics_fill_rect(ctx, grect_inset(cell_r, GEdgeInsets(margin)), CORNER_RADIUS, GCornersAll);
 
       // Draw icon
       graphics_context_set_compositing_mode(ctx, GCompOpSet);

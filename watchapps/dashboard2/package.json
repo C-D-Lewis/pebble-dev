@@ -1,6 +1,6 @@
 {
   "name": "dashboard2",
-  "version": "0.4.0",
+  "version": "1.0.0",
   "_note": "Check list in config.h!",
   "author": "Chris Lewis",
   "private": true,
