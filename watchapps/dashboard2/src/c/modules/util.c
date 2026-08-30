@@ -3,7 +3,15 @@
 char* util_get_toggle_name(int index) {
   switch(index) {
     case ToggleTypeFindPhone: return "Find Phone";
-    case ToggleTypeCycleRinger: return "Toggle Ringer Mode";
+    case ToggleTypeCycleRinger: {
+      const char c = data_get_toggle_state(index);
+      switch(c) {
+        case TOGGLE_STATE_RINGER_LOUD: return "Ringer (loud)";
+        case TOGGLE_STATE_RINGER_VIBRATE: return "Ringer (vibrate)";
+        case TOGGLE_STATE_RINGER_DND: return "Ringer (silent)";
+        default: return "Ringer (?)";
+      }
+    } break;
     default: return "?";
   }
 }
