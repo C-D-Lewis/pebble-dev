@@ -48,17 +48,17 @@ const GRect center_rect = scl_grect(330, 330, 330, 330);
 ```
 
 If a single percentage isn't precise enough, use 'per platform' variants to
-specify values up to 5% (50/1000 thousands) in precision for each platform
-(order is 'regular' shape, then 'emery' shape). 
+specify values in thousands for each platform.
 
 > In actuality, thousandths values should allow per-pixel precision until a
 > display shape is larger than 1000px in any direction.
 
 This is done with members of a struct for each distinct platform shape:
 
-- `o` - "Original size": aplite, basalt, diorite, flint
+- `o` - "Original size" (aplite, basalt, diorite, flint)
 - `c` - Chalk
 - `e` - Emery
+- `g` - Gabbro
 
 > This method allows transparently adding more platforms in the future without
 > breaking existing code!
@@ -79,7 +79,7 @@ const int y = scl_y_pp({.o = 450, .e = 480});
 If you need to select raw values based on platform, use `scl_pp()`:
 
 ```c
-// Choose 5 or 3 literally if emery or otherwise
+// Choose 5 or 3 literally if emery or otherwise (no scaling occurs)
 const int margin = scl_pp({.o = 3, .e = 5});
 ```
 
