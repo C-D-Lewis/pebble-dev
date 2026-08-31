@@ -7,8 +7,8 @@
   </tr>
 </table>
 
-**IMPORTANT**: Requires Android companion app which is available from GitHub:
-https://github.com/C-D-Lewis/pebble-dev/tree/master/watchapps/dashboard2
+**IMPORTANT**: Requires Android companion app which is available from GitHub 
+(https://github.com/C-D-Lewis/pebble-dev/tree/master/watchapps/dashboard2) or compiled from source with Android Studio.
 
 Modern successor to Dashboard, which is largely defunct now due to background app Android policy and permissions clampdowns since 2016. Starting with minimal features, and adding more as they are deemed possible with opt-in special device access as required. The focus is on modularity, maintainability, and re-usability.
 
