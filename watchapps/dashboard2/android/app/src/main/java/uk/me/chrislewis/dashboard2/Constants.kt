@@ -6,9 +6,8 @@ object Constants {
     // Watchapp UUID
     val APP_UUID: UUID = UUID.fromString("7606dabf-67cf-466a-92a7-5e62598a1436")
 
-    // FIXME: Update these once watchapp is published
-    val REBBLE_APPSTORE_URL = "https://apps.rebble.io/en_US/watchapps"
-    val REPEBBLE_APPSTORE_URL = "https://apps.repebble.com/apps"
+    val REBBLE_APPSTORE_URL = "https://apps.rebble.io/en_US/application/6a9583177739b6000ad225eb"
+    val REPEBBLE_APPSTORE_URL = "https://apps.repebble.com/077577b50210479da1285f84"
 
     // Compatible watchapp protocol version minimum
     // IMPORTANT NOTE: Increment when protocol has breaking changes!

@@ -8,6 +8,7 @@
     "pebble-packet": "^1.6.0",
     "pebble-scalable": "^2.2.0"
   },
+  "license": "Apache-2.0",
   "keywords": [
     "pebble-app"
   ],
