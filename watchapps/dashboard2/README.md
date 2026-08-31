@@ -28,7 +28,7 @@ Uses PebbleKit Android 2 to retrieve information about the phone and control som
 ## Installation
 
 Install the Pebble watchapp from your appstore of choice, then install the
-[required Android APK](https://s3.us-east-1.amazonaws.com/public-files.chrislewis.me.uk/pebble/dashboard2.apk).
+[required Android APK](https://s3.us-east-1.amazonaws.com/public-files.chrislewis.me.uk/pebble/dashboard2-1.0.0.apk).
 
 ## Feature requests
 
@@ -69,3 +69,8 @@ To add a new toggle / feature:
 
 - [Dashboard](https://apps.rebble.io/en_US/application/53ec8d840c3036447e000109)
 - [PebbleKit Android 2](https://github.com/pebble-dev/PebbleKitAndroid2)
+
+## TODO
+
+- Status bar in details area
+- Details area scrolls

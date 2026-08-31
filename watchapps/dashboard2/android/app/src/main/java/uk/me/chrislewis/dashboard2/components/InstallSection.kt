@@ -45,11 +45,6 @@ fun InstallSection() {
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.padding(0.dp, 8.dp)
             )
-            Text(
-                text = "BETA: Use the sideload PBW from Discord!",
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(0.dp, 8.dp)
-            )
             Row(
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -62,9 +57,8 @@ fun InstallSection() {
                         containerColor = MaterialTheme.colorScheme.secondary,
                         contentColor = MaterialTheme.colorScheme.onPrimary
                     ),
-                    enabled = false
                 ) {
-                    Text(text = "Rebble")
+                    Text(text = "rebble")
                 }
                 Button(
                     onClick = { uriHandler.openUri(Constants.REPEBBLE_APPSTORE_URL) },
@@ -73,9 +67,8 @@ fun InstallSection() {
                         containerColor = MaterialTheme.colorScheme.secondary,
                         contentColor = MaterialTheme.colorScheme.onPrimary
                     ),
-                    enabled = false
                 ) {
-                    Text(text = "RePebble")
+                    Text(text = "repebble")
                 }
             }
         }
