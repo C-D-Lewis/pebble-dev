@@ -1,10 +1,6 @@
 # dashboard2
 
-Modern successor to Dashboard, which is largely defunct now due to background
-app Android policy and permissions clampdowns since 2016. Starting with minimal
-features, and adding more as they are deemed possible with opt-in special device
-access as required. The focus is on modularity, maintainability, and
-reusability.
+Modern successor to Dashboard, which is largely defunct now due to background app Android policy and permissions clampdowns since 2016. Starting with minimal features, and adding more as they are deemed possible with opt-in special device access as required. The focus is on modularity, maintainability, and re-usability.
 
 Data available:
 
@@ -18,8 +14,12 @@ Toggles / features available:
 - Find Phone with loud sound
 - Cycle through ringer modes (requires opt-in permission, see below)
 
-Uses PebbleKit Android 2 to retrieve information about the phone and control
-some toggles / features via the offical Pebble Android app.
+Uses PebbleKit Android 2 to retrieve information about the phone and control some toggles / features via the official Pebble Android app.
+
+## Installation
+
+Install the Pebble watchapp from your appstore of choice, then install the
+[required Android APK](https://s3.us-east-1.amazonaws.com/public-files.chrislewis.me.uk/pebble/dashboard2.apk).
 
 ## Feature requests
 
