@@ -6,12 +6,8 @@
 // - Check compatible protocol version is correct
 // - Disable TEST flags
 
-
-
 ////////////////////////////////////////// TESTING AREA ////////////////////////////////////////////
-// Use test data
 // #define USE_TEST_DATA true
-// Expand the tray automatically
 // #define TEST_EXPAND_TRAY true
 
 ///////////////////////////////////////////// Behavior /////////////////////////////////////////////
@@ -28,7 +24,8 @@
 typedef enum {
   SyncStateInitial = 0,
   SyncStateOutOfDate,
-  SyncStateSuccess
+  SyncStateSuccess,
+  SyncStateTimeout
 } SyncState;
 
 // Lines up with main window selection index

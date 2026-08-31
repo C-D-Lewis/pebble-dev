@@ -7,6 +7,9 @@ import java.util.Date
 import java.util.Locale
 
 object Alarms {
+    /**
+     * Get next alarm datetime as short string.
+     */
     fun getNextAlarmTime(context: Context): String {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val nextAlarm = alarmManager.nextAlarmClock ?: return "-"

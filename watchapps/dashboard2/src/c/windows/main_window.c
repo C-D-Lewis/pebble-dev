@@ -63,8 +63,9 @@ static void splash_update_proc(Layer *layer, GContext *ctx) {
     )
   );
 
+  // Error messages
+  static char s_err_buff[48];
   if (app_state->sync_state == SyncStateOutOfDate) {
-    static char s_err_buff[48];
     snprintf(
       s_err_buff,
       sizeof(s_err_buff),
@@ -72,6 +73,17 @@ static void splash_update_proc(Layer *layer, GContext *ctx) {
       COMPAT_PROTOCOL_VERSION,
       app_state->compat_protocol_version
     );
+  }
+  if (app_state->sync_state == SyncStateTimeout) {
+    snprintf(
+      s_err_buff,
+      sizeof(s_err_buff),
+      "Sync timeout\nCheck phone app"
+    );
+  }
+
+  if (strlen(s_err_buff) > 0) {
+    vibes_long_pulse();
     graphics_context_set_text_color(ctx, GColorWhite);
     graphics_draw_text(
       ctx,

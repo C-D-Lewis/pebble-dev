@@ -1,5 +1,7 @@
 #include "comm.h"
 
+static AppTimer *sync_timeout_timer = NULL;
+
 static void packet_failed_handler() {
   APP_LOG(APP_LOG_LEVEL_ERROR, "Packet failed");
 }
@@ -74,6 +76,10 @@ static void inbox_received_handler(DictionaryIterator *iter, void *context) {
     app_state->sync_state = SyncStateOutOfDate;
   }
 
+  if (sync_timeout_timer) {
+    app_timer_cancel(sync_timeout_timer);
+    sync_timeout_timer = NULL;
+  }
   main_window_update();
 }
 
@@ -91,11 +97,24 @@ void comm_init() {
 
 void comm_deinit() {}
 
+static void sync_timeout_handler(void *context) {
+  APP_LOG(APP_LOG_LEVEL_ERROR, "Sync timeout");
+  AppState *app_state = data_get_app_state();
+  app_state->sync_state = SyncStateTimeout;
+  main_window_update();
+}
+
 void comm_request_sync() {
 #ifdef USE_TEST_DATA
   app_timer_register(1000, data_test_data_handler, NULL);
   return;
 #endif
+
+  // Use timeout
+  if (sync_timeout_timer) {
+    app_timer_cancel(sync_timeout_timer);
+  }
+  sync_timeout_timer = app_timer_register(10000, sync_timeout_handler, NULL);
 
   // Sync current settings and states from Android
   if (packet_begin()) {

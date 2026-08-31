@@ -23,6 +23,9 @@ object Battery {
         }
     }
 
+    /**
+     * Get if charging.
+     */
     fun isCharging(context: Context): Boolean {
         val intent = context.registerReceiver(
             null,

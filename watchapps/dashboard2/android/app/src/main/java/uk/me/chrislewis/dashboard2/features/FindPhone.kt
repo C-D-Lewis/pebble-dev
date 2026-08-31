@@ -8,6 +8,11 @@ import android.media.RingtoneManager
 object FindPhone {
     private var ringtone: Ringtone? = null
 
+    /**
+     * Play the default alarm sound.
+     *
+     * TODO: Custom sound?
+     */
     private fun playDefaultAlarmSound(context: Context) {
         // Get the default ALARM sound URI
         val alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
@@ -24,6 +29,9 @@ object FindPhone {
         }
     }
 
+    /**
+     * Handle a one-shot find phone call.
+     */
     fun handleFindPhone(context: Context) {
         if (ringtone == null || !ringtone?.isPlaying!!) {
             playDefaultAlarmSound(context)
@@ -32,10 +40,16 @@ object FindPhone {
         }
     }
 
+    /**
+     * Stop playing sound.
+     */
     fun stopPlaying() {
         ringtone?.stop()
     }
 
+    /**
+     * Get if is playing.
+     */
     fun isPlaying(): Boolean {
         if (ringtone == null) return false;
         return ringtone?.isPlaying!!

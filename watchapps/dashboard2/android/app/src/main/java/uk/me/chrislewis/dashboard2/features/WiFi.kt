@@ -9,6 +9,8 @@ import android.net.wifi.WifiManager
 object WiFi {
     /**
      * Get Wi-Fi network name.
+     *
+     * TODO: Keep this? Is it possible?
      */
     fun getWifiSSID(context: Context): String {
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager

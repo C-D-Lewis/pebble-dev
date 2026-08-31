@@ -1,14 +1,10 @@
 # dashboard2
 
-Modern successor to
-[Dashboard](https://apps.rebble.io/en_US/application/53ec8d840c3036447e000109),
-which is largely defunct now due to background app Android policy and
-permissions clampdowns since 2016. Starting with minimal features, and adding
-more as they are deemed possible with opt-in special device access as required.
-
-## Introduction
-
-The focus is on modularity, maintainability, and reusability.
+Modern successor to Dashboard, which is largely defunct now due to background
+app Android policy and permissions clampdowns since 2016. Starting with minimal
+features, and adding more as they are deemed possible with opt-in special device
+access as required. The focus is on modularity, maintainability, and
+reusability.
 
 Data available:
 
@@ -22,9 +18,8 @@ Toggles / features available:
 - Find Phone with loud sound
 - Cycle through ringer modes (requires opt-in permission, see below)
 
-Uses [PebbleKit Android 2](https://github.com/pebble-dev/PebbleKitAndroid2) to
-retrieve information about the phone and control some toggles / features via the
-offical Pebble Android app.
+Uses PebbleKit Android 2 to retrieve information about the phone and control
+some toggles / features via the offical Pebble Android app.
 
 ## Feature requests
 
@@ -61,41 +56,7 @@ To add a new toggle / feature:
    toggle state in `getToggleOrderString()`.
 4. Handle the new toggle in the pull-down tray grid.
 
-## Roadmap
+## See Also
 
-- [x] Basic comms with Android
-- [x] Running in background
-- [x] MVP initial features:
-  - [x] Basic watch UI (info + toggles)
-  - [x] Basic Android app UI
-  - [x] Loading splash
-  - [x] Watchapp minimum version check
-  - [x] Hard-coded toggle order
-  - [x] Phone name
-  - [x] Phone battery level
-  - [x] Phone free space
-  - [x] Hard-coded Find Phone sound (and/or flash?)
-  - [x] Next alarm
-  - [x] Is battery charging?
-  - [x] Change ringer mode? (Requires notif policy one-time permissions popup)
-  - [x] Check all layouts
-- [ ] Post-MVP:
-  - [ ] Customizable toggle order
-  - [ ] Customizable find phone sound
-  - [ ] Find Watch with vibration/sound/light?
-  - [ ] WiFi network name? (Needs location permission - DOA due to Android...)
-  - [ ] Cell network name?
-  - [ ] Next calendar event (needs calendar permission, timeline does it already)
-  - [ ] Custom webhook POST URL
-- [ ] Advanced (via [Shizuku](https://github.com/RikkaApps/Shizuku) or similar)
-  - [ ] Toggle WiFi?
-  - [ ] Toggle mobile data?
-  - [ ] Lock phone?
-  - [ ] Hotspot?
-  - [ ] Toggle AutoSync (background app updated not allowed DOA)
-  - [ ] Change WiFi network?
-- [ ] New things!?
-  - [ ] Free RAM (not useful as Linux uses it)
-  - [ ] Is WiFi vs is mobile data (may not require permission)
-- [ ] Summon phone features as Activities?
-  - [ ] NFC payment
+- [Dashboard](https://apps.rebble.io/en_US/application/53ec8d840c3036447e000109)
+- [PebbleKit Android 2](https://github.com/pebble-dev/PebbleKitAndroid2)

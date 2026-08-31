@@ -12,7 +12,8 @@ private val DarkColorScheme = darkColorScheme(
     onPrimary = Color(0xFFDDDDDD),
 
     surfaceVariant = Color(0xFF222222),
-    surfaceBright = Color(0xFF333333)
+    surfaceBright = Color(0xFF333333),
+    outline = Color(0xFF555555)
 )
 
 @Composable

@@ -21,6 +21,9 @@ private const val TAG = "PebbleReceiverService"
 class PebbleReceiverService : BasePebbleListenerService() {
     private val sender = DefaultPebbleSender(this)
 
+    /**
+     * When an AppMessage is received.
+     */
     override suspend fun onMessageReceived(
         watchappUUID: UUID,
         data: PebbleDictionary,
@@ -54,12 +57,7 @@ class PebbleReceiverService : BasePebbleListenerService() {
                 return handleSyncRequest()
             }
 
-            // AutoSync (does not work in background)
-//            if (type == Constants.TOGGLE_TYPE_AUTOSYNC) {
-//                AutoSync.toggleAutoSync(AutoSync.isAutoSyncEnabled())
-//                Log.d(TAG, "AutoSync now ${AutoSync.isAutoSyncEnabled()}")
-//                return handleSyncRequest()
-//            }
+            // More...
 
             Log.e(TAG, "Unknown toggle type: $type")
         }
@@ -68,12 +66,13 @@ class PebbleReceiverService : BasePebbleListenerService() {
         return ReceiveResult.Ack
     }
 
+    /**
+     * Respond to a sync request with current state.
+     */
     suspend fun handleSyncRequest(): ReceiveResult {
-        // TEST AREA
-
         // Assemble all sync data
         val dict = mapOf(
-            Constants.MESSAGE_KEY_COMPAT_PROTOCOL_VERSION to Constants.COMPATIBLE_PROTOCOL_VERSION,
+            Constants.MESSAGE_KEY_COMPAT_PROTOCOL_VERSION to PebbleDictionaryItem.Int32(Constants.COMPATIBLE_PROTOCOL_VERSION),
             Constants.MESSAGE_KEY_SYNC_TOGGLE_ORDER to PebbleDictionaryItem.Text(getToggleOrderString(this)),
             Constants.MESSAGE_KEY_SYNC_DEVICE_NAME to PebbleDictionaryItem.Text(Device.getDeviceName(this)),
             Constants.MESSAGE_KEY_SYNC_BATTERY_PERC to PebbleDictionaryItem.Text(Battery.getBatteryLevel(this).toString()),
@@ -82,28 +81,39 @@ class PebbleReceiverService : BasePebbleListenerService() {
             Constants.MESSAGE_KEY_SYNC_NEXT_ALARM to PebbleDictionaryItem.Text(Alarms.getNextAlarmTime(this)),
             Constants.MESSAGE_KEY_SYNC_IS_CHARGING to PebbleDictionaryItem.Int32(if (Battery.isCharging(this)) 1 else 0),
         )
+
         val result = sender.sendDataToPebble(Constants.APP_UUID, dict)
         Log.d(TAG, "Send $dict: $result")
         return ReceiveResult.Ack
     }
 
     /**
-     * Get toggle order as a string. Construct based on current state
+     * Get toggle order as a string. Constructed based on current state.
+     *
+     * Format: 2 chars per toggle - [TYPE,STATE] with defined toggle types and state values.
      */
     fun getToggleOrderString(context: Context): String {
-        // 2 chars per toggles - [TYPE,STATE]
         return "${Constants.TOGGLE_TYPE_FIND_PHONE}" + (if (FindPhone.isPlaying()) Constants.TOGGLE_STATE_ON else Constants.TOGGLE_STATE_OFF) +
                 "${Constants.TOGGLE_TYPE_CYCLE_RINGER}" + Ringer.getRingerModeProtocolValue(context)
     }
 
+    /**
+     * When watchapp opened.
+     */
     override fun onAppOpened(watchappUUID: UUID, watch: WatchIdentifier) {
 //        Log.d(TAG, "onAppOpened")
     }
 
+    /**
+     * When watchapp closed.
+     */
     override fun onAppClosed(watchappUUID: UUID, watch: WatchIdentifier) {
 //        Log.d(TAG, "onAppClosed")
     }
 
+    /**
+     * On service destroy.
+     */
     override fun onDestroy() {
         super.onDestroy()
         sender.close()

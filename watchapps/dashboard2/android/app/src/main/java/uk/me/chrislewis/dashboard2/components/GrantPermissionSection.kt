@@ -1,9 +1,10 @@
 package uk.me.chrislewis.dashboard2.components
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -42,11 +43,18 @@ fun GrantPermissionsSection() {
             Text(
                 text = "Some features require extra permissions - you can choose which you want to enable here.",
                 style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(0.dp, 8.dp)
+                modifier = Modifier.padding(0.dp, 16.dp)
             )
             // Notification policy for ringer cycling
             Column(
-                modifier = Modifier.fillMaxWidth().padding(16.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(
+                        width = 2.dp,
+                        color = MaterialTheme.colorScheme.outline,
+                        shape = RoundedCornerShape(8.dp)
+                    )
+                    .padding(16.dp, 8.dp)
             ) {
                 Text(
                     text = "Modes access is required to cycle ringer mode through silent/DND mode",

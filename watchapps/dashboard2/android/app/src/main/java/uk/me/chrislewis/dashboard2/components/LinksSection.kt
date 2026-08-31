@@ -100,7 +100,7 @@ fun LinksSection() {
             )
             LinkItem(
                 R.drawable.discord,
-                "Give feedback on Discord",
+                "Discuss on Discord",
                 "https://discord.com/channels/221364737269694464/1478019710187470888"
             )
         }

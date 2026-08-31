@@ -11,6 +11,9 @@ import uk.me.chrislewis.dashboard2.Constants
 private const val TAG = "Ringer"
 
 object Ringer {
+    /**
+     * Check if notification policy access is granted.
+     */
     fun checkNotificationPolicyAccess(context: Context): Boolean {
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val granted = notificationManager.isNotificationPolicyAccessGranted
@@ -18,14 +21,16 @@ object Ringer {
         return granted
     }
 
+    /**
+     * Request notification policy access in system UI.
+     */
     fun requestNotificationPolicyAccess(context: Context) {
-        // Access not granted - direct the user to the system settings page
         val intent = Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS)
         context.startActivity(intent)
     }
 
     /**
-     * Cycle the ringer mode
+     * Cycle the ringer mode.
      */
     fun cycleRingerMode(context: Context) {
         // Check access is granted
@@ -47,6 +52,9 @@ object Ringer {
         audioManager.ringerMode = nextMode
     }
 
+    /**
+     * Get mapped AppMessage protocol version from current ringer mode.
+     */
     fun getRingerModeProtocolValue(context: Context): String {
         if (!checkNotificationPolicyAccess(context)) {
             Log.e(TAG, "Tried to get ringer mode but missing permission")
