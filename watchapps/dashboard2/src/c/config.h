@@ -5,6 +5,7 @@
 // RELEASE CHECKLIST
 // - Check compatible protocol version is correct
 // - Disable TEST flags
+// - Update APK in S3
 
 ////////////////////////////////////////// TESTING AREA ////////////////////////////////////////////
 // #define USE_TEST_DATA true

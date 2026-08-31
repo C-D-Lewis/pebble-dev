@@ -1,5 +1,14 @@
 # dashboard2
 
+<table>
+  <tr>
+    <td><img src="screenshots/emery.png" /></td>
+    <td><img src="screenshots/emery-toggles.png" /></td>
+  </tr>
+</table>
+
+**IMPORTANT**: Requires Android companion app!
+
 Modern successor to Dashboard, which is largely defunct now due to background app Android policy and permissions clampdowns since 2016. Starting with minimal features, and adding more as they are deemed possible with opt-in special device access as required. The focus is on modularity, maintainability, and re-usability.
 
 Data available:
