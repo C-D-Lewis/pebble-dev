@@ -162,16 +162,25 @@ export const aggregateAllByKey = (rows: DbDocument[], key: keyof DbDocument): Gl
 export const performAggregations = (allRows: DbDocument[]): MetadataDocument => {
   // Filter out some rows (i.e: test data)
   const ignores = ['qemu', 'TEST', 'test'];
+
+  let ignoredNames = 0;
+  let ignoredShort = 0;
   const rows = allRows
     .filter((p) => {
       // Filter out names
-      return !(ignores.some((q) => p.model.includes(q) || p.platform.includes(q)))
+      const ok = !(ignores.some((q) => p.model.includes(q) || p.platform.includes(q)));
+      if (!ok) ignoredNames++;
+      return ok;
     })
     .filter((p) => {
-      // Min. 1 wk of data (28 samples)
-      return p.history.length >= MIN_HISTORY_LENGTH;
+      // Mininum amount of data
+      const ok = p.history.length >= MIN_HISTORY_LENGTH;
+      if (!ok) ignoredShort++;
+      return ok;
     });
-  console.log(`Ignored ${allRows.length - rows.length} rows`);
+  console.log(
+    `Ignored ${allRows.length - rows.length} rows (${ignoredNames} due to name, ${ignoredShort} due to short history)`
+  );
 
   const models: GlobalStatItem[] = aggregateAllByKey(rows, 'model');
   const platforms: GlobalStatItem[] = aggregateAllByKey(rows, 'platform');
