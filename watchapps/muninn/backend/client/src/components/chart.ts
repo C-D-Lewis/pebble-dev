@@ -141,6 +141,7 @@ export const HistoryChart = () => {
             // Linear on timestamps so missed samples show as horizontal gaps
             x: {
               type: 'linear',
+              bounds: 'data',
               ticks: {
                 maxTicksLimit: 10,
                 callback: (value) => formatTime(Number(value)),
