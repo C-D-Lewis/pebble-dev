@@ -65,29 +65,24 @@ export const HistoryChart = () => {
   };
 
   /**
-   * Create labels with a mode and history to filter.
+   * Format a millisecond timestamp for axis ticks and tooltips.
    *
-   * @param {HistoryItem[]} history - History of samples to use.
-   * @param {ChartMode} mode - Chart mode to use.
-   * @returns {string[]} Labels to use.
+   * @param {number} ms - Timestamp in milliseconds.
+   * @returns {string} Formatted date.
    */
-  const createLabels = (history: HistoryItem[], mode: ChartMode) => history
-    .filter((p) => filterHistoryItem(p, mode))
-    .map((item) => {
-      const d = new Date(item.ts * 1000);
-      return d.toLocaleString('en-GB', { day: 'numeric', month: 'short' });
-    });
+  const formatTime = (ms: number) => new Date(ms)
+    .toLocaleString('en-GB', { day: 'numeric', month: 'short' });
 
   /**
    * Create history datapoints with a mode and history to filter.
    *
    * @param {HistoryItem[]} history - History of samples to use.
    * @param {ChartMode} mode - Chart mode to use.
-   * @returns {string[]} Labels to use.
+   * @returns {{ x: number, y: number }[]} Points with x as a millisecond timestamp.
    */
   const createHistoryData = (history: HistoryItem[], mode: ChartMode) => history
     .filter((p) => filterHistoryItem(p, mode))
-    .map((p) => p.cp);
+    .map((p) => ({ x: p.ts * 1000, y: p.cp }));
 
   return fabricate('div')
     .setStyles(({ palette }) => ({
@@ -127,7 +122,6 @@ export const HistoryChart = () => {
       const opts: ChartConfiguration = {
         type: 'line',
         data: {
-          labels: createLabels(history, chartMode),
           datasets: [
             {
               label: 'Battery Level',
@@ -144,9 +138,12 @@ export const HistoryChart = () => {
           responsive: true,
           maintainAspectRatio: false,
           scales: {
+            // Linear on timestamps so missed samples show as horizontal gaps
             x: {
+              type: 'linear',
               ticks: {
                 maxTicksLimit: 10,
+                callback: (value) => formatTime(Number(value)),
               },
             },
             y: {
@@ -156,6 +153,11 @@ export const HistoryChart = () => {
             },
           },
           plugins: {
+            tooltip: {
+              callbacks: {
+                title: (items) => new Date(Number(items[0].parsed.x)).toLocaleString('en-GB'),
+              },
+            },
             legend: {
               display: false,
               position: 'bottom',
@@ -184,7 +186,6 @@ export const HistoryChart = () => {
       chartRef = new Chart(canvas as unknown as HTMLCanvasElement, opts);
     })
     .onUpdate((el, { history, chartMode }) => {
-      chartRef.data.labels = createLabels(history, chartMode);
       chartRef.data.datasets[0].data = createHistoryData(history, chartMode);
 
       chartRef.update();
