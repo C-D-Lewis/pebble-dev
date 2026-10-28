@@ -23,13 +23,58 @@
         },
         {
           "type": "font",
-          "name": "BEBAS_NEUE_25",
+          "name": "BEBAS_NEUE_20",
+          "file": "fonts/BebasNeue-Regular.ttf"
+        },
+        {
+          "type": "font",
+          "name": "BEBAS_NEUE_22",
           "file": "fonts/BebasNeue-Regular.ttf"
         },
         {
           "type": "font",
           "name": "BEBAS_NEUE_29",
           "file": "fonts/BebasNeue-Regular.ttf"
+        },
+        {
+          "type": "bitmap",
+          "name": "ICON_BLANK",
+          "file": "images/icon-blank.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "ICON_CLEAR",
+          "file": "images/icon-clear.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "ICON_CLOUD",
+          "file": "images/icon-cloud.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "ICON_FOG",
+          "file": "images/icon-fog.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "ICON_LIGHT_RAIN",
+          "file": "images/icon-light-rain.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "ICON_HEAVY_RAIN",
+          "file": "images/icon-heavy-rain.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "ICON_SNOW",
+          "file": "images/icon-snow.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "ICON_STORM",
+          "file": "images/icon-storm.png"
         }
       ]
     },

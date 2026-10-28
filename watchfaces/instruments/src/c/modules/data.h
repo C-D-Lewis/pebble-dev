@@ -11,6 +11,8 @@ typedef enum {
 typedef struct {
   int current_temp;
   int current_code;
+  char sunrise[8];
+  char sunset[8];
 } AppState;
 
 typedef struct {
@@ -23,4 +25,4 @@ void data_deinit();
 AppState* data_get_app_state();
 PersistData* data_get_persist_data();
 
-uint32_t data_get_weather_icon_id(int code);
+uint32_t data_get_weather_icon_id();

@@ -2,34 +2,24 @@
 
 static Window *s_window;
 static Layer *s_canvas_layer;
+static GBitmap *s_weather_bitmap;
 
 static AppTimer *s_tap_timer;
 static bool s_tapped, s_connected;
-static int s_anim_progress, s_day_prog_angle, s_anim_prog_angle;
+static int s_day_prog_angle;
 static time_t s_last_update_time;
 
 /******************************************** Drawing *********************************************/
 
-static void reload_bitmaps() {
-  // Weather changed
-}
-
 static void draw_date_and_time_display(GContext *ctx, GRect bounds, struct tm *t, int half_w, GPoint center) {
-  const int day = t->tm_mday;
-
-  // Date - Fri Oct
-  static char date_buff[32];
-  strftime(
-    date_buff,
-    sizeof(date_buff),
-    day < 10 ? "%a       %b" : "%a          %b",
-    t
-  );
-  const GRect date_bounds = GRect(0, scl_y(600), bounds.size.w, 100);
+  // Day of week
+  static char dow_buff[8];
+  strftime(dow_buff, sizeof(dow_buff), "%a", t);
+  const GRect date_bounds = GRect(scl_x(620), scl_y(360), 30, bounds.size.h);
   graphics_context_set_text_color(ctx, GColorLightGray);
   graphics_draw_text(
     ctx,
-    date_buff,
+    dow_buff,
     scl_get_font(SFI_Date),
     date_bounds,
     GTextOverflowModeWordWrap,
@@ -37,10 +27,10 @@ static void draw_date_and_time_display(GContext *ctx, GRect bounds, struct tm *t
     NULL
   );
 
-  // Day, larger and centered ('24')
-  static char day_buff[8];
+  // Day
+  static char day_buff[6];
   strftime(day_buff, sizeof(day_buff), "%d", t);
-  const GRect day_bounds = GRect(0, scl_y(590), bounds.size.w, 100);
+  const GRect day_bounds = GRect(scl_x(620), scl_y(430), 30, 100);
   graphics_context_set_text_color(ctx, GColorWhite);
   graphics_draw_text(
     ctx,
@@ -52,45 +42,62 @@ static void draw_date_and_time_display(GContext *ctx, GRect bounds, struct tm *t
     NULL
   );
 
+  // Month
+  static char month_buff[8];
+  strftime(month_buff, sizeof(month_buff), "%b", t);
+  const GRect month_bounds = GRect(scl_x(620), scl_y(545), 30, 100);
+  graphics_context_set_text_color(ctx, GColorLightGray);
+  graphics_draw_text(
+    ctx,
+    month_buff,
+    scl_get_font(SFI_Date),
+    month_bounds,
+    GTextOverflowModeWordWrap,
+    GTextAlignmentCenter,
+    NULL
+  );
+
   // Day progress hand
+  graphics_context_set_antialiased(ctx, true);
   graphics_context_set_stroke_color(ctx, GColorWhite);
   graphics_context_set_stroke_width(ctx, DAY_HAND_W);
-  const int notch_outer_radius = half_w - OUTER_RING_INSET - 1;
-  const int notch_inner_radius = CENTER_POST_W - 1;
-  GPoint day_notch_start = util_make_hand_point(
+  const int day_outer_r = half_w - OUTER_RING_INSET - 1;
+  const int day_inner_r = CENTER_POST_W - 1;
+  GPoint day_hand_start = util_make_hand_point(
     s_day_prog_angle,
     TRIG_MAX_ANGLE,
-    notch_outer_radius,
+    day_outer_r,
     center
   );
-  GPoint day_notch_end = util_make_hand_point(
+  GPoint day_hand_end = util_make_hand_point(
     s_day_prog_angle,
     TRIG_MAX_ANGLE,
-    notch_inner_radius,
+    day_inner_r,
     center
   );
-  graphics_draw_line(ctx, day_notch_start, day_notch_end);
-
+  graphics_draw_line(ctx, day_hand_start, day_hand_end);
+  graphics_context_set_antialiased(ctx, false);
 }
 
 static void draw_weather(GContext *ctx, GRect bounds) {
   AppState *app_state = data_get_app_state();
 
   // Weather icon
-  const uint32_t weather_icon_id = data_get_weather_icon_id();
-  // if (weather_icon) {
-  //   const GRect icon_bounds = GRect(scl_x(300), scl_y(300), ICON_SIZE, ICON_SIZE);
-  //   graphics_draw_bitmap_in_rect(ctx, weather_icon, icon_bounds);
-  // }
+  graphics_draw_bitmap_in_rect(
+    ctx,
+    s_weather_bitmap,
+    GRect(scl_x(230), scl_y(450), ICON_SIZE, ICON_SIZE)
+  );
 
   // Temperature
-  static char temp_buff[16];
+  static char temp_buff[8];
   if (app_state->current_temp == DATA_EMPTY) {
     snprintf(temp_buff, sizeof(temp_buff), " ");
   } else {
-    snprintf(temp_buff, sizeof(temp_buff), "%d", app_state->current_temp);
+    const int current_temp = util_convert_temp(app_state->current_temp);
+    snprintf(temp_buff, sizeof(temp_buff), "%d", current_temp);
   }
-  const GRect temp_bounds = GRect(scl_x(520), scl_y(280), bounds.size.w, 100);
+  const GRect temp_bounds = GRect(scl_x(345), scl_y(450), 30, 100);
   graphics_context_set_text_color(ctx, GColorLightGray);
   graphics_draw_text(
     ctx,
@@ -103,46 +110,25 @@ static void draw_weather(GContext *ctx, GRect bounds) {
   );
 }
 
-static void canvas_update_proc(Layer *layer, GContext *ctx) {
-  graphics_context_set_antialiased(ctx, false);
-
-  GRect bounds = layer_get_bounds(layer);
-  const int half_w = bounds.size.w / 2;
-  const int half_h = bounds.size.h / 2;
-  const GPoint center = GPoint(half_w, half_h);
-
-  // Progress through the day
-  time_t temp = time(NULL);
-  struct tm *t = localtime(&temp);
-#ifdef TEST
-  t->tm_hour = 21;
-  t->tm_min = 38;
-#endif
-  const int day_progress = (((t->tm_hour * 60) + t->tm_min) * 100) / MINUTES_PER_DAY;
-  s_day_prog_angle = (TRIG_MAX_ANGLE * day_progress * s_anim_progress) / (100 * 100);
-
-  // Adjust angle so noon is at the top, not middnight
-  s_day_prog_angle = (s_day_prog_angle - (2 * (TRIG_MAX_ANGLE / 4))) % TRIG_MAX_ANGLE;
-  
+static void draw_decorations(GContext *ctx, GRect bounds, GPoint center, int half_w) {
   // Radial dots for tracking hours
-  const int dot_len = scl_x(360);
-  graphics_context_set_stroke_color(ctx, GColorDarkGray);
+  const int dot_len = half_w - OUTER_RING_INSET - (HOUR_DOT_RING_W / 2);
+  graphics_context_set_stroke_color(ctx, GColorLightGray);
   graphics_context_set_stroke_width(ctx, 1);
   for (int i = 0; i < 24; i += 1) {
-    if (i % 2 == 0) {
-      // Even hour
+    if (i % 3 == 0) {
+      // Every 3 hours
       GPoint dot_point = util_make_hand_point(i, 24, dot_len, center);
       graphics_draw_circle(ctx, dot_point, DOT_S);
     } else {
-      // Odd hour
+      // Other hours
       GPoint dot_point = util_make_hand_point(i, 24, dot_len, center);
       graphics_draw_circle(ctx, dot_point, DOT_S / 2);
     }
   }
   
-  // Radial notches
-
-  // Outer decoration arc
+  // Outer day progress arc
+  graphics_context_set_antialiased(ctx, true);
   graphics_context_set_stroke_color(ctx, GColorWhite);
   graphics_context_set_stroke_width(ctx, OUTER_RING_W);
   graphics_draw_arc(
@@ -152,14 +138,10 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     0,
     TRIG_MAX_ANGLE
   );
+  graphics_context_set_antialiased(ctx, false);
+}
 
-  draw_weather(ctx, bounds);
-
-  // Tapped state?
-  if (s_tapped) {
-    // Show seconds?
-  }
-  
+static void draw_center_post(GContext *ctx, GPoint center) {
   // Center circle
   if (s_connected) {
     graphics_context_set_fill_color(ctx, GColorLightGray);
@@ -171,29 +153,150 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   }
   graphics_context_set_fill_color(ctx, GColorWhite);
   graphics_fill_circle(ctx, center, CENTER_POST_W);
+}
 
+static void draw_sunrise_and_sunset(GContext *ctx, GRect bounds, GPoint center) {
+  graphics_context_set_antialiased(ctx, true);
+
+  // Sunrise / sunset arcs
+  AppState *app_state = data_get_app_state();
+  if (app_state->current_code == DATA_EMPTY) return;
+
+  int sunrise_angle = util_get_time_angle(app_state->sunrise);
+  int sunset_angle = util_get_time_angle(app_state->sunset);
+
+  // Similar adjustment to angle so noon is at the top, not midnight
+  sunrise_angle = (sunrise_angle - (2 * (TRIG_MAX_ANGLE / 4))) % TRIG_MAX_ANGLE;
+  sunset_angle = (sunset_angle - (2 * (TRIG_MAX_ANGLE / 4))) % TRIG_MAX_ANGLE;
+
+  const GRect arc_bounds = grect_inset(bounds, GEdgeInsets(OUTER_RING_INSET));
+  graphics_context_set_fill_color(ctx, COLOR_DAY);
+  graphics_fill_radial(
+    ctx,
+    arc_bounds,
+    GOvalScaleModeFitCircle,
+    HOUR_DOT_RING_W,
+    sunrise_angle,
+    sunset_angle
+  );
+  graphics_context_set_fill_color(ctx, COLOR_NIGHT);
+  if (sunrise_angle < sunset_angle) {
+    sunrise_angle += TRIG_MAX_ANGLE;
+  }
+  graphics_fill_radial(
+    ctx,
+    arc_bounds,
+    GOvalScaleModeFitCircle,
+    HOUR_DOT_RING_W,
+    sunset_angle,
+    sunrise_angle
+  );
+
+  graphics_context_set_antialiased(ctx, false);
+}
+
+static void draw_arc_complication(GContext *ctx, GRect bounds, int slot, char *type) {
+  graphics_context_set_antialiased(ctx, true);
+  
+  // Slots are 0-3, clockwise from top, 30 degrees in length, diagonally opposite
+  int start_angle, end_angle;
+  switch (slot) {
+    case 0:
+      start_angle = TRIG_MAX_ANGLE / 16;
+      end_angle = (3 * TRIG_MAX_ANGLE) / 16;
+      break;
+    case 1:
+      start_angle = (5 * TRIG_MAX_ANGLE) / 16;
+      end_angle = (7 * TRIG_MAX_ANGLE) / 16;
+      break;
+    case 2:
+      start_angle = (9 * TRIG_MAX_ANGLE) / 16;
+      end_angle = (11 * TRIG_MAX_ANGLE) / 16;
+      break;
+    case 3:
+      start_angle = (13 * TRIG_MAX_ANGLE) / 16;
+      end_angle = (15 * TRIG_MAX_ANGLE) / 16;
+      break;
+    default:
+      return;
+  }
+
+  // Outline and black fill
+  const GRect arc_bounds = grect_inset(bounds, GEdgeInsets((COMPLICATION_W / 2) + 2));
+  graphics_context_set_stroke_width(ctx, COMPLICATION_W);
+  graphics_context_set_stroke_color(ctx, GColorWhite);
+  graphics_draw_arc(
+    ctx,
+    arc_bounds,
+    GOvalScaleModeFitCircle,
+    start_angle,
+    end_angle
+  );
+  const int inner_stroke_w = COMPLICATION_W - (OUTER_RING_W + 2);
+  graphics_context_set_stroke_width(ctx, inner_stroke_w);
+  graphics_context_set_stroke_color(ctx, GColorBlack);
+  graphics_draw_arc(
+    ctx,
+    arc_bounds,
+    GOvalScaleModeFitCircle,
+    start_angle,
+    end_angle
+  );
+
+  // Fill based on complication type
+  if (strcmp(type, SLOT_TYPE_BATTERY) == 0) {
+    // Fill based on battery level (percentage of start_angle to end_angle)
+    BatteryChargeState charge_state = battery_state_service_peek();
+    const int battery_angle = ((end_angle - start_angle) * charge_state.charge_percent) / 100;
+    graphics_context_set_stroke_color(ctx, GColorIslamicGreen);
+    graphics_draw_arc(
+      ctx,
+      arc_bounds,
+      GOvalScaleModeFitCircle,
+      start_angle,
+      start_angle + battery_angle
+    );
+  }
+
+  graphics_context_set_antialiased(ctx, false);
+}
+
+static void canvas_update_proc(Layer *layer, GContext *ctx) {
+  graphics_context_set_antialiased(ctx, false);
+
+  GRect bounds = layer_get_bounds(layer);
+  const int half_w = bounds.size.w / 2;
+  const int half_h = bounds.size.h / 2;
+  const GPoint center = GPoint(half_w, half_h);
+
+  time_t temp = time(NULL);
+  struct tm *t = localtime(&temp);
+  // Progress through the day
+#ifdef TEST
+  t->tm_hour = 12;
+  t->tm_min = 0;
+#endif
+  const int minutes = (t->tm_hour * 60) + t->tm_min;
+  s_day_prog_angle = (TRIG_MAX_ANGLE * minutes) / MINUTES_PER_DAY;
+  // Adjust angle so noon is at the top, not middnight
+  s_day_prog_angle = (s_day_prog_angle - (2 * (TRIG_MAX_ANGLE / 4))) % TRIG_MAX_ANGLE;
+
+  draw_sunrise_and_sunset(ctx, bounds, center);
+  draw_decorations(ctx, bounds, center, half_w);
+  draw_weather(ctx, bounds);
+  draw_center_post(ctx, center);
   draw_date_and_time_display(ctx, bounds, t, half_w, center);
-}
 
-/******************************************* Animations *******************************************/
+  // Complications
+  draw_arc_complication(ctx, bounds, 0, SLOT_TYPE_BATTERY);
+  // draw_arc_complication(ctx, bounds, 1, 0);
+  // draw_arc_complication(ctx, bounds, 2, 0);
+  // draw_arc_complication(ctx, bounds, 3, 0);
 
- static void intro_animation_update(Animation *animation, const AnimationProgress progress) {
-  s_anim_progress = ((int)progress * 100) / ANIMATION_NORMALIZED_MAX;
-  s_anim_prog_angle = (TRIG_MAX_ANGLE * s_anim_progress) / 100;
-
-  layer_mark_dirty(s_canvas_layer);
-}
-
-static void start_intro_animation() {
-  Animation *animation = animation_create();
-  animation_set_delay(animation, 100);
-  animation_set_duration(animation, 1500);
-  animation_set_curve(animation, AnimationCurveEaseInOut);
-  static AnimationImplementation implementation = {
-    .update = (AnimationUpdateImplementation) intro_animation_update
-  };
-  animation_set_implementation(animation, &implementation);
-  animation_schedule(animation);
+  // Tapped state?
+  if (s_tapped) {
+    // Show seconds?
+  }
 }
 
 /******************************************** Handlers ********************************************/
@@ -235,7 +338,7 @@ static void window_load(Window *window) {
   Layer *window_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(window_layer);
 
-  reload_bitmaps();
+  s_weather_bitmap = gbitmap_create_with_resource(RESOURCE_ID_ICON_BLANK);
 
   s_canvas_layer = layer_create(bounds);
   layer_set_update_proc(s_canvas_layer, canvas_update_proc);
@@ -246,6 +349,7 @@ static void window_unload(Window *window) {
   layer_destroy(s_canvas_layer);
 
   // Destroy all bitmaps here
+  gbitmap_destroy(s_weather_bitmap);
 
   window_destroy(s_window);
   s_window = NULL;
@@ -273,11 +377,11 @@ void main_window_push() {
 void main_window_reload() {
   s_last_update_time = time(NULL);
 
-  reload_bitmaps();
-  layer_mark_dirty(s_canvas_layer);
+  if (s_weather_bitmap) {
+    gbitmap_destroy(s_weather_bitmap);
+    s_weather_bitmap = NULL;
+  }
+  s_weather_bitmap = gbitmap_create_with_resource(data_get_weather_icon_id());
 
-  // Update display
-  s_anim_prog_angle = 0;
-  s_anim_progress = 0;
-  start_intro_animation();
+  layer_mark_dirty(s_canvas_layer);
 }

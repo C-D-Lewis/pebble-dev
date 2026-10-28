@@ -46,7 +46,7 @@ const getLocation = async () => new Promise((resolve, reject) => {
 });
 
 /**
- * Get the time portion of ISO datetime.
+ * Get the time portion of ISO datetime in format HH:MM, e.g. 06:12
  */
 const getTime = (str: string) => str.split('T')[1];
 

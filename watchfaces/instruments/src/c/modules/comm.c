@@ -11,6 +11,12 @@ static void inbox_received_handler(DictionaryIterator *iter, void *context) {
   if (packet_contains_key(iter, MESSAGE_KEY_CURRENT_CODE)) {
     app_state->current_code = packet_get_integer(iter, MESSAGE_KEY_CURRENT_CODE);
   }
+  if (packet_contains_key(iter, MESSAGE_KEY_SUNRISE)) {
+    snprintf(app_state->sunrise, sizeof(app_state->sunrise), "%s", packet_get_string(iter, MESSAGE_KEY_SUNRISE));
+  }
+  if (packet_contains_key(iter, MESSAGE_KEY_SUNSET)) {
+    snprintf(app_state->sunset, sizeof(app_state->sunset), "%s", packet_get_string(iter, MESSAGE_KEY_SUNSET));
+  }
 
   // Config
   if (packet_contains_key(iter, MESSAGE_KEY_CONFIG_TEMP_UNIT)) {
