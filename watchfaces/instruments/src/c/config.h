@@ -16,10 +16,8 @@
 #define CENTER_POST_W 4
 #define DOT_S 3
 #define ICON_SIZE 28
-#define COLOR_DAY GColorBlue
-#define COLOR_NIGHT GColorOxfordBlue
 
-// Config
+// Behavior
 #define MIN_WEATHER_INTERVAL_S (60 * 60 - 5)
 
 // Constants
@@ -27,5 +25,20 @@
 #define DATA_EMPTY -1000
 #define TEMP_UNIT_C "C"
 #define TEMP_UNIT_F "F"
-#define SLOT_TYPE_NONE "NONE"
-#define SLOT_TYPE_BATTERY "BATTERY"
+#define COMPLICATION_NONE "NONE"
+#define COMPLICATION_BATTERY "BATTERY"
+#define COMPLICATION_STEP_COUNT "STEP_COUNT"
+#define THEME_BLUE "BLUE"
+#define THEME_RED "RED"
+#define THEME_GREEN "GREEN"
+#define THEME_AQUA "AQUA"
+#define THEME_PURPLE "PURPLE"
+#define THEME_ORANGE "ORANGE"
+#define THEME_GRAY "GRAY"
+#define STEP_GOAL_5000 "5000"
+#define STEP_GOAL_7500 "7500"
+#define STEP_GOAL_10000 "10000"
+
+// Colors
+#define COLOR_BATTERY GColorIslamicGreen
+#define COLOR_STEP_COUNT GColorBlueMoon

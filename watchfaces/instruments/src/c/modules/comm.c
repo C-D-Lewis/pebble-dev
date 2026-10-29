@@ -27,6 +27,54 @@ static void inbox_received_handler(DictionaryIterator *iter, void *context) {
       packet_get_string(iter, MESSAGE_KEY_CONFIG_TEMP_UNIT)
     );
   }
+  if (packet_contains_key(iter, MESSAGE_KEY_CONFIG_THEME)) {
+    snprintf(
+      persist_data->theme,
+      sizeof(persist_data->theme),
+      "%s",
+      packet_get_string(iter, MESSAGE_KEY_CONFIG_THEME)
+    );
+  }
+  if (packet_contains_key(iter, MESSAGE_KEY_CONFIG_SLOT_1)) {
+    snprintf(
+      persist_data->slot_1,
+      sizeof(persist_data->slot_1),
+      "%s",
+      packet_get_string(iter, MESSAGE_KEY_CONFIG_SLOT_1)
+    );
+  }
+  if (packet_contains_key(iter, MESSAGE_KEY_CONFIG_SLOT_2)) {
+    snprintf(
+      persist_data->slot_2,
+      sizeof(persist_data->slot_2),
+      "%s",
+      packet_get_string(iter, MESSAGE_KEY_CONFIG_SLOT_2)
+    );
+  }
+  if (packet_contains_key(iter, MESSAGE_KEY_CONFIG_SLOT_3)) {
+    snprintf(
+      persist_data->slot_3,
+      sizeof(persist_data->slot_3),
+      "%s",
+      packet_get_string(iter, MESSAGE_KEY_CONFIG_SLOT_3)
+    );
+  }
+  if (packet_contains_key(iter, MESSAGE_KEY_CONFIG_SLOT_4)) {
+    snprintf(
+      persist_data->slot_4,
+      sizeof(persist_data->slot_4),
+      "%s",
+      packet_get_string(iter, MESSAGE_KEY_CONFIG_SLOT_4)
+    );
+  }
+  if (packet_contains_key(iter, MESSAGE_KEY_CONFIG_STEP_GOAL)) {
+    snprintf(
+      persist_data->step_goal,
+      sizeof(persist_data->step_goal),
+      "%s",
+      packet_get_string(iter, MESSAGE_KEY_CONFIG_STEP_GOAL)
+    );
+  }
 
   // Other
   if (packet_contains_key(iter, MESSAGE_KEY_WEATHER_ERROR)) {

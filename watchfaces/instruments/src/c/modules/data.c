@@ -13,10 +13,38 @@ void data_init() {
     persist_read_data(SK_PersistData, &s_persist_data, sizeof(PersistData));
   }
 
-  // If unset or newly added
+  // Defaults - if unset or newly added
   if (strlen(s_persist_data.temp_unit) == 0) {
     snprintf(s_persist_data.temp_unit, sizeof(s_persist_data.temp_unit), "%s", TEMP_UNIT_C);
   }
+  if (strlen(s_persist_data.theme) == 0) {
+    snprintf(s_persist_data.theme, sizeof(s_persist_data.theme), "%s", THEME_BLUE);
+  }
+  if (strlen(s_persist_data.slot_1) == 0) {
+    snprintf(s_persist_data.slot_1, sizeof(s_persist_data.slot_1), "%s", COMPLICATION_NONE);
+  }
+  if (strlen(s_persist_data.slot_2) == 0) {
+    snprintf(s_persist_data.slot_2, sizeof(s_persist_data.slot_2), "%s", COMPLICATION_STEP_COUNT);
+  }
+  if (strlen(s_persist_data.slot_3) == 0) {
+    snprintf(s_persist_data.slot_3, sizeof(s_persist_data.slot_3), "%s", COMPLICATION_NONE);
+  }
+  if (strlen(s_persist_data.slot_4) == 0) {
+    snprintf(s_persist_data.slot_4, sizeof(s_persist_data.slot_4), "%s", COMPLICATION_BATTERY);
+  }
+  if (strlen(s_persist_data.step_goal) == 0) {
+    snprintf(s_persist_data.step_goal, sizeof(s_persist_data.step_goal), "%s", STEP_GOAL_10000);
+  }
+
+  // TEST
+#ifdef TEST
+  snprintf(s_persist_data.theme, sizeof(s_persist_data.theme), "%s", THEME_RED);
+  snprintf(s_persist_data.slot_1, sizeof(s_persist_data.slot_1), "%s", COMPLICATION_NONE);
+  snprintf(s_persist_data.slot_2, sizeof(s_persist_data.slot_2), "%s", COMPLICATION_STEP_COUNT);
+  snprintf(s_persist_data.slot_3, sizeof(s_persist_data.slot_3), "%s", COMPLICATION_NONE);
+  snprintf(s_persist_data.slot_4, sizeof(s_persist_data.slot_4), "%s", COMPLICATION_BATTERY);
+  snprintf(s_persist_data.step_goal, sizeof(s_persist_data.step_goal), "%s", STEP_GOAL_10000);
+#endif
 }
 
 void data_deinit() {
@@ -81,3 +109,52 @@ uint32_t data_get_weather_icon_id() {
       return RESOURCE_ID_ICON_BLANK;
   }
 };
+
+GColor data_get_theme_day_color() {
+  if (strcmp(s_persist_data.theme, THEME_BLUE) == 0) {
+    return GColorBlue;
+  } else if (strcmp(s_persist_data.theme, THEME_RED) == 0) {
+    return GColorRed;
+  } else if (strcmp(s_persist_data.theme, THEME_GREEN) == 0) {
+    return GColorIslamicGreen;
+  } else if (strcmp(s_persist_data.theme, THEME_AQUA) == 0) {
+    return GColorTiffanyBlue;
+  } else if (strcmp(s_persist_data.theme, THEME_PURPLE) == 0) {
+    return GColorVividViolet;
+  } else if (strcmp(s_persist_data.theme, THEME_ORANGE) == 0) {
+    return GColorOrange;
+  } else if (strcmp(s_persist_data.theme, THEME_GRAY) == 0) {
+    return GColorDarkGray;
+  }
+
+  // Unknown
+  return GColorWhite;
+}
+
+GColor data_get_theme_night_color() {
+  if (strcmp(s_persist_data.theme, THEME_BLUE) == 0) {
+    return GColorOxfordBlue;
+  } else if (strcmp(s_persist_data.theme, THEME_RED) == 0) {
+    return GColorBulgarianRose;
+  } else if (strcmp(s_persist_data.theme, THEME_GREEN) == 0) {
+    return GColorDarkGreen;
+  } else if (strcmp(s_persist_data.theme, THEME_AQUA) == 0) {
+    return GColorMidnightGreen;
+  } else if (strcmp(s_persist_data.theme, THEME_PURPLE) == 0) {
+    return GColorImperialPurple;
+  } else if (strcmp(s_persist_data.theme, THEME_ORANGE) == 0) {
+    return GColorWindsorTan;
+  } else if (strcmp(s_persist_data.theme, THEME_GRAY) == 0) {
+    return GColorBlack;
+  }
+
+  // Unknown
+  return GColorWhite;
+}
+
+bool data_is_health_used() {
+  return strcmp(s_persist_data.slot_1, COMPLICATION_STEP_COUNT) == 0 ||
+    strcmp(s_persist_data.slot_2, COMPLICATION_STEP_COUNT) == 0 ||
+    strcmp(s_persist_data.slot_3, COMPLICATION_STEP_COUNT) == 0 ||
+    strcmp(s_persist_data.slot_4, COMPLICATION_STEP_COUNT) == 0;
+}

@@ -30,6 +30,7 @@ working_projects=$(cat <<EOF
 ./watchfaces/events/
 ./watchfaces/hollywatch/
 ./watchfaces/index/
+./watchfaces/instruments/
 ./watchfaces/isotime-appstore/
 ./watchfaces/kitty-watchface/
 ./watchfaces/morndas/

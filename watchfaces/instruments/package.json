@@ -87,7 +87,13 @@
       "SUNSET",
       "REQUEST_WEATHER",
       "WEATHER_ERROR",
-      "CONFIG_TEMP_UNIT"
+      "CONFIG_TEMP_UNIT",
+      "CONFIG_THEME",
+      "CONFIG_SLOT_1",
+      "CONFIG_SLOT_2",
+      "CONFIG_SLOT_3",
+      "CONFIG_SLOT_4",
+      "CONFIG_STEP_GOAL"
     ],
     "enableMultiJS": true,
     "displayName": "Instruments",
@@ -99,7 +105,10 @@
     "targetPlatforms": [
       "gabbro"
     ],
-    "capabilities": ["configurable"]
+    "capabilities": [
+      "configurable",
+      "health"
+    ]
   },
   "name": "instruments",
   "devDependencies": {
