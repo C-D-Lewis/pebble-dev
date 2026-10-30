@@ -6,8 +6,21 @@ const TEST_MODE = false;
 
 /** Test position */
 const TEST_POSITION = { coords: { latitude: 51.74, longitude: 0.48 } };
+/** Sample precipitation data */
+const TEST_PRECIP_ARR = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20, 40, 20, 50, 90, 20];
+/** Sample weather codes */
+const TEST_CODES_ARR = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 77, 82, 99];
 
 setupClay();
+
+/**
+ * Zero pad a number, max 99
+ */
+const zeroPadTo99 = (num: number) => {
+  if (num < 10) return `0${num}`;
+  if (num > 99) return '99';
+  return String(num);
+};
 
 /**
  * Fetch weather for this day from OpenMeteo.
@@ -59,21 +72,34 @@ const sendWeather = async () => {
     const { latitude, longitude } = pos.coords;
     console.log(`Got location: ${latitude}, ${longitude}`);
 
-    const { current, daily } = await fetchWeatherForecast(latitude, longitude);
+    const { current, daily, hourly } = await fetchWeatherForecast(latitude, longitude);
     const {
       temperature_2m: currentTemp,
       weather_code: currentCode,
     } = current;
     const { sunrise, sunset } = daily;
+    const {
+      precipitation_probability: hourlyPrecip,
+      weather_code: hourlyCodes,
+    } = hourly;
 
     const sunriseTime = getTime(sunrise[0]);
     const sunsetTime = getTime(sunset[0]);
+
+    // Need either the next 6, or the last six of the day
+    const precipArr = TEST_MODE ? TEST_PRECIP_ARR : hourlyPrecip;
+    const startHour = Math.min(new Date().getHours(), precipArr.length - 6);
+    const nextSixPrecip = precipArr.slice(startHour, startHour + 6);
+    const codesArr = TEST_MODE ? TEST_CODES_ARR : hourlyCodes;
+    const nextSixCodes = codesArr.slice(startHour, startHour + 6);
 
     const dict = {
       CURRENT_TEMP: Math.round(currentTemp),
       CURRENT_CODE: currentCode,
       SUNRISE: sunriseTime,
       SUNSET: sunsetTime,
+      PRECIP_ARR: nextSixPrecip.map(zeroPadTo99).join(''),
+      CODE_ARR: nextSixCodes.map(zeroPadTo99).join(''),
     };
     console.log(JSON.stringify(dict, null, 2));
     

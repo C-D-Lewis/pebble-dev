@@ -48,6 +48,11 @@
         },
         {
           "type": "bitmap",
+          "name": "ICON_CLEAR_NIGHT",
+          "file": "images/icon-clear-night.png"
+        },
+        {
+          "type": "bitmap",
           "name": "ICON_CLOUD",
           "file": "images/icon-cloud.png"
         },
@@ -85,6 +90,8 @@
       "CURRENT_CODE",
       "SUNRISE",
       "SUNSET",
+      "PRECIP_ARR",
+      "CODE_ARR",
       "REQUEST_WEATHER",
       "WEATHER_ERROR",
       "CONFIG_TEMP_UNIT",

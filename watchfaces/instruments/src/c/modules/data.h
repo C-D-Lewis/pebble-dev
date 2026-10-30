@@ -13,6 +13,8 @@ typedef struct {
   int current_code;
   char sunrise[8];
   char sunset[8];
+  char precip_arr[STR_ARR_SIZE];
+  char code_arr[STR_ARR_SIZE];
 } AppState;
 
 typedef struct {
@@ -37,3 +39,9 @@ GColor data_get_theme_day_color();
 GColor data_get_theme_night_color();
 
 bool data_is_health_used();
+
+GColor data_get_precip_color(int precip_chance);
+
+int data_get_strarr_value(char *arr, int hour);
+
+GColor data_get_weather_color(int code);

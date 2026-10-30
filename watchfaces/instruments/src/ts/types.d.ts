@@ -8,4 +8,8 @@ export type WeatherApiResponse = {
     sunrise: string[];
     sunset: string[];
   };
+  hourly: {
+    precipitation_probability: number[];
+    weather_code: number[];
+  };
 };

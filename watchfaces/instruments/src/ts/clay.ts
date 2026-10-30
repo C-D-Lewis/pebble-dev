@@ -10,7 +10,9 @@ interface ClayConstructor {
 const SLOT_OPTIONS = [
   { label: 'None', value: 'NONE' },
   { label: 'Battery', value: 'BATTERY' },
-  { label: 'Step Count', value: 'STEP_COUNT' },
+  { label: 'Step count', value: 'STEP_COUNT' },
+  { label: 'Next 6hrs rain', value: 'NEXT_RAIN' },
+  { label: 'Next 6hrs weather', value: 'NEXT_WEATHER' },
 ];
 
 const config = [
@@ -89,6 +91,16 @@ const config = [
           { label: 'Farenheit', value: 'F' }
         ]
       }
+    ]
+  },
+  {
+    type: 'section',
+    items: [
+      { type: 'heading', defaultValue: 'Notes' },
+      {
+        type: 'text',
+        defaultValue: 'Next 6hrs rain/weather shows current hour and 5 upcoming hours, until the last 6 hours of the day where the indicator moves instead.'
+      },
     ]
   },
   { type: 'submit', defaultValue: 'Save' }

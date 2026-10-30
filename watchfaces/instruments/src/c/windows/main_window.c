@@ -132,7 +132,7 @@ static void draw_center_post(GContext *ctx, GPoint center) {
     graphics_fill_circle(ctx, center, 2 * CENTER_POST_W);
   } else {
     graphics_context_set_stroke_color(ctx, GColorLightGray);
-    graphics_context_set_stroke_width(ctx, 2);
+    graphics_context_set_stroke_width(ctx, 1);
     graphics_draw_circle(ctx, center, 2 * CENTER_POST_W);
   }
   graphics_context_set_fill_color(ctx, GColorWhite);
@@ -187,6 +187,7 @@ static void draw_sunrise_and_sunset(GContext *ctx, GRect bounds, GPoint center) 
 static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, int slot, char *type) {
   graphics_context_set_antialiased(ctx, true);
 
+  AppState *app_state = data_get_app_state();
   PersistData *persist_data = data_get_persist_data();
   
   // Slots are 0-3, clockwise from top, 45 degrees in length, diagonally opposite
@@ -214,27 +215,27 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
 
   // Just a slim line if no complication in this slot
   const GRect arc_r = grect_inset(bounds, GEdgeInsets((COMPLICATION_W / 2) + 3));
+  const int inner_w = COMPLICATION_W - (OUTER_RING_W + 2);
   if (strcmp(type, COMPLICATION_NONE) == 0) {
     graphics_context_set_stroke_width(ctx, OUTER_RING_W);
     graphics_context_set_stroke_color(ctx, GColorDarkGray);
     graphics_draw_arc(ctx, arc_r, GOvalScaleModeFitCircle, start_ang, end_ang);
-    return;
+  } else {
+    // Outline and black fill
+    graphics_context_set_stroke_width(ctx, COMPLICATION_W);
+    graphics_context_set_stroke_color(ctx, COLOR_COMPLICATION);
+    graphics_draw_arc(ctx, arc_r, GOvalScaleModeFitCircle, start_ang, end_ang);
+    graphics_context_set_stroke_width(ctx, inner_w);
+    graphics_context_set_stroke_color(ctx, GColorBlack);
+    graphics_draw_arc(ctx, arc_r, GOvalScaleModeFitCircle, start_ang, end_ang);
   }
-
-  // Outline and black fill
-  graphics_context_set_stroke_width(ctx, COMPLICATION_W);
-  graphics_context_set_stroke_color(ctx, GColorWhite);
-  graphics_draw_arc(ctx, arc_r, GOvalScaleModeFitCircle, start_ang, end_ang);
-  const int inner_stroke_w = COMPLICATION_W - (OUTER_RING_W + 2);
-  graphics_context_set_stroke_width(ctx, inner_stroke_w);
-  graphics_context_set_stroke_color(ctx, GColorBlack);
-  graphics_draw_arc(ctx, arc_r, GOvalScaleModeFitCircle, start_ang, end_ang);
 
   // Fill based on battery level
   if (strcmp(type, COMPLICATION_BATTERY) == 0) {
     BatteryChargeState charge_state = battery_state_service_peek();
     const int batt_ang = ((end_ang - start_ang) * charge_state.charge_percent) / 100;
     graphics_context_set_stroke_color(ctx, COLOR_BATTERY);
+    graphics_context_set_stroke_width(ctx, inner_w);
     graphics_draw_arc(ctx, arc_r, GOvalScaleModeFitCircle, start_ang, start_ang + batt_ang);
 
     // White dot to show actual angle on this arc (TODO: DRY this)
@@ -251,8 +252,10 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
   // Fill based on progress to step goal
   if (strcmp(type, COMPLICATION_STEP_COUNT) == 0) {
     const int step_goal = atoi(persist_data->step_goal);
-    const int step_ang = ((end_ang - start_ang) * s_steps) / step_goal;
+    const int max_steps = s_steps > step_goal ? step_goal : s_steps;
+    const int step_ang = ((end_ang - start_ang) * max_steps) / step_goal;
     graphics_context_set_stroke_color(ctx, COLOR_STEP_COUNT);
+    graphics_context_set_stroke_width(ctx, inner_w);
     graphics_draw_arc(ctx, arc_r, GOvalScaleModeFitCircle, start_ang, start_ang + step_ang);
 
     // White dot to show actual angle on this arc
@@ -260,6 +263,74 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
       start_ang + step_ang,
       TRIG_MAX_ANGLE,
       center.x - (COMPLICATION_W / 2) - 3,
+      center
+    );
+    graphics_context_set_fill_color(ctx, GColorWhite);
+    graphics_fill_circle(ctx, dot_point, OUTER_RING_W);
+  }
+
+  // Next 6 rain chance or weather codes
+  const bool is_next_rain = strcmp(type, COMPLICATION_NEXT_RAIN) == 0;
+  const bool is_next_weather = strcmp(type, COMPLICATION_NEXT_WEATHER) == 0;
+  if (is_next_rain || is_next_weather) {
+    // Fill ends
+    graphics_context_set_antialiased(ctx, false);
+    graphics_context_set_stroke_width(ctx, inner_w);
+    graphics_context_set_stroke_color(ctx, COLOR_COMPLICATION);
+    graphics_draw_arc(ctx, arc_r, GOvalScaleModeFitCircle, start_ang, end_ang);
+    graphics_context_set_antialiased(ctx, true);
+
+    const int item_l = (45 * TRIG_MAX_ANGLE) / (360 * 6);
+
+    // Each of six hourly items
+    for (int i = 0; i < NUM_FORECAST_ITEMS; i++) {
+      GColor color = GColorVividViolet;
+      if (is_next_rain) {
+        const int chance = data_get_strarr_value(app_state->precip_arr, i);
+        color = data_get_precip_color(chance);
+      }
+      if (is_next_weather) {
+        const int code = data_get_strarr_value(app_state->code_arr, i);
+        color = data_get_weather_color(code);
+      }
+
+      const int item_ang = start_ang + (i * item_l);
+      const GRect item_r = grect_inset(bounds, GEdgeInsets((2 * OUTER_RING_W) + 1));
+      graphics_context_set_fill_color(ctx, color);
+      graphics_fill_radial(
+        ctx,
+        item_r,
+        GOvalScaleModeFitCircle,
+        inner_w,
+        item_ang,
+        item_ang + item_l
+      );
+
+      // Separator
+      graphics_context_set_fill_color(ctx, COLOR_COMPLICATION);
+      graphics_fill_radial(
+        ctx,
+        item_r,
+        GOvalScaleModeFitCircle,
+        inner_w,
+        item_ang + item_l - 75,
+        item_ang + item_l + 75
+      );
+    }
+
+    // Be in first item all day until last 6 hours
+    time_t temp = time(NULL);
+    struct tm *t = localtime(&temp);
+    const int hours = t->tm_hour;
+    int dot_ang = start_ang + (item_l / 2);
+    if (hours > 24 - NUM_FORECAST_ITEMS) {
+      // Track dot to the end of day using current hour
+      dot_ang += (NUM_FORECAST_ITEMS - (24 - hours)) * item_l;
+    }
+    GPoint dot_point = util_make_hand_point(
+      dot_ang,
+      TRIG_MAX_ANGLE,
+      center.x - (COMPLICATION_W / 2) - 2,
       center
     );
     graphics_context_set_fill_color(ctx, GColorWhite);
