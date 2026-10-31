@@ -92,6 +92,8 @@
       "SUNSET",
       "PRECIP_ARR",
       "CODE_ARR",
+      "TEMP_LOW",
+      "TEMP_HIGH",
       "REQUEST_WEATHER",
       "WEATHER_ERROR",
       "CONFIG_TEMP_UNIT",

@@ -7,6 +7,8 @@ void data_init() {
   // Default state always
   s_app_state.current_temp = DATA_EMPTY;
   s_app_state.current_code = DATA_EMPTY;
+  s_app_state.temp_low = DATA_EMPTY;
+  s_app_state.temp_high = DATA_EMPTY;
 
   // Read existing data if it exists
   if (persist_exists(SK_PersistData)) {
@@ -21,16 +23,16 @@ void data_init() {
     snprintf(s_persist_data.theme, sizeof(s_persist_data.theme), "%s", THEME_BLUE);
   }
   if (strlen(s_persist_data.slot_1) == 0) {
-    snprintf(s_persist_data.slot_1, sizeof(s_persist_data.slot_1), "%s", COMPLICATION_STEP_COUNT);
+    snprintf(s_persist_data.slot_1, sizeof(s_persist_data.slot_1), "%s", COMP_STEP_COUNT);
   }
   if (strlen(s_persist_data.slot_2) == 0) {
-    snprintf(s_persist_data.slot_2, sizeof(s_persist_data.slot_2), "%s", COMPLICATION_NEXT_WEATHER);
+    snprintf(s_persist_data.slot_2, sizeof(s_persist_data.slot_2), "%s", COMP_NEXT_RAIN);
   }
   if (strlen(s_persist_data.slot_3) == 0) {
-    snprintf(s_persist_data.slot_3, sizeof(s_persist_data.slot_3), "%s", COMPLICATION_NEXT_RAIN);
+    snprintf(s_persist_data.slot_3, sizeof(s_persist_data.slot_3), "%s", COMP_TEMP_RANGE);
   }
   if (strlen(s_persist_data.slot_4) == 0) {
-    snprintf(s_persist_data.slot_4, sizeof(s_persist_data.slot_4), "%s", COMPLICATION_BATTERY);
+    snprintf(s_persist_data.slot_4, sizeof(s_persist_data.slot_4), "%s", COMP_BATTERY);
   }
   if (strlen(s_persist_data.step_goal) == 0) {
     snprintf(s_persist_data.step_goal, sizeof(s_persist_data.step_goal), "%s", STEP_GOAL_10000);
@@ -39,10 +41,10 @@ void data_init() {
   // TEST
 #ifdef TEST
   snprintf(s_persist_data.theme, sizeof(s_persist_data.theme), "%s", THEME_RED);
-  snprintf(s_persist_data.slot_1, sizeof(s_persist_data.slot_1), "%s", COMPLICATION_STEP_COUNT);
-  snprintf(s_persist_data.slot_2, sizeof(s_persist_data.slot_2), "%s", COMPLICATION_NEXT_RAIN);
-  snprintf(s_persist_data.slot_3, sizeof(s_persist_data.slot_3), "%s", COMPLICATION_NONE);
-  snprintf(s_persist_data.slot_4, sizeof(s_persist_data.slot_4), "%s", COMPLICATION_BATTERY);
+  snprintf(s_persist_data.slot_1, sizeof(s_persist_data.slot_1), "%s", COMP_STEP_COUNT);
+  snprintf(s_persist_data.slot_2, sizeof(s_persist_data.slot_2), "%s", COMP_NEXT_RAIN);
+  snprintf(s_persist_data.slot_3, sizeof(s_persist_data.slot_3), "%s", COMP_TEMP_RANGE);
+  snprintf(s_persist_data.slot_4, sizeof(s_persist_data.slot_4), "%s", COMP_BATTERY);
   snprintf(s_persist_data.step_goal, sizeof(s_persist_data.step_goal), "%s", STEP_GOAL_10000);
 #endif
 }
@@ -63,14 +65,109 @@ PersistData* data_get_persist_data() {
 
 /*********************************** Methods ***********************************/
 
+GColor data_get_theme_day_color() {
+  if (strcmp(s_persist_data.theme, THEME_BLUE) == 0) {
+    return GColorBlueMoon;
+  } else if (strcmp(s_persist_data.theme, THEME_RED) == 0) {
+    return GColorRed;
+  } else if (strcmp(s_persist_data.theme, THEME_GREEN) == 0) {
+    return GColorIslamicGreen;
+  } else if (strcmp(s_persist_data.theme, THEME_AQUA) == 0) {
+    return GColorTiffanyBlue;
+  } else if (strcmp(s_persist_data.theme, THEME_PURPLE) == 0) {
+    return GColorVividViolet;
+  } else if (strcmp(s_persist_data.theme, THEME_ORANGE) == 0) {
+    return GColorOrange;
+  } else if (strcmp(s_persist_data.theme, THEME_GRAY) == 0) {
+    return GColorDarkGray;
+  }
+
+  // Unknown
+  return COLOR_ERROR;
+}
+
+GColor data_get_theme_night_color() {
+  if (strcmp(s_persist_data.theme, THEME_BLUE) == 0) {
+    return GColorDukeBlue;
+  } else if (strcmp(s_persist_data.theme, THEME_RED) == 0) {
+    return GColorBulgarianRose;
+  } else if (strcmp(s_persist_data.theme, THEME_GREEN) == 0) {
+    return GColorDarkGreen;
+  } else if (strcmp(s_persist_data.theme, THEME_AQUA) == 0) {
+    return GColorMidnightGreen;
+  } else if (strcmp(s_persist_data.theme, THEME_PURPLE) == 0) {
+    return GColorImperialPurple;
+  } else if (strcmp(s_persist_data.theme, THEME_ORANGE) == 0) {
+    return GColorWindsorTan;
+  } else if (strcmp(s_persist_data.theme, THEME_GRAY) == 0) {
+    return GColorBlack;
+  }
+
+  // Unknown
+  return COLOR_ERROR;
+}
+
+/**
+ * Lighter blue means more rain chance
+ */
+GColor data_get_precip_color(int precip_chance) {
+  if (precip_chance <= 10) return GColorBlack;
+  if (precip_chance < 33) return GColorDukeBlue;
+  if (precip_chance < 66) return GColorBlue;
+  if (precip_chance < 90) return GColorBlueMoon;
+  return GColorVividCerulean;
+};
+
+GColor data_get_weather_color(int code) {
+  switch (code) {
+    case 0:
+    case 1: // Mainly clear
+      return GColorBlack;
+    case 3: // Overcast
+      return GColorDarkGray;
+    case 2: // Partly cloudy
+    case 45: // Fog
+    case 48: // Depositing rime fog
+      return GColorLightGray;
+    case 51: // Light Drizzle
+    case 53: // Moderate Drizzle
+    case 55: // Dense Drizzle
+    case 56: // Light Freezing Drizzle
+    case 57: // Dense Freezing Drizzle
+    case 61: // Slight Rain
+    case 66: // Light Freezing Rain
+    case 80: // Slight Rain showers
+      return GColorBlue;
+    case 63: // Moderate Rain
+    case 65: // Heavy Rain
+    case 67: // Heavy Freezing Rain
+    case 81: // Moderate Rain showers
+    case 82: // Violent Rain showers
+      return GColorBlueMoon;
+    case 85: // Slight Snow showers
+    case 86: // Heavy Snow showers
+    case 71: // Slight Snow fall
+    case 73: // Moderate Snow fall
+    case 75: // Heavy Snow fall
+    case 77: // Snow grains
+      return GColorWhite;
+    case 95: // Thunderstorm: Slight or moderate
+    case 96: // Thunderstorm with slight hail
+    case 99: // Thunderstorm with heavy hail
+      return GColorYellow;
+    default:
+      return COLOR_ERROR;
+  }
+};
+
 uint32_t data_get_weather_icon_id() {
-  s_app_state.current_code = 0;
   switch (s_app_state.current_code) {
     case 0:
     case 1: { // Mainly clear
       time_t temp = time(NULL);
       struct tm *t = localtime(&temp);
-      return t->tm_hour >= 18 ? RESOURCE_ID_ICON_CLEAR_NIGHT : RESOURCE_ID_ICON_CLEAR;
+      const bool is_night = t->tm_hour >= 18 || t->tm_hour < 6;
+      return is_night ? RESOURCE_ID_ICON_CLEAR_NIGHT : RESOURCE_ID_ICON_CLEAR;
     }
     case 2: // Partly cloudy
     case 3: // Overcast
@@ -110,62 +207,12 @@ uint32_t data_get_weather_icon_id() {
   }
 };
 
-GColor data_get_theme_day_color() {
-  if (strcmp(s_persist_data.theme, THEME_BLUE) == 0) {
-    return GColorBlueMoon;
-  } else if (strcmp(s_persist_data.theme, THEME_RED) == 0) {
-    return GColorRed;
-  } else if (strcmp(s_persist_data.theme, THEME_GREEN) == 0) {
-    return GColorIslamicGreen;
-  } else if (strcmp(s_persist_data.theme, THEME_AQUA) == 0) {
-    return GColorTiffanyBlue;
-  } else if (strcmp(s_persist_data.theme, THEME_PURPLE) == 0) {
-    return GColorVividViolet;
-  } else if (strcmp(s_persist_data.theme, THEME_ORANGE) == 0) {
-    return GColorOrange;
-  } else if (strcmp(s_persist_data.theme, THEME_GRAY) == 0) {
-    return GColorDarkGray;
-  }
-
-  // Unknown
-  return GColorWhite;
-}
-
-GColor data_get_theme_night_color() {
-  if (strcmp(s_persist_data.theme, THEME_BLUE) == 0) {
-    return GColorDukeBlue;
-  } else if (strcmp(s_persist_data.theme, THEME_RED) == 0) {
-    return GColorBulgarianRose;
-  } else if (strcmp(s_persist_data.theme, THEME_GREEN) == 0) {
-    return GColorDarkGreen;
-  } else if (strcmp(s_persist_data.theme, THEME_AQUA) == 0) {
-    return GColorMidnightGreen;
-  } else if (strcmp(s_persist_data.theme, THEME_PURPLE) == 0) {
-    return GColorImperialPurple;
-  } else if (strcmp(s_persist_data.theme, THEME_ORANGE) == 0) {
-    return GColorWindsorTan;
-  } else if (strcmp(s_persist_data.theme, THEME_GRAY) == 0) {
-    return GColorBlack;
-  }
-
-  // Unknown
-  return GColorWhite;
-}
-
 bool data_is_health_used() {
-  return strcmp(s_persist_data.slot_1, COMPLICATION_STEP_COUNT) == 0 ||
-    strcmp(s_persist_data.slot_2, COMPLICATION_STEP_COUNT) == 0 ||
-    strcmp(s_persist_data.slot_3, COMPLICATION_STEP_COUNT) == 0 ||
-    strcmp(s_persist_data.slot_4, COMPLICATION_STEP_COUNT) == 0;
+  return strcmp(s_persist_data.slot_1, COMP_STEP_COUNT) == 0 ||
+    strcmp(s_persist_data.slot_2, COMP_STEP_COUNT) == 0 ||
+    strcmp(s_persist_data.slot_3, COMP_STEP_COUNT) == 0 ||
+    strcmp(s_persist_data.slot_4, COMP_STEP_COUNT) == 0;
 }
-
-GColor data_get_precip_color(int precip_chance) {
-  if (precip_chance <= 10) return GColorBlack;
-  if (precip_chance < 33) return GColorVividCerulean;
-  if (precip_chance < 66) return GColorBlueMoon;
-  if (precip_chance < 90) return GColorBlue;
-  return GColorDukeBlue;
-};
 
 /**
  * Arrays are two chars per item, 6 items.
@@ -177,45 +224,3 @@ int data_get_strarr_value(char *arr, int hour) {
   const char value[3] = {arr[index], arr[index + 1], '\0'};
   return atoi(value);
 }
-
-GColor data_get_weather_color(int code) {
-  switch (code) {
-    case 0:
-    case 1: // Mainly clear
-      return GColorBlack;
-    case 3: // Overcast
-      return GColorDarkGray;
-    case 2: // Partly cloudy
-    case 45: // Fog
-    case 48: // Depositing rime fog
-      return GColorLightGray;
-    case 51: // Light Drizzle
-    case 53: // Moderate Drizzle
-    case 55: // Dense Drizzle
-    case 56: // Light Freezing Drizzle
-    case 57: // Dense Freezing Drizzle
-    case 61: // Slight Rain
-    case 66: // Light Freezing Rain
-    case 80: // Slight Rain showers
-      return GColorBlueMoon;
-    case 63: // Moderate Rain
-    case 65: // Heavy Rain
-    case 67: // Heavy Freezing Rain
-    case 81: // Moderate Rain showers
-    case 82: // Violent Rain showers
-      return GColorBlue;
-    case 85: // Slight Snow showers
-    case 86: // Heavy Snow showers
-    case 71: // Slight Snow fall
-    case 73: // Moderate Snow fall
-    case 75: // Heavy Snow fall
-    case 77: // Snow grains
-      return GColorWhite;
-    case 95: // Thunderstorm: Slight or moderate
-    case 96: // Thunderstorm with slight hail
-    case 99: // Thunderstorm with heavy hail
-      return GColorYellow;
-    default:
-      return GColorClear;
-  }
-};

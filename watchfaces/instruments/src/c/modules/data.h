@@ -15,6 +15,8 @@ typedef struct {
   char sunset[8];
   char precip_arr[STR_ARR_SIZE];
   char code_arr[STR_ARR_SIZE];
+  int temp_low;
+  int temp_high;
 } AppState;
 
 typedef struct {
@@ -33,15 +35,13 @@ void data_deinit();
 AppState* data_get_app_state();
 PersistData* data_get_persist_data();
 
-uint32_t data_get_weather_icon_id();
-
 GColor data_get_theme_day_color();
 GColor data_get_theme_night_color();
+GColor data_get_precip_color(int precip_chance);
+GColor data_get_weather_color(int code);
+
+uint32_t data_get_weather_icon_id();
 
 bool data_is_health_used();
 
-GColor data_get_precip_color(int precip_chance);
-
 int data_get_strarr_value(char *arr, int hour);
-
-GColor data_get_weather_color(int code);

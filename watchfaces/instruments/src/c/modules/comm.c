@@ -12,10 +12,18 @@ static void inbox_received_handler(DictionaryIterator *iter, void *context) {
     app_state->current_code = packet_get_integer(iter, MESSAGE_KEY_CURRENT_CODE);
   }
   if (packet_contains_key(iter, MESSAGE_KEY_SUNRISE)) {
-    snprintf(app_state->sunrise, sizeof(app_state->sunrise), "%s", packet_get_string(iter, MESSAGE_KEY_SUNRISE));
+    snprintf(app_state->sunrise,
+      sizeof(app_state->sunrise),
+      "%s",
+      packet_get_string(iter, MESSAGE_KEY_SUNRISE)
+    );
   }
   if (packet_contains_key(iter, MESSAGE_KEY_SUNSET)) {
-    snprintf(app_state->sunset, sizeof(app_state->sunset), "%s", packet_get_string(iter, MESSAGE_KEY_SUNSET));
+    snprintf(app_state->sunset,
+      sizeof(app_state->sunset),
+      "%s",
+      packet_get_string(iter, MESSAGE_KEY_SUNSET)
+    );
   }
   if (packet_contains_key(iter, MESSAGE_KEY_PRECIP_ARR)) {
     snprintf(
@@ -26,7 +34,18 @@ static void inbox_received_handler(DictionaryIterator *iter, void *context) {
     );
   }
   if (packet_contains_key(iter, MESSAGE_KEY_CODE_ARR)) {
-    snprintf(app_state->code_arr, sizeof(app_state->code_arr), "%s", packet_get_string(iter, MESSAGE_KEY_CODE_ARR));
+    snprintf(
+      app_state->code_arr,
+      sizeof(app_state->code_arr),
+      "%s",
+      packet_get_string(iter, MESSAGE_KEY_CODE_ARR)
+    );
+  }
+  if (packet_contains_key(iter, MESSAGE_KEY_TEMP_LOW)) {
+    app_state->temp_low = packet_get_integer(iter, MESSAGE_KEY_TEMP_LOW);
+  }
+  if (packet_contains_key(iter, MESSAGE_KEY_TEMP_HIGH)) {
+    app_state->temp_high = packet_get_integer(iter, MESSAGE_KEY_TEMP_HIGH);
   }
 
   // Config
@@ -88,6 +107,7 @@ static void inbox_received_handler(DictionaryIterator *iter, void *context) {
   }
 
   // Other
+  // TODO: Currently unused
   if (packet_contains_key(iter, MESSAGE_KEY_WEATHER_ERROR)) {
     app_state->current_code = WEATHER_ERROR;
   }

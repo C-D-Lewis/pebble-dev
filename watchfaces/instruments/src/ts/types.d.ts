@@ -11,5 +11,6 @@ export type WeatherApiResponse = {
   hourly: {
     precipitation_probability: number[];
     weather_code: number[];
+    temperature_2m: number[];
   };
 };

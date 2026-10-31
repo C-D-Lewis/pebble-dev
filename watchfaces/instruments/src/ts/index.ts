@@ -81,6 +81,7 @@ const sendWeather = async () => {
     const {
       precipitation_probability: hourlyPrecip,
       weather_code: hourlyCodes,
+      temperature_2m: hourlyTemps,
     } = hourly;
 
     const sunriseTime = getTime(sunrise[0]);
@@ -93,6 +94,18 @@ const sendWeather = async () => {
     const codesArr = TEST_MODE ? TEST_CODES_ARR : hourlyCodes;
     const nextSixCodes = codesArr.slice(startHour, startHour + 6);
 
+    // Derive low/high from array so it never exceeds
+    let tempLow = 999;
+    let tempHigh = -999;
+    hourlyTemps.forEach((i) => {
+      if (i < tempLow) {
+        tempLow = i;
+      }
+      if (i > tempHigh) {
+        tempHigh = i;
+      }
+    });
+
     const dict = {
       CURRENT_TEMP: Math.round(currentTemp),
       CURRENT_CODE: currentCode,
@@ -100,6 +113,8 @@ const sendWeather = async () => {
       SUNSET: sunsetTime,
       PRECIP_ARR: nextSixPrecip.map(zeroPadTo99).join(''),
       CODE_ARR: nextSixCodes.map(zeroPadTo99).join(''),
+      TEMP_LOW: Math.round(tempLow),
+      TEMP_HIGH: Math.round(tempHigh),
     };
     console.log(JSON.stringify(dict, null, 2));
     
