@@ -95,7 +95,7 @@
       "TEMP_LOW",
       "TEMP_HIGH",
       "REQUEST_WEATHER",
-      "WEATHER_ERROR",
+      "DATA_ERROR",
       "CONFIG_TEMP_UNIT",
       "CONFIG_THEME",
       "CONFIG_SLOT_1",

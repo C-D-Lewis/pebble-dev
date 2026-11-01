@@ -45,3 +45,5 @@ uint32_t data_get_weather_icon_id();
 bool data_is_health_used();
 
 int data_get_strarr_value(char *arr, int hour);
+
+bool data_is_weather_valid();

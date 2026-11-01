@@ -7,9 +7,13 @@ const TEST_MODE = false;
 /** Test position */
 const TEST_POSITION = { coords: { latitude: 51.74, longitude: 0.48 } };
 /** Sample precipitation data */
-const TEST_PRECIP_ARR = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20, 40, 20, 50, 90, 20];
+const TEST_PRECIP_ARR = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 90, 40, 20, 50, 90, 20];
 /** Sample weather codes */
 const TEST_CODES_ARR = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 77, 82, 99];
+/** Test current temp */
+const TEST_CURRENT_TEMP = 12;
+/** Sample temperatures */
+const TEST_TEMPS_ARR = [10, 11, 12, 13, 14, 15, 14, 13, 12, 11, 10, 11, 12, 13, 14, 15, 14, 13, 12, 11, 10, 11, 12, 13];
 
 setupClay();
 
@@ -74,7 +78,7 @@ const sendWeather = async () => {
 
     const { current, daily, hourly } = await fetchWeatherForecast(latitude, longitude);
     const {
-      temperature_2m: currentTemp,
+      temperature_2m: temp2m,
       weather_code: currentCode,
     } = current;
     const { sunrise, sunset } = daily;
@@ -87,6 +91,8 @@ const sendWeather = async () => {
     const sunriseTime = getTime(sunrise[0]);
     const sunsetTime = getTime(sunset[0]);
 
+    const currentTemp = TEST_MODE ? TEST_CURRENT_TEMP : temp2m;
+
     // Need either the next 6, or the last six of the day
     const precipArr = TEST_MODE ? TEST_PRECIP_ARR : hourlyPrecip;
     const startHour = Math.min(new Date().getHours(), precipArr.length - 6);
@@ -95,9 +101,10 @@ const sendWeather = async () => {
     const nextSixCodes = codesArr.slice(startHour, startHour + 6);
 
     // Derive low/high from array so it never exceeds
+    const tempsArr = TEST_MODE ? TEST_TEMPS_ARR : hourlyTemps;
     let tempLow = 999;
     let tempHigh = -999;
-    hourlyTemps.forEach((i) => {
+    tempsArr.forEach((i) => {
       if (i < tempLow) {
         tempLow = i;
       }
@@ -135,7 +142,7 @@ const sendWeather = async () => {
       }
     }
 
-    await PebbleTS.sendAppMessage({ WEATHER_ERROR: 1 });
+    await PebbleTS.sendAppMessage({ DATA_ERROR: 1 });
   }
 };
 

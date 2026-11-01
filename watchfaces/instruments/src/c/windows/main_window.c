@@ -10,6 +10,25 @@ static int s_day_prog_ang, s_steps;
 
 /******************************************** Drawing *********************************************/
 
+static void draw_text_bubble(GContext *ctx, GRect bounds, char *text, GTextAlignment alignment) {
+  const int corner_r = 5;
+  
+  graphics_context_set_fill_color(ctx, GColorWhite);
+  graphics_fill_rect(ctx, bounds, corner_r, GCornersAll);
+  graphics_context_set_fill_color(ctx, GColorBlack);
+  graphics_fill_rect(ctx, grect_inset(bounds, GEdgeInsets(OUTER_RING_W)), corner_r, GCornersAll);
+  graphics_context_set_text_color(ctx, GColorWhite);
+  graphics_draw_text(
+    ctx,
+    text,
+    scl_get_font(SFI_Label),
+    grect_inset(bounds, GEdgeInsets2(0, 2 * OUTER_RING_W)),
+    GTextOverflowModeWordWrap,
+    alignment,
+    NULL
+  );
+}
+
 static void draw_date_and_time_display(GContext *ctx, GRect bounds, struct tm *t, GPoint center) {
   // Day of week
   static char dow_buff[8];
@@ -54,7 +73,6 @@ static void draw_date_and_time_display(GContext *ctx, GRect bounds, struct tm *t
   );
 
   // Day progress hand
-  graphics_context_set_antialiased(ctx, true);
   graphics_context_set_stroke_color(ctx, GColorWhite);
   graphics_context_set_stroke_width(ctx, DAY_HAND_W);
   GPoint day_hand_start = util_make_hand_point(
@@ -70,7 +88,18 @@ static void draw_date_and_time_display(GContext *ctx, GRect bounds, struct tm *t
     center
   );
   graphics_draw_line(ctx, day_hand_start, day_hand_end);
-  graphics_context_set_antialiased(ctx, false);
+
+  if (s_tapped) {
+    // Show time over center post
+    static char time_buff[8];
+    strftime(time_buff, sizeof(time_buff), "%H:%M", t);
+    draw_text_bubble(
+      ctx,
+      GRect(scl_x(400), scl_y(460), scl_x(200), scl_y(100)),
+      time_buff,
+      GTextAlignmentCenter
+    );
+  }
 }
 
 static void draw_weather(GContext *ctx, GRect bounds) {
@@ -85,7 +114,7 @@ static void draw_weather(GContext *ctx, GRect bounds) {
 
   // Temperature
   static char temp_buff[8];
-  if (app_state->current_temp == DATA_EMPTY) {
+  if (!data_is_weather_valid()) {
     snprintf(temp_buff, sizeof(temp_buff), " ");
   } else {
     snprintf(temp_buff, sizeof(temp_buff), "%d", util_convert_temp(app_state->current_temp));
@@ -104,7 +133,6 @@ static void draw_weather(GContext *ctx, GRect bounds) {
 
 static void draw_decorations(GContext *ctx, GRect bounds, GPoint center) {
   // Outer day arc
-  graphics_context_set_antialiased(ctx, true);
   graphics_context_set_stroke_color(ctx, GColorWhite);
   graphics_context_set_stroke_width(ctx, OUTER_RING_W);
   graphics_draw_arc(
@@ -114,22 +142,22 @@ static void draw_decorations(GContext *ctx, GRect bounds, GPoint center) {
     0,
     TRIG_MAX_ANGLE
   );
-  graphics_context_set_antialiased(ctx, false);
 
   // Straight line representing midnight
   graphics_context_set_stroke_color(ctx, GColorDarkGray);
   graphics_context_set_stroke_width(ctx, 2);
   const int eod_ang = (180 * TRIG_MAX_ANGLE) / 360;
+  const int hand_r = center.x - OUTER_RING_INSET - HOUR_DOT_RING_W;
   GPoint eod_hand_start = util_make_hand_point(
     eod_ang,
     TRIG_MAX_ANGLE,
-    center.x - OUTER_RING_INSET - HOUR_DOT_RING_W,
+    hand_r,
     center
   );
   GPoint eod_hand_end = util_make_hand_point(
     eod_ang,
     TRIG_MAX_ANGLE,
-    CENTER_POST_W - 1,
+    hand_r - 10,
     center
   );
   graphics_draw_line(ctx, eod_hand_start, eod_hand_end);
@@ -169,9 +197,8 @@ static void draw_center_post(GContext *ctx, GPoint center) {
 
 static void draw_sunrise_and_sunset_ring(GContext *ctx, GRect bounds, GPoint center) {
   AppState *app_state = data_get_app_state();
-  if (app_state->current_code == DATA_EMPTY) return;
 
-  graphics_context_set_antialiased(ctx, true);
+  const GRect arc_r = grect_inset(bounds, GEdgeInsets(OUTER_RING_INSET));
 
   int s_rise_ang = util_get_time_angle(app_state->sunrise);
   int s_set_ang = util_get_time_angle(app_state->sunset);
@@ -179,7 +206,6 @@ static void draw_sunrise_and_sunset_ring(GContext *ctx, GRect bounds, GPoint cen
   s_rise_ang = (s_rise_ang - (2 * (TRIG_MAX_ANGLE / 4))) % TRIG_MAX_ANGLE;
   s_set_ang = (s_set_ang - (2 * (TRIG_MAX_ANGLE / 4))) % TRIG_MAX_ANGLE;
 
-  const GRect arc_r = grect_inset(bounds, GEdgeInsets(OUTER_RING_INSET));
 
   // Day and night arc sections
   graphics_context_set_fill_color(ctx, data_get_theme_day_color());
@@ -209,8 +235,6 @@ static void draw_sunrise_and_sunset_ring(GContext *ctx, GRect bounds, GPoint cen
     s_set_ang - notch_ang,
     s_set_ang + notch_ang
   );
-
-  graphics_context_set_antialiased(ctx, false);
 }
 
 static void draw_gauge_dot(GContext *ctx, GPoint center, int angle) {
@@ -230,30 +254,54 @@ static void draw_gauge_dot(GContext *ctx, GPoint center, int angle) {
   graphics_fill_circle(ctx, dot_point, GAUGE_DOT_S);
 }
 
+static void draw_empty_complication(GContext *ctx, GRect arc_r, int start_ang, int end_ang) {
+  graphics_context_set_stroke_width(ctx, OUTER_RING_W);
+  graphics_context_set_stroke_color(ctx, GColorDarkGray);
+  graphics_draw_arc(ctx, arc_r, GOvalScaleModeFitCircle, start_ang, end_ang);
+}
+
+static void draw_empty_gauge(GContext *ctx, GRect arc_r, int start_ang, int end_ang, int inner_w) {
+  // Outline and black fill for empty gauge
+  graphics_context_set_stroke_width(ctx, COMPLICATION_W);
+  graphics_context_set_stroke_color(ctx, COLOR_COMPLICATION);
+  graphics_draw_arc(ctx, arc_r, GOvalScaleModeFitCircle, start_ang, end_ang);
+  graphics_context_set_stroke_width(ctx, inner_w);
+  graphics_context_set_stroke_color(ctx, GColorBlack);
+  graphics_draw_arc(ctx, arc_r, GOvalScaleModeFitCircle, start_ang, end_ang);
+}
+
 static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, int slot, char *type) {
   AppState *app_state = data_get_app_state();
   PersistData *persist_data = data_get_persist_data();
 
-  graphics_context_set_antialiased(ctx, true);
-
   // Slots are 0-3, clockwise from top, 45 degrees in length, diagonally opposite
   int start_ang, end_ang;
+  GRect text_r;
+  GTextAlignment alignment;
   switch (slot) {
     case 0:
       start_ang = TRIG_MAX_ANGLE / 16;
       end_ang = (3 * TRIG_MAX_ANGLE) / 16;
+      text_r = GRect(scl_x(600), scl_y(165), scl_x(250), scl_y(100));
+      alignment = GTextAlignmentLeft;
       break;
     case 1:
       start_ang = (5 * TRIG_MAX_ANGLE) / 16;
       end_ang = (7 * TRIG_MAX_ANGLE) / 16;
+      text_r = GRect(scl_x(600), scl_y(735), scl_x(250), scl_y(100));
+      alignment = GTextAlignmentLeft;
       break;
     case 2:
       start_ang = (9 * TRIG_MAX_ANGLE) / 16;
       end_ang = (11 * TRIG_MAX_ANGLE) / 16;
+      text_r = GRect(scl_x(150), scl_y(735), scl_x(250), scl_y(100));
+      alignment = GTextAlignmentRight;
       break;
     case 3:
       start_ang = (13 * TRIG_MAX_ANGLE) / 16;
       end_ang = (15 * TRIG_MAX_ANGLE) / 16;
+      text_r = GRect(scl_x(150), scl_y(165), scl_x(250), scl_y(100));
+      alignment = GTextAlignmentRight;
       break;
     default:
       return;
@@ -266,21 +314,21 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
 
   if (strcmp(type, COMP_NONE) == 0) {
     // Just a slim line if no complication in this slot
-    graphics_context_set_stroke_width(ctx, OUTER_RING_W);
-    graphics_context_set_stroke_color(ctx, GColorDarkGray);
-    graphics_draw_arc(ctx, arc_r, GOvalScaleModeFitCircle, start_ang, end_ang);
-  } else {
-    // Outline and black fill for empty gauge
-    graphics_context_set_stroke_width(ctx, COMPLICATION_W);
-    graphics_context_set_stroke_color(ctx, COLOR_COMPLICATION);
-    graphics_draw_arc(ctx, arc_r, GOvalScaleModeFitCircle, start_ang, end_ang);
-    graphics_context_set_stroke_width(ctx, inner_w);
-    graphics_context_set_stroke_color(ctx, GColorBlack);
-    graphics_draw_arc(ctx, arc_r, GOvalScaleModeFitCircle, start_ang, end_ang);
+    draw_empty_complication(ctx, arc_r, start_ang, end_ang);
+    return;
   }
 
   // Fill based on battery level
   if (strcmp(type, COMP_BATTERY) == 0) {
+    if (s_tapped) {
+      static char batt_buff[8];
+      BatteryChargeState charge_state = battery_state_service_peek();
+      snprintf(batt_buff, sizeof(batt_buff), "%d%%", charge_state.charge_percent);
+      draw_text_bubble(ctx, text_r, batt_buff, alignment);
+    }
+
+    draw_empty_gauge(ctx, arc_r, start_ang, end_ang, inner_w);
+  
     BatteryChargeState charge_state = battery_state_service_peek();
     const int batt_ang = ((end_ang - start_ang) * charge_state.charge_percent) / 100;
     graphics_context_set_stroke_color(ctx, COLOR_BATTERY);
@@ -288,10 +336,24 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
     graphics_draw_arc(ctx, arc_r, GOvalScaleModeFitCircle, start_ang, start_ang + batt_ang);
 
     draw_gauge_dot(ctx, center, start_ang + batt_ang);
+    return;
   }
   
   // Fill based on progress to step goal
   if (strcmp(type, COMP_STEP_COUNT) == 0) {
+    if (s_steps == DATA_EMPTY) {
+      draw_empty_complication(ctx, arc_r, start_ang, end_ang);
+      return;
+    }
+
+    if (s_tapped) {
+      static char step_buff[8];
+      snprintf(step_buff, sizeof(step_buff), "%d", s_steps);
+      draw_text_bubble(ctx, text_r, step_buff, alignment);
+    }
+    
+    draw_empty_gauge(ctx, arc_r, start_ang, end_ang, inner_w);
+
     const int step_goal = atoi(persist_data->step_goal);
     const int max_steps = s_steps > step_goal ? step_goal : s_steps;
     const int step_ang = ((end_ang - start_ang) * max_steps) / step_goal;
@@ -300,19 +362,24 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
     graphics_draw_arc(ctx, arc_r, GOvalScaleModeFitCircle, start_ang, start_ang + step_ang);
 
     draw_gauge_dot(ctx, center, start_ang + step_ang);
+    return;
   }
 
   // Next 6 rain chance or weather codes
   const bool is_next_rain = strcmp(type, COMP_NEXT_RAIN) == 0;
   const bool is_next_weather = strcmp(type, COMP_NEXT_WEATHER) == 0;
   if (is_next_rain || is_next_weather) {
+    if (!data_is_weather_valid()) {
+      draw_empty_complication(ctx, arc_r, start_ang, end_ang);
+      return;
+    }
+
+    draw_empty_gauge(ctx, arc_r, start_ang, end_ang, inner_w);
+
     // Fill ends
-    graphics_context_set_antialiased(ctx, false);
     graphics_context_set_stroke_width(ctx, inner_w);
     graphics_context_set_stroke_color(ctx, COLOR_COMPLICATION);
     graphics_draw_arc(ctx, arc_r, GOvalScaleModeFitCircle, start_ang, end_ang);
-    graphics_context_set_antialiased(ctx, true);
-
 
     // Each of six hourly items
     for (int i = 0; i < NUM_FORECAST_ITEMS; i++) {
@@ -360,75 +427,89 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
       dot_ang += (NUM_FORECAST_ITEMS - (24 - hours)) * item_l;
     }
     draw_gauge_dot(ctx, center, dot_ang);
+    return;
   }
 
   if (strcmp(type, COMP_TEMP_RANGE) == 0) {
-    const int cap_ang = 300;
+    if (!data_is_weather_valid()) {
+      draw_empty_complication(ctx, arc_r, start_ang, end_ang);
+      return;
+    }
+
+    if (s_tapped) {
+      static char range_buff[8];
+      snprintf(
+        range_buff,
+        sizeof(range_buff),
+        "%d-%d",
+        util_convert_temp(app_state->temp_low),
+        util_convert_temp(app_state->temp_high)
+      );
+      draw_text_bubble(ctx, text_r, range_buff, alignment);
+    }
+
+    draw_empty_gauge(ctx, arc_r, start_ang, end_ang, inner_w);
+
     const GRect blk_arc_r = grect_inset(bounds, GEdgeInsets(2 * OUTER_RING_W));
 
-    // Fill ends with cool/hot colors and middle with black
-    graphics_context_set_antialiased(ctx, false);
+    // One item for each integer temperature, including both endpoints.
+    if (app_state->temp_high < app_state->temp_low) {
+      APP_LOG(APP_LOG_LEVEL_ERROR, "High temp below low temp");
+      return;
+    }
+
+    const int item_count = app_state->temp_high - app_state->temp_low + 1;
+    const int gauge_ang = end_ang - start_ang;
+    const int item_s = gauge_ang / item_count;
+
+    // Fill ends with cool/hot colors
     graphics_context_set_stroke_width(ctx, inner_w);
     graphics_context_set_stroke_color(ctx, COLOR_HIGH_TEMP);
     graphics_draw_arc(ctx, arc_r, GOvalScaleModeFitCircle, start_ang, end_ang);
     graphics_context_set_stroke_color(ctx, COLOR_LOW_TEMP);
-    graphics_draw_arc(ctx, arc_r, GOvalScaleModeFitCircle, start_ang, start_ang + cap_ang);
-    graphics_context_set_fill_color(ctx, GColorBlack);
-    graphics_fill_radial(
-      ctx,
-      blk_arc_r,
-      GOvalScaleModeFitCircle,
-      inner_w,
-      start_ang + cap_ang,
-      end_ang - cap_ang
-    );
+    graphics_draw_arc(ctx, arc_r, GOvalScaleModeFitCircle, start_ang, start_ang + (2 * item_s));
 
-    // Divisions for number of degrees in the range
-    const int t_range = app_state->temp_high - app_state->temp_low;
-    const int ang_s = end_ang - start_ang;
+    for (int i = 0; i < item_count; i++) {
+      const int item_ang = start_ang + (i * item_s);
+      
+      // Item black section
+      graphics_context_set_fill_color(ctx, GColorBlack);
+      graphics_fill_radial(
+        ctx,
+        blk_arc_r,
+        GOvalScaleModeFitCircle,
+        inner_w,
+        item_ang,
+        item_ang + item_s
+      );
 
-    if (t_range > 1) {
+      // Separator
       graphics_context_set_fill_color(ctx, GColorDarkGray);
-
-      for (int i = 1; i < t_range; i++) {
-        const int item_ang = start_ang + (i * ang_s) / t_range;
-
-        graphics_fill_radial(
-          ctx,
-          blk_arc_r,
-          GOvalScaleModeFitCircle,
-          inner_w,
-          item_ang - sep_ang,
-          item_ang + sep_ang
-        );
-      }
+      graphics_fill_radial(
+        ctx,
+        blk_arc_r,
+        GOvalScaleModeFitCircle,
+        inner_w,
+        item_ang - sep_ang,
+        item_ang + sep_ang
+      );
     }
-
-    // Position of current temperature on the scale
-    if (app_state->temp_high < app_state->temp_low) {
-      APP_LOG(APP_LOG_LEVEL_ERROR, "High temp below low temp");
-    } else {
-      // Stay within scale
-      int temp = app_state->current_temp;
-      if (temp < app_state->temp_low) {
-        temp = app_state->temp_low;
-      }
-      if (temp > app_state->temp_high) {
-        temp = app_state->temp_high;
-      }
-      const int dot_ang = start_ang + (((temp - app_state->temp_low) * ang_s) / t_range) + (item_l / 2);
-      draw_gauge_dot(ctx, center, dot_ang);
+    
+    // Stay within scale
+    int temp = app_state->current_temp;
+    if (temp < app_state->temp_low) {
+      temp = app_state->temp_low;
     }
-
-    graphics_context_set_antialiased(ctx, true);
+    if (temp > app_state->temp_high) {
+      temp = app_state->temp_high;
+    }
+    const int item_index = temp - app_state->temp_low;
+    const int dot_ang = start_ang + (item_index * item_s) + (item_s / 2);
+    draw_gauge_dot(ctx, center, dot_ang);
   }
-
-  graphics_context_set_antialiased(ctx, false);
 }
 
 static void canvas_update_proc(Layer *layer, GContext *ctx) {
-  graphics_context_set_antialiased(ctx, false);
-
   PersistData *persist_data = data_get_persist_data();
 
   GRect bounds = layer_get_bounds(layer);
@@ -460,7 +541,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
 
   // Tapped state
   if (s_tapped) {
-    // TODO: Show full time
+    // TODO: Show full time and cmoplication numbers
   }
 }
 
@@ -508,7 +589,7 @@ static void update_step_count() {
   if (mask & HealthServiceAccessibilityMaskAvailable) {
     s_steps = (int)health_service_sum_today(metric);
   } else {
-    s_steps = 0;
+    s_steps = DATA_EMPTY;
   }
 }
 

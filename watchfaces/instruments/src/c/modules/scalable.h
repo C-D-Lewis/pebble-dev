@@ -7,6 +7,7 @@ typedef enum {
   SFI_Weather,
   SFI_Date,
   SFI_DateLarge,
+  SFI_Label,
 } ScalableFontId;
 
 void scalable_init();

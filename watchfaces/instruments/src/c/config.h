@@ -23,8 +23,8 @@
 #define CHARS_PER_ITEM 2
 #define NUM_FORECAST_ITEMS 6
 #define STR_ARR_SIZE ((CHARS_PER_ITEM * NUM_FORECAST_ITEMS) + 1)
-#define WEATHER_ERROR 1000
 #define DATA_EMPTY -1000
+#define DATA_ERROR 1000
 
 // Enums
 #define TEMP_UNIT_C "C"

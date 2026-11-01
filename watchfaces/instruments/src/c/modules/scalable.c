@@ -10,4 +10,5 @@ void scalable_init() {
   scl_set_fonts(SFI_Date, {.g = s_font_20});
   scl_set_fonts(SFI_DateLarge, {.g = s_font_29});
   scl_set_fonts(SFI_Weather, {.g = s_font_22});
+  scl_set_fonts(SFI_Label, {.g = s_font_20});
 }

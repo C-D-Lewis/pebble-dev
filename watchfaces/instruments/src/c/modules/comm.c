@@ -107,15 +107,19 @@ static void inbox_received_handler(DictionaryIterator *iter, void *context) {
   }
 
   // Other
-  // TODO: Currently unused
-  if (packet_contains_key(iter, MESSAGE_KEY_WEATHER_ERROR)) {
-    app_state->current_code = WEATHER_ERROR;
+  if (packet_contains_key(iter, MESSAGE_KEY_DATA_ERROR)) {
+    app_state->current_code = DATA_ERROR;
   }
 
   main_window_reload();
 }
 
 void comm_request_weather() {
+  AppState *app_state = data_get_app_state();
+
+  app_state->current_temp = DATA_EMPTY;
+  app_state->current_code = DATA_EMPTY;
+
   if (packet_begin()) {
     packet_put_integer(MESSAGE_KEY_REQUEST_WEATHER, 1);
     packet_send(NULL);

@@ -41,10 +41,10 @@ void data_init() {
   // TEST
 #ifdef TEST
   snprintf(s_persist_data.theme, sizeof(s_persist_data.theme), "%s", THEME_RED);
-  snprintf(s_persist_data.slot_1, sizeof(s_persist_data.slot_1), "%s", COMP_STEP_COUNT);
-  snprintf(s_persist_data.slot_2, sizeof(s_persist_data.slot_2), "%s", COMP_NEXT_RAIN);
+  snprintf(s_persist_data.slot_1, sizeof(s_persist_data.slot_1), "%s", COMP_TEMP_RANGE);
+  snprintf(s_persist_data.slot_2, sizeof(s_persist_data.slot_2), "%s", COMP_TEMP_RANGE);
   snprintf(s_persist_data.slot_3, sizeof(s_persist_data.slot_3), "%s", COMP_TEMP_RANGE);
-  snprintf(s_persist_data.slot_4, sizeof(s_persist_data.slot_4), "%s", COMP_BATTERY);
+  snprintf(s_persist_data.slot_4, sizeof(s_persist_data.slot_4), "%s", COMP_TEMP_RANGE);
   snprintf(s_persist_data.step_goal, sizeof(s_persist_data.step_goal), "%s", STEP_GOAL_10000);
 #endif
 }
@@ -223,4 +223,8 @@ int data_get_strarr_value(char *arr, int hour) {
   const int index = hour * 2; // Two chars per code
   const char value[3] = {arr[index], arr[index + 1], '\0'};
   return atoi(value);
+}
+
+bool data_is_weather_valid() {
+  return s_app_state.current_code != DATA_EMPTY && s_app_state.current_code != DATA_ERROR;
 }
