@@ -58,7 +58,11 @@ const getLocation = async () => new Promise((resolve, reject) => {
   navigator.geolocation.getCurrentPosition(
     resolve,
     reject,
-    { timeout: 30000, maximumAge: 60000 },
+    {
+      timeout: 10000,
+      maximumAge: 60000,
+      enableHighAccuracy: false,
+    },
   );
 });
 

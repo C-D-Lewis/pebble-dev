@@ -41,10 +41,10 @@ void data_init() {
   // TEST
 #ifdef TEST
   snprintf(s_persist_data.theme, sizeof(s_persist_data.theme), "%s", THEME_RED);
-  snprintf(s_persist_data.slot_1, sizeof(s_persist_data.slot_1), "%s", COMP_TEMP_RANGE);
-  snprintf(s_persist_data.slot_2, sizeof(s_persist_data.slot_2), "%s", COMP_TEMP_RANGE);
-  snprintf(s_persist_data.slot_3, sizeof(s_persist_data.slot_3), "%s", COMP_TEMP_RANGE);
-  snprintf(s_persist_data.slot_4, sizeof(s_persist_data.slot_4), "%s", COMP_TEMP_RANGE);
+  snprintf(s_persist_data.slot_1, sizeof(s_persist_data.slot_1), "%s", COMP_NEXT_WEATHER);
+  snprintf(s_persist_data.slot_2, sizeof(s_persist_data.slot_2), "%s", COMP_NEXT_WEATHER);
+  snprintf(s_persist_data.slot_3, sizeof(s_persist_data.slot_3), "%s", COMP_NEXT_WEATHER);
+  snprintf(s_persist_data.slot_4, sizeof(s_persist_data.slot_4), "%s", COMP_NEXT_WEATHER);
   snprintf(s_persist_data.step_goal, sizeof(s_persist_data.step_goal), "%s", STEP_GOAL_10000);
 #endif
 }
@@ -202,10 +202,54 @@ uint32_t data_get_weather_icon_id() {
     case 97: // Heavy thunderstorm
     case 99: // Thunderstorm with heavy hail
       return RESOURCE_ID_ICON_STORM;
+    case DATA_ERROR:
+      return RESOURCE_ID_ICON_WARNING;
     default:
       return RESOURCE_ID_ICON_BLANK;
   }
 };
+
+char* data_get_weather_str(int code) {
+  switch (code) {
+    case 0:
+    case 1:
+      return "Clear";
+    case 3:
+    case 2:
+      return "Cloud";
+    case 45:
+    case 48:
+      return "Fog";
+    case 51:
+    case 53:
+    case 55:
+    case 56:
+    case 57:
+    case 61:
+    case 66:
+    case 80:
+      return "Showers";
+    case 63:
+    case 65:
+    case 67:
+    case 81:
+    case 82:
+      return "Rain";
+    case 85:
+    case 86:
+    case 71:
+    case 73:
+    case 75:
+    case 77:
+      return "Snow";
+    case 95:
+    case 96:
+    case 99:
+      return "Thunder";
+    default:
+      return "?";
+  }
+}
 
 bool data_is_health_used() {
   return strcmp(s_persist_data.slot_1, COMP_STEP_COUNT) == 0 ||

@@ -42,6 +42,8 @@ GColor data_get_weather_color(int code);
 
 uint32_t data_get_weather_icon_id();
 
+char* data_get_weather_str(int code);
+
 bool data_is_health_used();
 
 int data_get_strarr_value(char *arr, int hour);

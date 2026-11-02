@@ -80,6 +80,11 @@
           "type": "bitmap",
           "name": "ICON_STORM",
           "file": "images/icon-storm.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "ICON_WARNING",
+          "file": "images/icon-warning.png"
         }
       ]
     },

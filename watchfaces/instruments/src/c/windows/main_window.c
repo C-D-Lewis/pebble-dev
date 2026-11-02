@@ -5,7 +5,7 @@ static Layer *s_canvas_layer;
 static GBitmap *s_weather_bitmap;
 
 static AppTimer *s_tap_timer;
-static bool s_tapped, s_connected;
+static bool s_tapped = false, s_connected;
 static int s_day_prog_ang, s_steps;
 
 /******************************************** Drawing *********************************************/
@@ -38,7 +38,7 @@ static void draw_date_and_time_display(GContext *ctx, GRect bounds, struct tm *t
     ctx,
     dow_buff,
     scl_get_font(SFI_Date),
-    GRect(scl_x(620), scl_y(360), 30, bounds.size.h),
+    GRect(scl_x(610), scl_y(360), 30, bounds.size.h),
     GTextOverflowModeWordWrap,
     GTextAlignmentCenter,
     NULL
@@ -52,7 +52,7 @@ static void draw_date_and_time_display(GContext *ctx, GRect bounds, struct tm *t
     ctx,
     day_buff,
     scl_get_font(SFI_DateLarge),
-    GRect(scl_x(620), scl_y(430), 30, 100),
+    GRect(scl_x(610), scl_y(430), 30, 100),
     GTextOverflowModeWordWrap,
     GTextAlignmentCenter,
     NULL
@@ -66,7 +66,7 @@ static void draw_date_and_time_display(GContext *ctx, GRect bounds, struct tm *t
     ctx,
     month_buff,
     scl_get_font(SFI_Date),
-    GRect(scl_x(620), scl_y(545), 30, 100),
+    GRect(scl_x(610), scl_y(545), 30, 100),
     GTextOverflowModeWordWrap,
     GTextAlignmentCenter,
     NULL
@@ -114,8 +114,10 @@ static void draw_weather(GContext *ctx, GRect bounds) {
 
   // Temperature
   static char temp_buff[8];
-  if (!data_is_weather_valid()) {
+  if (app_state->current_code == DATA_EMPTY) {
     snprintf(temp_buff, sizeof(temp_buff), " ");
+  } else if (app_state->current_code == DATA_ERROR) {
+    snprintf(temp_buff, sizeof(temp_buff), "ERR");
   } else {
     snprintf(temp_buff, sizeof(temp_buff), "%d", util_convert_temp(app_state->current_temp));
   }
@@ -198,6 +200,8 @@ static void draw_center_post(GContext *ctx, GPoint center) {
 static void draw_sunrise_and_sunset_ring(GContext *ctx, GRect bounds, GPoint center) {
   AppState *app_state = data_get_app_state();
 
+  if (!data_is_weather_valid()) return;
+
   const GRect arc_r = grect_inset(bounds, GEdgeInsets(OUTER_RING_INSET));
 
   int s_rise_ang = util_get_time_angle(app_state->sunrise);
@@ -205,7 +209,6 @@ static void draw_sunrise_and_sunset_ring(GContext *ctx, GRect bounds, GPoint cen
   // Similar adjustment to angle so noon is at the top, not midnight
   s_rise_ang = (s_rise_ang - (2 * (TRIG_MAX_ANGLE / 4))) % TRIG_MAX_ANGLE;
   s_set_ang = (s_set_ang - (2 * (TRIG_MAX_ANGLE / 4))) % TRIG_MAX_ANGLE;
-
 
   // Day and night arc sections
   graphics_context_set_fill_color(ctx, data_get_theme_day_color());
@@ -274,6 +277,9 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
   AppState *app_state = data_get_app_state();
   PersistData *persist_data = data_get_persist_data();
 
+  const bool is_next_rain = strcmp(type, COMP_NEXT_RAIN) == 0;
+  const bool is_next_weather = strcmp(type, COMP_NEXT_WEATHER) == 0;
+
   // Slots are 0-3, clockwise from top, 45 degrees in length, diagonally opposite
   int start_ang, end_ang;
   GRect text_r;
@@ -284,24 +290,42 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
       end_ang = (3 * TRIG_MAX_ANGLE) / 16;
       text_r = GRect(scl_x(600), scl_y(165), scl_x(250), scl_y(100));
       alignment = GTextAlignmentLeft;
+
+      if (is_next_weather) {
+        text_r.origin.x -= scl_x(80);
+        text_r.size.w += scl_x(80);
+      }
       break;
     case 1:
       start_ang = (5 * TRIG_MAX_ANGLE) / 16;
       end_ang = (7 * TRIG_MAX_ANGLE) / 16;
       text_r = GRect(scl_x(600), scl_y(735), scl_x(250), scl_y(100));
       alignment = GTextAlignmentLeft;
+
+      if (is_next_weather) {
+        text_r.origin.x -= scl_x(80);
+        text_r.size.w += scl_x(80);
+      }
       break;
     case 2:
       start_ang = (9 * TRIG_MAX_ANGLE) / 16;
       end_ang = (11 * TRIG_MAX_ANGLE) / 16;
       text_r = GRect(scl_x(150), scl_y(735), scl_x(250), scl_y(100));
       alignment = GTextAlignmentRight;
+
+      if (is_next_weather) {
+        text_r.size.w += scl_x(80);
+      }
       break;
     case 3:
       start_ang = (13 * TRIG_MAX_ANGLE) / 16;
       end_ang = (15 * TRIG_MAX_ANGLE) / 16;
       text_r = GRect(scl_x(150), scl_y(165), scl_x(250), scl_y(100));
       alignment = GTextAlignmentRight;
+
+      if (is_next_weather) {
+        text_r.size.w += scl_x(80);
+      }
       break;
     default:
       return;
@@ -366,12 +390,25 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
   }
 
   // Next 6 rain chance or weather codes
-  const bool is_next_rain = strcmp(type, COMP_NEXT_RAIN) == 0;
-  const bool is_next_weather = strcmp(type, COMP_NEXT_WEATHER) == 0;
   if (is_next_rain || is_next_weather) {
     if (!data_is_weather_valid()) {
       draw_empty_complication(ctx, arc_r, start_ang, end_ang);
       return;
+    }
+
+    if (s_tapped) {
+      if (is_next_rain) {
+        static char rain_buff[8];
+        const int chance = data_get_strarr_value(app_state->precip_arr, 0);
+        snprintf(rain_buff, sizeof(rain_buff), "%d%%", chance);
+        draw_text_bubble(ctx, text_r, rain_buff, alignment);
+      }
+      if (is_next_weather) {
+        static char weather_buff[8];
+        const int code = data_get_strarr_value(app_state->code_arr, 0);
+        snprintf(weather_buff, sizeof(weather_buff), "%s", data_get_weather_str(code));
+        draw_text_bubble(ctx, text_r, weather_buff, alignment);
+      }
     }
 
     draw_empty_gauge(ctx, arc_r, start_ang, end_ang, inner_w);
@@ -406,6 +443,7 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
       );
 
       // Separator
+      if (i == NUM_FORECAST_ITEMS - 1) break;
       graphics_context_set_fill_color(ctx, GColorDarkGray);
       graphics_fill_radial(
         ctx,
