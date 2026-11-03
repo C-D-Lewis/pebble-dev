@@ -35,6 +35,7 @@
 #define COMP_NEXT_RAIN "NEXT_RAIN"
 #define COMP_NEXT_WEATHER "NEXT_WEATHER"
 #define COMP_TEMP_RANGE "TEMP_RANGE"
+#define COMP_PHONE_BATTERY "PHONE_BATTERY"
 #define THEME_BLUE "BLUE"
 #define THEME_RED "RED"
 #define THEME_GREEN "GREEN"
@@ -48,6 +49,7 @@
 
 // Colors
 #define COLOR_BATTERY GColorIslamicGreen
+#define COLOR_PHONE_BATTERY GColorJaegerGreen
 #define COLOR_STEP_COUNT GColorJazzberryJam
 #define COLOR_COMPLICATION GColorWhite
 #define COLOR_ERROR GColorVividViolet

@@ -15,6 +15,7 @@ const SLOT_OPTIONS = [
   { label: 'Next 6hrs rain', value: 'NEXT_RAIN' },
   { label: 'Next 6hrs weather', value: 'NEXT_WEATHER' },
   { label: 'Low/high temperature', value: 'TEMP_RANGE' },
+  { label: 'Phone battery (if available)', value: 'PHONE_BATTERY' },
 ];
 
 const config = [

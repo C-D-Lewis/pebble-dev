@@ -279,6 +279,8 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
 
   const bool is_next_rain = strcmp(type, COMP_NEXT_RAIN) == 0;
   const bool is_next_weather = strcmp(type, COMP_NEXT_WEATHER) == 0;
+  const bool is_battery = strcmp(type, COMP_BATTERY) == 0;
+  const bool is_phone_battery = strcmp(type, COMP_PHONE_BATTERY) == 0;
 
   // Slots are 0-3, clockwise from top, 45 degrees in length, diagonally opposite
   int start_ang, end_ang;
@@ -291,7 +293,7 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
       text_r = GRect(scl_x(600), scl_y(165), scl_x(250), scl_y(100));
       alignment = GTextAlignmentLeft;
 
-      if (is_next_weather) {
+      if (is_next_weather || is_phone_battery) {
         text_r.origin.x -= scl_x(80);
         text_r.size.w += scl_x(80);
       }
@@ -302,7 +304,7 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
       text_r = GRect(scl_x(600), scl_y(735), scl_x(250), scl_y(100));
       alignment = GTextAlignmentLeft;
 
-      if (is_next_weather) {
+      if (is_next_weather || is_phone_battery) {
         text_r.origin.x -= scl_x(80);
         text_r.size.w += scl_x(80);
       }
@@ -313,7 +315,7 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
       text_r = GRect(scl_x(150), scl_y(735), scl_x(250), scl_y(100));
       alignment = GTextAlignmentRight;
 
-      if (is_next_weather) {
+      if (is_next_weather || is_phone_battery) {
         text_r.size.w += scl_x(80);
       }
       break;
@@ -323,7 +325,7 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
       text_r = GRect(scl_x(150), scl_y(165), scl_x(250), scl_y(100));
       alignment = GTextAlignmentRight;
 
-      if (is_next_weather) {
+      if (is_next_weather || is_phone_battery) {
         text_r.size.w += scl_x(80);
       }
       break;
@@ -342,20 +344,39 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
     return;
   }
 
-  // Fill based on battery level
-  if (strcmp(type, COMP_BATTERY) == 0) {
+  // Fill based on battery/phone battery level
+  if (is_battery || is_phone_battery) {
+    if (
+      is_phone_battery && (
+        app_state->phone_battery == DATA_EMPTY || app_state->phone_battery == DATA_ERROR
+      )
+    ) {
+      draw_empty_complication(ctx, arc_r, start_ang, end_ang);
+      return;
+    }
+
     if (s_tapped) {
-      static char batt_buff[8];
-      BatteryChargeState charge_state = battery_state_service_peek();
-      snprintf(batt_buff, sizeof(batt_buff), "%d%%", charge_state.charge_percent);
+      static char batt_buff[16];
+      if (is_battery) {
+        BatteryChargeState charge_state = battery_state_service_peek();
+        snprintf(batt_buff, sizeof(batt_buff), "%d%%", charge_state.charge_percent);
+      } else if (is_phone_battery) {
+        snprintf(batt_buff, sizeof(batt_buff), "%d%% (P)", app_state->phone_battery);
+      }
       draw_text_bubble(ctx, text_r, batt_buff, alignment);
     }
 
     draw_empty_gauge(ctx, arc_r, start_ang, end_ang, inner_w);
   
-    BatteryChargeState charge_state = battery_state_service_peek();
-    const int batt_ang = ((end_ang - start_ang) * charge_state.charge_percent) / 100;
-    graphics_context_set_stroke_color(ctx, COLOR_BATTERY);
+    int percent = 0;
+    if (is_battery) {
+      BatteryChargeState charge_state = battery_state_service_peek();
+      percent = charge_state.charge_percent;
+    } else if (is_phone_battery) {
+      percent = app_state->phone_battery;
+    }
+    const int batt_ang = ((end_ang - start_ang) * percent) / 100;
+    graphics_context_set_stroke_color(ctx, is_battery ? COLOR_BATTERY : COLOR_PHONE_BATTERY);
     graphics_context_set_stroke_width(ctx, inner_w);
     graphics_draw_arc(ctx, arc_r, GOvalScaleModeFitCircle, start_ang, start_ang + batt_ang);
 
@@ -414,9 +435,11 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
     draw_empty_gauge(ctx, arc_r, start_ang, end_ang, inner_w);
 
     // Fill ends
+    graphics_context_set_antialiased(ctx, false);
     graphics_context_set_stroke_width(ctx, inner_w);
     graphics_context_set_stroke_color(ctx, COLOR_COMPLICATION);
     graphics_draw_arc(ctx, arc_r, GOvalScaleModeFitCircle, start_ang, end_ang);
+    graphics_context_set_antialiased(ctx, true);
 
     // Each of six hourly items
     for (int i = 0; i < NUM_FORECAST_ITEMS; i++) {

@@ -107,6 +107,9 @@ static void inbox_received_handler(DictionaryIterator *iter, void *context) {
   }
 
   // Other
+  if (packet_contains_key(iter, MESSAGE_KEY_PHONE_BATTERY)) {
+    app_state->phone_battery = packet_get_integer(iter, MESSAGE_KEY_PHONE_BATTERY);
+  }
   if (packet_contains_key(iter, MESSAGE_KEY_DATA_ERROR)) {
     app_state->current_code = DATA_ERROR;
   }

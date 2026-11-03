@@ -99,6 +99,7 @@
       "CODE_ARR",
       "TEMP_LOW",
       "TEMP_HIGH",
+      "PHONE_BATTERY",
       "REQUEST_WEATHER",
       "DATA_ERROR",
       "CONFIG_TEMP_UNIT",

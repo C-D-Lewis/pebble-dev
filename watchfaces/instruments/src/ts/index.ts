@@ -3,7 +3,6 @@ import { WeatherApiResponse } from './types.js';
 
 /** Disable before release! */
 const TEST_MODE = false;
-
 /** Test position */
 const TEST_POSITION = { coords: { latitude: 51.74, longitude: 0.48 } };
 /** Sample precipitation data */
@@ -14,6 +13,8 @@ const TEST_CODES_ARR = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 const TEST_CURRENT_TEMP = 12;
 /** Sample temperatures */
 const TEST_TEMPS_ARR = [10, 11, 12, 13, 14, 15, 14, 13, 12, 11, 10, 11, 12, 13, 14, 15, 14, 13, 12, 11, 10, 11, 12, 13];
+/** Test phone battery level */
+const TEST_BATTERY_LEVEL = 75;
 
 setupClay();
 
@@ -117,6 +118,19 @@ const sendWeather = async () => {
       }
     });
 
+    // Get device battery
+    let batteryLevel = 0;
+    if (!navigator.getBattery) {
+      console.log('navigator.getBattery not supported');
+      batteryLevel = 0;
+    } else {
+      const b = await navigator.getBattery();
+      batteryLevel = Math.round(b.level * 100);
+    }
+    if (TEST_MODE) {
+      batteryLevel = TEST_BATTERY_LEVEL;
+    }
+
     const dict = {
       CURRENT_TEMP: Math.round(currentTemp),
       CURRENT_CODE: currentCode,
@@ -126,6 +140,7 @@ const sendWeather = async () => {
       CODE_ARR: nextSixCodes.map(zeroPadTo99).join(''),
       TEMP_LOW: Math.round(tempLow),
       TEMP_HIGH: Math.round(tempHigh),
+      PHONE_BATTERY: batteryLevel,
     };
     console.log(JSON.stringify(dict, null, 2));
     

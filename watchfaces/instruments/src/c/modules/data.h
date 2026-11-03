@@ -17,6 +17,7 @@ typedef struct {
   char code_arr[STR_ARR_SIZE];
   int temp_low;
   int temp_high;
+  int phone_battery;
 } AppState;
 
 typedef struct {

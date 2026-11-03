@@ -14,3 +14,10 @@ export type WeatherApiResponse = {
     temperature_2m: number[];
   };
 };
+
+// Stub navigator battery API
+declare global {
+  interface Navigator {
+    getBattery(): Promise<{ level: number }>;
+  }
+}
