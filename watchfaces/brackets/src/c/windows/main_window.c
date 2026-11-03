@@ -1,16 +1,5 @@
 #include "main_window.h"
 
-#if defined(PBL_PLATFORM_EMERY)
-  #define DISPLAY_W 200
-  #define DISPLAY_H 228
-#elif defined(PBL_PLATFORM_CHALK)
-  #define DISPLAY_W 180
-  #define DISPLAY_H 180
-#else
-  #define DISPLAY_W 144
-  #define DISPLAY_H 168
-#endif
-
 static Window *s_window;
 static TextLayer *s_date_layer, *s_time_layer, *s_batt_and_bt_layer, *s_complication_layer;
 static Layer *s_canvas_layer;
@@ -127,11 +116,16 @@ static bool any_complication_enabled() {
     strcmp(persist_data->complication_type, COMPLICATION_TYPE_NONE) != 0;
 }
 
-static void draw_brackets(GContext *ctx, GRect bounds, int scl_y) {
+static void draw_brackets(GContext *ctx, GRect bounds, int scld_y) {
   PersistData *persist_data = data_get_persist_data();
 
-  GRect rect = scl_grect(0, scl_y, 940, 270);
-  const int bracket_w = scl_x(30);
+  GRect rect = GRect(
+    0,
+    scl_y(scld_y),
+    scl_x_pp({.o = 940, .g = 750}),
+    scl_y_pp({.e = 270, .g = 260})
+  );
+  const int bracket_w = scl_x_pp({.o = 30, .g = 25});
   const int bracket_x_inset = scl_x(70);
 
   graphics_context_set_fill_color(ctx, persist_data->color_brackets);
@@ -163,7 +157,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
 }
 
 static GPoint get_root_point() {
-  const int root_x = PBL_IF_ROUND_ELSE(scl_x(150), scl_x(25));
+  const int root_x = scl_x_pp({.o = 25, .c = 150, .g = 130});
   const int root_y = any_complication_enabled() ? scl_y(190) : scl_y(360);
   return GPoint(root_x, root_y);
 }
@@ -177,18 +171,18 @@ static void layout() {
   const GPoint root = get_root_point();
   int y = PBL_IF_ROUND_ELSE(scl_y(200), root.y);
 
-  layer_set_frame(s_canvas_layer, GRect(root.x, root.y, DISPLAY_W, DISPLAY_H));
+  layer_set_frame(s_canvas_layer, GRect(root.x, root.y, PS_DISP_W, PS_DISP_H));
 
-  const int text_x = PBL_IF_ROUND_ELSE(scl_x(260), scl_x_pp({.o = 140, .e = 113}));
-  y -= scl_y_pp({.o = 40, .e = 50});
+  const int text_x = scl_x_pp({.o = 140, .c = 260, .e = 113, .g = 210});
+  y -= scl_y_pp({.o = 40, .e = 50, .g = 50});
   GRect frame = grect_inset(bounds, GEdgeInsets(y, 0, 0, text_x));
   layer_set_frame(text_layer_get_layer(s_date_layer), frame);
 
-  y += scl_y_pp({.o = 165, .e =  162});
+  y += scl_y_pp({.o = 165, .e =  162, .g = 162});
   frame = grect_inset(bounds, GEdgeInsets(y, 0, 0, text_x));
   layer_set_frame(text_layer_get_layer(s_time_layer), frame);
 
-  y += scl_y_pp({.o = 195, .e =  200});
+  y += scl_y_pp({.o = 195, .e =  200, .g = 200});
 
   if (persist_data->battery_and_bluetooth) {
     frame = grect_inset(bounds, GEdgeInsets(y, 0, 0, text_x));
@@ -196,7 +190,7 @@ static void layout() {
   }
 
   if (any_complication_enabled()) {
-    y += scl_y_pp({.o = 165, .e =  163});
+    y += scl_y_pp({.o = 165, .e =  163, .g = 163});
     frame = grect_inset(bounds, GEdgeInsets(y, 0, 0, text_x));
     layer_set_frame(text_layer_get_layer(s_complication_layer), frame);
   }
@@ -249,7 +243,7 @@ static void window_load(Window *window) {
   
   const GPoint root = get_root_point();
 
-  s_canvas_layer = layer_create(GRect(root.x, root.y, DISPLAY_W, DISPLAY_H));
+  s_canvas_layer = layer_create(GRect(root.x, root.y, PS_DISP_W, PS_DISP_H));
   layer_set_update_proc(s_canvas_layer, canvas_update_proc);
   layer_add_child(root_layer, s_canvas_layer);
 
