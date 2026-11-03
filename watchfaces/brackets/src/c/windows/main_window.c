@@ -116,14 +116,14 @@ static bool any_complication_enabled() {
     strcmp(persist_data->complication_type, COMPLICATION_TYPE_NONE) != 0;
 }
 
-static void draw_brackets(GContext *ctx, GRect bounds, int scld_y) {
+static void draw_brackets(GContext *ctx, GRect bounds, int scld_y, int h_off) {
   PersistData *persist_data = data_get_persist_data();
 
   GRect rect = GRect(
     0,
     scl_y(scld_y),
     scl_x_pp({.o = 940, .g = 750}),
-    scl_y_pp({.e = 270, .g = 260})
+    scl_y_pp({.e = 270, .g = 262}) + h_off
   );
   const int bracket_w = scl_x_pp({.o = 30, .g = 25});
   const int bracket_x_inset = scl_x(70);
@@ -149,10 +149,20 @@ static void draw_brackets(GContext *ctx, GRect bounds, int scld_y) {
 static void canvas_update_proc(Layer *layer, GContext *ctx) {
   GRect bounds = layer_get_bounds(layer);
 
-  draw_brackets(ctx, bounds, 0);
+  draw_brackets(
+    ctx,
+    bounds,
+    scl_pp({.o = 0, .g = 2}),
+    scl_pp({.o = 0, .g = -1})
+  );
 
   if (any_complication_enabled()) {
-    draw_brackets(ctx, bounds, 365);
+    draw_brackets(
+      ctx,
+      bounds,
+      365,
+      scl_pp({.o = 0, .g = -1})
+    );
   }
 }
 
