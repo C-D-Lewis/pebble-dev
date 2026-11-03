@@ -20,7 +20,7 @@ Some PBWs can be found in `/pbw` for sideloading.
 | Name                  | Screenshot                                                 | Builds              | Icon | PBW                                |
 |-----------------------|------------------------------------------------------------|---------------------|------|------------------------------------|
 | `beam-up`             | ![](watchfaces/beam-up/screenshots/aplite.png)             | `A - F`             | ✅    | [pbw](pbw/beam-up.pbw)             |
-| `brackets`            | ![](watchfaces/brackets/screenshots/diorite.png)           | `A - F`             | ✅    | [pbw](pbw/brackets.pbw)            |
+| `brackets`            | ![](watchfaces/brackets/screenshots/diorite.png)           | `A - G`             | ✅    | [pbw](pbw/brackets.pbw)            |
 | `cards`               | ![](watchfaces/cards/screenshots/diorite.png)              | `A` `B` `D`         |      | [pbw](pbw/cards.pbw)               |
 | `cmd-time-typed`      | ![](watchfaces/cmd-time-typed/screenshots/diorite.png)     | `A - E`             | ✅    | [pbw](pbw/cmd-time-typed.pbw)      |
 | `cmd-time`            | ![](watchfaces/cmd-time/screenshots/diorite.png)           | `A - E`             | ✅    | [pbw](pbw/cmd-time.pbw)            |
@@ -33,6 +33,7 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `events`              | ![](watchfaces/events/screenshots/aplite.png)              | `A` `B` `D` `E`     | ✅    | [pbw](pbw/events.pbw)              |
 | `hollywatch`          | ![](watchfaces/hollywatch/screenshots/basalt.png)          | `A - G`             |      | [pbw](pbw/hollywatch.pbw)          |
 | `index`               | ![](watchfaces/index/screenshots/aplite.png)               | `A - D`             |      | [pbw](pbw/index.pbw)               |
+| `instruments`         | ![](watchfaces/instruments/screenshots/gabbro.png)         | `G`                 | ✅    | TBD                                |
 | `isotime-appstore`    | ![](watchfaces/isotime-appstore/screenshots/yellow.png)    | `A - G`             | ✅    | [pbw](pbw/isotime-appstore.pbw)    |
 | `kitty-watchface`     | ![](watchfaces/kitty-watchface/screenshots/aplite.png)     | `A` `B` `D`         |      | [pbw](pbw/kitty-watchface.pbw)     |
 | `morndas`             | ![](watchfaces/morndas/screenshots/basalt.png)             | `A` `B` `D` `E` `F` |      | [pbw](pbw/morndas.pbw)             |
