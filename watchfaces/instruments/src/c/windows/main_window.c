@@ -417,16 +417,25 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
       return;
     }
 
+    time_t temp = time(NULL);
+    struct tm *t = localtime(&temp);
+    const int hours = t->tm_hour;
+
+    int forecast_i = 0;
+    if (hours > 24 - NUM_FORECAST_ITEMS) {
+      forecast_i = NUM_FORECAST_ITEMS - (24 - hours);
+    }
+
     if (s_tapped) {
       if (is_next_rain) {
         static char rain_buff[8];
-        const int chance = data_get_strarr_value(app_state->precip_arr, 0);
+        const int chance = data_get_strarr_value(app_state->precip_arr, forecast_i);
         snprintf(rain_buff, sizeof(rain_buff), "%d%%", chance);
         draw_text_bubble(ctx, text_r, rain_buff, alignment);
       }
       if (is_next_weather) {
         static char weather_buff[8];
-        const int code = data_get_strarr_value(app_state->code_arr, 0);
+        const int code = data_get_strarr_value(app_state->code_arr, forecast_i);
         snprintf(weather_buff, sizeof(weather_buff), "%s", data_get_weather_str(code));
         draw_text_bubble(ctx, text_r, weather_buff, alignment);
       }
@@ -479,14 +488,7 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
     }
 
     // Be in first item all day until last 6 hours
-    time_t temp = time(NULL);
-    struct tm *t = localtime(&temp);
-    const int hours = t->tm_hour;
-    int dot_ang = start_ang + (item_l / 2);
-    if (hours > 24 - NUM_FORECAST_ITEMS) {
-      // Track dot to the end of day using current hour
-      dot_ang += (NUM_FORECAST_ITEMS - (24 - hours)) * item_l;
-    }
+    const int dot_ang = start_ang + (forecast_i * item_l) + (item_l / 2);
     draw_gauge_dot(ctx, center, dot_ang);
     return;
   }
