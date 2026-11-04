@@ -9,10 +9,10 @@
 #define OUTER_RING_W 3
 #define OUTER_RING_INSET 30
 #define COMPLICATION_W 21
-#define HOUR_DOT_RING_W 21
+#define HOUR_DOT_RING_W 22
 #define DAY_HAND_W 4
-#define CENTER_POST_W 5
-#define HOUR_DOT_S 3
+#define CENTER_POST_W 6
+#define HOUR_DOT_S 4
 #define ICON_SIZE 28
 #define GAUGE_DOT_S 2
 
@@ -36,6 +36,8 @@
 #define COMP_NEXT_WEATHER "NEXT_WEATHER"
 #define COMP_TEMP_RANGE "TEMP_RANGE"
 #define COMP_PHONE_BATTERY "PHONE_BATTERY"
+#define COMP_MONTH_PROGRESS "MONTH_PROGRESS"
+#define COMP_YEAR_PROGRESS "YEAR_PROGRESS"
 #define THEME_BLUE "BLUE"
 #define THEME_RED "RED"
 #define THEME_GREEN "GREEN"
@@ -55,3 +57,5 @@
 #define COLOR_ERROR GColorVividViolet
 #define COLOR_LOW_TEMP GColorBlueMoon
 #define COLOR_HIGH_TEMP GColorRed
+#define COLOR_MONTH_PROGRESS GColorLightGray
+#define COLOR_YEAR_PROGRESS GColorDarkGray

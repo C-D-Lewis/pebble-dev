@@ -1,11 +1,11 @@
 {
-  "version": "1.8.0",
+  "version": "1.9.0",
   "author": "Chris Lewis",
   "private": true,
   "dependencies": {
-    "@rebble/clay": "^1.0.10",
-    "pebble-isometric": "^1.4.0",
-    "pebble-packet": "^1.6.0"
+    "@rebble/clay": "^1.1.0",
+    "pebble-isometric": "^1.6.0",
+    "pebble-packet": "^1.6.1"
   },
   "keywords": [
     "pebble-app"
@@ -47,7 +47,8 @@
       "chalk",
       "diorite",
       "emery",
-      "flint"
+      "flint",
+      "gabbro"
     ],
     "capabilities": []
   },

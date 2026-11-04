@@ -47,7 +47,7 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `starfield-smooth`    | ![](watchfaces/starfield-smooth/screenshots/aplite.png)    | `A - C`             | ✅    | [pbw](pbw/starfield-smooth.pbw)    |
 | `thin`                | ![](watchfaces/thin/screenshots/basalt.png)                | `A - G`             | ✅    | [pbw](pbw/thin.pbw)                |
 | `time-dots-appstore`  | ![](watchfaces/time-dots-appstore/screenshots/basalt1.png) | `A - G`             |      | [pbw](pbw/time-dots-appstore.pbw)  |
-| `void-statues`        | ![](watchfaces/void-statues/screenshots/basalt.png)        | `A - F`             |      | [pbw](pbw/void-statues.pbw)        |
+| `void-statues`        | ![](watchfaces/void-statues/screenshots/basalt.png)        | `A - G`             |      | [pbw](pbw/void-statues.pbw)        |
 
 
 ## `watchapps`
@@ -60,7 +60,6 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `muninn`         | ![](watchapps/muninn/screenshots/basalt.png)            | `A - G`               | ✅    | [pbw](pbw/muninn.pbw)         |
 | `news-headlines` | ![](watchapps/news-headlines/screenshots/basalt.png)    | `A - F`               | ✅    | [pbw](pbw/news-headlines.pbw) |
 | `tube-status`    | ![](watchapps/tube-status/screenshots/basalt.png)       | `A - E`               | ✅    | [pbw](pbw/tube-status.pbw)    |
-| `pge-examples`   |                                                         | ❌ (needs pge package) |      |                               |
 
 ## `libraries`
 

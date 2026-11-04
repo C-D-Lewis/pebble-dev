@@ -6,7 +6,15 @@
 // #define TEST
 
 // TODO: Use pebble-scalable here
-#if defined(PBL_PLATFORM_EMERY)
+#if defined(PBL_PLATFORM_GABBRO)
+  #define DISPLAY_W 260
+  #define DISPLAY_H 260
+  #define PROJECTION_OFFSET GPoint((DISPLAY_W / 4) + 8, (DISPLAY_H / 2) - 15)
+  #define B_W 11
+  #define B_H 13
+  #define MINUTE_ROW_OFFSET -4
+  #define X_NUDGE 1
+#elif defined(PBL_PLATFORM_EMERY)
   #define DISPLAY_W 200
   #define DISPLAY_H 228
   #define PROJECTION_OFFSET GPoint((DISPLAY_W / 4) - 7, (DISPLAY_H / 2) - 18)
@@ -41,7 +49,7 @@
 #define BOX_SIZE GSize(B_W, B_W)
 
 // Testing purposes
-#define T_HOURS 18
+#define T_HOURS 23
 #define T_MINUTES 24
-#define T_IS_DAY false
+#define T_IS_DAY true
 #define T_IS_CONNECTED true

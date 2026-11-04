@@ -22,7 +22,7 @@ static void window_load(Window *window) {
   GRect shrinking_rect = GRect(5, 0, bounds.size.w - 10, 2000);
   GSize text_size = graphics_text_layout_get_content_size(
     reason,
-    scalable_get_font(SFI_Medium), 
+    scl_get_font(SFI_Medium), 
     shrinking_rect,
     GTextOverflowModeWordWrap,
     PBL_IF_ROUND_ELSE(GTextAlignmentCenter, GTextAlignmentLeft)
@@ -41,7 +41,7 @@ static void window_load(Window *window) {
     PBL_IF_ROUND_ELSE(GTextAlignmentCenter, GTextAlignmentLeft)
   );
   text_layer_set_overflow_mode(s_text_layer, GTextOverflowModeWordWrap);
-  text_layer_set_font(s_text_layer, scalable_get_font(SFI_Medium));
+  text_layer_set_font(s_text_layer, scl_get_font(SFI_Medium));
   text_layer_set_text(s_text_layer, reason);
 
 #if defined(PBL_ROUND)

@@ -1,9 +1,9 @@
 #if defined(PBL_RECT)
 #include "line_window.h"
 
-#define LOGO_RADIUS scalable_x(85)
-#define STRIPE_WIDTH scalable_x_pp(85, 90)
-#define LOGO_MARGIN scalable_x_pp(80, 80)
+#define LOGO_RADIUS scl_x(85)
+#define STRIPE_WIDTH scl_x_pp({.o = 85, .e = 90 })
+#define LOGO_MARGIN scl_x_pp({.o = 80, .e = 80 })
 
 static Window *s_window;
 static MenuLayer *s_menu_layer;
@@ -34,11 +34,8 @@ void draw_row_handler(GContext *ctx, const Layer *cell_layer, MenuIndex *cell_in
     graphics_draw_text(
       ctx,
       received == 0 ? "Good service on all lines" : "Good service on all other lines",
-      scalable_get_font(SFI_Small),
-      scalable_grect_pp(
-        GRect(0, -25, 1000, 250),
-        GRect(0, -25, 1000, 250)
-      ),
+      scl_get_font(SFI_Small),
+      GRect(0, scl_y(-25), scl_x(1000), scl_y(250)),
       GTextOverflowModeWordWrap,
       GTextAlignmentCenter,
       NULL
@@ -97,11 +94,8 @@ void draw_row_handler(GContext *ctx, const Layer *cell_layer, MenuIndex *cell_in
   graphics_draw_text(
     ctx,
     data_get_line_name(line_data->type),
-    scalable_get_font(SFI_Medium),
-    scalable_grect_pp(
-      GRect(220, -40, 750, 200),
-      GRect(230, -20, 750, 200)
-    ),
+    scl_get_font(SFI_Medium),
+    GRect(scl_x_pp({.o = 220, .e = 230}), scl_y_pp({.o = -40, .e = -20}), scl_x(750), scl_y(200)),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentLeft,
     NULL
@@ -109,11 +103,8 @@ void draw_row_handler(GContext *ctx, const Layer *cell_layer, MenuIndex *cell_in
   graphics_draw_text(
     ctx,
     line_data->state,
-    scalable_get_font(SFI_MediumBold),
-    scalable_grect_pp(
-      GRect(220, 75, 750, 200),
-      GRect(230, 95, 750, 200)
-    ),
+    scl_get_font(SFI_MediumBold),
+    GRect(scl_x_pp({.o = 220, .e = 230}), scl_y_pp({.o = 75, .e = 95}), scl_x(750), scl_y(200)),
     GTextOverflowModeTrailingEllipsis,
     GTextAlignmentLeft,
     NULL
@@ -125,7 +116,7 @@ void draw_row_handler(GContext *ctx, const Layer *cell_layer, MenuIndex *cell_in
     graphics_context_set_fill_color(ctx, data_get_line_state_color(cell_index->row));
     graphics_fill_rect(
       ctx,
-      scalable_grect(915, 0, 90, 260),
+      GRect(scl_x(915), 0, scl_x(90), scl_y(260)),
       GCornerNone,
       0
     );
@@ -134,11 +125,8 @@ void draw_row_handler(GContext *ctx, const Layer *cell_layer, MenuIndex *cell_in
     graphics_draw_text(
       ctx,
       ">",
-      scalable_get_font(SFI_MediumBold),
-      scalable_grect_pp(
-        GRect(930, 25, 120, 500),
-        GRect(935, 40, 120, 500)
-      ),
+      scl_get_font(SFI_MediumBold),
+      GRect(scl_x_pp({.o = 930, .e = 935}), scl_y_pp({.o = 25, .e = 40}), scl_x(120), scl_y(500)),
       GTextOverflowModeWordWrap,
       GTextAlignmentLeft,
       NULL
@@ -146,7 +134,7 @@ void draw_row_handler(GContext *ctx, const Layer *cell_layer, MenuIndex *cell_in
   }
 
   // Sep
-  const int sep_h = scalable_y_pp(10, 15);
+  const int sep_h = scl_y_pp({.o = 10, .e = 15});
   graphics_context_set_fill_color(ctx, GColorBlack);
   graphics_fill_rect(ctx, GRect(bounds.origin.x, bounds.size.h - sep_h, bounds.size.w, sep_h), GCornerNone, 0);
 }
@@ -157,7 +145,7 @@ uint16_t get_num_rows_handler(MenuLayer *menu_layer, uint16_t section_index, voi
 }
 
 int16_t get_cell_height_handler(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) {
-  return scalable_y(260);
+  return scl_y(260);
 }
 
 void selection_will_change_handler(struct MenuLayer *menu_layer, MenuIndex *new_index, MenuIndex old_index, void *context) {

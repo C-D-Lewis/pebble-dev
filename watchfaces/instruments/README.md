@@ -19,6 +19,8 @@ Available complications:
 - Next 6 hours weather conditions
 - Next 6 hours rain chance
 - Current temperature on the daily low/high range
+- Month progress
+- Year progress
 - None (empty slot)
 
 Customization options:

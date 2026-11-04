@@ -1,7 +1,7 @@
 #if defined(PBL_ROUND)
 #include "line_window.h"
 
-#define RING_MARGIN 20
+#define RING_MARGIN scl_x(111)
 #define RING_MAX_ANGLE 320
 
 static Window *s_window;
@@ -18,7 +18,7 @@ static void draw_station(GContext *ctx, GPoint center, int index) {
   graphics_fill_circle(ctx, center, (6 * (LINE_WINDOW_RADIUS - 1)) / 7); 
 
   graphics_context_set_stroke_color(ctx, GColorBlack);
-  graphics_context_set_stroke_width(ctx, 3);
+  graphics_context_set_stroke_width(ctx, LINE_WINDOW_STROKE_WIDTH);
   graphics_draw_circle(ctx, center, LINE_WINDOW_RADIUS - 2);
 }
 
@@ -153,7 +153,7 @@ static void ring_update_proc(Layer *layer, GContext *ctx) {
     graphics_context_set_fill_color(ctx, data_get_line_state_color(s_selected_line));
     graphics_fill_rect(
       ctx,
-      grect_inset(bounds, GEdgeInsets(0, 0, 0, bounds.size.w - 12)),
+      grect_inset(bounds, GEdgeInsets(0, 0, 0, bounds.size.w - scl_x(50))),
       GCornerNone,
       0
     );
@@ -162,8 +162,8 @@ static void ring_update_proc(Layer *layer, GContext *ctx) {
     graphics_draw_text(
       ctx,
       ">",
-      fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD),
-      GRect(bounds.size.w - 11, (bounds.size.h / 2) - 20, 12, 30),
+      scl_get_font(SFI_MediumBold),
+      GRect(bounds.size.w - scl_x(40), (bounds.size.h / 2) - 20, 30, 30),
       GTextOverflowModeTrailingEllipsis,
       GTextAlignmentLeft,
       NULL

@@ -15,7 +15,7 @@ void scalable_init() {
   s_font_g28 = fonts_get_system_font(FONT_KEY_GOTHIC_28);
   s_font_g28_b = fonts_get_system_font(FONT_KEY_GOTHIC_28_BOLD);
 
-  scalable_set_fonts(SFI_Small, &s_font_g18b, &s_font_g24_b);
-  scalable_set_fonts(SFI_Medium, &s_font_g24, &s_font_g28);
-  scalable_set_fonts(SFI_MediumBold, &s_font_g24_b, &s_font_g28_b);
+  scl_set_fonts(SFI_Small, {.o = s_font_g18b, .e = s_font_g24_b});
+  scl_set_fonts(SFI_Medium, {.o = s_font_g24, .e = s_font_g28});
+  scl_set_fonts(SFI_MediumBold, {.o = s_font_g24_b, .e = s_font_g28_b});
 }

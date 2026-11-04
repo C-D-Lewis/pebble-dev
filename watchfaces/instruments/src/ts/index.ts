@@ -73,6 +73,30 @@ const getLocation = async () => new Promise((resolve, reject) => {
 const getTime = (str: string) => str.split('T')[1];
 
 /**
+ * Get progress to next month.
+ * Much easier to calculate in JS than C.
+ */
+const getMonthProgress = () => {
+  const now = new Date();
+  const nextMonthDays = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+  return Math.round((now.getDate() / nextMonthDays) * 100);
+};
+
+/**
+ * Get progress through the year.
+ */
+const getYearProgress = () => {
+  const now = new Date();
+  const dayMs = 24 * 60 * 60 * 1000;
+  const year = now.getFullYear();
+
+  const dayOfYear = (Date.UTC(year, now.getMonth(), now.getDate()) - Date.UTC(year, 0, 1)) / dayMs + 1;
+  const daysInYear = (Date.UTC(year + 1, 0, 1) - Date.UTC(year, 0, 1)) / dayMs;
+
+  return Math.round((dayOfYear / daysInYear) * 100);
+};
+
+/**
  * Get location and weather, and send to watch.
  */
 const sendWeather = async () => {
@@ -141,6 +165,8 @@ const sendWeather = async () => {
       TEMP_LOW: Math.round(tempLow),
       TEMP_HIGH: Math.round(tempHigh),
       PHONE_BATTERY: batteryLevel,
+      MONTH_PROGRESS: getMonthProgress(),
+      YEAR_PROGRESS: getYearProgress(),
     };
     console.log(JSON.stringify(dict, null, 2));
     

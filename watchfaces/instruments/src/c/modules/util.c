@@ -1,11 +1,20 @@
 #include "util.h"
 
+/**
+ * Adjust value before integer truncation.
+ */
+static int round_div(int value, int divisor) {
+  return value >= 0
+      ? (value + divisor / 2) / divisor
+      : (value - divisor / 2) / divisor;
+}
+
 GPoint util_make_hand_point(int quantity, int intervals, int len, GPoint center) {
   const int angle = (TRIG_MAX_ANGLE * quantity) / intervals;
-  return (GPoint) {
-    .x = (int16_t)(sin_lookup(angle) * (int32_t)len / TRIG_MAX_RATIO) + center.x,
-    .y = (int16_t)(-cos_lookup(angle) * (int32_t)len / TRIG_MAX_RATIO) + center.y,
-  };
+  const int x = round_div(sin_lookup(angle) * (int32_t)len, TRIG_MAX_RATIO);
+  const int y = round_div(-cos_lookup(angle) * (int32_t)len, TRIG_MAX_RATIO);
+
+  return (GPoint) { .x = center.x + x, .y = center.y + y };
 }
 
 int util_get_time_angle(char *time_str) {

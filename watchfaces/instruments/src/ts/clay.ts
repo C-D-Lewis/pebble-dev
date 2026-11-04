@@ -10,12 +10,14 @@ interface ClayConstructor {
 /** Options for complication slots */
 const SLOT_OPTIONS = [
   { label: 'None', value: 'NONE' },
-  { label: 'Battery', value: 'BATTERY' },
+  { label: 'Watch battery', value: 'BATTERY' },
+  { label: 'Phone battery (if available)', value: 'PHONE_BATTERY' },
   { label: 'Step count', value: 'STEP_COUNT' },
   { label: 'Next 6hrs rain', value: 'NEXT_RAIN' },
   { label: 'Next 6hrs weather', value: 'NEXT_WEATHER' },
-  { label: 'Low/high temperature', value: 'TEMP_RANGE' },
-  { label: 'Phone battery (if available)', value: 'PHONE_BATTERY' },
+  { label: 'Temperature range', value: 'TEMP_RANGE' },
+  { label: 'Month progress', value: 'MONTH_PROGRESS' },
+  { label: 'Year progress', value: 'YEAR_PROGRESS' },
 ];
 
 const config = [

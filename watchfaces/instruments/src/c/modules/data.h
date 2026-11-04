@@ -18,6 +18,8 @@ typedef struct {
   int temp_low;
   int temp_high;
   int phone_battery;
+  int month_progress;
+  int year_progress;
 } AppState;
 
 typedef struct {

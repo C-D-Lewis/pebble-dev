@@ -4,9 +4,9 @@
   "author": "Chris Lewis",
   "private": true,
   "dependencies": {
-    "pebble-events": "^1.2.0",
-    "pebble-packet": "^1.4.0",
-    "pebble-scalable": "^1.5.1"
+    "pebble-events": "^1.2.1",
+    "pebble-packet": "^1.6.1",
+    "pebble-scalable": "^2.4.0"
   },
   "devDependencies": {
     "pkts": "^0.2.1"
@@ -56,7 +56,8 @@
       "basalt",
       "chalk",
       "diorite",
-      "emery"
+      "emery",
+      "gabbro"
     ],
     "capabilities": []
   }

@@ -47,6 +47,12 @@ static void inbox_received_handler(DictionaryIterator *iter, void *context) {
   if (packet_contains_key(iter, MESSAGE_KEY_TEMP_HIGH)) {
     app_state->temp_high = packet_get_integer(iter, MESSAGE_KEY_TEMP_HIGH);
   }
+  if (packet_contains_key(iter, MESSAGE_KEY_MONTH_PROGRESS)) {
+    app_state->month_progress = packet_get_integer(iter, MESSAGE_KEY_MONTH_PROGRESS);
+  }
+  if (packet_contains_key(iter, MESSAGE_KEY_YEAR_PROGRESS)) {
+    app_state->year_progress = packet_get_integer(iter, MESSAGE_KEY_YEAR_PROGRESS);
+  }
 
   // Config
   if (packet_contains_key(iter, MESSAGE_KEY_CONFIG_TEMP_UNIT)) {

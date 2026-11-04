@@ -100,6 +100,8 @@
       "TEMP_LOW",
       "TEMP_HIGH",
       "PHONE_BATTERY",
+      "MONTH_PROGRESS",
+      "YEAR_PROGRESS",
       "REQUEST_WEATHER",
       "DATA_ERROR",
       "CONFIG_TEMP_UNIT",
