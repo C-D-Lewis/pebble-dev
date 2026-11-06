@@ -102,6 +102,7 @@
       "PHONE_BATTERY",
       "MONTH_PROGRESS",
       "YEAR_PROGRESS",
+      "MOON_PHASE",
       "REQUEST_WEATHER",
       "DATA_ERROR",
       "CONFIG_TEMP_UNIT",

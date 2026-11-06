@@ -33,7 +33,7 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `events`              | ![](watchfaces/events/screenshots/aplite.png)              | `A` `B` `D` `E`     | ✅    | [pbw](pbw/events.pbw)              |
 | `hollywatch`          | ![](watchfaces/hollywatch/screenshots/basalt.png)          | `A - G`             |      | [pbw](pbw/hollywatch.pbw)          |
 | `index`               | ![](watchfaces/index/screenshots/aplite.png)               | `A - D`             |      | [pbw](pbw/index.pbw)               |
-| `instruments`         | ![](watchfaces/instruments/screenshots/gabbro.png)         | `G`                 | ✅    | TBD                                |
+| `instruments`         | ![](watchfaces/instruments/screenshots/gabbro1.png)        | `G`                 | ✅    | [pbw](pbw/instruments.pbw)         |
 | `isotime-appstore`    | ![](watchfaces/isotime-appstore/screenshots/yellow.png)    | `A - G`             | ✅    | [pbw](pbw/isotime-appstore.pbw)    |
 | `kitty-watchface`     | ![](watchfaces/kitty-watchface/screenshots/aplite.png)     | `A` `B` `D`         |      | [pbw](pbw/kitty-watchface.pbw)     |
 | `morndas`             | ![](watchfaces/morndas/screenshots/basalt.png)             | `A` `B` `D` `E` `F` |      | [pbw](pbw/morndas.pbw)             |
@@ -52,14 +52,14 @@ Some PBWs can be found in `/pbw` for sideloading.
 
 ## `watchapps`
 
-| Name             | Screenshot                                              | Builds                | Icon | PBW                           |
-|------------------|---------------------------------------------------------|-----------------------|------|-------------------------------|
-| `block-world`    | ![](watchapps/block-world/screenshots/basalt.png)       | `B` `C` `E`           |      | [pbw](pbw/block-world.pbw)    |
-| `dashboard`      | ![](watchapps/dashboard/assets/screenshots/basalt1.png) | `A - D`               | ✅    | [pbw](pbw/dashboard.pbw)      |
-| `dashboard2`     | ![](watchapps/dashboard2/screenshots/emery.png)         | `A - G`               | ✅    | [pbw](pbw/dashboard2.pbw)     |
-| `muninn`         | ![](watchapps/muninn/screenshots/basalt.png)            | `A - G`               | ✅    | [pbw](pbw/muninn.pbw)         |
-| `news-headlines` | ![](watchapps/news-headlines/screenshots/basalt.png)    | `A - F`               | ✅    | [pbw](pbw/news-headlines.pbw) |
-| `tube-status`    | ![](watchapps/tube-status/screenshots/basalt.png)       | `A - E`               | ✅    | [pbw](pbw/tube-status.pbw)    |
+| Name             | Screenshot                                              | Builds      | Icon | PBW                           |
+|------------------|---------------------------------------------------------|-------------|------|-------------------------------|
+| `block-world`    | ![](watchapps/block-world/screenshots/basalt.png)       | `B` `C` `E` |      | [pbw](pbw/block-world.pbw)    |
+| `dashboard`      | ![](watchapps/dashboard/assets/screenshots/basalt1.png) | `A - D`     | ✅    | [pbw](pbw/dashboard.pbw)      |
+| `dashboard2`     | ![](watchapps/dashboard2/screenshots/emery.png)         | `A - G`     | ✅    | [pbw](pbw/dashboard2.pbw)     |
+| `muninn`         | ![](watchapps/muninn/screenshots/basalt.png)            | `A - G`     | ✅    | [pbw](pbw/muninn.pbw)         |
+| `news-headlines` | ![](watchapps/news-headlines/screenshots/basalt.png)    | `A - F`     | ✅    | [pbw](pbw/news-headlines.pbw) |
+| `tube-status`    | ![](watchapps/tube-status/screenshots/basalt.png)       | `A - E`     | ✅    | [pbw](pbw/tube-status.pbw)    |
 
 ## `libraries`
 

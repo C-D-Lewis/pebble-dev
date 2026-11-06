@@ -20,6 +20,7 @@ typedef struct {
   int phone_battery;
   int month_progress;
   int year_progress;
+  int moon_phase;
 } AppState;
 
 typedef struct {

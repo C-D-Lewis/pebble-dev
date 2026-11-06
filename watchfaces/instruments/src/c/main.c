@@ -8,7 +8,7 @@
 
 static void init() {
   data_init();
-  comm_init(256, 256);
+  comm_init(512, 256);
   scalable_init();
 
 #ifdef TEST

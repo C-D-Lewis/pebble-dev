@@ -7,6 +7,7 @@ export type WeatherApiResponse = {
   daily: {
     sunrise: string[];
     sunset: string[];
+    moon_phase: number[];
   };
   hourly: {
     precipitation_probability: number[];

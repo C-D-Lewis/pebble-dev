@@ -53,6 +53,9 @@ static void inbox_received_handler(DictionaryIterator *iter, void *context) {
   if (packet_contains_key(iter, MESSAGE_KEY_YEAR_PROGRESS)) {
     app_state->year_progress = packet_get_integer(iter, MESSAGE_KEY_YEAR_PROGRESS);
   }
+  if (packet_contains_key(iter, MESSAGE_KEY_MOON_PHASE)) {
+    app_state->moon_phase = packet_get_integer(iter, MESSAGE_KEY_MOON_PHASE);
+  }
 
   // Config
   if (packet_contains_key(iter, MESSAGE_KEY_CONFIG_TEMP_UNIT)) {

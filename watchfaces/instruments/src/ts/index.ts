@@ -36,7 +36,7 @@ const fetchWeatherForecast = async (lat: number, lon: number ): Promise<WeatherA
     longitude: lon,
     hourly: 'temperature_2m,weather_code,precipitation_probability',
     current: 'temperature_2m,weather_code',
-    daily: 'sunrise,sunset',
+    daily: 'sunrise,sunset,moon_phase',
     forecast_days: 1,
     temperature_unit: 'celsius',
     timezone: 'auto',
@@ -110,7 +110,7 @@ const sendWeather = async () => {
       temperature_2m: temp2m,
       weather_code: currentCode,
     } = current;
-    const { sunrise, sunset } = daily;
+    const { sunrise, sunset, moon_phase: moonPhase } = daily;
     const {
       precipitation_probability: hourlyPrecip,
       weather_code: hourlyCodes,
@@ -167,6 +167,7 @@ const sendWeather = async () => {
       PHONE_BATTERY: batteryLevel,
       MONTH_PROGRESS: getMonthProgress(),
       YEAR_PROGRESS: getYearProgress(),
+      MOON_PHASE: moonPhase[0] * 100,
     };
     console.log(JSON.stringify(dict, null, 2));
     

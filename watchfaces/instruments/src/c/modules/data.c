@@ -12,6 +12,7 @@ void data_init() {
   s_app_state.phone_battery = DATA_EMPTY;
   s_app_state.month_progress = DATA_EMPTY;
   s_app_state.year_progress = DATA_EMPTY;
+  s_app_state.moon_phase = DATA_EMPTY;
 
   // Read existing data if it exists
   if (persist_exists(SK_PersistData)) {
@@ -43,9 +44,9 @@ void data_init() {
 
   // TEST
 #ifdef TEST
-  snprintf(s_persist_data.theme, sizeof(s_persist_data.theme), "%s", THEME_RED);
-  snprintf(s_persist_data.slot_1, sizeof(s_persist_data.slot_1), "%s", COMP_BATTERY);
-  snprintf(s_persist_data.slot_2, sizeof(s_persist_data.slot_2), "%s", COMP_YEAR_PROGRESS);
+  snprintf(s_persist_data.theme, sizeof(s_persist_data.theme), "%s", THEME_PURPLE);
+  snprintf(s_persist_data.slot_1, sizeof(s_persist_data.slot_1), "%s", COMP_STEP_COUNT);
+  snprintf(s_persist_data.slot_2, sizeof(s_persist_data.slot_2), "%s", COMP_NEXT_RAIN);
   snprintf(s_persist_data.slot_3, sizeof(s_persist_data.slot_3), "%s", COMP_TEMP_RANGE);
   snprintf(s_persist_data.slot_4, sizeof(s_persist_data.slot_4), "%s", COMP_PHONE_BATTERY);
   snprintf(s_persist_data.step_goal, sizeof(s_persist_data.step_goal), "%s", STEP_GOAL_10000);
