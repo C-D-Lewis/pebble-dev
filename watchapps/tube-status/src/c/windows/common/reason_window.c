@@ -19,7 +19,13 @@ static void window_load(Window *window) {
   char *reason = data_get_line(s_index)->reason;
 
   // Code from devsite to try and fit text inside a TextLayer inside a ScrollLayer
-  GRect shrinking_rect = GRect(5, 0, bounds.size.w - 10, 2000);
+  const int x_margin = scl_x_pp({.o = 20, .g = 80});
+  GRect shrinking_rect = GRect(
+    x_margin,
+    0,
+    bounds.size.w - (2 * x_margin),
+    2000
+  );
   GSize text_size = graphics_text_layout_get_content_size(
     reason,
     scl_get_font(SFI_Medium), 
@@ -27,12 +33,12 @@ static void window_load(Window *window) {
     GTextOverflowModeWordWrap,
     PBL_IF_ROUND_ELSE(GTextAlignmentCenter, GTextAlignmentLeft)
   );
-  text_size.h += 10;
-  const int x_margin = 5;
+  text_size.h += (2 * x_margin);
   GRect text_bounds = bounds;
   text_bounds.origin.x += x_margin;
+  text_bounds.origin.y = scl_y_pp({.o = 0, .g = 100});
   text_bounds.size.w -= (2 * x_margin);
-  text_bounds.size.h = text_size.h;
+  text_bounds.size.h = text_size.h + 50;
 
   // Text display
   s_text_layer = text_layer_create(text_bounds);
@@ -43,10 +49,6 @@ static void window_load(Window *window) {
   text_layer_set_overflow_mode(s_text_layer, GTextOverflowModeWordWrap);
   text_layer_set_font(s_text_layer, scl_get_font(SFI_Medium));
   text_layer_set_text(s_text_layer, reason);
-
-#if defined(PBL_ROUND)
-  text_layer_enable_screen_text_flow_and_paging(s_text_layer, 6);
-#endif
 
   GEdgeInsets window_insets = (GEdgeInsets) {
     .top = STATUS_BAR_LAYER_HEIGHT - 1,

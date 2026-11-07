@@ -59,8 +59,30 @@ GColor data_get_line_color(int type) {
     case LineTypeVictoria:           return GColorFromHEX(0x0098D4);
     default:                         return GColorWhite;
   }
+#else
+  switch(type) {
+    case LineTypeBakerloo:           return GColorBlack;
+    case LineTypeCentral:            return GColorBlack;
+    case LineTypeCircle:             return GColorLightGray;
+    case LineTypeDistrict:           return GColorBlack;
+    case LineTypeDLR:                return GColorLightGray;
+    case LineTypeElizabeth:          return GColorBlack;
+    case LineTypeHammersmithAndCity: return GColorLightGray;
+    case LineTypeJubilee:            return GColorLightGray;
+    case LineTypeLiberty:            return GColorBlack;
+    case LineTypeLioness:            return GColorLightGray;
+    case LineTypeMetropolitan:       return GColorBlack;
+    case LineTypeMildmay:            return GColorLightGray;
+    case LineTypeNorthern:           return GColorBlack;
+    case LineTypePiccadilly:         return GColorBlack;
+    case LineTypeSuffragette:        return GColorBlack;
+    case LineTypeWaterlooAndCity:    return GColorLightGray;
+    case LineTypeWeaver:             return GColorBlack;
+    case LineTypeWindrush:           return GColorBlack;
+    case LineTypeVictoria:           return GColorBlack;
+    default:                         return GColorWhite;
+  }
 #endif
-  return GColorBlack;
 }
 
 LineData* data_get_line(int index) {

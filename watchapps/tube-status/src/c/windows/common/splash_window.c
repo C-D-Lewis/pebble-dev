@@ -18,17 +18,23 @@ static void logo_update_proc(Layer *layer, GContext *ctx) {
 
 /**
  * Simple progress bar with inset
+ * FIXME: This geometry maths is insane - use scl only
  */
 static void progress_bar_update_proc(Layer *layer, GContext *ctx) {
   const int cap_radius = scl_x(35);
-  const int inset = 2;
+  const int inset = scl_x(15);
 
   // Background
   graphics_context_set_fill_color(ctx, GColorBlack);
   graphics_fill_circle(ctx, GPoint(cap_radius, cap_radius), cap_radius);
   graphics_fill_rect(
     ctx,
-    GRect(cap_radius, 0, BAR_WIDTH - (2 * cap_radius), (2 * cap_radius) + inset - 1),
+    GRect(
+      cap_radius - 2,
+      0,
+      BAR_WIDTH - (2 * cap_radius) + 4,
+      cap_radius + inset + scl_x_pp({.o = 25, .e = 25, .g = 24})
+    ),
     0,
     GCornerNone
   );
@@ -40,7 +46,12 @@ static void progress_bar_update_proc(Layer *layer, GContext *ctx) {
   graphics_fill_circle(ctx, GPoint(cap_radius, cap_radius), cap_radius - inset);
   graphics_fill_rect(
     ctx,
-    GRect(cap_radius + inset, inset, width - (2 * inset) + 1, (2 * cap_radius) - inset - 1),
+    GRect(
+      cap_radius + inset - scl_x(10),
+      inset,
+      width - (2 * inset) + scl_x(25),
+      cap_radius + (inset / 2) + scl_x_pp({.o = 10, .e = 6, .g = -1})
+    ),
     0,
     GCornerNone
   );

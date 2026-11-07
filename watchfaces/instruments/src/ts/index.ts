@@ -163,7 +163,7 @@ const sendWeather = async () => {
       PRECIP_ARR: nextSixPrecip.map(zeroPadTo99).join(''),
       CODE_ARR: nextSixCodes.map(zeroPadTo99).join(''),
       TEMP_LOW: Math.round(tempLow),
-      TEMP_HIGH: Math.round(tempHigh),
+      TEMP_HIGH: Math.floor(tempHigh),
       PHONE_BATTERY: batteryLevel,
       MONTH_PROGRESS: getMonthProgress(),
       YEAR_PROGRESS: getYearProgress(),

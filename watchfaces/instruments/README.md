@@ -1,8 +1,6 @@
 # Instruments
 
-Purpose-built Pebble Round 2 watchface showing concise time, date, weather, with
-a choice of four configurable complication slots. The focus is on readability
-and usefulness.
+Purpose-built Pebble Round 2 watchface showing concise time, date, weather, with a choice of four configurable complication slots. The focus is on readability and usefulness.
 
 Features include:
 

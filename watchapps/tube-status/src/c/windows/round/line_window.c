@@ -3,6 +3,9 @@
 
 #define RING_MARGIN scl_x(111)
 #define RING_MAX_ANGLE 320
+#define RADIUS scl_x(60)
+#define MARGIN scl_x(50)
+#define STROKE_WIDTH scl_x(15)
 
 static Window *s_window;
 static Layer *s_ring_layer;
@@ -15,24 +18,27 @@ static int s_selected_line;
 
 static void draw_station(GContext *ctx, GPoint center, int index) {
   graphics_context_set_fill_color(ctx, GColorWhite);
-  graphics_fill_circle(ctx, center, (6 * (LINE_WINDOW_RADIUS - 1)) / 7); 
+  graphics_fill_circle(ctx, center, (6 * (RADIUS - 1)) / 7);
 
   graphics_context_set_stroke_color(ctx, GColorBlack);
-  graphics_context_set_stroke_width(ctx, LINE_WINDOW_STROKE_WIDTH);
-  graphics_draw_circle(ctx, center, LINE_WINDOW_RADIUS - 2);
+  graphics_context_set_stroke_width(ctx, STROKE_WIDTH);
+  graphics_draw_circle(ctx, center, RADIUS - 2);
 }
 
 /******************************** Click Config ********************************/
 
 static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
-  int max = data_get_lines_received();
-  s_selected_line -= (s_selected_line > 0) ? 1 : -max;
+  if (s_selected_line == 0) return;
+
+  s_selected_line -= 1;
   layer_mark_dirty(s_ring_layer);
 }
 
 static void down_click_handler(ClickRecognizerRef recognizer, void *context) {
-  int max = data_get_lines_received();
-  s_selected_line += (s_selected_line < max) ? 1 : -max;
+  const int max = data_get_lines_received();
+  if (s_selected_line == max) return;
+
+  s_selected_line += 1;
   layer_mark_dirty(s_ring_layer);
 }
 
@@ -53,37 +59,41 @@ static void click_config_provider(void *context) {
 
 static void ring_update_proc(Layer *layer, GContext *ctx) {
   const GRect bounds = layer_get_bounds(layer);
-  const int name_y_margin = 60;
+
+  const LineData *line_data = data_get_line(s_selected_line);
+  const int name_y_margin = scl_y(360);
   const GSize name_size = graphics_text_layout_get_content_size_with_attributes(
-    data_get_line_name(s_selected_line),
-    fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD),
+    data_get_line_name(line_data->type),
+    scl_get_font(SFI_MediumBold),
     grect_inset(bounds, GEdgeInsets(name_y_margin, 0, 0, 0)),
     GTextOverflowModeWordWrap,
     GTextAlignmentCenter,
     s_attributes
   );
 
-  int received = data_get_lines_received();
+  const int num_received = data_get_lines_received();
 
   // Draw ring
-  GColor line_color = s_selected_line == received ? GColorBlue : data_get_line_color(s_selected_line);
+  GColor line_color = s_selected_line == num_received
+    ? GColorBlue
+    : data_get_line_color(line_data->type);
   graphics_context_set_fill_color(ctx, line_color);
   GRect ring_rect = grect_inset(bounds, GEdgeInsets(RING_MARGIN));
   graphics_fill_radial(
     ctx,
     ring_rect,
-    GOvalScaleModeFitCircle, 
-    LINE_WINDOW_MARGIN,
+    GOvalScaleModeFitCircle,
+    MARGIN,
     DEG_TO_TRIGANGLE(0),
     DEG_TO_TRIGANGLE(360)
   );
-  if (s_selected_line != received && data_get_line_color_is_striped(s_selected_line)) {
+  if (s_selected_line != num_received && data_get_line_color_is_striped(line_data->type)) {
     graphics_context_set_fill_color(ctx, GColorWhite);
     graphics_fill_radial(
       ctx,
-      grect_inset(ring_rect, GEdgeInsets((3))),
+      grect_inset(ring_rect, GEdgeInsets(scl_x(15))),
       GOvalScaleModeFitCircle,
-      4,
+      scl_x(20),
       DEG_TO_TRIGANGLE(0),
       DEG_TO_TRIGANGLE(360)
     );
@@ -91,10 +101,10 @@ static void ring_update_proc(Layer *layer, GContext *ctx) {
 
   // Stations
   int angle = 0;
-  for(int i = 0; i <= received; i++) {
-    angle = (i * RING_MAX_ANGLE) / received;
+  for(int i = 0; i <= num_received; i++) {
+    angle = (i * RING_MAX_ANGLE) / num_received;
     GPoint center = gpoint_from_polar(
-      grect_inset(ring_rect, GEdgeInsets((LINE_WINDOW_MARGIN / 2) - 1)), 
+      grect_inset(ring_rect, GEdgeInsets((MARGIN / 2) - 1)),
       GOvalScaleModeFitCircle,
       DEG_TO_TRIGANGLE(angle)
     );
@@ -102,25 +112,25 @@ static void ring_update_proc(Layer *layer, GContext *ctx) {
   }
 
   // Selection
-  angle = (s_selected_line * RING_MAX_ANGLE) / received;
+  angle = (s_selected_line * RING_MAX_ANGLE) / num_received;
   GPoint center = gpoint_from_polar(
-    grect_inset(ring_rect, GEdgeInsets((LINE_WINDOW_MARGIN / 2) - 1)), 
+    grect_inset(ring_rect, GEdgeInsets((MARGIN / 2) - 1)),
     GOvalScaleModeFitCircle,
     DEG_TO_TRIGANGLE(angle)
   );
   graphics_context_set_fill_color(ctx, GColorBlack);
-  graphics_fill_circle(ctx, center, LINE_WINDOW_MARGIN / 2);
+  graphics_fill_circle(ctx, center, (MARGIN / 2) + scl_x(5));
 
   graphics_context_set_text_color(ctx, GColorBlack);
 
   // Summary of all other statuses
-  if (s_selected_line == received) {
+  if (s_selected_line == num_received) {
     graphics_draw_text(
       ctx,
-      received == 0 ? "Good service on all lines" : "Good service on all other lines",
-      fonts_get_system_font(FONT_KEY_GOTHIC_24),
+      num_received == 0 ? "Good service on all lines" : "Good service on all other lines",
+      scl_get_font(SFI_Medium),
       grect_inset(bounds, GEdgeInsets(name_y_margin, 0, 0, 0)),
-      GTextOverflowModeWordWrap, 
+      GTextOverflowModeWordWrap,
       GTextAlignmentCenter,
       s_attributes
     );
@@ -130,40 +140,41 @@ static void ring_update_proc(Layer *layer, GContext *ctx) {
   // Line name and status
   graphics_draw_text(
     ctx,
-    data_get_line_name(s_selected_line),
-    fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD),
+    data_get_line_name(line_data->type),
+    scl_get_font(SFI_MediumBold),
     grect_inset(bounds, GEdgeInsets(name_y_margin, 0, 0, 0)),
-    GTextOverflowModeWordWrap, 
+    GTextOverflowModeWordWrap,
     GTextAlignmentCenter,
     s_attributes
   );
   graphics_draw_text(
     ctx,
-    data_get_line(s_selected_line)->state,
-    fonts_get_system_font(FONT_KEY_GOTHIC_24),
+    line_data->state,
+    scl_get_font(SFI_Medium),
     grect_inset(bounds, GEdgeInsets(name_y_margin + name_size.h, 0, 0, 0)),
-    GTextOverflowModeWordWrap, 
+    GTextOverflowModeWordWrap,
     GTextAlignmentCenter,
     s_attributes
   );
 
   // Reason window hint
   if (data_get_line_has_reason(s_selected_line)) {
+    const int reason_inset = scl_x(60);
     // Background
     graphics_context_set_fill_color(ctx, data_get_line_state_color(s_selected_line));
     graphics_fill_rect(
       ctx,
-      grect_inset(bounds, GEdgeInsets(0, 0, 0, bounds.size.w - scl_x(50))),
+      grect_inset(bounds, GEdgeInsets(0, 0, 0, bounds.size.w - reason_inset)),
       GCornerNone,
       0
     );
-    
+
     // Arrow
     graphics_draw_text(
       ctx,
-      ">",
+      " >",
       scl_get_font(SFI_MediumBold),
-      GRect(bounds.size.w - scl_x(40), (bounds.size.h / 2) - 20, 30, 30),
+      GRect(bounds.size.w - reason_inset, (bounds.size.h / 2) - 20, 30, 30),
       GTextOverflowModeTrailingEllipsis,
       GTextAlignmentLeft,
       NULL
@@ -182,7 +193,7 @@ static void window_load(Window *window) {
   layer_add_child(window_layer, s_ring_layer);
 
   s_attributes = graphics_text_attributes_create();
-  graphics_text_attributes_enable_screen_text_flow(s_attributes, RING_MARGIN + LINE_WINDOW_MARGIN);
+  graphics_text_attributes_enable_screen_text_flow(s_attributes, RING_MARGIN + MARGIN);
 }
 
 static void window_unload(Window *window) {
@@ -207,7 +218,7 @@ void line_window_push() {
   window_stack_push(s_window, true);
 
   // Begin with the first line
-  s_selected_line = LineTypeBakerloo;
+  s_selected_line = 0;
   layer_mark_dirty(s_ring_layer);
 }
 #endif
