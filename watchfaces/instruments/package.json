@@ -111,6 +111,8 @@
       "CONFIG_SLOT_2",
       "CONFIG_SLOT_3",
       "CONFIG_SLOT_4",
+      "CONFIG_SLOT_5",
+      "CONFIG_SLOT_6",
       "CONFIG_STEP_GOAL"
     ],
     "enableMultiJS": true,

@@ -38,6 +38,12 @@ void data_init() {
   if (strlen(s_persist_data.slot_4) == 0) {
     snprintf(s_persist_data.slot_4, sizeof(s_persist_data.slot_4), "%s", COMP_BATTERY);
   }
+  if (strlen(s_persist_data.slot_5) == 0) {
+    snprintf(s_persist_data.slot_5, sizeof(s_persist_data.slot_5), "%s", COMP_NONE);
+  }
+  if (strlen(s_persist_data.slot_6) == 0) {
+    snprintf(s_persist_data.slot_6, sizeof(s_persist_data.slot_6), "%s", COMP_NONE);
+  }
   if (strlen(s_persist_data.step_goal) == 0) {
     snprintf(s_persist_data.step_goal, sizeof(s_persist_data.step_goal), "%s", STEP_GOAL_10000);
   }
@@ -45,10 +51,12 @@ void data_init() {
   // TEST
 #ifdef TEST
   snprintf(s_persist_data.theme, sizeof(s_persist_data.theme), "%s", THEME_PURPLE);
-  snprintf(s_persist_data.slot_1, sizeof(s_persist_data.slot_1), "%s", COMP_STEP_COUNT);
+  snprintf(s_persist_data.slot_1, sizeof(s_persist_data.slot_1), "%s", COMP_BATTERY);
   snprintf(s_persist_data.slot_2, sizeof(s_persist_data.slot_2), "%s", COMP_NEXT_RAIN);
   snprintf(s_persist_data.slot_3, sizeof(s_persist_data.slot_3), "%s", COMP_TEMP_RANGE);
-  snprintf(s_persist_data.slot_4, sizeof(s_persist_data.slot_4), "%s", COMP_PHONE_BATTERY);
+  snprintf(s_persist_data.slot_4, sizeof(s_persist_data.slot_4), "%s", COMP_NEXT_WEATHER);
+  snprintf(s_persist_data.slot_5, sizeof(s_persist_data.slot_5), "%s", COMP_STEP_COUNT);
+  snprintf(s_persist_data.slot_6, sizeof(s_persist_data.slot_6), "%s", COMP_MOON_PHASE);
   snprintf(s_persist_data.step_goal, sizeof(s_persist_data.step_goal), "%s", STEP_GOAL_10000);
 #endif
 }
@@ -275,4 +283,44 @@ int data_get_strarr_value(char *arr, int hour) {
 
 bool data_is_weather_valid() {
   return s_app_state.current_code != DATA_EMPTY && s_app_state.current_code != DATA_ERROR;
+}
+
+int data_get_complication_count() {
+  int count = 0;
+  count += strcmp(s_persist_data.slot_1, COMP_NONE) != 0 ? 1 : 0;
+  count += strcmp(s_persist_data.slot_2, COMP_NONE) != 0 ? 1 : 0;
+  count += strcmp(s_persist_data.slot_3, COMP_NONE) != 0 ? 1 : 0;
+  count += strcmp(s_persist_data.slot_4, COMP_NONE) != 0 ? 1 : 0;
+  count += strcmp(s_persist_data.slot_5, COMP_NONE) != 0 ? 1 : 0;
+  count += strcmp(s_persist_data.slot_6, COMP_NONE) != 0 ? 1 : 0;
+  return count;
+}
+
+// slots: 1 2 - 3 4 5 6
+// want: 3rd filled slot
+char* data_get_nth_complication_type(int n) {
+  if (n < 0) return COMP_NONE;
+
+  // Make list so we can iterate through it
+  char *slots[NUM_SLOTS] = {
+    s_persist_data.slot_1,
+    s_persist_data.slot_2,
+    s_persist_data.slot_3,
+    s_persist_data.slot_4,
+    s_persist_data.slot_5,
+    s_persist_data.slot_6,
+  };
+
+  int counted = 0;
+  for (int i = 0; i < NUM_SLOTS; i++) {
+    // Count this slot as non-empty
+    if (strcmp(slots[i], COMP_NONE) != 0) {
+      // We found enough, this is the one to use
+      if (counted == n) return slots[i];
+      
+      counted++;
+    }
+  }
+
+  return COMP_NONE;
 }

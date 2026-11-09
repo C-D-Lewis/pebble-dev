@@ -30,6 +30,8 @@ typedef struct {
   char slot_2[16];    // Complication slot 2
   char slot_3[16];    // Complication slot 3
   char slot_4[16];    // Complication slot 4
+  char slot_5[16];    // Complication slot 5
+  char slot_6[16];    // Complication slot 6
   char step_goal[8];  // Steps goal
 } PersistData;
 
@@ -53,3 +55,6 @@ bool data_is_health_used();
 int data_get_strarr_value(char *arr, int hour);
 
 bool data_is_weather_valid();
+
+int data_get_complication_count();
+char* data_get_nth_complication_type(int n);

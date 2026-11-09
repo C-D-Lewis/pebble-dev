@@ -106,6 +106,22 @@ static void inbox_received_handler(DictionaryIterator *iter, void *context) {
       packet_get_string(iter, MESSAGE_KEY_CONFIG_SLOT_4)
     );
   }
+  if (packet_contains_key(iter, MESSAGE_KEY_CONFIG_SLOT_5)) {
+    snprintf(
+      persist_data->slot_5,
+      sizeof(persist_data->slot_5),
+      "%s",
+      packet_get_string(iter, MESSAGE_KEY_CONFIG_SLOT_5)
+    );
+  }
+  if (packet_contains_key(iter, MESSAGE_KEY_CONFIG_SLOT_6)) {
+    snprintf(
+      persist_data->slot_6,
+      sizeof(persist_data->slot_6),
+      "%s",
+      packet_get_string(iter, MESSAGE_KEY_CONFIG_SLOT_6)
+    );
+  }
   if (packet_contains_key(iter, MESSAGE_KEY_CONFIG_STEP_GOAL)) {
     snprintf(
       persist_data->step_goal,

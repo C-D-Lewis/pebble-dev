@@ -289,62 +289,41 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
   const bool is_year_prog = strcmp(type, COMP_YEAR_PROGRESS) == 0;
   const bool is_moon_phase = strcmp(type, COMP_MOON_PHASE) == 0;
 
-  // Slots are 0-3, clockwise from top, 45 degrees in length, diagonally opposite
-  int start_ang, end_ang;
-  GRect text_r;
-  GTextAlignment alignment;
-  switch (slot) {
-    case 0:
-      start_ang = TRIG_MAX_ANGLE / 16;
-      end_ang = (3 * TRIG_MAX_ANGLE) / 16;
-      text_r = GRect(scl_x(600), scl_y(165), scl_x(250), scl_y(100));
-      alignment = GTextAlignmentLeft;
-
-      if (is_next_weather || is_phone_battery || is_moon_phase) {
-        text_r.origin.x -= scl_x(80);
-        text_r.size.w += scl_x(80);
-      }
-      break;
-    case 1:
-      start_ang = (5 * TRIG_MAX_ANGLE) / 16;
-      end_ang = (7 * TRIG_MAX_ANGLE) / 16;
-      text_r = GRect(scl_x(600), scl_y(735), scl_x(250), scl_y(100));
-      alignment = GTextAlignmentLeft;
-
-      if (is_next_weather || is_phone_battery || is_moon_phase) {
-        text_r.origin.x -= scl_x(80);
-        text_r.size.w += scl_x(80);
-      }
-      break;
-    case 2:
-      start_ang = (9 * TRIG_MAX_ANGLE) / 16;
-      end_ang = (11 * TRIG_MAX_ANGLE) / 16;
-      text_r = GRect(scl_x(150), scl_y(735), scl_x(250), scl_y(100));
-      alignment = GTextAlignmentRight;
-
-      if (is_next_weather || is_phone_battery || is_moon_phase) {
-        text_r.size.w += scl_x(80);
-      }
-      break;
-    case 3:
-      start_ang = (13 * TRIG_MAX_ANGLE) / 16;
-      end_ang = (15 * TRIG_MAX_ANGLE) / 16;
-      text_r = GRect(scl_x(150), scl_y(165), scl_x(250), scl_y(100));
-      alignment = GTextAlignmentRight;
-
-      if (is_next_weather || is_phone_battery || is_moon_phase) {
-        text_r.size.w += scl_x(80);
-      }
-      break;
-    default:
-      return;
+  const int slot_count = data_get_complication_count();
+  const int gap_deg = slot_count > 4 ? 20 : 40;
+  const int gap_ang = (gap_deg * TRIG_MAX_ANGLE) / 360;
+  const int slot_l_deg = (360 - (gap_deg * slot_count)) / slot_count;
+  const int slot_l_ang = (TRIG_MAX_ANGLE * slot_l_deg) / 360;
+  // Slots are 0-3, clockwise from top
+  const int start_ang = (gap_ang / 2) + (slot * slot_l_ang) + (slot * gap_ang);
+  const int end_ang = start_ang + slot_l_ang;
+  const bool is_lhs = start_ang > TRIG_MAX_ANGLE / 2;
+  const bool is_bottom = start_ang > TRIG_MAX_ANGLE / 4 && start_ang < (3 * TRIG_MAX_ANGLE) / 4;
+  const GTextAlignment alignment = is_lhs ? GTextAlignmentRight : GTextAlignmentLeft;
+  // Slot mid-point, aligned with left or right edge of screen
+  GRect text_r = GRect(0, 0, scl_x(250), scl_y(100));
+  if (is_next_weather || is_phone_battery || is_moon_phase) {
+    text_r.size.w += scl_x(80);
+  }
+  GPoint bubble_origin = util_make_hand_point(
+    start_ang + ((end_ang - start_ang) / 2),
+    TRIG_MAX_ANGLE,
+    (PS_DISP_W / 2) - scl_x(10),
+    center
+  );
+  text_r.origin = bubble_origin;
+  if (!is_lhs) {
+    text_r.origin.x -= text_r.size.w;
+  }
+  if (is_bottom) {
+    text_r.origin.y -= text_r.size.h;
   }
 
   const GRect arc_r = grect_inset(bounds, GEdgeInsets((COMPLICATION_W / 2) + 3));
   const int inner_w = COMPLICATION_W - (OUTER_RING_W + 3);
   const int sep_ang = 75;
-  const int item_l = (45 * TRIG_MAX_ANGLE) / (360 * 6);
   const GRect blk_arc_r = grect_inset(bounds, GEdgeInsets(2 * OUTER_RING_W));
+  const int fc_item_l = (slot_l_deg * TRIG_MAX_ANGLE) / (360 * NUM_FORECAST_ITEMS);
 
   if (strcmp(type, COMP_NONE) == 0) {
     // Just a slim line if no complication in this slot
@@ -470,7 +449,7 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
         color = data_get_weather_color(code);
       }
 
-      const int item_ang = start_ang + (i * item_l);
+      const int item_ang = start_ang + (i * fc_item_l);
       const GRect item_r = grect_inset(bounds, GEdgeInsets(2 * OUTER_RING_W));
       graphics_context_set_fill_color(ctx, color);
       graphics_fill_radial(
@@ -479,7 +458,7 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
         GOvalScaleModeFitCircle,
         inner_w,
         item_ang,
-        item_ang + item_l
+        item_ang + fc_item_l
       );
 
       // Separator
@@ -490,13 +469,13 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
         item_r,
         GOvalScaleModeFitCircle,
         inner_w,
-        item_ang + item_l - sep_ang,
-        item_ang + item_l + sep_ang
+        item_ang + fc_item_l - sep_ang,
+        item_ang + fc_item_l + sep_ang
       );
     }
 
     // Be in first item all day until last 6 hours
-    const int dot_ang = start_ang + (forecast_i * item_l) + (item_l / 2);
+    const int dot_ang = start_ang + (forecast_i * fc_item_l) + (fc_item_l / 2);
     draw_gauge_dot(ctx, center, dot_ang, GColorWhite);
     return;
   }
@@ -615,7 +594,6 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
     }
 
     const int phase = app_state->moon_phase;
-    const int fullness = phase < 50 ? phase : 100 - phase;
 
     if (s_tapped) {
       static char moon_buff[8];
@@ -648,8 +626,7 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
     graphics_draw_arc(ctx, arc_r, GOvalScaleModeFitCircle, start_ang, end_ang);
 
     // Arcs in 7ths, full moon in the middle. Shame there is only two shades of grey
-    const int quarter_ang = (end_ang - start_ang) / 4;
-    const int item_l = (end_ang - start_ang) / 7;
+    const int fc_item_l = (end_ang - start_ang) / 7;
     graphics_context_set_fill_color(ctx, GColorBlack);
     graphics_fill_radial(
       ctx,
@@ -657,7 +634,7 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
       GOvalScaleModeFitCircle,
       inner_w,
       start_ang,
-      start_ang + item_l
+      start_ang + fc_item_l
     );
     graphics_context_set_fill_color(ctx, GColorDarkGray);
     graphics_fill_radial(
@@ -665,8 +642,8 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
       blk_arc_r,
       GOvalScaleModeFitCircle,
       inner_w,
-      start_ang + item_l,
-      start_ang + (2 * item_l)
+      start_ang + fc_item_l,
+      start_ang + (2 * fc_item_l)
     );
     graphics_context_set_fill_color(ctx, GColorLightGray);
     graphics_fill_radial(
@@ -674,8 +651,8 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
       blk_arc_r,
       GOvalScaleModeFitCircle,
       inner_w,
-      start_ang + (2 * item_l),
-      start_ang + (3 * item_l)
+      start_ang + (2 * fc_item_l),
+      start_ang + (3 * fc_item_l)
     );
     graphics_context_set_fill_color(ctx, GColorWhite);
     graphics_fill_radial(
@@ -683,8 +660,8 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
       blk_arc_r,
       GOvalScaleModeFitCircle,
       inner_w,
-      start_ang + (3 * item_l),
-      start_ang + (4 * item_l)
+      start_ang + (3 * fc_item_l),
+      start_ang + (4 * fc_item_l)
     );
     graphics_context_set_fill_color(ctx, GColorLightGray);
     graphics_fill_radial(
@@ -692,8 +669,8 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
       blk_arc_r,
       GOvalScaleModeFitCircle,
       inner_w,
-      start_ang + (4 * item_l),
-      start_ang + (5 * item_l)
+      start_ang + (4 * fc_item_l),
+      start_ang + (5 * fc_item_l)
     );
     graphics_context_set_fill_color(ctx, GColorDarkGray);
     graphics_fill_radial(
@@ -701,8 +678,8 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
       blk_arc_r,
       GOvalScaleModeFitCircle,
       inner_w,
-      start_ang + (5 * item_l),
-      start_ang + (6 * item_l)
+      start_ang + (5 * fc_item_l),
+      start_ang + (6 * fc_item_l)
     );
     graphics_context_set_fill_color(ctx, GColorBlack);
     graphics_fill_radial(
@@ -710,7 +687,7 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
       blk_arc_r,
       GOvalScaleModeFitCircle,
       inner_w,
-      start_ang + (6 * item_l),
+      start_ang + (6 * fc_item_l),
       end_ang
     );
     graphics_context_set_antialiased(ctx, true);
@@ -722,8 +699,6 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
 }
 
 static void canvas_update_proc(Layer *layer, GContext *ctx) {
-  PersistData *persist_data = data_get_persist_data();
-
   GRect bounds = layer_get_bounds(layer);
   const GPoint center = GPoint(bounds.size.w / 2, bounds.size.h / 2);
 
@@ -746,14 +721,10 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   draw_date_and_time_display(ctx, bounds, t, center);
 
   // Complications!
-  draw_arc_complication(ctx, bounds, center, 0, persist_data->slot_1);
-  draw_arc_complication(ctx, bounds, center, 1, persist_data->slot_2);
-  draw_arc_complication(ctx, bounds, center, 2, persist_data->slot_3);
-  draw_arc_complication(ctx, bounds, center, 3, persist_data->slot_4);
-
-  // Tapped state
-  if (s_tapped) {
-    // TODO: Show full time and cmoplication numbers
+  for (int i = 0; i < data_get_complication_count(); i++) {
+    char *type = data_get_nth_complication_type(i);
+    if (strcmp(type, COMP_NONE) == 0) continue;
+    draw_arc_complication(ctx, bounds, center, i, type);
   }
 }
 

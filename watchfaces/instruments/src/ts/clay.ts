@@ -55,6 +55,20 @@ const config = [
         label: 'Slot 4',
         options: SLOT_OPTIONS,
       },
+      {
+        type: 'select',
+        messageKey: 'CONFIG_SLOT_5',
+        defaultValue: 'NONE',
+        label: 'Slot 5',
+        options: SLOT_OPTIONS,
+      },
+      {
+        type: 'select',
+        messageKey: 'CONFIG_SLOT_6',
+        defaultValue: 'NONE',
+        label: 'Slot 6',
+        options: SLOT_OPTIONS,
+      },
     ],
   },
   {

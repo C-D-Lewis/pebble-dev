@@ -17,7 +17,7 @@
 #define GAUGE_DOT_S 2
 
 // Behavior
-#define MIN_WEATHER_INTERVAL_S (60 * 60 - 5)
+#define NUM_SLOTS 6 // Until all is iterative, look for counting loops
 
 // Constants
 #define CHARS_PER_ITEM 2

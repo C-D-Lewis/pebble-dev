@@ -60,7 +60,7 @@ const getLocation = async () => new Promise((resolve, reject) => {
     resolve,
     reject,
     {
-      timeout: 10000,
+      timeout: 5000,
       maximumAge: 60000,
       enableHighAccuracy: false,
     },
