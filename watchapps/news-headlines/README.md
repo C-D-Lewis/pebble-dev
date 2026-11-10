@@ -22,6 +22,9 @@ Open source since December 2016.
 
 ## TODO
 
-- [ ] Use messageKeys and pebble-packet (when flint is available)
 - [x] Remove image stuff
+- [ ] Use messageKeys and pebble-packet
+- [ ] scalable fonts
 - [ ] Check Chalk layout
+- [ ] DRY variables
+- [ ] scalable instead of hardcoded nudges and coordinates

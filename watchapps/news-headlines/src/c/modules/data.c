@@ -9,6 +9,8 @@ void data_init() {
   }
 }
 
+void data_deinit() {}
+
 Story* data_get_story(int index) {
   return &s_stories[index];
 }
@@ -89,7 +91,4 @@ bool data_load_cached_data() {
   data_set_quantity(DATA_MAX_PERSISTED);
 
   return true;
-}
-
-void data_deinit() {
 }

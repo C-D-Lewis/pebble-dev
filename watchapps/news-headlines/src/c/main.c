@@ -39,7 +39,6 @@ static void init() {
 }
 
 static void deinit() {
-  // Don't cache now, incase it's invalid
   data_deinit();
 
   // AppGlance oooh

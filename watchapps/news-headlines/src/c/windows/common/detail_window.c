@@ -10,24 +10,31 @@ static int s_index;
 static void deco_layer_update_proc(Layer *layer, GContext *ctx) {
   const GRect bounds = layer_get_bounds(layer);
 
-  const int margin = scl_x(15);
+  const int x_margin = scl_x(15);
+  const int y_margin = scl_y_pp({.o = 15, .g = 50});
+
   graphics_context_set_fill_color(ctx, GColorDarkGray);
   graphics_fill_rect(
     ctx,
-    GRect(margin, margin, bounds.size.w - (2 * margin), scl_y(40)),
+    GRect(x_margin, y_margin, bounds.size.w - (2 * x_margin), scl_y(40)),
     0,
     GCornerNone
   );
   graphics_context_set_fill_color(ctx, GColorBlack);
   graphics_fill_rect(
     ctx,
-    GRect(margin, scl_y(60), bounds.size.w - (2 * margin), scl_y(15)),
+    GRect(
+      x_margin,
+      y_margin + scl_y_pp({.o = 50, .g = 50}),
+      bounds.size.w - (2 * x_margin),
+      scl_y(15)
+    ),
     0,
     GCornerNone
   );
   graphics_fill_rect(
     ctx,
-    grect_inset(bounds, GEdgeInsets(bounds.size.h - 4, margin, 2, margin)),
+    GRect(0, bounds.size.h - (2 * y_margin), PS_DISP_W, x_margin),
     0,
     GCornerNone
   );
@@ -39,31 +46,29 @@ static void window_load(Window *window) {
 
   Story *story = data_get_story(s_index);
 
-  const int y_margin = scl_y(60);
+  const int x_margin = scl_x_pp({.o = 5, .g = 120});
+  const int y_margin = scl_y_pp({.o = 60, .g = 140});
   
   // Code from devsite to try and fit text inside a TextLayer inside a ScrollLayer
-  GRect shrinking_rect = GRect(2, 0, bounds.size.w - 4, 2000);
+  GRect shrinking_rect = GRect(x_margin, 0, bounds.size.w - (2 * x_margin), 2000);
+  GTextAlignment alignment = PBL_IF_ROUND_ELSE(GTextAlignmentCenter, GTextAlignmentLeft);
   GSize text_size = graphics_text_layout_get_content_size(
     story->description,
     scl_get_font(SFI_Medium), 
     shrinking_rect,
     GTextOverflowModeWordWrap,
-    GTextAlignmentLeft
+    alignment
   );
   text_size.h += 10;
   GRect text_bounds = bounds;
-  text_bounds.origin.x += 2;
-  text_bounds.size.w -= 4;
+  text_bounds.origin.x += x_margin;
+  text_bounds.size.w -= 2 * x_margin;
   text_bounds.size.h = text_size.h;
 
   s_desc_layer = text_layer_create(text_bounds);
   text_layer_set_font(s_desc_layer, scl_get_font(SFI_Medium));
-  text_layer_set_text_alignment(s_desc_layer, GTextAlignmentLeft);
+  text_layer_set_text_alignment(s_desc_layer, alignment);
   text_layer_set_text(s_desc_layer, story->description);
-
-#if defined(PBL_ROUND)
-  text_layer_enable_screen_text_flow_and_paging(s_desc_layer, 6);
-#endif
 
   s_scroll_layer = scroll_layer_create(
     GRect(0, y_margin, bounds.size.w, bounds.size.h - y_margin - scl_y(25))

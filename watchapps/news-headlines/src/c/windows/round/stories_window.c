@@ -26,7 +26,11 @@ static void animate_in(int offset) {
   GRect start = layer_get_frame(s_title_layer);
   start.origin.y += offset;
 
-  PropertyAnimation *prop_anim = property_animation_create_layer_frame(s_title_layer, &start, &finish);
+  PropertyAnimation *prop_anim = property_animation_create_layer_frame(
+    s_title_layer,
+    &start,
+    &finish
+  );
   Animation *anim = property_animation_get_animation(prop_anim);
   animation_set_handlers(anim, (AnimationHandlers) {
     .stopped = anim_stopped_handler
@@ -51,35 +55,81 @@ static void title_update_proc(Layer *layer, GContext *ctx) {
 
   // Top decorations
   graphics_context_set_fill_color(ctx, GColorDarkGray);
-  graphics_fill_rect(ctx, GRect(bounds.origin.x + 3, bounds.origin.y + 3, bounds.size.w - 6, 2), 0, GCornerNone);
-  graphics_fill_rect(ctx, GRect(bounds.origin.x + 3, bounds.origin.y + 7, bounds.size.w - 6, 3), 0, GCornerNone);
+  graphics_fill_rect(
+    ctx,
+    GRect(bounds.origin.x + 3, bounds.origin.y + 3, bounds.size.w - 6, 2),
+    0,
+    GCornerNone
+  );
+  graphics_fill_rect(
+    ctx,
+    GRect(bounds.origin.x + 3, bounds.origin.y + 7, bounds.size.w - 6, 3),
+    0,
+    GCornerNone
+  );
 
   // Title
   GRect title_bounds = grect_inset(bounds, GEdgeInsets(5, 3, 0, 3));
   graphics_context_set_text_color(ctx, GColorBlack);
-  graphics_draw_text(ctx, story->title, fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD),
-    title_bounds, GTextOverflowModeWordWrap,
-    GTextAlignmentCenter, NULL);
+  graphics_draw_text(
+    ctx,
+    story->title,
+    scl_get_font(SFI_MediumBold),
+    title_bounds,
+    GTextOverflowModeWordWrap,
+    GTextAlignmentCenter,
+    NULL
+  );
 
-  GSize title_size = graphics_text_layout_get_content_size(story->title,
-    fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD), title_bounds,
-    GTextOverflowModeWordWrap, GTextAlignmentCenter);
+  GSize title_size = graphics_text_layout_get_content_size(
+    story->title,
+    scl_get_font(SFI_MediumBold),
+    title_bounds,
+    GTextOverflowModeWordWrap,
+    GTextAlignmentCenter
+  );
 
   // Dummy text boxes
   graphics_context_set_fill_color(ctx, GColorLightGray);
   srand(time(NULL));
   int y = bounds.origin.y + 3 + title_size.h + 10;
-  graphics_fill_rect(ctx, GRect(
-    bounds.origin.x + 5, y,
-    bounds.size.w - s_fake_para_widths[0], (s_fake_para_widths[0] / 2)), 0, GCornerNone);
+  graphics_fill_rect(
+    ctx,
+    GRect(
+      bounds.origin.x + 5,
+      y,
+      bounds.size.w - s_fake_para_widths[0],
+      s_fake_para_widths[0] / 2
+    ),
+    0,
+    GCornerNone
+  );
   y += (s_fake_para_widths[0] / 2) + 3;
-  graphics_fill_rect(ctx, GRect(
-    bounds.origin.x + 5, y,
-    bounds.size.w - s_fake_para_widths[1], (s_fake_para_widths[1] / 2)), 0, GCornerNone);
+  graphics_fill_rect(
+    ctx,
+    GRect(
+      bounds.origin.x + 5,
+      y,
+      bounds.size.w - s_fake_para_widths[1],
+      s_fake_para_widths[1] / 2
+    ),
+    0,
+    GCornerNone
+  );
   y += (s_fake_para_widths[1] / 2) + 3;
-  graphics_fill_rect(ctx, GRect(
-    bounds.origin.x + 5, y,
-    bounds.size.w - s_fake_para_widths[2], 168), 0, GCornerNone); // Fill the rest
+
+  // Fill the rest
+  graphics_fill_rect(
+    ctx,
+    GRect(
+      bounds.origin.x + 5,
+      y,
+      bounds.size.w - s_fake_para_widths[2],
+      1000
+    ),
+    0,
+    GCornerNone
+  ); 
 }
 
 static void update_data() {
@@ -87,8 +137,16 @@ static void update_data() {
   snprintf(s_status_buffer, sizeof(s_status_buffer), "%d/%d", s_index + 1, data_get_quantity());
   text_layer_set_text(s_status_layer, s_status_buffer);
 
-  content_indicator_set_content_available(s_indicator, ContentIndicatorDirectionUp, (s_index > 0));
-  content_indicator_set_content_available(s_indicator, ContentIndicatorDirectionDown, (s_index < data_get_quantity() - 1));
+  content_indicator_set_content_available(
+    s_indicator,
+    ContentIndicatorDirectionUp,
+    (s_index > 0)
+  );
+  content_indicator_set_content_available(
+    s_indicator,
+    ContentIndicatorDirectionDown,
+    (s_index < data_get_quantity() - 1)
+  );
 
   layer_mark_dirty(s_title_layer);
 }
@@ -158,7 +216,11 @@ static void up_update_proc(Layer *layer, GContext *ctx) {
     GRect bitmap_bounds = gbitmap_get_bounds(s_wrench_bitmap);
     const int x_margin = (bounds.size.w - bitmap_bounds.size.w) / 2;
     const int y_margin = PBL_IF_ROUND_ELSE(3, 3);
-    graphics_draw_bitmap_in_rect(ctx, s_wrench_bitmap, GRect(x_margin, y_margin, bitmap_bounds.size.w, bitmap_bounds.size.h));
+    graphics_draw_bitmap_in_rect(
+      ctx,
+      s_wrench_bitmap,
+      GRect(x_margin, y_margin, bitmap_bounds.size.w, bitmap_bounds.size.h)
+    );
   }
 }
 
@@ -168,7 +230,7 @@ static void window_load(Window *this) {
 
   s_wrench_bitmap = gbitmap_create_with_resource(RESOURCE_ID_SPANNER);
 
-  const int margin = (bounds.size.w - 144) / 2;
+  const int margin = (bounds.size.w - scl_x(600)) / 2;
   const GEdgeInsets title_insets = {
     .top = STATUS_BAR_LAYER_HEIGHT + PBL_IF_ROUND_ELSE(20, 3),
     .left = margin,
@@ -178,33 +240,51 @@ static void window_load(Window *this) {
   layer_set_update_proc(s_title_layer, title_update_proc);
   layer_add_child(window_layer, s_title_layer);
 
-  const int indicator_margin = PBL_IF_ROUND_ELSE(STATUS_BAR_LAYER_HEIGHT, STATUS_BAR_LAYER_HEIGHT - 3);
+  const int indicator_margin = PBL_IF_ROUND_ELSE(
+    STATUS_BAR_LAYER_HEIGHT,
+    STATUS_BAR_LAYER_HEIGHT - 3
+  );
 
-  s_up_indicator_layer = layer_create(grect_inset(bounds, GEdgeInsets(0, 0, bounds.size.h - indicator_margin - PBL_IF_ROUND_ELSE(0, 5), 0)));
+  s_up_indicator_layer = layer_create(
+    grect_inset(
+      bounds,
+      GEdgeInsets(0, 0, bounds.size.h - indicator_margin - PBL_IF_ROUND_ELSE(0, 5), 0)
+    )
+  );
   layer_set_update_proc(s_up_indicator_layer, up_update_proc);
   layer_add_child(window_layer, s_up_indicator_layer);
-  s_down_indicator_layer = layer_create(grect_inset(bounds, GEdgeInsets(bounds.size.h - indicator_margin, 0, 0, 0)));
+  s_down_indicator_layer = layer_create(
+    grect_inset(bounds, GEdgeInsets(bounds.size.h - indicator_margin, 0, 0, 0))
+  );
   layer_add_child(window_layer, s_down_indicator_layer);
 
   s_indicator = content_indicator_create();
-  content_indicator_configure_direction(s_indicator, ContentIndicatorDirectionUp, &(ContentIndicatorConfig) {
-    .layer = s_up_indicator_layer,
-    .times_out = false,
-    .alignment = GAlignCenter,
-    .colors = {
-      .foreground = GColorWhite,
-      .background = GColorDarkCandyAppleRed
+  content_indicator_configure_direction(
+    s_indicator,
+    ContentIndicatorDirectionUp,
+    &(ContentIndicatorConfig) {
+      .layer = s_up_indicator_layer,
+      .times_out = false,
+      .alignment = GAlignCenter,
+      .colors = {
+        .foreground = GColorWhite,
+        .background = GColorDarkCandyAppleRed
+      }
     }
-  });
-  content_indicator_configure_direction(s_indicator, ContentIndicatorDirectionDown, &(ContentIndicatorConfig) {
-    .layer = s_down_indicator_layer,
-    .times_out = false,
-    .alignment = GAlignCenter,
-    .colors = {
-      .foreground = GColorBlack,
-      .background = GColorClear
+  );
+  content_indicator_configure_direction(
+    s_indicator,
+    ContentIndicatorDirectionDown,
+    &(ContentIndicatorConfig) {
+      .layer = s_down_indicator_layer,
+      .times_out = false,
+      .alignment = GAlignCenter,
+      .colors = {
+        .foreground = GColorBlack,
+        .background = GColorClear
+      }
     }
-  });
+  );
 
 #if defined(PBL_ROUND)
   GRect status_bounds = GRect(0, indicator_margin - 8, bounds.size.w, STATUS_BAR_H);
@@ -213,9 +293,12 @@ static void window_load(Window *this) {
 #endif
   s_status_layer = text_layer_create(status_bounds);
   text_layer_set_text_color(s_status_layer, GColorWhite);
-  text_layer_set_font(s_status_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD));
+  text_layer_set_font(s_status_layer, scl_get_font(SFI_Small));
   text_layer_set_background_color(s_status_layer, GColorClear);
-  text_layer_set_text_alignment(s_status_layer, PBL_IF_ROUND_ELSE(GTextAlignmentCenter, GTextAlignmentRight));
+  text_layer_set_text_alignment(
+    s_status_layer,
+    PBL_IF_ROUND_ELSE(GTextAlignmentCenter, GTextAlignmentRight)
+  );
   text_layer_set_overflow_mode(s_status_layer, GTextOverflowModeTrailingEllipsis);
   layer_add_child(window_layer, text_layer_get_layer(s_status_layer));
 

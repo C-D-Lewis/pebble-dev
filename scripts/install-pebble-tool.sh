@@ -7,7 +7,7 @@ sudo apt-get update && sudo apt-get install -y \
   curl \
   libsdl1.2debian \
   libfdt1 \
-  python3.12-venv \
+  python3.13-venv \
   gcc-arm-none-eabi
 
 echo ">>> Installing uv"
