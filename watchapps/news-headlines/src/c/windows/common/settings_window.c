@@ -18,7 +18,7 @@ static void menu_cell_draw(GContext *ctx, Layer *layer, char *title, char *desc)
     return;
   }
 
-#if defined(PBL_PLATFORM_CHALK)
+#if defined(PBL_ROUND)
   // Use Chalk's text flowing
   menu_cell_basic_draw(ctx, layer, title, desc, NULL);
   return;

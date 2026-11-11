@@ -34,7 +34,7 @@ static void deco_layer_update_proc(Layer *layer, GContext *ctx) {
   );
   graphics_fill_rect(
     ctx,
-    GRect(0, bounds.size.h - (2 * y_margin), PS_DISP_W, x_margin),
+    GRect(0, bounds.size.h - (2 * x_margin), PS_DISP_W, x_margin),
     0,
     GCornerNone
   );
@@ -46,15 +46,15 @@ static void window_load(Window *window) {
 
   Story *story = data_get_story(s_index);
 
-  const int x_margin = scl_x_pp({.o = 5, .g = 120});
-  const int y_margin = scl_y_pp({.o = 60, .g = 140});
-  
+  const int x_margin = scl_x_pp({.o = 5, .c = 120, .g = 120});
+  const int y_margin = scl_y_pp({.o = 70, .c = 120, .e = 60, .g = 115});
+
   // Code from devsite to try and fit text inside a TextLayer inside a ScrollLayer
   GRect shrinking_rect = GRect(x_margin, 0, bounds.size.w - (2 * x_margin), 2000);
   GTextAlignment alignment = PBL_IF_ROUND_ELSE(GTextAlignmentCenter, GTextAlignmentLeft);
   GSize text_size = graphics_text_layout_get_content_size(
     story->description,
-    scl_get_font(SFI_Medium), 
+    scl_get_font(SFI_Medium),
     shrinking_rect,
     GTextOverflowModeWordWrap,
     alignment

@@ -3,7 +3,7 @@
 #pragma once
 
 // Disable before release!
-// #define TEST
+#define TEST
 
 // Layout
 #define OUTER_RING_W 3
@@ -17,7 +17,7 @@
 #define GAUGE_DOT_S 2
 
 // Behavior
-#define NUM_SLOTS 6 // Until all is iterative, look for counting loops
+#define NUM_SLOTS 6 // Until all is iterative, look for counting loops!
 
 // Constants
 #define CHARS_PER_ITEM 2

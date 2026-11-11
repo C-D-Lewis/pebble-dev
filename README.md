@@ -58,8 +58,8 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `dashboard`      | ![](watchapps/dashboard/assets/screenshots/basalt1.png) | `A - D`     | ✅    | [pbw](pbw/dashboard.pbw)      |
 | `dashboard2`     | ![](watchapps/dashboard2/screenshots/emery.png)         | `A - G`     | ✅    | [pbw](pbw/dashboard2.pbw)     |
 | `muninn`         | ![](watchapps/muninn/screenshots/basalt.png)            | `A - G`     | ✅    | [pbw](pbw/muninn.pbw)         |
-| `news-headlines` | ![](watchapps/news-headlines/screenshots/basalt.png)    | `A - F`     | ✅    | [pbw](pbw/news-headlines.pbw) |
-| `tube-status`    | ![](watchapps/tube-status/screenshots/basalt.png)       | `A - E`     | ✅    | [pbw](pbw/tube-status.pbw)    |
+| `news-headlines` | ![](watchapps/news-headlines/screenshots/basalt.png)    | `A - G`     | ✅    | [pbw](pbw/news-headlines.pbw) |
+| `tube-status`    | ![](watchapps/tube-status/screenshots/basalt.png)       | `A - G`     | ✅    | [pbw](pbw/tube-status.pbw)    |
 
 ## `libraries`
 

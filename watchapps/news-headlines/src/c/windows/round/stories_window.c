@@ -215,7 +215,7 @@ static void up_update_proc(Layer *layer, GContext *ctx) {
 
     GRect bitmap_bounds = gbitmap_get_bounds(s_wrench_bitmap);
     const int x_margin = (bounds.size.w - bitmap_bounds.size.w) / 2;
-    const int y_margin = PBL_IF_ROUND_ELSE(3, 3);
+    const int y_margin = 3;
     graphics_draw_bitmap_in_rect(
       ctx,
       s_wrench_bitmap,
@@ -230,9 +230,9 @@ static void window_load(Window *this) {
 
   s_wrench_bitmap = gbitmap_create_with_resource(RESOURCE_ID_SPANNER);
 
-  const int margin = (bounds.size.w - scl_x(600)) / 2;
+  const int margin = (bounds.size.w - scl_x_pp({.o = 800, .c = 900})) / 2;
   const GEdgeInsets title_insets = {
-    .top = STATUS_BAR_LAYER_HEIGHT + PBL_IF_ROUND_ELSE(20, 3),
+    .top = STATUS_BAR_LAYER_HEIGHT + scl_y_pp({.o = 50, .c = 60, .g = 110}),
     .left = margin,
     .right = margin
   };
@@ -286,14 +286,15 @@ static void window_load(Window *this) {
     }
   );
 
-#if defined(PBL_ROUND)
-  GRect status_bounds = GRect(0, indicator_margin - 8, bounds.size.w, STATUS_BAR_H);
-#elif defined(PBL_RECT)
-  GRect status_bounds = GRect(0, -3, bounds.size.w - 5, STATUS_BAR_H);
-#endif
+  GRect status_bounds = GRect(
+    0,
+    indicator_margin - scl_y_pp({.o = 10, .c = 55, .g = 10}),
+    bounds.size.w,
+    STATUS_BAR_H
+  );
   s_status_layer = text_layer_create(status_bounds);
   text_layer_set_text_color(s_status_layer, GColorWhite);
-  text_layer_set_font(s_status_layer, scl_get_font(SFI_Small));
+  text_layer_set_font(s_status_layer, scl_get_font(SFI_StatusLayer));
   text_layer_set_background_color(s_status_layer, GColorClear);
   text_layer_set_text_alignment(
     s_status_layer,

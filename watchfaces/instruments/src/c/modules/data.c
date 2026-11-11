@@ -49,14 +49,15 @@ void data_init() {
   }
 
   // TEST
+  // MAKE SURE ALL CASES SHOW CORRECT TEXT POSITIONS
 #ifdef TEST
   snprintf(s_persist_data.theme, sizeof(s_persist_data.theme), "%s", THEME_PURPLE);
   snprintf(s_persist_data.slot_1, sizeof(s_persist_data.slot_1), "%s", COMP_BATTERY);
   snprintf(s_persist_data.slot_2, sizeof(s_persist_data.slot_2), "%s", COMP_NEXT_RAIN);
   snprintf(s_persist_data.slot_3, sizeof(s_persist_data.slot_3), "%s", COMP_TEMP_RANGE);
   snprintf(s_persist_data.slot_4, sizeof(s_persist_data.slot_4), "%s", COMP_NEXT_WEATHER);
-  snprintf(s_persist_data.slot_5, sizeof(s_persist_data.slot_5), "%s", COMP_STEP_COUNT);
-  snprintf(s_persist_data.slot_6, sizeof(s_persist_data.slot_6), "%s", COMP_MOON_PHASE);
+  snprintf(s_persist_data.slot_5, sizeof(s_persist_data.slot_5), "%s", COMP_MOON_PHASE);
+  snprintf(s_persist_data.slot_6, sizeof(s_persist_data.slot_6), "%s", COMP_MONTH_PROGRESS);
   snprintf(s_persist_data.step_goal, sizeof(s_persist_data.step_goal), "%s", STEP_GOAL_10000);
 #endif
 }

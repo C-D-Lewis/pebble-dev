@@ -153,7 +153,7 @@ static void draw_decorations(GContext *ctx, GRect bounds, GPoint center) {
   // Straight line representing midnight and ligher one for midday
   graphics_context_set_stroke_color(ctx, GColorDarkGray);
   graphics_context_set_stroke_width(ctx, 2);
-  const int eod_ang = (180 * TRIG_MAX_ANGLE) / 360;
+  const int eod_ang = DEG_TO_TRIGANGLE(180);
   const int hand_r = center.x - OUTER_RING_INSET - HOUR_DOT_RING_W;
   GPoint eod_hand_start = util_make_hand_point(eod_ang, TRIG_MAX_ANGLE, hand_r, center);
   GPoint eod_hand_end = util_make_hand_point(eod_ang, TRIG_MAX_ANGLE, hand_r - 10, center);
@@ -246,10 +246,7 @@ static void draw_sunrise_and_sunset_ring(GContext *ctx, GRect bounds, GPoint cen
 
 static void draw_gauge_dot(GContext *ctx, GPoint center, int angle, GColor color) {
   // Due to how dots are plotted, needs different offset in different positions
-  int offset = 2;
-  if (angle < (3 * TRIG_MAX_ANGLE) / 4) {
-    offset = 3;
-  }
+  const int offset = (angle < (3 * TRIG_MAX_ANGLE) / 4) ? 3 : 2;
 
   GPoint dot_point = util_make_hand_point(
     angle,
@@ -291,32 +288,41 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
 
   const int slot_count = data_get_complication_count();
   const int gap_deg = slot_count > 4 ? 20 : 40;
-  const int gap_ang = (gap_deg * TRIG_MAX_ANGLE) / 360;
+  const int gap_ang = DEG_TO_TRIGANGLE(gap_deg);
   const int slot_l_deg = (360 - (gap_deg * slot_count)) / slot_count;
-  const int slot_l_ang = (TRIG_MAX_ANGLE * slot_l_deg) / 360;
+  const int slot_l_ang = DEG_TO_TRIGANGLE(slot_l_deg);
   // Slots are 0-3, clockwise from top
   const int start_ang = (gap_ang / 2) + (slot * slot_l_ang) + (slot * gap_ang);
   const int end_ang = start_ang + slot_l_ang;
   const bool is_lhs = start_ang > TRIG_MAX_ANGLE / 2;
-  const bool is_bottom = start_ang > TRIG_MAX_ANGLE / 4 && start_ang < (3 * TRIG_MAX_ANGLE) / 4;
-  const GTextAlignment alignment = is_lhs ? GTextAlignmentRight : GTextAlignmentLeft;
-  // Slot mid-point, aligned with left or right edge of screen
-  GRect text_r = GRect(0, 0, scl_x(250), scl_y(100));
-  if (is_next_weather || is_phone_battery || is_moon_phase) {
-    text_r.size.w += scl_x(80);
-  }
-  GPoint bubble_origin = util_make_hand_point(
-    start_ang + ((end_ang - start_ang) / 2),
+  const GTextAlignment alignment = GTextAlignmentCenter;
+
+  // Place the label at the arc midpoint
+  GRect txt_r = GRect(0, 0, scl_x(250), scl_y(100));
+  const int origin_ang = start_ang + slot_l_ang / 2;
+  GPoint txt_p = util_make_hand_point(
+    origin_ang,
     TRIG_MAX_ANGLE,
-    (PS_DISP_W / 2) - scl_x(10),
+    (PS_DISP_W / 2) - scl_x(13),
     center
   );
-  text_r.origin = bubble_origin;
-  if (!is_lhs) {
-    text_r.origin.x -= text_r.size.w;
+  // Slightly longer
+  if (is_next_weather || is_phone_battery) {
+    txt_r.size.w += scl_x(70);
   }
-  if (is_bottom) {
-    text_r.origin.y -= text_r.size.h;
+
+  // Put the label box inward from the anchor, toward the display center.
+  const int dx = txt_p.x - center.x;
+  if (abs(dx) < txt_r.size.w / 2) {
+    txt_r.origin.x = txt_p.x - txt_r.size.w / 2;
+  } else {
+    txt_r.origin.x = dx < 0 ? txt_p.x : txt_p.x - txt_r.size.w;
+  }
+  txt_r.origin.y = txt_p.y < center.y ? txt_p.y : txt_p.y - (txt_r.size.h * 2) / 3;
+  if (txt_r.origin.y < 0) {
+    txt_r.origin.y = 0;
+  } else if (txt_r.origin.y + txt_r.size.h > PS_DISP_H) {
+    txt_r.origin.y = PS_DISP_H - txt_r.size.h;
   }
 
   const GRect arc_r = grect_inset(bounds, GEdgeInsets((COMPLICATION_W / 2) + 3));
@@ -342,17 +348,6 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
       return;
     }
 
-    if (s_tapped) {
-      static char batt_buff[16];
-      if (is_battery) {
-        BatteryChargeState charge_state = battery_state_service_peek();
-        snprintf(batt_buff, sizeof(batt_buff), "%d%%", charge_state.charge_percent);
-      } else if (is_phone_battery) {
-        snprintf(batt_buff, sizeof(batt_buff), "%d%% (P)", app_state->phone_battery);
-      }
-      draw_text_bubble(ctx, text_r, batt_buff, alignment, scl_get_font(SFI_Label));
-    }
-
     draw_empty_gauge(ctx, arc_r, start_ang, end_ang, inner_w);
   
     int percent = 0;
@@ -368,6 +363,17 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
     graphics_draw_arc(ctx, arc_r, GOvalScaleModeFitCircle, start_ang, start_ang + batt_ang);
 
     draw_gauge_dot(ctx, center, start_ang + batt_ang, GColorWhite);
+
+    if (s_tapped) {
+      static char batt_buff[16];
+      if (is_battery) {
+        BatteryChargeState charge_state = battery_state_service_peek();
+        snprintf(batt_buff, sizeof(batt_buff), "%d%%", charge_state.charge_percent);
+      } else if (is_phone_battery) {
+        snprintf(batt_buff, sizeof(batt_buff), "%d%% (P)", app_state->phone_battery);
+      }
+      draw_text_bubble(ctx, txt_r, batt_buff, alignment, scl_get_font(SFI_Label));
+    }
     return;
   }
   
@@ -376,12 +382,6 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
     if (s_steps == DATA_EMPTY) {
       draw_empty_complication(ctx, arc_r, start_ang, end_ang);
       return;
-    }
-
-    if (s_tapped) {
-      static char step_buff[8];
-      snprintf(step_buff, sizeof(step_buff), "%d", s_steps);
-      draw_text_bubble(ctx, text_r, step_buff, alignment, scl_get_font(SFI_Label));
     }
     
     draw_empty_gauge(ctx, arc_r, start_ang, end_ang, inner_w);
@@ -394,6 +394,12 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
     graphics_draw_arc(ctx, arc_r, GOvalScaleModeFitCircle, start_ang, start_ang + step_ang);
 
     draw_gauge_dot(ctx, center, start_ang + step_ang, GColorWhite);
+
+    if (s_tapped) {
+      static char step_buff[8];
+      snprintf(step_buff, sizeof(step_buff), "%d", s_steps);
+      draw_text_bubble(ctx, txt_r, step_buff, alignment, scl_get_font(SFI_Label));
+    }
     return;
   }
 
@@ -411,21 +417,6 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
     int forecast_i = 0;
     if (hours > 24 - NUM_FORECAST_ITEMS) {
       forecast_i = NUM_FORECAST_ITEMS - (24 - hours);
-    }
-
-    if (s_tapped) {
-      if (is_next_rain) {
-        static char rain_buff[8];
-        const int chance = data_get_strarr_value(app_state->precip_arr, forecast_i);
-        snprintf(rain_buff, sizeof(rain_buff), "%d%%", chance);
-        draw_text_bubble(ctx, text_r, rain_buff, alignment, scl_get_font(SFI_Label));
-      }
-      if (is_next_weather) {
-        static char weather_buff[8];
-        const int code = data_get_strarr_value(app_state->code_arr, forecast_i);
-        snprintf(weather_buff, sizeof(weather_buff), "%s", data_get_weather_str(code));
-        draw_text_bubble(ctx, text_r, weather_buff, alignment, scl_get_font(SFI_Label));
-      }
     }
 
     draw_empty_gauge(ctx, arc_r, start_ang, end_ang, inner_w);
@@ -477,6 +468,21 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
     // Be in first item all day until last 6 hours
     const int dot_ang = start_ang + (forecast_i * fc_item_l) + (fc_item_l / 2);
     draw_gauge_dot(ctx, center, dot_ang, GColorWhite);
+
+    if (s_tapped) {
+      if (is_next_rain) {
+        static char rain_buff[8];
+        const int chance = data_get_strarr_value(app_state->precip_arr, forecast_i);
+        snprintf(rain_buff, sizeof(rain_buff), "%d%%", chance);
+        draw_text_bubble(ctx, txt_r, rain_buff, alignment, scl_get_font(SFI_Label));
+      }
+      if (is_next_weather) {
+        static char weather_buff[8];
+        const int code = data_get_strarr_value(app_state->code_arr, forecast_i);
+        snprintf(weather_buff, sizeof(weather_buff), "%s", data_get_weather_str(code));
+        draw_text_bubble(ctx, txt_r, weather_buff, alignment, scl_get_font(SFI_Label));
+      }
+    }
     return;
   }
 
@@ -484,18 +490,6 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
     if (!data_is_weather_valid()) {
       draw_empty_complication(ctx, arc_r, start_ang, end_ang);
       return;
-    }
-
-    if (s_tapped) {
-      static char range_buff[8];
-      snprintf(
-        range_buff,
-        sizeof(range_buff),
-        "%d-%d",
-        util_convert_temp(app_state->temp_low),
-        util_convert_temp(app_state->temp_high)
-      );
-      draw_text_bubble(ctx, text_r, range_buff, alignment, scl_get_font(SFI_Label));
     }
 
     draw_empty_gauge(ctx, arc_r, start_ang, end_ang, inner_w);
@@ -554,22 +548,25 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
     const int item_index = temp - app_state->temp_low;
     const int dot_ang = start_ang + (item_index * item_s) + (item_s / 2);
     draw_gauge_dot(ctx, center, dot_ang, GColorWhite);
+
+    if (s_tapped) {
+      static char range_buff[8];
+      snprintf(
+        range_buff,
+        sizeof(range_buff),
+        "%d-%d",
+        util_convert_temp(app_state->temp_low),
+        util_convert_temp(app_state->temp_high)
+      );
+      draw_text_bubble(ctx, txt_r, range_buff, alignment, scl_get_font(SFI_Label));
+    }
+    return;
   }
 
   if (is_month_prog || is_year_prog) {
     if (app_state->month_progress == DATA_EMPTY) {
       draw_empty_complication(ctx, arc_r, start_ang, end_ang);
       return;
-    }
-
-    if (s_tapped) {
-      static char month_buff[8];
-      if (is_year_prog) {
-        snprintf(month_buff, sizeof(month_buff), "%d%%", app_state->year_progress);
-      } else {
-        snprintf(month_buff, sizeof(month_buff), "%d%%", app_state->month_progress);
-      }
-      draw_text_bubble(ctx, text_r, month_buff, alignment, scl_get_font(SFI_Label));
     }
 
     draw_empty_gauge(ctx, arc_r, start_ang, end_ang, inner_w);
@@ -585,36 +582,23 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
     graphics_draw_arc(ctx, arc_r, GOvalScaleModeFitCircle, start_ang, start_ang + ang);
 
     draw_gauge_dot(ctx, center, start_ang + ang, GColorWhite);
+
+    if (s_tapped) {
+      static char month_buff[8];
+      if (is_year_prog) {
+        snprintf(month_buff, sizeof(month_buff), "%d%%", app_state->year_progress);
+      } else {
+        snprintf(month_buff, sizeof(month_buff), "%d%%", app_state->month_progress);
+      }
+      draw_text_bubble(ctx, txt_r, month_buff, alignment, scl_get_font(SFI_Label));
+    }
+    return;
   }
 
   if (is_moon_phase) {
     if (app_state->moon_phase == DATA_EMPTY) {
       draw_empty_complication(ctx, arc_r, start_ang, end_ang);
       return;
-    }
-
-    const int phase = app_state->moon_phase;
-
-    if (s_tapped) {
-      static char moon_buff[8];
-      if (phase < 13) {
-        snprintf(moon_buff, sizeof(moon_buff), "NEW");
-      } else if (phase < 25) {
-        snprintf(moon_buff, sizeof(moon_buff), "WAX CR");
-      } else if (phase < 38) {
-        snprintf(moon_buff, sizeof(moon_buff), "1ST QT");
-      } else if (phase < 50) {
-        snprintf(moon_buff, sizeof(moon_buff), "WAX GB");
-      } else if (phase < 63) {
-        snprintf(moon_buff, sizeof(moon_buff), "FULL");
-      } else if (phase < 75) {
-        snprintf(moon_buff, sizeof(moon_buff), "WAN GB");
-      } else if (phase < 88) {
-        snprintf(moon_buff, sizeof(moon_buff), "3RD QT");
-      } else {
-        snprintf(moon_buff, sizeof(moon_buff), "WAN CR");
-      }
-      draw_text_bubble(ctx, text_r, moon_buff, alignment, scl_get_font(SFI_Label));
     }
 
     draw_empty_gauge(ctx, arc_r, start_ang, end_ang, inner_w);
@@ -692,9 +676,33 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
     );
     graphics_context_set_antialiased(ctx, true);
 
+    const int phase = app_state->moon_phase;
     const int moon_ang = ((end_ang - start_ang) * phase) / 100;
     const GColor color = phase > 43 && phase < 57 ? GColorBlack : GColorWhite;
     draw_gauge_dot(ctx, center, start_ang + moon_ang, color);
+
+    if (s_tapped) {
+      static char moon_buff[8];
+      if (phase < 13) {
+        snprintf(moon_buff, sizeof(moon_buff), "NEW");
+      } else if (phase < 25) {
+        snprintf(moon_buff, sizeof(moon_buff), "WAX CR");
+      } else if (phase < 38) {
+        snprintf(moon_buff, sizeof(moon_buff), "1ST QT");
+      } else if (phase < 50) {
+        snprintf(moon_buff, sizeof(moon_buff), "WAX GB");
+      } else if (phase < 63) {
+        snprintf(moon_buff, sizeof(moon_buff), "FULL");
+      } else if (phase < 75) {
+        snprintf(moon_buff, sizeof(moon_buff), "WAN GB");
+      } else if (phase < 88) {
+        snprintf(moon_buff, sizeof(moon_buff), "3RD QT");
+      } else {
+        snprintf(moon_buff, sizeof(moon_buff), "WAN CR");
+      }
+      draw_text_bubble(ctx, txt_r, moon_buff, alignment, scl_get_font(SFI_Label));
+    }
+    return;
   }
 }
 
