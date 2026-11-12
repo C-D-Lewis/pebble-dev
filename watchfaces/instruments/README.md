@@ -1,6 +1,6 @@
 # Instruments
 
-Purpose-built Pebble Round 2 watchface showing concise time, date, weather, with a choice of four configurable complication slots. The focus is on readability and usefulness.
+Purpose-built Pebble Round 2 watchface showing concise time, date, weather, with a choice of up to 6 configurable complication slots. The focus is on readability and usefulness.
 
 Features include:
 
@@ -9,7 +9,8 @@ Features include:
 - Clear date display.
 - Current weather conditions and temperature.
 - Choice of color theme for time dial.
-- Four complication slots capable of displaying any available complication.
+- Up to 6 complication slots capable of displaying any available complication.
+- Shake to see current time larger and complication current values.
 
 Available complications:
 
@@ -19,9 +20,10 @@ Available complications:
 - Next 6 hours weather conditions.
 - Next 6 hours rain chance.
 - Current temperature on the daily low/high range.
+- Moon phase.
+- Daily UX maximum index.
 - Month progress.
 - Year progress.
-- Moon phase.
 - None (empty slot).
 
 Customization options:
@@ -31,3 +33,8 @@ Customization options:
 - Temperature unit (C / F)
 
 Weather data from https://open-meteo.com
+
+## TODO
+
+- [ ] Tides? Need a good source
+- [ ] Custom future date complication

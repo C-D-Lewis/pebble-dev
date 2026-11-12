@@ -10,4 +10,4 @@
 void comm_init(uint32_t inbox, uint32_t outbox);
 void comm_deinit();
 
-void comm_request_weather();
+void comm_request_data();

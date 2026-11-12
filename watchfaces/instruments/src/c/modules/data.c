@@ -5,14 +5,7 @@ static PersistData s_persist_data;
 
 void data_init() {
   // Default state always
-  s_app_state.current_temp = DATA_EMPTY;
-  s_app_state.current_code = DATA_EMPTY;
-  s_app_state.temp_low = DATA_EMPTY;
-  s_app_state.temp_high = DATA_EMPTY;
-  s_app_state.phone_battery = DATA_EMPTY;
-  s_app_state.month_progress = DATA_EMPTY;
-  s_app_state.year_progress = DATA_EMPTY;
-  s_app_state.moon_phase = DATA_EMPTY;
+  data_reset_app_state();
 
   // Read existing data if it exists
   if (persist_exists(SK_PersistData)) {
@@ -53,17 +46,27 @@ void data_init() {
 #ifdef TEST
   snprintf(s_persist_data.theme, sizeof(s_persist_data.theme), "%s", THEME_PURPLE);
   snprintf(s_persist_data.slot_1, sizeof(s_persist_data.slot_1), "%s", COMP_BATTERY);
-  snprintf(s_persist_data.slot_2, sizeof(s_persist_data.slot_2), "%s", COMP_NEXT_RAIN);
-  snprintf(s_persist_data.slot_3, sizeof(s_persist_data.slot_3), "%s", COMP_TEMP_RANGE);
-  snprintf(s_persist_data.slot_4, sizeof(s_persist_data.slot_4), "%s", COMP_NEXT_WEATHER);
-  snprintf(s_persist_data.slot_5, sizeof(s_persist_data.slot_5), "%s", COMP_MOON_PHASE);
-  snprintf(s_persist_data.slot_6, sizeof(s_persist_data.slot_6), "%s", COMP_MONTH_PROGRESS);
+  snprintf(s_persist_data.slot_2, sizeof(s_persist_data.slot_2), "%s", COMP_MONTH_PROGRESS);
+  snprintf(s_persist_data.slot_3, sizeof(s_persist_data.slot_3), "%s", COMP_YEAR_PROGRESS);
+  snprintf(s_persist_data.slot_4, sizeof(s_persist_data.slot_4), "%s", COMP_UV_INDEX_MAX);
+  snprintf(s_persist_data.slot_5, sizeof(s_persist_data.slot_5), "%s", COMP_NEXT_RAIN);
+  snprintf(s_persist_data.slot_6, sizeof(s_persist_data.slot_6), "%s", COMP_NEXT_WEATHER);
   snprintf(s_persist_data.step_goal, sizeof(s_persist_data.step_goal), "%s", STEP_GOAL_10000);
 #endif
 }
 
 void data_deinit() {
   persist_write_data(SK_PersistData, &s_persist_data, sizeof(PersistData));
+}
+
+void data_reset_app_state() {
+  s_app_state.current_temp = DATA_EMPTY;
+  s_app_state.current_code = DATA_EMPTY;
+  s_app_state.temp_low = DATA_EMPTY;
+  s_app_state.temp_high = DATA_EMPTY;
+  s_app_state.moon_phase = DATA_EMPTY;
+  s_app_state.uv_index_max = DATA_EMPTY;
+  s_app_state.phone_battery = DATA_EMPTY;
 }
 
 /***************************** Getters / setters ******************************/

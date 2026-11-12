@@ -16,9 +16,10 @@ const SLOT_OPTIONS = [
   { label: 'Next 6hrs rain', value: 'NEXT_RAIN' },
   { label: 'Next 6hrs weather', value: 'NEXT_WEATHER' },
   { label: 'Temperature range', value: 'TEMP_RANGE' },
+  { label: 'Moon phase', value: 'MOON_PHASE' },
+  { label: 'UV index (max)', value: 'UV_INDEX_MAX' },
   { label: 'Month progress', value: 'MONTH_PROGRESS' },
   { label: 'Year progress', value: 'YEAR_PROGRESS' },
-  { label: 'Moon phase', value: 'MOON_PHASE' },
 ];
 
 const config = [

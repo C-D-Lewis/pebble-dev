@@ -17,10 +17,9 @@ typedef struct {
   char code_arr[STR_ARR_SIZE];
   int temp_low;
   int temp_high;
-  int phone_battery;
-  int month_progress;
-  int year_progress;
   int moon_phase;
+  int uv_index_max;
+  int phone_battery;
 } AppState;
 
 typedef struct {
@@ -37,6 +36,8 @@ typedef struct {
 
 void data_init();
 void data_deinit();
+
+void data_reset_app_state();
 
 AppState* data_get_app_state();
 PersistData* data_get_persist_data();

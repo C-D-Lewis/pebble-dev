@@ -106,15 +106,15 @@ static void draw_date_and_time_display(GContext *ctx, GRect bounds, struct tm *t
 }
 
 static void draw_weather(GContext *ctx, GRect bounds) {
-  AppState *app_state = data_get_app_state();
-
   if (s_tapped) return;
+
+  AppState *app_state = data_get_app_state();
 
   // Weather icon
   graphics_draw_bitmap_in_rect(
     ctx,
     s_weather_bitmap,
-    GRect(scl_x(230), scl_y(450), ICON_SIZE, ICON_SIZE)
+    GRect(scl_x(240), scl_y(450), ICON_SIZE, ICON_SIZE)
   );
 
   // Temperature
@@ -131,7 +131,7 @@ static void draw_weather(GContext *ctx, GRect bounds) {
     ctx,
     temp_buff,
     scl_get_font(SFI_Weather),
-    GRect(scl_x(345), scl_y(450), 30, 100),
+    GRect(scl_x(355), scl_y(450), 30, 100),
     GTextOverflowModeWordWrap,
     GTextAlignmentLeft,
     NULL
@@ -139,7 +139,7 @@ static void draw_weather(GContext *ctx, GRect bounds) {
 }
 
 static void draw_decorations(GContext *ctx, GRect bounds, GPoint center) {
-  // Outer day arc
+  // Day arcs
   graphics_context_set_stroke_color(ctx, GColorWhite);
   graphics_context_set_stroke_width(ctx, OUTER_RING_W);
   graphics_draw_arc(
@@ -149,12 +149,19 @@ static void draw_decorations(GContext *ctx, GRect bounds, GPoint center) {
     0,
     TRIG_MAX_ANGLE
   );
+  graphics_draw_arc(
+    ctx,
+    grect_inset(bounds, GEdgeInsets(OUTER_RING_INSET + HOUR_DOT_RING_W + OUTER_RING_W / 2)),
+    GOvalScaleModeFitCircle,
+    0,
+    TRIG_MAX_ANGLE
+  );
 
-  // Straight line representing midnight and ligher one for midday
+  // Straight line representing midnight and ligher one for mid-day
   graphics_context_set_stroke_color(ctx, GColorDarkGray);
   graphics_context_set_stroke_width(ctx, 2);
   const int eod_ang = DEG_TO_TRIGANGLE(180);
-  const int hand_r = center.x - OUTER_RING_INSET - HOUR_DOT_RING_W;
+  const int hand_r = center.x - OUTER_RING_INSET - HOUR_DOT_RING_W - OUTER_RING_W;
   GPoint eod_hand_start = util_make_hand_point(eod_ang, TRIG_MAX_ANGLE, hand_r, center);
   GPoint eod_hand_end = util_make_hand_point(eod_ang, TRIG_MAX_ANGLE, hand_r - 10, center);
   graphics_draw_line(ctx, eod_hand_start, eod_hand_end);
@@ -294,7 +301,6 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
   // Slots are 0-3, clockwise from top
   const int start_ang = (gap_ang / 2) + (slot * slot_l_ang) + (slot * gap_ang);
   const int end_ang = start_ang + slot_l_ang;
-  const bool is_lhs = start_ang > TRIG_MAX_ANGLE / 2;
   const GTextAlignment alignment = GTextAlignmentCenter;
 
   // Place the label at the arc midpoint
@@ -307,7 +313,7 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
     center
   );
   // Slightly longer
-  if (is_next_weather || is_phone_battery) {
+  if (is_next_weather) {
     txt_r.size.w += scl_x(70);
   }
 
@@ -370,7 +376,7 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
         BatteryChargeState charge_state = battery_state_service_peek();
         snprintf(batt_buff, sizeof(batt_buff), "%d%%", charge_state.charge_percent);
       } else if (is_phone_battery) {
-        snprintf(batt_buff, sizeof(batt_buff), "%d%% (P)", app_state->phone_battery);
+        snprintf(batt_buff, sizeof(batt_buff), "P: %d%%", app_state->phone_battery);
       }
       draw_text_bubble(ctx, txt_r, batt_buff, alignment, scl_get_font(SFI_Label));
     }
@@ -421,11 +427,11 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
 
     draw_empty_gauge(ctx, arc_r, start_ang, end_ang, inner_w);
 
-    // Fill ends
+    // Fill ends - offsets for cleaner drawing
     graphics_context_set_antialiased(ctx, false);
     graphics_context_set_stroke_width(ctx, inner_w);
     graphics_context_set_stroke_color(ctx, COLOR_COMPLICATION);
-    graphics_draw_arc(ctx, arc_r, GOvalScaleModeFitCircle, start_ang, end_ang);
+    graphics_draw_arc(ctx, arc_r, GOvalScaleModeFitCircle, start_ang - 50, end_ang + 50);
     graphics_context_set_antialiased(ctx, true);
 
     // Each of six hourly items
@@ -441,7 +447,7 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
       }
 
       const int item_ang = start_ang + (i * fc_item_l);
-      const GRect item_r = grect_inset(bounds, GEdgeInsets(2 * OUTER_RING_W));
+      const GRect item_r = grect_inset(bounds, GEdgeInsets((2 * OUTER_RING_W) + 1));
       graphics_context_set_fill_color(ctx, color);
       graphics_fill_radial(
         ctx,
@@ -564,18 +570,16 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
   }
 
   if (is_month_prog || is_year_prog) {
-    if (app_state->month_progress == DATA_EMPTY) {
-      draw_empty_complication(ctx, arc_r, start_ang, end_ang);
-      return;
-    }
-
     draw_empty_gauge(ctx, arc_r, start_ang, end_ang, inner_w);
+
+    const int month_progress = util_get_month_progress();
+    const int year_progress = util_get_year_progress();
 
     int ang;
     if (is_year_prog) {
-      ang = ((end_ang - start_ang) * app_state->year_progress) / 100;
+      ang = ((end_ang - start_ang) * year_progress) / 100;
     } else {
-      ang = ((end_ang - start_ang) * app_state->month_progress) / 100;
+      ang = ((end_ang - start_ang) * month_progress) / 100;
     }
     graphics_context_set_stroke_color(ctx, is_month_prog ? COLOR_MONTH_PROGRESS : COLOR_YEAR_PROGRESS);
     graphics_context_set_stroke_width(ctx, inner_w);
@@ -584,13 +588,13 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
     draw_gauge_dot(ctx, center, start_ang + ang, GColorWhite);
 
     if (s_tapped) {
-      static char month_buff[8];
+      static char y_m_buff[8];
       if (is_year_prog) {
-        snprintf(month_buff, sizeof(month_buff), "%d%%", app_state->year_progress);
+        snprintf(y_m_buff, sizeof(y_m_buff), "%d%%", year_progress);
       } else {
-        snprintf(month_buff, sizeof(month_buff), "%d%%", app_state->month_progress);
+        snprintf(y_m_buff, sizeof(y_m_buff), "%d%%", month_progress);
       }
-      draw_text_bubble(ctx, txt_r, month_buff, alignment, scl_get_font(SFI_Label));
+      draw_text_bubble(ctx, txt_r, y_m_buff, alignment, scl_get_font(SFI_Label));
     }
     return;
   }
@@ -704,6 +708,30 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
     }
     return;
   }
+
+  if (strcmp(type, COMP_UV_INDEX_MAX) == 0) {
+    if (app_state->uv_index_max == DATA_EMPTY) {
+      draw_empty_complication(ctx, arc_r, start_ang, end_ang);
+      return;
+    }
+    
+    draw_empty_gauge(ctx, arc_r, start_ang, end_ang, inner_w);
+
+    const int uv_index_max = app_state->uv_index_max;
+    const int step_ang = ((end_ang - start_ang) * uv_index_max) / MAX_UV_INDEX;
+    graphics_context_set_stroke_color(ctx, COLOR_UV_INDEX_MAX);
+    graphics_context_set_stroke_width(ctx, inner_w);
+    graphics_draw_arc(ctx, arc_r, GOvalScaleModeFitCircle, start_ang, start_ang + step_ang);
+
+    draw_gauge_dot(ctx, center, start_ang + step_ang, GColorWhite);
+
+    if (s_tapped) {
+      static char step_buff[8];
+      snprintf(step_buff, sizeof(step_buff), "UV: %d", uv_index_max);
+      draw_text_bubble(ctx, txt_r, step_buff, alignment, scl_get_font(SFI_Label));
+    }
+    return;
+  }
 }
 
 static void canvas_update_proc(Layer *layer, GContext *ctx) {
@@ -777,7 +805,7 @@ static void tick_handler(struct tm *tick_time, TimeUnits changed) {
     // Retry weather every ten minutes
     (tick_time->tm_min % 10 == 0 && tick_time->tm_sec == 0 && !data_is_weather_valid())
   ) {
-    comm_request_weather();
+    comm_request_data();
   }
 
   update_step_count();

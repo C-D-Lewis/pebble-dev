@@ -4,6 +4,11 @@ static void inbox_received_handler(DictionaryIterator *iter, void *context) {
   PersistData *persist_data = data_get_persist_data();
   AppState *app_state = data_get_app_state();
 
+  // Ready
+  if (packet_contains_key(iter, MESSAGE_KEY_READY)) {
+    comm_request_data();
+  }
+
   // Weather
   if (packet_contains_key(iter, MESSAGE_KEY_CURRENT_TEMP)) {
     app_state->current_temp = packet_get_integer(iter, MESSAGE_KEY_CURRENT_TEMP);
@@ -47,11 +52,8 @@ static void inbox_received_handler(DictionaryIterator *iter, void *context) {
   if (packet_contains_key(iter, MESSAGE_KEY_TEMP_HIGH)) {
     app_state->temp_high = packet_get_integer(iter, MESSAGE_KEY_TEMP_HIGH);
   }
-  if (packet_contains_key(iter, MESSAGE_KEY_MONTH_PROGRESS)) {
-    app_state->month_progress = packet_get_integer(iter, MESSAGE_KEY_MONTH_PROGRESS);
-  }
-  if (packet_contains_key(iter, MESSAGE_KEY_YEAR_PROGRESS)) {
-    app_state->year_progress = packet_get_integer(iter, MESSAGE_KEY_YEAR_PROGRESS);
+  if (packet_contains_key(iter, MESSAGE_KEY_UV_INDEX_MAX)) {
+    app_state->uv_index_max = packet_get_integer(iter, MESSAGE_KEY_UV_INDEX_MAX);
   }
   if (packet_contains_key(iter, MESSAGE_KEY_MOON_PHASE)) {
     app_state->moon_phase = packet_get_integer(iter, MESSAGE_KEY_MOON_PHASE);
@@ -131,7 +133,7 @@ static void inbox_received_handler(DictionaryIterator *iter, void *context) {
     );
   }
 
-  // Other
+  // Other data
   if (packet_contains_key(iter, MESSAGE_KEY_PHONE_BATTERY)) {
     app_state->phone_battery = packet_get_integer(iter, MESSAGE_KEY_PHONE_BATTERY);
   }
@@ -142,14 +144,19 @@ static void inbox_received_handler(DictionaryIterator *iter, void *context) {
   main_window_reload();
 }
 
-void comm_request_weather() {
-  AppState *app_state = data_get_app_state();
+void comm_request_data() {
+  PersistData *persist_data = data_get_persist_data();
 
-  app_state->current_temp = DATA_EMPTY;
-  app_state->current_code = DATA_EMPTY;
+  data_reset_app_state();
 
   if (packet_begin()) {
     packet_put_integer(MESSAGE_KEY_REQUEST_WEATHER, 1);
+    packet_put_string(MESSAGE_KEY_REQUEST_SLOT_1, persist_data->slot_1);
+    packet_put_string(MESSAGE_KEY_REQUEST_SLOT_2, persist_data->slot_2);
+    packet_put_string(MESSAGE_KEY_REQUEST_SLOT_3, persist_data->slot_3);
+    packet_put_string(MESSAGE_KEY_REQUEST_SLOT_4, persist_data->slot_4);
+    packet_put_string(MESSAGE_KEY_REQUEST_SLOT_5, persist_data->slot_5);
+    packet_put_string(MESSAGE_KEY_REQUEST_SLOT_6, persist_data->slot_6);
     packet_send(NULL);
   }
 }

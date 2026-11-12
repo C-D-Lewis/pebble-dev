@@ -8,6 +8,7 @@ export type WeatherApiResponse = {
     sunrise: string[];
     sunset: string[];
     moon_phase: number[];
+    uv_index_max: number[];
   };
   hourly: {
     precipitation_probability: number[];
@@ -15,6 +16,10 @@ export type WeatherApiResponse = {
     temperature_2m: number[];
   };
 };
+
+export type MarineApiResponse = {
+  
+}
 
 // Stub navigator battery API
 declare global {
