@@ -46,7 +46,7 @@ void data_init() {
 #ifdef TEST
   snprintf(s_persist_data.theme, sizeof(s_persist_data.theme), "%s", THEME_PURPLE);
   snprintf(s_persist_data.slot_1, sizeof(s_persist_data.slot_1), "%s", COMP_BATTERY);
-  snprintf(s_persist_data.slot_2, sizeof(s_persist_data.slot_2), "%s", COMP_MONTH_PROGRESS);
+  snprintf(s_persist_data.slot_2, sizeof(s_persist_data.slot_2), "%s", COMP_STEP_COUNT);
   snprintf(s_persist_data.slot_3, sizeof(s_persist_data.slot_3), "%s", COMP_YEAR_PROGRESS);
   snprintf(s_persist_data.slot_4, sizeof(s_persist_data.slot_4), "%s", COMP_UV_INDEX_MAX);
   snprintf(s_persist_data.slot_5, sizeof(s_persist_data.slot_5), "%s", COMP_NEXT_RAIN);
