@@ -5,11 +5,20 @@ static PersistData s_persist_data;
 
 void data_init() {
   // Default state always
-  data_reset_app_state();
+  s_app_state.data_updated = false;
 
   // Read existing data if it exists
   if (persist_exists(SK_PersistData)) {
     persist_read_data(SK_PersistData, &s_persist_data, sizeof(PersistData));
+  } else {
+    // Set default values
+    s_persist_data.current_temp = DATA_EMPTY;
+    s_persist_data.current_code = DATA_EMPTY;
+    s_persist_data.temp_low = DATA_EMPTY;
+    s_persist_data.temp_high = DATA_EMPTY;
+    s_persist_data.moon_phase = DATA_EMPTY;
+    s_persist_data.uv_index_max = DATA_EMPTY;
+    s_persist_data.phone_battery = DATA_EMPTY;
   }
 
   // Defaults - if unset or newly added
@@ -57,16 +66,6 @@ void data_init() {
 
 void data_deinit() {
   persist_write_data(SK_PersistData, &s_persist_data, sizeof(PersistData));
-}
-
-void data_reset_app_state() {
-  s_app_state.current_temp = DATA_EMPTY;
-  s_app_state.current_code = DATA_EMPTY;
-  s_app_state.temp_low = DATA_EMPTY;
-  s_app_state.temp_high = DATA_EMPTY;
-  s_app_state.moon_phase = DATA_EMPTY;
-  s_app_state.uv_index_max = DATA_EMPTY;
-  s_app_state.phone_battery = DATA_EMPTY;
 }
 
 /***************************** Getters / setters ******************************/
@@ -177,7 +176,7 @@ GColor data_get_weather_color(int code) {
 };
 
 uint32_t data_get_weather_icon_id() {
-  switch (s_app_state.current_code) {
+  switch (s_persist_data.current_code) {
     case 0:
     case 1: { // Mainly clear
       time_t temp = time(NULL);
@@ -286,7 +285,7 @@ int data_get_strarr_value(char *arr, int hour) {
 }
 
 bool data_is_weather_valid() {
-  return s_app_state.current_code != DATA_EMPTY && s_app_state.current_code != DATA_ERROR;
+  return s_persist_data.current_code != DATA_EMPTY && s_persist_data.current_code != DATA_ERROR;
 }
 
 int data_get_complication_count() {

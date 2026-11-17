@@ -28,6 +28,7 @@
 #define DATA_ERROR 1000
 
 // Enums
+// Complication values - max 16 chars
 #define COMP_NONE "NONE"
 #define COMP_BATTERY "BATTERY"
 #define COMP_STEP_COUNT "STEP_COUNT"

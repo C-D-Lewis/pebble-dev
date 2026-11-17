@@ -7,7 +7,9 @@ interface ClayConstructor {
   new(config: object[]): Clay;
 };
 
-/** Options for complication slots */
+/**
+ * Options for complication slots - 'value' max 16 chars
+ */
 const SLOT_OPTIONS = [
   { label: 'None', value: 'NONE' },
   { label: 'Watch battery', value: 'BATTERY' },

@@ -7,56 +7,57 @@ static void inbox_received_handler(DictionaryIterator *iter, void *context) {
   // Ready
   if (packet_contains_key(iter, MESSAGE_KEY_READY)) {
     comm_request_data();
+    return;
   }
 
   // Weather
   if (packet_contains_key(iter, MESSAGE_KEY_CURRENT_TEMP)) {
-    app_state->current_temp = packet_get_integer(iter, MESSAGE_KEY_CURRENT_TEMP);
+    persist_data->current_temp = packet_get_integer(iter, MESSAGE_KEY_CURRENT_TEMP);
   }
   if (packet_contains_key(iter, MESSAGE_KEY_CURRENT_CODE)) {
-    app_state->current_code = packet_get_integer(iter, MESSAGE_KEY_CURRENT_CODE);
+    persist_data->current_code = packet_get_integer(iter, MESSAGE_KEY_CURRENT_CODE);
   }
   if (packet_contains_key(iter, MESSAGE_KEY_SUNRISE)) {
-    snprintf(app_state->sunrise,
-      sizeof(app_state->sunrise),
+    snprintf(persist_data->sunrise,
+      sizeof(persist_data->sunrise),
       "%s",
       packet_get_string(iter, MESSAGE_KEY_SUNRISE)
     );
   }
   if (packet_contains_key(iter, MESSAGE_KEY_SUNSET)) {
-    snprintf(app_state->sunset,
-      sizeof(app_state->sunset),
+    snprintf(persist_data->sunset,
+      sizeof(persist_data->sunset),
       "%s",
       packet_get_string(iter, MESSAGE_KEY_SUNSET)
     );
   }
   if (packet_contains_key(iter, MESSAGE_KEY_PRECIP_ARR)) {
     snprintf(
-      app_state->precip_arr,
-      sizeof(app_state->precip_arr),
+      persist_data->precip_arr,
+      sizeof(persist_data->precip_arr),
       "%s",
       packet_get_string(iter, MESSAGE_KEY_PRECIP_ARR)
     );
   }
   if (packet_contains_key(iter, MESSAGE_KEY_CODE_ARR)) {
     snprintf(
-      app_state->code_arr,
-      sizeof(app_state->code_arr),
+      persist_data->code_arr,
+      sizeof(persist_data->code_arr),
       "%s",
       packet_get_string(iter, MESSAGE_KEY_CODE_ARR)
     );
   }
   if (packet_contains_key(iter, MESSAGE_KEY_TEMP_LOW)) {
-    app_state->temp_low = packet_get_integer(iter, MESSAGE_KEY_TEMP_LOW);
+    persist_data->temp_low = packet_get_integer(iter, MESSAGE_KEY_TEMP_LOW);
   }
   if (packet_contains_key(iter, MESSAGE_KEY_TEMP_HIGH)) {
-    app_state->temp_high = packet_get_integer(iter, MESSAGE_KEY_TEMP_HIGH);
+    persist_data->temp_high = packet_get_integer(iter, MESSAGE_KEY_TEMP_HIGH);
   }
   if (packet_contains_key(iter, MESSAGE_KEY_UV_INDEX_MAX)) {
-    app_state->uv_index_max = packet_get_integer(iter, MESSAGE_KEY_UV_INDEX_MAX);
+    persist_data->uv_index_max = packet_get_integer(iter, MESSAGE_KEY_UV_INDEX_MAX);
   }
   if (packet_contains_key(iter, MESSAGE_KEY_MOON_PHASE)) {
-    app_state->moon_phase = packet_get_integer(iter, MESSAGE_KEY_MOON_PHASE);
+    persist_data->moon_phase = packet_get_integer(iter, MESSAGE_KEY_MOON_PHASE);
   }
 
   // Config
@@ -135,19 +136,18 @@ static void inbox_received_handler(DictionaryIterator *iter, void *context) {
 
   // Other data
   if (packet_contains_key(iter, MESSAGE_KEY_PHONE_BATTERY)) {
-    app_state->phone_battery = packet_get_integer(iter, MESSAGE_KEY_PHONE_BATTERY);
+    persist_data->phone_battery = packet_get_integer(iter, MESSAGE_KEY_PHONE_BATTERY);
   }
   if (packet_contains_key(iter, MESSAGE_KEY_DATA_ERROR)) {
-    app_state->current_code = DATA_ERROR;
+    persist_data->current_code = DATA_ERROR;
   }
 
+  app_state->data_updated = true;
   main_window_reload();
 }
 
 void comm_request_data() {
   PersistData *persist_data = data_get_persist_data();
-
-  data_reset_app_state();
 
   if (packet_begin()) {
     packet_put_integer(MESSAGE_KEY_REQUEST_WEATHER, 1);

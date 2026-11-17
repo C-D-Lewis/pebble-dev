@@ -9,6 +9,21 @@ typedef enum {
 } StorageKeys;
 
 typedef struct {
+  bool data_updated;
+} AppState;
+
+// DO NOT MODIFY ORDER OR DIMENSIONS
+typedef struct {
+  char temp_unit[4];  // C or F
+  char theme[8];      // BLUE, RED, etc.
+  char slot_1[16];    // Complication slot 1
+  char slot_2[16];    // Complication slot 2
+  char slot_3[16];    // Complication slot 3
+  char slot_4[16];    // Complication slot 4
+  char slot_5[16];    // Complication slot 5
+  char slot_6[16];    // Complication slot 6
+  char step_goal[8];  // Steps goal
+
   int current_temp;
   int current_code;
   char sunrise[8];
@@ -20,24 +35,10 @@ typedef struct {
   int moon_phase;
   int uv_index_max;
   int phone_battery;
-} AppState;
-
-typedef struct {
-  char temp_unit[4];  // C or F
-  char theme[8];      // BLUE, RED, etc.
-  char slot_1[16];    // Complication slot 1
-  char slot_2[16];    // Complication slot 2
-  char slot_3[16];    // Complication slot 3
-  char slot_4[16];    // Complication slot 4
-  char slot_5[16];    // Complication slot 5
-  char slot_6[16];    // Complication slot 6
-  char step_goal[8];  // Steps goal
 } PersistData;
 
 void data_init();
 void data_deinit();
-
-void data_reset_app_state();
 
 AppState* data_get_app_state();
 PersistData* data_get_persist_data();

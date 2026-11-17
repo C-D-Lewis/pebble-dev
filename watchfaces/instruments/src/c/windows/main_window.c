@@ -108,7 +108,7 @@ static void draw_date_and_time_display(GContext *ctx, GRect bounds, struct tm *t
 static void draw_weather(GContext *ctx, GRect bounds) {
   if (s_tapped) return;
 
-  AppState *app_state = data_get_app_state();
+  PersistData *persist_data = data_get_persist_data();
 
   // Weather icon
   graphics_draw_bitmap_in_rect(
@@ -119,12 +119,12 @@ static void draw_weather(GContext *ctx, GRect bounds) {
 
   // Temperature
   static char temp_buff[8];
-  if (app_state->current_code == DATA_EMPTY) {
+  if (persist_data->current_code == DATA_EMPTY) {
     snprintf(temp_buff, sizeof(temp_buff), " ");
-  } else if (app_state->current_code == DATA_ERROR) {
+  } else if (persist_data->current_code == DATA_ERROR) {
     snprintf(temp_buff, sizeof(temp_buff), "ERR");
   } else {
-    snprintf(temp_buff, sizeof(temp_buff), "%d", util_convert_temp(app_state->current_temp));
+    snprintf(temp_buff, sizeof(temp_buff), "%d", util_convert_temp(persist_data->current_temp));
   }
   graphics_context_set_text_color(ctx, GColorLightGray);
   graphics_draw_text(
@@ -209,22 +209,25 @@ static void draw_center_post(GContext *ctx, GPoint center) {
 }
 
 static void draw_sunrise_and_sunset_ring(GContext *ctx, GRect bounds, GPoint center) {
+  PersistData *persist_data = data_get_persist_data();
   AppState *app_state = data_get_app_state();
 
   if (!data_is_weather_valid()) return;
 
   const GRect arc_r = grect_inset(bounds, GEdgeInsets(OUTER_RING_INSET));
 
-  int s_rise_ang = util_get_time_angle(app_state->sunrise);
-  int s_set_ang = util_get_time_angle(app_state->sunset);
+  int s_rise_ang = util_get_time_angle(persist_data->sunrise);
+  int s_set_ang = util_get_time_angle(persist_data->sunset);
   // Similar adjustment to angle so noon is at the top, not midnight
   s_rise_ang = (s_rise_ang - (2 * (TRIG_MAX_ANGLE / 4))) % TRIG_MAX_ANGLE;
   s_set_ang = (s_set_ang - (2 * (TRIG_MAX_ANGLE / 4))) % TRIG_MAX_ANGLE;
 
+  const bool data_ready = !app_state->data_updated;
+
   // Day and night arc sections
-  graphics_context_set_fill_color(ctx, s_tapped ? GColorDarkGray : data_get_theme_day_color());
+  graphics_context_set_fill_color(ctx, data_ready ? GColorDarkGray : data_get_theme_day_color());
   graphics_fill_radial(ctx, arc_r, GOvalScaleModeFitCircle, HOUR_DOT_RING_W, s_rise_ang, s_set_ang);
-  graphics_context_set_fill_color(ctx, s_tapped ? GColorDarkGray : data_get_theme_night_color());
+  graphics_context_set_fill_color(ctx, data_ready ? GColorDarkGray : data_get_theme_night_color());
   if (s_rise_ang < s_set_ang) {
     s_rise_ang += TRIG_MAX_ANGLE;
   }
@@ -232,7 +235,7 @@ static void draw_sunrise_and_sunset_ring(GContext *ctx, GRect bounds, GPoint cen
 
   // Dawn notch on each border between sunrise and sunset
   const int notch_ang = TRIG_MAX_ANGLE / 256;
-  graphics_context_set_fill_color(ctx, s_tapped ? GColorDarkGray : GColorChromeYellow);
+  graphics_context_set_fill_color(ctx, data_ready ? GColorDarkGray : GColorChromeYellow);
   graphics_fill_radial(
     ctx,
     arc_r,
@@ -282,7 +285,6 @@ static void draw_empty_gauge(GContext *ctx, GRect arc_r, int start_ang, int end_
 }
 
 static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, int slot, char *type) {
-  AppState *app_state = data_get_app_state();
   PersistData *persist_data = data_get_persist_data();
 
   const bool is_next_rain = strcmp(type, COMP_NEXT_RAIN) == 0;
@@ -345,11 +347,8 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
 
   // Fill based on battery/phone battery level
   if (is_battery || is_phone_battery) {
-    if (
-      is_phone_battery && (
-        app_state->phone_battery == DATA_EMPTY || app_state->phone_battery == DATA_ERROR
-      )
-    ) {
+    const int phone_battery = persist_data->phone_battery;
+    if (is_phone_battery && (phone_battery == DATA_EMPTY || phone_battery == DATA_ERROR)) {
       draw_empty_complication(ctx, arc_r, start_ang, end_ang);
       return;
     }
@@ -361,7 +360,7 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
       BatteryChargeState charge_state = battery_state_service_peek();
       percent = charge_state.charge_percent;
     } else if (is_phone_battery) {
-      percent = app_state->phone_battery;
+      percent = phone_battery;
     }
     const int batt_ang = ((end_ang - start_ang) * percent) / 100;
     graphics_context_set_stroke_color(ctx, is_battery ? COLOR_BATTERY : COLOR_PHONE_BATTERY);
@@ -376,7 +375,7 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
         BatteryChargeState charge_state = battery_state_service_peek();
         snprintf(batt_buff, sizeof(batt_buff), "%d%%", charge_state.charge_percent);
       } else if (is_phone_battery) {
-        snprintf(batt_buff, sizeof(batt_buff), "P: %d%%", app_state->phone_battery);
+        snprintf(batt_buff, sizeof(batt_buff), "P: %d%%", persist_data->phone_battery);
       }
       draw_text_bubble(ctx, txt_r, batt_buff, alignment, scl_get_font(SFI_Label));
     }
@@ -438,11 +437,11 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
     for (int i = 0; i < NUM_FORECAST_ITEMS; i++) {
       GColor color = COLOR_ERROR;
       if (is_next_rain) {
-        const int chance = data_get_strarr_value(app_state->precip_arr, i);
+        const int chance = data_get_strarr_value(persist_data->precip_arr, i);
         color = data_get_precip_color(chance);
       }
       if (is_next_weather) {
-        const int code = data_get_strarr_value(app_state->code_arr, i);
+        const int code = data_get_strarr_value(persist_data->code_arr, i);
         color = data_get_weather_color(code);
       }
 
@@ -478,13 +477,13 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
     if (s_tapped) {
       if (is_next_rain) {
         static char rain_buff[8];
-        const int chance = data_get_strarr_value(app_state->precip_arr, forecast_i);
+        const int chance = data_get_strarr_value(persist_data->precip_arr, forecast_i);
         snprintf(rain_buff, sizeof(rain_buff), "%d%%", chance);
         draw_text_bubble(ctx, txt_r, rain_buff, alignment, scl_get_font(SFI_Label));
       }
       if (is_next_weather) {
         static char weather_buff[8];
-        const int code = data_get_strarr_value(app_state->code_arr, forecast_i);
+        const int code = data_get_strarr_value(persist_data->code_arr, forecast_i);
         snprintf(weather_buff, sizeof(weather_buff), "%s", data_get_weather_str(code));
         draw_text_bubble(ctx, txt_r, weather_buff, alignment, scl_get_font(SFI_Label));
       }
@@ -501,12 +500,14 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
     draw_empty_gauge(ctx, arc_r, start_ang, end_ang, inner_w);
 
     // One item for each integer temperature, including both endpoints.
-    if (app_state->temp_high < app_state->temp_low) {
+    const int temp_low = persist_data->temp_low;
+    const int temp_high = persist_data->temp_high;
+    if (temp_high < temp_low) {
       APP_LOG(APP_LOG_LEVEL_ERROR, "High temp below low temp");
       return;
     }
 
-    const int item_count = app_state->temp_high - app_state->temp_low + 1;
+    const int item_count = temp_high - temp_low + 1;
     const int gauge_ang = end_ang - start_ang;
     const int item_s = gauge_ang / item_count;
 
@@ -544,14 +545,14 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
     }
     
     // Stay within scale
-    int temp = app_state->current_temp;
-    if (temp < app_state->temp_low) {
-      temp = app_state->temp_low;
+    int temp = persist_data->current_temp;
+    if (temp < temp_low) {
+      temp = temp_low;
     }
-    if (temp > app_state->temp_high) {
-      temp = app_state->temp_high;
+    if (temp > temp_high) {
+      temp = temp_high;
     }
-    const int item_index = temp - app_state->temp_low;
+    const int item_index = temp - temp_low;
     const int dot_ang = start_ang + (item_index * item_s) + (item_s / 2);
     draw_gauge_dot(ctx, center, dot_ang, GColorWhite);
 
@@ -561,8 +562,8 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
         range_buff,
         sizeof(range_buff),
         "%d-%d",
-        util_convert_temp(app_state->temp_low),
-        util_convert_temp(app_state->temp_high)
+        util_convert_temp(temp_low),
+        util_convert_temp(temp_high)
       );
       draw_text_bubble(ctx, txt_r, range_buff, alignment, scl_get_font(SFI_Label));
     }
@@ -600,7 +601,8 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
   }
 
   if (is_moon_phase) {
-    if (app_state->moon_phase == DATA_EMPTY) {
+    const int moon_phase = persist_data->moon_phase;
+    if (moon_phase == DATA_EMPTY) {
       draw_empty_complication(ctx, arc_r, start_ang, end_ang);
       return;
     }
@@ -680,26 +682,25 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
     );
     graphics_context_set_antialiased(ctx, true);
 
-    const int phase = app_state->moon_phase;
-    const int moon_ang = ((end_ang - start_ang) * phase) / 100;
-    const GColor color = phase > 43 && phase < 57 ? GColorBlack : GColorWhite;
+    const int moon_ang = ((end_ang - start_ang) * moon_phase) / 100;
+    const GColor color = moon_phase > 43 && moon_phase < 57 ? GColorBlack : GColorWhite;
     draw_gauge_dot(ctx, center, start_ang + moon_ang, color);
 
     if (s_tapped) {
       static char moon_buff[8];
-      if (phase < 13) {
+      if (moon_phase < 13) {
         snprintf(moon_buff, sizeof(moon_buff), "NEW");
-      } else if (phase < 25) {
+      } else if (moon_phase < 25) {
         snprintf(moon_buff, sizeof(moon_buff), "WAX CR");
-      } else if (phase < 38) {
+      } else if (moon_phase < 38) {
         snprintf(moon_buff, sizeof(moon_buff), "1ST QT");
-      } else if (phase < 50) {
+      } else if (moon_phase < 50) {
         snprintf(moon_buff, sizeof(moon_buff), "WAX GB");
-      } else if (phase < 63) {
+      } else if (moon_phase < 63) {
         snprintf(moon_buff, sizeof(moon_buff), "FULL");
-      } else if (phase < 75) {
+      } else if (moon_phase < 75) {
         snprintf(moon_buff, sizeof(moon_buff), "WAN GB");
-      } else if (phase < 88) {
+      } else if (moon_phase < 88) {
         snprintf(moon_buff, sizeof(moon_buff), "3RD QT");
       } else {
         snprintf(moon_buff, sizeof(moon_buff), "WAN CR");
@@ -710,14 +711,14 @@ static void draw_arc_complication(GContext *ctx, GRect bounds, GPoint center, in
   }
 
   if (strcmp(type, COMP_UV_INDEX_MAX) == 0) {
-    if (app_state->uv_index_max == DATA_EMPTY) {
+    const int uv_index_max = persist_data->uv_index_max;
+    if (uv_index_max == DATA_EMPTY) {
       draw_empty_complication(ctx, arc_r, start_ang, end_ang);
       return;
     }
     
     draw_empty_gauge(ctx, arc_r, start_ang, end_ang, inner_w);
 
-    const int uv_index_max = app_state->uv_index_max;
     const int step_ang = ((end_ang - start_ang) * uv_index_max) / MAX_UV_INDEX;
     graphics_context_set_stroke_color(ctx, COLOR_UV_INDEX_MAX);
     graphics_context_set_stroke_width(ctx, inner_w);

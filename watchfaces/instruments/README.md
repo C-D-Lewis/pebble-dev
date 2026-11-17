@@ -8,9 +8,10 @@ Features include:
 - Bluetooh connection indicator (middle post).
 - Clear date display.
 - Current weather conditions and temperature.
-- Choice of color theme for time dial.
+- Choice of color theme for sunrise/sunset dial (when data is not stale).
 - Up to 6 complication slots capable of displaying any available complication.
 - Shake to see current time larger and complication current values.
+- Caching of recent data.
 
 Available complications:
 
