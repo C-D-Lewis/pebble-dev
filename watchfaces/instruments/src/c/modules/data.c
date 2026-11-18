@@ -62,6 +62,8 @@ void data_init() {
   snprintf(s_persist_data.slot_6, sizeof(s_persist_data.slot_6), "%s", COMP_NEXT_WEATHER);
   snprintf(s_persist_data.step_goal, sizeof(s_persist_data.step_goal), "%s", STEP_GOAL_10000);
 #endif
+
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "PersistData size: %d", (int)sizeof(PersistData));
 }
 
 void data_deinit() {

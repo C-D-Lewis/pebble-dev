@@ -222,12 +222,12 @@ static void draw_sunrise_and_sunset_ring(GContext *ctx, GRect bounds, GPoint cen
   s_rise_ang = (s_rise_ang - (2 * (TRIG_MAX_ANGLE / 4))) % TRIG_MAX_ANGLE;
   s_set_ang = (s_set_ang - (2 * (TRIG_MAX_ANGLE / 4))) % TRIG_MAX_ANGLE;
 
-  const bool data_ready = !app_state->data_updated;
+  const bool data_stale = !app_state->data_updated;
 
   // Day and night arc sections
-  graphics_context_set_fill_color(ctx, data_ready ? GColorDarkGray : data_get_theme_day_color());
+  graphics_context_set_fill_color(ctx, data_stale ? GColorDarkGray : data_get_theme_day_color());
   graphics_fill_radial(ctx, arc_r, GOvalScaleModeFitCircle, HOUR_DOT_RING_W, s_rise_ang, s_set_ang);
-  graphics_context_set_fill_color(ctx, data_ready ? GColorDarkGray : data_get_theme_night_color());
+  graphics_context_set_fill_color(ctx, data_stale ? GColorDarkGray : data_get_theme_night_color());
   if (s_rise_ang < s_set_ang) {
     s_rise_ang += TRIG_MAX_ANGLE;
   }
@@ -235,7 +235,7 @@ static void draw_sunrise_and_sunset_ring(GContext *ctx, GRect bounds, GPoint cen
 
   // Dawn notch on each border between sunrise and sunset
   const int notch_ang = TRIG_MAX_ANGLE / 256;
-  graphics_context_set_fill_color(ctx, data_ready ? GColorDarkGray : GColorChromeYellow);
+  graphics_context_set_fill_color(ctx, data_stale ? GColorDarkGray : GColorChromeYellow);
   graphics_fill_radial(
     ctx,
     arc_r,
