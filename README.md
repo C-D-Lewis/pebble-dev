@@ -25,7 +25,7 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `cmd-time-typed`      | ![](watchfaces/cmd-time-typed/screenshots/diorite.png)     | `A - E`             | ✅    | [pbw](pbw/cmd-time-typed.pbw)      |
 | `cmd-time`            | ![](watchfaces/cmd-time/screenshots/diorite.png)           | `A - E`             | ✅    | [pbw](pbw/cmd-time.pbw)            |
 | `dayring`             | ![](watchfaces/dayring/screenshots/basalt.png)             | `A - G`             |      | [pbw](pbw/dayring.pbw)             |
-| `deep-rock`           | ![](watchfaces/deep-rock/screenshots/basalt.png)           | `A` `B` `D` `E` `F` |      | [pbw](pbw/deep-rock.pbw)           |
+| `deep-rock`           | ![](watchfaces/deep-rock/screenshots/emery.png)            | `A` `B` `D` `E` `F` |      | [pbw](pbw/deep-rock.pbw)           |
 | `dont-panic`          | ![](watchfaces/dont-panic/screenshots/emery.png)           | `B` `C` `E` `G`     |      | [pbw](pbw/dont-panic.pbw)          |
 | `dual-gauge`          | ![](watchfaces/dual-gauge/screenshots/basalt.png)          | `A - D`             |      | [pbw](pbw/dual-gauge.pbw)          |
 | `eclipse`             | ![](watchfaces/eclipse/screenshots/aplite.png)             | `A` `B` `D`         |      | [pbw](pbw/eclipse.pbw)             |
@@ -47,7 +47,7 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `starfield-smooth`    | ![](watchfaces/starfield-smooth/screenshots/aplite.png)    | `A - C`             | ✅    | [pbw](pbw/starfield-smooth.pbw)    |
 | `thin`                | ![](watchfaces/thin/screenshots/basalt.png)                | `A - G`             | ✅    | [pbw](pbw/thin.pbw)                |
 | `time-dots-appstore`  | ![](watchfaces/time-dots-appstore/screenshots/basalt1.png) | `A - G`             |      | [pbw](pbw/time-dots-appstore.pbw)  |
-| `void-statues`        | ![](watchfaces/void-statues/screenshots/basalt.png)        | `A - G`             |      | [pbw](pbw/void-statues.pbw)        |
+| `void-statues`        | ![](watchfaces/void-statues/screenshots/emery.png)         | `A - G`             |      | [pbw](pbw/void-statues.pbw)        |
 
 
 ## `watchapps`
@@ -57,9 +57,9 @@ Some PBWs can be found in `/pbw` for sideloading.
 | `block-world`    | ![](watchapps/block-world/screenshots/basalt.png)       | `B` `C` `E` |      | [pbw](pbw/block-world.pbw)    |
 | `dashboard`      | ![](watchapps/dashboard/assets/screenshots/basalt1.png) | `A - D`     | ✅    | [pbw](pbw/dashboard.pbw)      |
 | `dashboard2`     | ![](watchapps/dashboard2/screenshots/emery.png)         | `A - G`     | ✅    | [pbw](pbw/dashboard2.pbw)     |
-| `muninn`         | ![](watchapps/muninn/screenshots/basalt.png)            | `A - G`     | ✅    | [pbw](pbw/muninn.pbw)         |
-| `news-headlines` | ![](watchapps/news-headlines/screenshots/basalt.png)    | `A - G`     | ✅    | [pbw](pbw/news-headlines.pbw) |
-| `tube-status`    | ![](watchapps/tube-status/screenshots/basalt.png)       | `A - G`     | ✅    | [pbw](pbw/tube-status.pbw)    |
+| `muninn`         | ![](watchapps/muninn/screenshots/emery.png)             | `A - G`     | ✅    | [pbw](pbw/muninn.pbw)         |
+| `news-headlines` | ![](watchapps/news-headlines/screenshots/emery.png)     | `A - G`     | ✅    | [pbw](pbw/news-headlines.pbw) |
+| `tube-status`    | ![](watchapps/tube-status/screenshots/emery.png)        | `A - G`     | ✅    | [pbw](pbw/tube-status.pbw)    |
 
 ## `libraries`
 
