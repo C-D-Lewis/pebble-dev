@@ -83,7 +83,7 @@ The response will look something like this:
 
 > Currently `instanceId` is not used, but could be in the future.
 
-```
+```json
 [{
   "instanceId": "0",
   "properties": {
@@ -96,7 +96,6 @@ The response will look something like this:
   }
 }]
 ```
-
 
 ## Backend
 
