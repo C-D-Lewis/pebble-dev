@@ -20,3 +20,5 @@ function.zip
 
 coverage
 .nyc_output
+
+.vscode

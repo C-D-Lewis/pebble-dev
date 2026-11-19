@@ -9,11 +9,12 @@ import { HistoryItem } from '../types';
 import { ensureUploadId } from './upload';
 import { buildHistoryKey } from './util';
 import { loadHistory, saveHistory } from './history';
+import { savePluginStats } from './plugin';
 
 /**
  * Send the watch the last seen timestamp so updates can be incremental.
  */
-export const handleGetSyncInfo = async () => {
+export const handleGetSyncInfo = async (dict: Record<string, any>) => {
   const history = loadHistory();
   // console.log(JSON.stringify(history));
 
@@ -22,20 +23,36 @@ export const handleGetSyncInfo = async () => {
     lastTs = history[0].timestamp;
   }
 
-  const now = new Date().getTime();
   const uploadId = await ensureUploadId();
+
+  const now = new Date().getTime();
+  const batteryLife = calculateEstimatedBatteryLife(history, now);
+  const allTimeRate = calculateDischargeRate(history);
+  const lastWeekRate = calculateLastWeekRate(history, now);
+  const meanTimeBetweenCharges = calculateMeanTimeBetweenCharges(history);
+
   const res = {
     SYNC_TIMESTAMP: lastTs,
     SYNC_COUNT: history.length,
     STAT_TOTAL_DAYS: Math.floor(history.length / 4),
-    STAT_ALL_TIME_RATE: String(calculateDischargeRate(history)),
-    STAT_LAST_WEEK_RATE: String(calculateLastWeekRate(history, now)),
-    STAT_BATTERY_LIFE: calculateEstimatedBatteryLife(history, now),
-    STAT_MTBC: calculateMeanTimeBetweenCharges(history),
+    STAT_ALL_TIME_RATE: String(allTimeRate),
+    STAT_LAST_WEEK_RATE: String(lastWeekRate),
+    STAT_BATTERY_LIFE: batteryLife,
+    STAT_MTBC: meanTimeBetweenCharges,
     UPLOAD_ID: uploadId,
   };
   console.log(JSON.stringify(res));
   await PebbleTS.sendAppMessage(res);
+
+  // Also update the Pebble plugin
+  savePluginStats({
+    daysRemaining: dict.DAYS_REMAINING, // This is sent as part of watchapp response to the ready event
+    batteryLife,
+    allTimeRate,
+    lastWeekRate,
+    meanTimeBetweenCharges,
+    updatedAt: now,
+  });
 };
 
 /**

@@ -151,7 +151,27 @@
       "UPLOAD_ID",
       "UPLOAD_HISTORY",
       "UPLOAD_STATUS"
-    ]
+    ],
+    "plugin": {
+      "description": "Share Muninn calculated battery statistics, if available",
+      "script": "src/pkjs/plugin.js",
+      "sources": [
+        {
+          "category": "muninn",
+          "items": ["stats"],
+          "properties": {
+            "daysRemaining": ["numericValue"],
+            "batteryLife": ["numericValue"],
+            "allTimeRate": ["numericValue"],
+            "lastWeekRate": ["numericValue"],
+            "meanTimeBetweenCharges": ["numericValue"],
+            "updatedAt": ["numericValue"]
+          },
+          "supportsMultiple": false,
+          "suggestedRefreshIntervalSec": 60
+        }
+      ]
+    }
   },
   "dependencies": {
     "pebble-scalable": "^2.2.0"

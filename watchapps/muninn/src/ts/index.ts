@@ -29,7 +29,7 @@ Pebble.addEventListener('appmessage', async (e) => {
 
   try {
     if (dict.PUSH_PIN) await handlePushTimelinePin(dict);
-    if (dict.GET_SYNC_INFO) await handleGetSyncInfo();
+    if (dict.GET_SYNC_INFO) await handleGetSyncInfo(dict);
     if (dict.SYNC_SAMPLE) await handleSync(dict);
     if (dict.SYNC_DELETE) await deleteAll();
     if (dict.UPLOAD_HISTORY) await uploadHistory();

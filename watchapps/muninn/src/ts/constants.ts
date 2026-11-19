@@ -24,3 +24,6 @@ export const MAX_GAP_SECONDS = 12 * SECONDS_PER_HOUR; // 12 hours
 export const TEST_SAMPLE_DATA = false;
 /** Whether to log successful TS tests */
 export const TEST_LOG_OK_TESTS = false;
+
+/** LocalStorage key for plugin stats */
+export const STORAGE_KEY_PLUGIN_STATS = 'PLUGIN_STATS';

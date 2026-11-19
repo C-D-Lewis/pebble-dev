@@ -26,6 +26,7 @@ Features:
 - Upload and view all your data in web config page
 - Set an AppGlance to show estimate in the launcher menu
 - View general battery tips
+- Publishes a plugin with useful battery stats (est. battery life, discharge per day, etc.) on supported devices
 
 Options:
 - Custom low battery threshold notification (50%/20%/10%)
@@ -37,6 +38,65 @@ Options:
 Important notes:
 - If the watch is off at the next sample time, the app must be launched to allow wakeups to be resumed.
 - The initial estimate may be an overestimate but will smooth out soon after.
+
+## Plugin
+
+Installing the Muninn watchapp will also make the Muninn
+[Pebble Plugin](https://developer.repebble.com/guides/plugins/) `muninn/stats`
+available for other watchapps and watchfaces to consume useful statistics about
+the user's battery life, discharge rates, and more. If the user does not yet
+have enough samples for these stats, no useful data will be reported by the
+plugin.
+
+Currently the exposed properties are:
+
+* `daysRemaining` - Estimated number of days remaining of charge.
+* `batteryLife` - Estimated battery life in days.
+* `allTimeRate` - Discharge rate across all recorded samples.
+* `lastWeekRate` - Discharge rate over the previous week only.
+* `meanTimeBetweenCharges` - Average time in days between charges (req. at least
+  2).
+* `updatedAt` - Last time the stats were updated.
+
+To consume the plugin data, register a source handler:
+
+> See the `test/plugin-reader` directory for an example consuming app.
+
+```js
+Pebble.addEventListener('ready', function (e) {
+  console.log('Ready');
+
+  Pebble.subscribeToSource({
+    category: 'muninn',
+    item: 'stats',
+    limit: 1,
+    onData: ({ instances }) => {
+      // Use the stats here!
+      console.log(JSON.stringify(instances, null, 2));
+    },
+    onError: (err) => console.log(err.code, err.message),
+  });
+});
+```
+
+The response will look something like this:
+
+> Currently `instanceId` is not used, but could be in the future.
+
+```
+[{
+  "instanceId": "0",
+  "properties": {
+    "daysRemaining": { "numericValue": { "value": 11, "unit": "days" } },
+    "batteryLife": { "numericValue": { "value": 16, "unit": "days" } },
+    "allTimeRate": { "numericValue": { "value": 6.7, "unit": "%" } },
+    "lastWeekRate": { "numericValue": { "value": 6.2, "unit": "%" } },
+    "meanTimeBetweenCharges": { "numericValue": { "value": 12, "unit": "days" } },
+    "updatedAt": { "numericValue": { "value": 1795106567182 } }
+  }
+}]
+```
+
 
 ## Backend
 
