@@ -53,6 +53,10 @@ void data_init() {
     s_bool_settings[DataKeyHourlyVibration] = true;
     s_bool_settings[DataKeySleep] = true;
   }
+  if (TEST_COLORS) {
+    s_foreground = GColorWhite;
+    s_background = GColorJazzberryJam;
+  }
 }
 
 void data_deinit() {

@@ -1,5 +1,5 @@
 {
-  "version": "3.10.0",
+  "version": "3.11.0",
   "author": "Chris Lewis",
   "private": true,
   "keywords": [
@@ -76,7 +76,8 @@
       "chalk",
       "diorite",
       "emery",
-      "flint"
+      "flint",
+      "gabbro"
     ],
     "capabilities": [
       "configurable"
@@ -84,9 +85,9 @@
   },
   "name": "beam-up",
   "dependencies": {
-    "@rebble/clay": "^1.0.6",
-    "pebble-packet": "^1.5.0",
-    "pebble-scalable": "^1.6.0",
-    "pebble-universal-fb": "^1.9.0"
+    "@rebble/clay": "^1.1.0",
+    "pebble-packet": "^1.6.1",
+    "pebble-scalable": "^2.4.0",
+    "pebble-universal-fb": "^1.11.0"
   }
 }

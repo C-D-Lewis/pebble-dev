@@ -4,21 +4,23 @@
 #define NUM_CHARS 5
 
 // Here be dragons and if another larger round display comes out my head will explode
-#define DIGIT_Y scalable_y_pp(300, 300)
-#define SECONDS_Y_OFFSET scalable_y_pp(605, 600)
-#define SECONDS_HEIGHT scalable_y(30)
-#define BEAM_W PBL_IF_ROUND_ELSE(scalable_x(165), scalable_x_pp(208, 205))
-#define BEAM_H ((2 * DIGIT_Y) - scalable_y_pp(10, 20))
-#define DIGIT_W scalable_x(250)
-#define DIGIT_H scalable_y(357)
-// Necessary to center
-#define HOURS_TENS_X  PBL_IF_ROUND_ELSE(scalable_x(80),  scalable_x(20))
-#define HOURS_UNITS_X PBL_IF_ROUND_ELSE(scalable_x(265), scalable_x(250))
-#define MINS_TENS_X   PBL_IF_ROUND_ELSE(scalable_x(545), scalable_x(555))
-#define MINS_UNITS_X  PBL_IF_ROUND_ELSE(scalable_x(735), scalable_x(784))
-// Extra nudge for text
-#define D_N_X PBL_IF_ROUND_ELSE(scalable_x(-55), scalable_x_pp(0, -10))
-#define D_N_Y PBL_IF_ROUND_ELSE(scalable_y(15), scalable_y_pp(0, -15))
+// 2026 note: Adjust beams first, then adjust text nudges
+#define BEAM_W scl_x_pp({.o = 208, .c = 165, .e = 205, .g = 157})
+#define DIGIT_Y scl_y_pp({.o = 300, .e = 300, .g = 330})
+#define BEAM_H ((2 * DIGIT_Y) - scl_y_pp({.o = 10, .c = 15, .e = 20, .g = 80}))
+#define DIGIT_W scl_x(250)
+#define DIGIT_H scl_y(357)
+// Positions beams
+#define HOURS_TENS_X  scl_x_pp({.o = 20, .c = 80, .g = 90})
+#define HOURS_UNITS_X scl_x_pp({.o = 250, .c = 265, .g = 275})
+#define MINS_TENS_X   scl_x_pp({.o = 555, .c = 545, .g = 555})
+#define MINS_UNITS_X  scl_x_pp({.o = 784, .c = 735, .g = 745})
+// Extra nudge for text relative to beams
+#define D_N_X scl_x_pp({.o = 0, .c = -55, .e = -10, .g = -65})
+#define D_N_Y scl_y_pp({.o = 0, .c = 15, .e = -15})
+// Other
+#define SECONDS_Y_OFFSET scl_y_pp({.o = 605, .e = 600, .g = 600})
+#define SECONDS_HEIGHT scl_y(30)
 
 static Window *s_window;
 static TextLayer *s_digits[NUM_CHARS], *s_date_layer;
@@ -448,7 +450,7 @@ static void window_load(Window *window) {
   s_digits[1] = text_layer_create(
     GRect(HOURS_UNITS_X + D_N_X, DIGIT_Y + D_N_Y, DIGIT_W, DIGIT_H)
   );
-  const int colon_x = HOURS_UNITS_X + scalable_x(65);
+  const int colon_x = HOURS_UNITS_X + scl_x(65);
   s_digits[2] = text_layer_create(
     GRect(colon_x + D_N_X, DIGIT_Y + D_N_Y, DIGIT_W, DIGIT_H)
   );
@@ -462,7 +464,7 @@ static void window_load(Window *window) {
   for(int i = 0; i < NUM_CHARS; i++) {
     text_layer_set_background_color(s_digits[i], GColorClear);
     text_layer_set_text_alignment(s_digits[i], GTextAlignmentRight);
-    text_layer_set_font(s_digits[i], scalable_get_font(SFI_Large));
+    text_layer_set_font(s_digits[i], scl_get_font(SFI_Large));
     layer_add_child(window_layer, text_layer_get_layer(s_digits[i]));
   }
 
@@ -482,7 +484,7 @@ static void window_load(Window *window) {
     s_date_layer,
     PBL_IF_ROUND_ELSE(GTextAlignmentCenter, GTextAlignmentRight)
   );
-  text_layer_set_font(s_date_layer, scalable_get_font(SFI_Small));
+  text_layer_set_font(s_date_layer, scl_get_font(SFI_Small));
 
   s_seconds_bar = layer_create(GRect(0, SECONDS_Y_OFFSET, 0, SECONDS_HEIGHT));
   layer_set_update_proc(s_seconds_bar, seconds_update_proc);
@@ -494,7 +496,7 @@ static void window_load(Window *window) {
   s_bt_layer = layer_create(
     GRect(
       (bounds.size.w - bitmap_bounds.size.w) / 2,
-      scalable_y(833),
+      scl_y(833),
       bitmap_bounds.size.w,
       bitmap_bounds.size.h
     )

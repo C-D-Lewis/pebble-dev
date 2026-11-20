@@ -28,10 +28,6 @@ Using the 'Settings' button in the Pebble app after install, choose from the fol
 
 * Vibrate on the hour
 
-## TODO
-
-- Emery support
-
 ## History
 
 GitHub stats prior to being moved to `pebble-dev`:
