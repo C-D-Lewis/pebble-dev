@@ -37,5 +37,9 @@ Weather data from https://open-meteo.com
 
 ## TODO
 
-- [ ] Tides? Need a good source
 - [ ] Custom future date complication
+- [ ] Humidity?
+- [ ] Distance w/goal
+- [ ] Active minutes w/goal
+- [ ] Pollen? Need API
+- [ ] Tides? Need API
