@@ -48,9 +48,7 @@ export const handleGetSyncInfo = async (dict: Record<string, any>) => {
   savePluginStats({
     daysRemaining: dict.DAYS_REMAINING, // This is sent as part of watchapp response to the ready event
     batteryLife,
-    allTimeRate,
     lastWeekRate,
-    meanTimeBetweenCharges,
     updatedAt: now,
   });
 };

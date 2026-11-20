@@ -1,4 +1,4 @@
-// TODO: Move this to PKTS when able
+// TODO: Move this to PKTS when able - manifest requires source file name...
 
 /** LocalStorage key for stats */
 const STORAGE_KEY_PLUGIN_STATS = 'PLUGIN_STATS';
@@ -33,14 +33,8 @@ Pebble.registerSourceHandler(async (req, res) => {
         batteryLife: {
           numericValue: { value: stats.batteryLife || -1, unit: 'days' },
         },
-        allTimeRate: {
-          numericValue: { value: stats.allTimeRate || -1, unit: '%' },
-        },
         lastWeekRate: {
           numericValue: { value: stats.lastWeekRate || -1, unit: '%' },
-        },
-        meanTimeBetweenCharges: {
-          numericValue: { value: stats.meanTimeBetweenCharges || -1, unit: 'days' },
         },
         updatedAt: {
           numericValue: { value: stats.updatedAt || -1 },

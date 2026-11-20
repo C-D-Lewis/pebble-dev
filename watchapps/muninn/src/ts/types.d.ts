@@ -31,12 +31,8 @@ export type PluginStats = {
   daysRemaining: number;
   /** Battery life in days */
   batteryLife: number;
-  /** All-time samples rate discharged per day */
-  allTimeRate: number;
   /** Rate discharged over last week only */
   lastWeekRate: number;
-  /** Mean time between charges, in days */
-  meanTimeBetweenCharges: number;
   /** When stats were updated */
   updatedAt: number;
 };

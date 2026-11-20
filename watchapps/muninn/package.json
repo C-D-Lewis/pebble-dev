@@ -153,7 +153,7 @@
       "UPLOAD_STATUS"
     ],
     "plugin": {
-      "description": "Share Muninn calculated battery statistics, if available",
+      "description": "Shares Muninn calculated battery statistics, if available",
       "script": "src/pkjs/plugin.js",
       "sources": [
         {
@@ -162,9 +162,7 @@
           "properties": {
             "daysRemaining": ["numericValue"],
             "batteryLife": ["numericValue"],
-            "allTimeRate": ["numericValue"],
             "lastWeekRate": ["numericValue"],
-            "meanTimeBetweenCharges": ["numericValue"],
             "updatedAt": ["numericValue"]
           },
           "supportsMultiple": false,
