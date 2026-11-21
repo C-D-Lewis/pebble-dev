@@ -1,7 +1,7 @@
 {
   "name": "muninn",
   "author": "Chris Lewis",
-  "version": "1.51.0",
+  "version": "1.52.0",
   "_note": "Checklist in config.h!",
   "private": true,
   "keywords": [
@@ -169,7 +169,33 @@
           "suggestedRefreshIntervalSec": 60
         }
       ]
-    }
+    },
+    "usesPermissions": [
+      {
+        "name": "Timeline",
+        "reason": "To add a pin when it is time to charge the watch",
+        "required": false
+      },
+      {
+        "name": "Internet",
+        "parameters": {
+          "domains": [
+            "muninn.chrislewis.me.uk",
+            "unpkg.com"
+          ]
+        },
+        "reason": "To view long-term history statistics in mobile app",
+        "required": false
+      },
+      {
+        "name": "Internet",
+        "parameters": {
+          "domains": ["muninn-api.chrislewis.me.uk"]
+        },
+        "reason": "To update long-term history statistics in mobile app",
+        "required": false
+      }
+    ]
   },
   "dependencies": {
     "pebble-scalable": "^2.2.0"

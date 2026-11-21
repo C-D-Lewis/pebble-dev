@@ -345,7 +345,7 @@ static void underline_update_proc(Layer *layer, GContext *ctx) {
     ctx,
     title,
     scl_get_font(SFI_Small),
-    GRect(0, scl_y_pp({-30, .c = -20, .e = -25, .g = -20}), PS_DISP_W, 100),
+    GRect(0, scl_y_pp({.o = -30, .c = -20, .e = -25, .g = -10}), PS_DISP_W, 100),
     GTextOverflowModeWordWrap,
     GTextAlignmentCenter,
     NULL

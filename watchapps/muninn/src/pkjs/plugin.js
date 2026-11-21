@@ -38,7 +38,7 @@ Pebble.registerSourceHandler(async (req, res) => {
           numericValue: { value: stats.lastWeekRate || -1, unit: '%' },
         },
         updatedAt: {
-          numericValue: { value: stats.updatedAt || -1 },
+          numericValue: { value: stats.updatedAt || -1, unit: 'ms' },
         },
       },
     }],

@@ -49,12 +49,14 @@ the user's battery life, discharge rates, and more.
 If the user does not yet have enough samples for these stats, no useful data
 will be reported by the plugin and `-1` values will be returned.
 
-Currently the exposed properties are:
+Currently the exposed properties are as follows.
 
-* `daysRemaining` - Estimated number of days remaining of charge.
-* `batteryLife` - Estimated battery life in days.
-* `lastWeekRate` - Discharge rate over the previous week only.
-* `updatedAt` - Last time the stats were updated.
+| Name            | Type           | Description                                  |
+|-----------------|----------------|----------------------------------------------|
+| `daysRemaining` | `numericValue` | Estimated number of days remaining of charge |
+| `batteryLife`   | `numericValue` | Estimated battery life in days               |
+| `lastWeekRate`  | `numericValue` | Discharge rate over the previous week only   |
+| `updatedAt`     | `numericValue` | Last time the stats were updated             |
 
 To consume the plugin data, register a source handler:
 
