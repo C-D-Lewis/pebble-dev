@@ -24,7 +24,7 @@ export type UploadHistoryItem = {
 };
 
 /**
- * Shape of stats provided by the Pebble Plugin.
+ * Shape of stats provided by the Pebble plugin.
  */
 export type PluginStats = {
   /** Number of estimated days remaining */

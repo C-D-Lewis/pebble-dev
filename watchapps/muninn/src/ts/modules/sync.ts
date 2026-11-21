@@ -27,18 +27,16 @@ export const handleGetSyncInfo = async (dict: Record<string, any>) => {
 
   const now = new Date().getTime();
   const batteryLife = calculateEstimatedBatteryLife(history, now);
-  const allTimeRate = calculateDischargeRate(history);
   const lastWeekRate = calculateLastWeekRate(history, now);
-  const meanTimeBetweenCharges = calculateMeanTimeBetweenCharges(history);
 
   const res = {
     SYNC_TIMESTAMP: lastTs,
     SYNC_COUNT: history.length,
     STAT_TOTAL_DAYS: Math.floor(history.length / 4),
-    STAT_ALL_TIME_RATE: String(allTimeRate),
+    STAT_ALL_TIME_RATE: String(calculateDischargeRate(history)),
     STAT_LAST_WEEK_RATE: String(lastWeekRate),
     STAT_BATTERY_LIFE: batteryLife,
-    STAT_MTBC: meanTimeBetweenCharges,
+    STAT_MTBC: calculateMeanTimeBetweenCharges(history),
     UPLOAD_ID: uploadId,
   };
   console.log(JSON.stringify(res));
