@@ -89,7 +89,7 @@ The response will look something like this:
     "daysRemaining": { "numericValue": { "value": 11, "unit": "days" } },
     "batteryLife": { "numericValue": { "value": 16, "unit": "days" } },
     "lastWeekRate": { "numericValue": { "value": 6.2, "unit": "%" } },
-    "updatedAt": { "numericValue": { "value": 1795106567182 } }
+    "updatedAt": { "numericValue": { "value": 1795106567182, "unit": "ms" } }
   }
 }]
 ```

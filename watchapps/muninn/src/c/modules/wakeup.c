@@ -66,11 +66,13 @@ void wakeup_handler(WakeupId wakeup_id, int32_t cookie) {
   // Did we wake too early? Seen on PT2
   const time_t ts_now = time(NULL);
   const struct tm *now = localtime(&ts_now);
+#if !defined(WAKEUP_NEXT_MINUTE)
   if (now->tm_min > WAKEUP_WINDOW_M) {
     // Try scheduling again
     wakeup_schedule_next();
     return;
   }
+#endif
 
 #ifdef FEATURE_SYNC
   // If mid-day and enabled, upload history for viewing in app config page
