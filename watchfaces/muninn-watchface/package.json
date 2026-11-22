@@ -1,0 +1,60 @@
+{
+  "version": "1.0.0",
+  "_note": "Check config.h!",
+  "author": "Chris Lewis",
+  "private": true,
+  "dependencies": {
+    "pebble-packet": "^1.6.1",
+    "pebble-scalable": "^2.2.0"
+  },
+  "keywords": [
+    "pebble-app"
+  ],
+  "pebble": {
+    "sdkVersion": "3",
+    "resources": {
+      "media": [
+        {
+          "type": "bitmap",
+          "file": "images/muninn.png",
+          "name": "MUNINN"
+        },
+        {
+          "type": "font",
+          "name": "GOTCHA_GOTHIC_40",
+          "file": "fonts/Gotcha-Gothic.ttf"
+        },
+        {
+          "type": "font",
+          "name": "GOTCHA_GOTHIC_22",
+          "file": "fonts/Gotcha-Gothic.ttf"
+        },
+        {
+          "type": "font",
+          "name": "GOTCHA_GOTHIC_18",
+          "file": "fonts/Gotcha-Gothic.ttf"
+        }
+      ]
+    },
+    "projectType": "native",
+    "uuid": "82f4031f-9e69-451c-8d8d-6a8b30b24d59",
+    "messageKeys": [
+      "BATTERY_LIFE",
+      "BATTERY_DAYS_REMAINING",
+      "BATTERY_LAST_WEEK_RATE"
+    ],
+    "enableMultiJS": true,
+    "displayName": "Muninn",
+    "watchapp": {
+      "onlyShownOnCommunication": false,
+      "hiddenApp": false,
+      "watchface": true
+    },
+    "targetPlatforms": [
+      "emery",
+      "gabbro"
+    ],
+    "capabilities": []
+  },
+  "name": "muninn-watchface"
+}
