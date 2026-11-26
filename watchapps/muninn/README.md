@@ -1,8 +1,5 @@
 # muninn :zap: :bird:
 
-_Odin tasked Muninn with memory of the land... Over time, he will provide you
-with battery wisdom._
-
 <table>
   <tr>
     <td><img src="screenshots/emery.png" /></td>
@@ -10,6 +7,14 @@ with battery wisdom._
     <td><img src="screenshots/emery-stats.png" /></td>
   </tr>
 </table>
+
+_Odin tasked Muninn with memory of the land... Over time, he will provide you
+with battery wisdom._
+
+* [Description](#description)
+* [Plugin](#plugin)
+* [Backend](#backend)
+* [Bugs](#bugs)
 
 ## Description
 
@@ -49,18 +54,22 @@ the user's battery life, discharge rates, and more.
 If the user does not yet have enough samples for these stats, no useful data
 will be reported by the plugin and `-1` values will be returned.
 
-Currently the exposed properties are as follows.
+Currently the exposed properties are as follows. All values are rounded for
+simplicity and consistency. Prefer `dischargeRate` over `lastWeekRate` for best
+consistency with watchapp.
 
 | Name            | Type           | Description                                  |
 |-----------------|----------------|----------------------------------------------|
 | `daysRemaining` | `numericValue` | Estimated number of days remaining of charge |
-| `batteryLife`   | `numericValue` | Estimated battery life in days               |
-| `lastWeekRate`  | `numericValue` | Discharge rate over the previous week only   |
+| `batteryLife`   | `numericValue` | Estimated total battery life in days         |
+| `dischargeRate` | `numericValue` | Current watchapp discharge rate              |
+| `lastWeekRate`  | `numericValue` | Discharge rate from previous week only       |
 | `updatedAt`     | `numericValue` | Last time the stats were updated             |
 
 To consume the plugin data, register a source handler:
 
-> See the `test/plugin-reader` directory for an example consuming app.
+> See the `muninn-watchface` directory for a complete example consuming
+> watchface.
 
 ```js
 Pebble.addEventListener('ready', function (e) {
@@ -82,19 +91,30 @@ Pebble.addEventListener('ready', function (e) {
 
 The response will look something like this:
 
+> Currently `instanceId` is not meaningful, but could be in the future.
+
 ```json
 [{
   "instanceId": "0",
   "properties": {
     "daysRemaining": { "numericValue": { "value": 11, "unit": "days" } },
     "batteryLife": { "numericValue": { "value": 16, "unit": "days" } },
-    "lastWeekRate": { "numericValue": { "value": 6.2, "unit": "%" } },
+    "dischargeRate": { "numericValue": { "value": 7, "unit": "%" } },
+    "lastWeekRate": { "numericValue": { "value": 6, "unit": "%" } },
     "updatedAt": { "numericValue": { "value": 1795106567182, "unit": "ms" } }
   }
 }]
 ```
 
-> Currently `instanceId` is not meaningful, but could be in the future.
+### Plugin Consumers
+
+These watchapps or watchfaces consumer from the Muninn plugin to provide stats
+in other ways.
+
+> Want to be listed here? Let me know in the
+> [Discord project](https://discord.com/channels/221364737269694464/1444392721539403868).
+
+* None (yet!)
 
 ## Backend
 
@@ -112,6 +132,6 @@ See [backend](./backend/) for more information.
 ## Bugs
 
 Please report bugs here on in the
-[Discord thread](https://discord.com/channels/221364737269694464/1444392721539403868)
+[Discord project](https://discord.com/channels/221364737269694464/1444392721539403868)
 including watch model and age (i.e.: Pebble Time Steel, from 2016) and what
 kind of anomalous behavior you encountered.

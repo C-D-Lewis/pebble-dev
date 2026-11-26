@@ -1,7 +1,7 @@
 {
   "name": "muninn",
   "author": "Chris Lewis",
-  "version": "1.52.0",
+  "version": "1.53.0",
   "_note": "Checklist in config.h!",
   "private": true,
   "keywords": [
@@ -162,6 +162,7 @@
           "properties": {
             "daysRemaining": ["numericValue"],
             "batteryLife": ["numericValue"],
+            "dischargeRate": ["numericValue"],
             "lastWeekRate": ["numericValue"],
             "updatedAt": ["numericValue"]
           },

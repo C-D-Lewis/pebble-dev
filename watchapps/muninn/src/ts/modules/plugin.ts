@@ -6,5 +6,5 @@ import { PluginStats } from '../types';
  */
 export const savePluginStats = (stats: PluginStats) => {
   localStorage.setItem(STORAGE_KEY_PLUGIN_STATS, JSON.stringify(stats));
-  console.log(`Saved plugin stats: ${JSON.stringify(stats)}`);
+  console.log(`Plugin stats: ${JSON.stringify(stats)}`);
 };

@@ -39,14 +39,15 @@ export const handleGetSyncInfo = async (dict: Record<string, any>) => {
     STAT_MTBC: calculateMeanTimeBetweenCharges(history),
     UPLOAD_ID: uploadId,
   };
-  console.log(JSON.stringify(res));
+  console.log(`Sync data: ${JSON.stringify(res)}`);
   await PebbleTS.sendAppMessage(res);
 
   // Also update the Pebble plugin
   savePluginStats({
-    daysRemaining: dict.DAYS_REMAINING, // This is sent as part of watchapp response to the ready event
-    batteryLife,
-    lastWeekRate,
+    daysRemaining: Math.round(dict.DAYS_REMAINING), // This is sent as part of watchapp response to the ready event
+    batteryLife: Math.round(batteryLife),
+    dischargeRate: Math.round(dict.DISCHARGE_RATE),
+    lastWeekRate: Math.round(lastWeekRate),
     updatedAt: now,
   });
 };

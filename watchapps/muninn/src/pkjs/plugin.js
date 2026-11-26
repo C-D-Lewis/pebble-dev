@@ -26,13 +26,16 @@ Pebble.registerSourceHandler(async (req, res) => {
     validUntilMs: Date.now() + 60_000, // Match refresh interval in manifest
     instances: [{
       instanceId: '0', // Must be string!
-      // DO NOT ALTER THIS INTERFACE WITHOUT A GOOD PLAN
+      // THIS INTERFACE IS THE CONTRACT
       properties: {
         daysRemaining: {
           numericValue: { value: stats.daysRemaining || -1, unit: 'days' },
         },
         batteryLife: {
           numericValue: { value: stats.batteryLife || -1, unit: 'days' },
+        },
+        dischargeRate: {
+          numericValue: { value: stats.dischargeRate || -1, unit: '%' },
         },
         lastWeekRate: {
           numericValue: { value: stats.lastWeekRate || -1, unit: '%' },

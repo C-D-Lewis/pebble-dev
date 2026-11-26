@@ -27,11 +27,13 @@ export type UploadHistoryItem = {
  * Shape of stats provided by the Pebble plugin.
  */
 export type PluginStats = {
-  /** Number of estimated days remaining */
+  /** Number of estimated days remaining as reported by the watchapp */
   daysRemaining: number;
   /** Battery life in days */
   batteryLife: number;
-  /** Rate discharged over last week only */
+  /** Recent discharge rate as reported by the watchapp */
+  dischargeRate: number;
+  /** Rate discharged over last week only as calculated in JS side */
   lastWeekRate: number;
   /** When stats were updated */
   updatedAt: number;

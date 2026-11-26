@@ -16,7 +16,8 @@ static void add_push_pin_data(DictionaryIterator *iter) {
   const int rate = 4;
 #else
   const int days = data_calculate_days_remaining(false);
-  const int rate = data_calculate_avg_discharge_rate_x100(false) / 100;
+  // Rounding here before truncation, to align with now the plugin rounds its data
+  const int rate = (data_calculate_avg_discharge_rate_x100(false) + 50) / 100;
 #endif
 
   if (!util_is_not_status(days) || !util_is_not_status(rate)) return;
@@ -98,6 +99,7 @@ void inbox_received_handler(DictionaryIterator *iter, void *context) {
   if (t) {
     DictionaryIterator *out;
     app_message_outbox_begin(&out);
+    // ! Used by pin push AND plugin stats data
     add_push_pin_data(out);
 #if defined(FEATURE_SYNC)
     dict_write_int32(out, MESSAGE_KEY_GET_SYNC_INFO, 1);
