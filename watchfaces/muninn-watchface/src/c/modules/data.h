@@ -7,7 +7,7 @@
 typedef struct {
   int days_remaining;
   int battery_life;
-  int last_week_rate_x10;
+  int last_week_rate;
 } AppState;
 
 void data_init();

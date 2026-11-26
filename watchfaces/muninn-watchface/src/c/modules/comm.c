@@ -11,7 +11,7 @@ void inbox_received_handler(DictionaryIterator *iter, void *context) {
     app_state->battery_life = packet_get_integer(iter, MESSAGE_KEY_BATTERY_LIFE);
   }
   if (packet_contains_key(iter, MESSAGE_KEY_BATTERY_LAST_WEEK_RATE)) {
-    app_state->last_week_rate_x10 = packet_get_integer(iter, MESSAGE_KEY_BATTERY_LAST_WEEK_RATE);
+    app_state->last_week_rate = packet_get_integer(iter, MESSAGE_KEY_BATTERY_LAST_WEEK_RATE);
   }
 
   main_window_reload();

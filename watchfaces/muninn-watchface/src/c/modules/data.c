@@ -5,12 +5,12 @@ static AppState s_app_state;
 void data_init() {
   s_app_state.days_remaining = STATUS_EMPTY;
   s_app_state.battery_life = STATUS_EMPTY;
-  s_app_state.last_week_rate_x10 = STATUS_EMPTY;
+  s_app_state.last_week_rate = STATUS_EMPTY;
 
 #if defined(TEST)
   s_app_state.days_remaining = 12;
   s_app_state.battery_life = 16;
-  s_app_state.last_week_rate_x10 = 38;
+  s_app_state.last_week_rate = 4;
 #endif
 }
 

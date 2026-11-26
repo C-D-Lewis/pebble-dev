@@ -13,14 +13,14 @@ const requestMuninnData = () => {
         properties: {
           batteryLife: { numericValue: { value: life } },
           daysRemaining: { numericValue: { value: days } },
-          lastWeekRate: { numericValue: { value: rate } },
+          dischargeRate: { numericValue: { value: rate } },
         }
       } = data;
 
       Pebble.sendAppMessage({
         BATTERY_LIFE: life,
         BATTERY_DAYS_REMAINING: days,
-        BATTERY_LAST_WEEK_RATE: rate * 10,
+        BATTERY_LAST_WEEK_RATE: rate,
       });
     },
     onError: (err) => console.log(err.code, err.message),

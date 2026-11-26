@@ -100,14 +100,9 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
 
   // Daily rate
   static char s_rate_buff[8];
-  const int last_week_rate_x10 = app_state->last_week_rate_x10;
-  if (last_week_rate_x10 != STATUS_EMPTY) {
-    const int tens = last_week_rate_x10 / 10;
-    if (tens >= 10) {
-      snprintf(s_rate_buff, sizeof(s_rate_buff), "%d%%", last_week_rate_x10);
-    } else {
-      snprintf(s_rate_buff, sizeof(s_rate_buff), "%d.%d%%", tens, (last_week_rate_x10 % 10));
-    }
+  const int last_week_rate = app_state->last_week_rate;
+  if (last_week_rate != STATUS_EMPTY) {
+    snprintf(s_rate_buff, sizeof(s_rate_buff), "%d%%", last_week_rate);
   } else {
     snprintf(s_rate_buff, sizeof(s_rate_buff), "--");
   }
