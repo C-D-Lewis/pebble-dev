@@ -3,11 +3,11 @@
 
 #include <pebble.h>
 
-#include "../common/reason_window.h"
-
-#include "../../config.h"
+#include "../../modules/comm.h"
 #include "../../modules/data.h"
 #include "../../modules/scalable.h"
+
+#include "../common/reason_window.h"
 
 void line_window_push();
 #endif

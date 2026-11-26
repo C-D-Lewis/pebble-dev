@@ -33,7 +33,7 @@ static void progress_bar_update_proc(Layer *layer, GContext *ctx) {
       cap_radius - 2,
       0,
       BAR_WIDTH - (2 * cap_radius) + 4,
-      cap_radius + inset + scl_x_pp({.o = 25, .e = 25, .g = 24})
+      cap_radius + inset + scl_x_pp({.o = 25, .c = 24, .e = 25, .g = 24})
     ),
     0,
     GCornerNone
@@ -50,7 +50,7 @@ static void progress_bar_update_proc(Layer *layer, GContext *ctx) {
       cap_radius + inset - scl_x(10),
       inset,
       width - (2 * inset) + scl_x(25),
-      cap_radius + (inset / 2) + scl_x_pp({.o = 10, .e = 6, .g = -1})
+      cap_radius + (inset / 2) + scl_x_pp({.o = 10, .c = -1, .e = 6, .g = -1})
     ),
     0,
     GCornerNone

@@ -19,7 +19,7 @@ static void window_load(Window *window) {
   char *reason = data_get_line(s_index)->reason;
 
   // Code from devsite to try and fit text inside a TextLayer inside a ScrollLayer
-  const int x_margin = scl_x_pp({.o = 20, .g = 80});
+  const int x_margin = scl_x_pp({.o = 20, .c = 80, .g = 80});
   GRect shrinking_rect = GRect(
     x_margin,
     0,
@@ -36,7 +36,7 @@ static void window_load(Window *window) {
   text_size.h += (2 * x_margin);
   GRect text_bounds = bounds;
   text_bounds.origin.x += x_margin;
-  text_bounds.origin.y = scl_y_pp({.o = 0, .g = 100});
+  text_bounds.origin.y = scl_y_pp({.o = 0, .c = 80, .g = 80});
   text_bounds.size.w -= (2 * x_margin);
   text_bounds.size.h = text_size.h + 50;
 

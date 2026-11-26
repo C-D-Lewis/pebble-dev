@@ -1,15 +1,14 @@
 {
   "name": "tube-status",
-  "version": "3.15.0",
+  "version": "3.16.0",
   "author": "Chris Lewis",
   "private": true,
   "dependencies": {
-    "pebble-events": "^1.2.1",
     "pebble-packet": "^1.6.1",
     "pebble-scalable": "^2.4.0"
   },
   "devDependencies": {
-    "pkts": "^0.2.1"
+    "pkts": "^0.3.0-beta.1"
   },
   "scripts": {
     "build": "pkts build"
@@ -37,12 +36,11 @@
     "projectType": "native",
     "uuid": "5120531c-9d73-4852-b26d-3d3cee90d92a",
     "messageKeys": [
-      "LineIndex",
-      "LineType",
-      "LineStatus",
-      "LineReason",
-      "FlagIsComplete",
-      "FlagLineCount"
+      "LINE_TYPE",
+      "LINE_STATUS",
+      "LINE_REASON",
+      "FLAG_IS_COMPLETE",
+      "FLAG_LINE_COUNT"
     ],
     "enableMultiJS": true,
     "displayName": "Tube Status",
@@ -59,6 +57,16 @@
       "emery",
       "gabbro"
     ],
-    "capabilities": []
+    "capabilities": [],
+    "usesPermissions": [
+      {
+        "name": "Internet",
+        "parameters": {
+          "domains": ["api.tfl.gov.uk"]
+        },
+        "reason": "To download TfL delay status data",
+        "required": true
+      }
+    ]
   }
 }

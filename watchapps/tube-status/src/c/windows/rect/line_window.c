@@ -24,7 +24,7 @@ void draw_row_handler(GContext *ctx, const Layer *cell_layer, MenuIndex *cell_in
   GRect bounds = layer_get_bounds(cell_layer);
   int index = cell_index->row;
 
-  int received = data_get_lines_received();
+  int received = comm_get_lines_received();
   if (index >= received) {
     // All other lines good
     graphics_context_set_fill_color(ctx, GColorWhite);
@@ -141,7 +141,7 @@ void draw_row_handler(GContext *ctx, const Layer *cell_layer, MenuIndex *cell_in
 
 uint16_t get_num_rows_handler(MenuLayer *menu_layer, uint16_t section_index, void *context) {
   // Number of concern sent by JS plus one for 'all others are good' notice
-  return data_get_lines_received() + 1;
+  return comm_get_lines_received() + 1;
 }
 
 int16_t get_cell_height_handler(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) {
@@ -149,7 +149,7 @@ int16_t get_cell_height_handler(struct MenuLayer *menu_layer, MenuIndex *cell_in
 }
 
 void selection_will_change_handler(struct MenuLayer *menu_layer, MenuIndex *new_index, MenuIndex old_index, void *context) {
-  if (new_index->row >= data_get_lines_received()) {
+  if (new_index->row >= comm_get_lines_received()) {
     new_index->row = old_index.row;
   }
 }

@@ -4,10 +4,12 @@ static LineData s_line_data[LineTypeMax];
 static int s_progress = 0;
 static int s_progress_max = LineTypeMax;
 
-void data_init() {
-}
+void data_init() {}
 
-void data_deinit() {
+void data_deinit() {}
+
+LineData* data_get_line(int index) {
+  return &s_line_data[index];
 }
 
 char* data_get_line_name(int type) {
@@ -85,26 +87,6 @@ GColor data_get_line_color(int type) {
 #endif
 }
 
-LineData* data_get_line(int index) {
-  return &s_line_data[index];
-}
-
-GColor data_get_line_state_color(int index) {
-  char *state = data_get_line(index)->state;
-  
-  // Minor, Part
-  if (strstr(state, "inor") || strstr(state, "art")) {
-    return PBL_IF_COLOR_ELSE(GColorChromeYellow, GColorDarkGray);
-  }
-
-  // Severe, Planned, Closed, Suspended
-  if (strstr(state, "evere") || strstr(state, "lanned") || strstr(state, "losed") || strstr(state, "uspended")) {
-    return PBL_IF_COLOR_ELSE(GColorRed, GColorDarkGray);
-  }
-
-  return GColorClear;
-}
-
 bool data_get_line_color_is_striped(int type) {
   switch(type) {
     case LineTypeDLR:
@@ -129,11 +111,6 @@ int data_get_progress() {
   return s_progress;
 }
 
-bool data_get_line_has_reason(int index) {
-  char *reason = data_get_line(index)->reason;
-  return strlen(reason) != 0;
-}
-
 void data_set_progress_max(int max) {
   s_progress_max = max;
 }
@@ -142,12 +119,23 @@ int data_get_progress_max() {
   return s_progress_max;
 }
 
-int data_get_lines_received() {
-  int count = 0;
-  for (int i = 0; i < LineTypeMax; i++) {
-    if (strlen(s_line_data[i].state) != 0) {
-      count++;
-    }
+bool data_get_line_has_reason(int index) {
+  char *reason = data_get_line(index)->reason;
+  return strlen(reason) != 0;
+}
+
+GColor data_get_line_state_color(int index) {
+  char *state = data_get_line(index)->state;
+  
+  // Minor, Part
+  if (strstr(state, "inor") || strstr(state, "art")) {
+    return PBL_IF_COLOR_ELSE(GColorChromeYellow, GColorDarkGray);
   }
-  return count;
+
+  // Severe, Planned, Closed, Suspended
+  if (strstr(state, "evere") || strstr(state, "lanned") || strstr(state, "losed") || strstr(state, "uspended")) {
+    return PBL_IF_COLOR_ELSE(GColorRed, GColorDarkGray);
+  }
+
+  return GColorClear;
 }

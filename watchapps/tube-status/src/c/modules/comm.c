@@ -2,40 +2,36 @@
 
 static AppTimer *s_timeout_timer;
 
-void set_fast(bool fast) {
-  app_comm_set_sniff_interval(fast ? SNIFF_INTERVAL_REDUCED: SNIFF_INTERVAL_NORMAL);
-}
+static int s_lines_received;
 
 static void inbox_received_handler(DictionaryIterator *iter, void *context) {
   // APP_LOG(APP_LOG_LEVEL_DEBUG, "Size: %d", packet_get_size(iter));
 
-  int index = 0;
-  if (packet_contains_key(iter, MESSAGE_KEY_LineIndex)) {
-    index = packet_get_integer(iter, MESSAGE_KEY_LineIndex);
+  if (packet_contains_key(iter, MESSAGE_KEY_LINE_TYPE)) {
     // APP_LOG(APP_LOG_LEVEL_DEBUG, "Index: %d", index);
 
-    LineData *line_data = data_get_line(index);
-    line_data->index = index;
-    line_data->type = packet_get_integer(iter, MESSAGE_KEY_LineType);
+    LineData *line_data = data_get_line(s_lines_received);
+    line_data->type = packet_get_integer(iter, MESSAGE_KEY_LINE_TYPE);
 
-    char *status = packet_get_string(iter, MESSAGE_KEY_LineStatus);
+    char *status = packet_get_string(iter, MESSAGE_KEY_LINE_STATUS);
     snprintf(line_data->state, strlen(status) + 1 /* EOF */, "%s", status);
 
-    char *reason = packet_get_string(iter, MESSAGE_KEY_LineReason);
+    char *reason = packet_get_string(iter, MESSAGE_KEY_LINE_REASON);
     snprintf(line_data->reason, strlen(reason) + 1 /* EOF */, "%s", reason);
+
+    s_lines_received += 1;
   }
 
-  data_set_progress(index);
-  if (packet_contains_key(iter, MESSAGE_KEY_FlagLineCount)) {
-    data_set_progress_max(packet_get_integer(iter, MESSAGE_KEY_FlagLineCount));
+  if (packet_contains_key(iter, MESSAGE_KEY_FLAG_LINE_COUNT)) {
+    data_set_progress_max(packet_get_integer(iter, MESSAGE_KEY_FLAG_LINE_COUNT));
     splash_window_update();
   }
+  data_set_progress(s_lines_received);
 
   if (
-    packet_contains_key(iter, MESSAGE_KEY_FlagIsComplete) &&
-    packet_get_integer(iter, MESSAGE_KEY_FlagIsComplete) == 1
+    packet_contains_key(iter, MESSAGE_KEY_FLAG_IS_COMPLETE) &&
+    packet_get_integer(iter, MESSAGE_KEY_FLAG_IS_COMPLETE) == 1
   ) {
-    set_fast(false);
     line_window_push();
   }
 }
@@ -45,13 +41,10 @@ static void inbox_dropped_handler(AppMessageResult reason, void *context) {
 }
 
 void comm_init() {
-  events_app_message_request_inbox_size(COMM_INBOX_SIZE);
-  events_app_message_request_outbox_size(COMM_OUTBOX_SIZE);
-  events_app_message_open();
-  events_app_message_register_inbox_received(inbox_received_handler, NULL);
-  events_app_message_register_inbox_dropped(inbox_dropped_handler, NULL);
+  app_message_open(COMM_INBOX_SIZE, COMM_OUTBOX_SIZE);
+  app_message_register_inbox_received(inbox_received_handler);
+  app_message_register_inbox_dropped(inbox_dropped_handler);
 
-  set_fast(true);
 }
 
 void comm_deinit() {
@@ -59,4 +52,8 @@ void comm_deinit() {
     app_timer_cancel(s_timeout_timer);
     s_timeout_timer = NULL;
   }
+}
+
+int comm_get_lines_received() {
+  return s_lines_received;
 }

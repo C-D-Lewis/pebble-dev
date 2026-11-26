@@ -28,22 +28,26 @@ static void draw_station(GContext *ctx, GPoint center, int index) {
 /******************************** Click Config ********************************/
 
 static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
-  if (s_selected_line == 0) return;
-
-  s_selected_line -= 1;
+  if (s_selected_line == 0) {
+    // Go to 'all other lines' message
+    s_selected_line = comm_get_lines_received();
+  } else {
+    s_selected_line -= 1;
+  }
   layer_mark_dirty(s_ring_layer);
 }
 
 static void down_click_handler(ClickRecognizerRef recognizer, void *context) {
-  const int max = data_get_lines_received();
-  if (s_selected_line == max) return;
-
-  s_selected_line += 1;
+  if (s_selected_line == comm_get_lines_received()) {
+    s_selected_line = 0;
+  } else {
+    s_selected_line += 1;
+  }
   layer_mark_dirty(s_ring_layer);
 }
 
 static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
-  int max = data_get_lines_received();
+  const int max = comm_get_lines_received();
   if (s_selected_line >= max || !data_get_line_has_reason(s_selected_line)) return;
 
   reason_window_push(s_selected_line);
@@ -61,7 +65,7 @@ static void ring_update_proc(Layer *layer, GContext *ctx) {
   const GRect bounds = layer_get_bounds(layer);
 
   const LineData *line_data = data_get_line(s_selected_line);
-  const int name_y_margin = scl_y(360);
+  const int name_y_margin = scl_y_pp({.c = 300, .g = 360});
   const GSize name_size = graphics_text_layout_get_content_size_with_attributes(
     data_get_line_name(line_data->type),
     scl_get_font(SFI_MediumBold),
@@ -71,7 +75,7 @@ static void ring_update_proc(Layer *layer, GContext *ctx) {
     s_attributes
   );
 
-  const int num_received = data_get_lines_received();
+  const int num_received = comm_get_lines_received();
 
   // Draw ring
   GColor line_color = s_selected_line == num_received
@@ -87,13 +91,14 @@ static void ring_update_proc(Layer *layer, GContext *ctx) {
     DEG_TO_TRIGANGLE(0),
     DEG_TO_TRIGANGLE(360)
   );
+  // Striped line style
   if (s_selected_line != num_received && data_get_line_color_is_striped(line_data->type)) {
     graphics_context_set_fill_color(ctx, GColorWhite);
     graphics_fill_radial(
       ctx,
       grect_inset(ring_rect, GEdgeInsets(scl_x(15))),
       GOvalScaleModeFitCircle,
-      scl_x(20),
+      scl_x_pp({.c = 15, .g = 20}),
       DEG_TO_TRIGANGLE(0),
       DEG_TO_TRIGANGLE(360)
     );
@@ -102,6 +107,9 @@ static void ring_update_proc(Layer *layer, GContext *ctx) {
   // Stations
   int angle = 0;
   for(int i = 0; i <= num_received; i++) {
+    // No stop for other message
+    if (i == num_received) continue;
+
     angle = (i * RING_MAX_ANGLE) / num_received;
     GPoint center = gpoint_from_polar(
       grect_inset(ring_rect, GEdgeInsets((MARGIN / 2) - 1)),
@@ -112,24 +120,25 @@ static void ring_update_proc(Layer *layer, GContext *ctx) {
   }
 
   // Selection
-  angle = (s_selected_line * RING_MAX_ANGLE) / num_received;
-  GPoint center = gpoint_from_polar(
-    grect_inset(ring_rect, GEdgeInsets((MARGIN / 2) - 1)),
-    GOvalScaleModeFitCircle,
-    DEG_TO_TRIGANGLE(angle)
-  );
-  graphics_context_set_fill_color(ctx, GColorBlack);
-  graphics_fill_circle(ctx, center, (MARGIN / 2) + scl_x(5));
-
-  graphics_context_set_text_color(ctx, GColorBlack);
+  if (s_selected_line != num_received) {
+    angle = (s_selected_line * RING_MAX_ANGLE) / num_received;
+    GPoint center = gpoint_from_polar(
+      grect_inset(ring_rect, GEdgeInsets((MARGIN / 2) - 1)),
+      GOvalScaleModeFitCircle,
+      DEG_TO_TRIGANGLE(angle)
+    );
+    graphics_context_set_fill_color(ctx, GColorBlack);
+    graphics_fill_circle(ctx, center, (MARGIN / 2) + scl_x(5));
+  }
 
   // Summary of all other statuses
+  graphics_context_set_text_color(ctx, GColorBlack);
   if (s_selected_line == num_received) {
     graphics_draw_text(
       ctx,
       num_received == 0 ? "Good service on all lines" : "Good service on all other lines",
-      scl_get_font(SFI_Medium),
-      grect_inset(bounds, GEdgeInsets(name_y_margin, 0, 0, 0)),
+      scl_get_font(SFI_MediumBold),
+      grect_inset(bounds, GEdgeInsets(name_y_margin, scl_x(200), 0, scl_x(200))),
       GTextOverflowModeWordWrap,
       GTextAlignmentCenter,
       s_attributes

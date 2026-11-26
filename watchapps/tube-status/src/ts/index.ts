@@ -1,24 +1,4 @@
-/** Expected Line ID values */
-type LineId = 'bakerloo' | 'central' | 'circle' | 'district' | 'dlr' | 'elizabeth' |
-  'hammersmith-city' | 'jubilee' | 'liberty' | 'lioness' | 'metropolitan' | 'mildmay' |
-  'northern' | 'piccadilly' | 'suffragette' | 'victoria' | 'waterloo-city' | 'weaver' |
-  'windrush';
-
-/** API data type */
-type TfLApiResult = {
-  id: LineId;
-  lineStatuses: {
-    statusSeverityDescription: string;
-    reason?: string;
-  }[];
-};
-
-/** Processed data type */
-type LineData = {
-  id: string;
-  status: string;
-  reason: string;
-};
+import { LineData, LineId, TfLApiResult } from './types';
 
 /** Despite attempts to not rely on index, need to map these API IDs to C enum values */
 const LINE_TYPE_MAP: { [key in LineId]: number } = {
@@ -42,13 +22,12 @@ const LINE_TYPE_MAP: { [key in LineId]: number } = {
   weaver: 17,
   windrush: 18,
 };
-
 /** API modes to query */
 const MODES = ['tube', 'dlr', 'elizabeth-line', 'overground'];
-/** Number of lines the API returns */
-const NUM_LINES = 19;
-/** Max reason length */
+/** Max reason length - matching C structure */
 const MAX_REASON_LENGTH = 512;
+/** Good Service status string */
+const STATUS_GOOD_SERVICE = 'Good Service';
 
 /**
  * Download all lines statuses.
@@ -59,24 +38,27 @@ const fetchLinesWithIssues = async (): Promise<LineData[]> => {
   const json = await PebbleTS.fetchJSON(url) as TfLApiResult[];
   // console.log(JSON.stringify(json, null, 2));
 
-  // Send only those with issues (will need better logic if a setting for this is implemented)
+  // Test empty response - no issues
   // return [];
+
+  // Send only those with issues (will need better logic if a setting for this is implemented)
   return json
-    .filter((obj: TfLApiResult) => obj.lineStatuses[0].statusSeverityDescription !== 'Good Service')
-    .reduce((acc, obj: TfLApiResult): LineData[] => {
-      let reason = obj.lineStatuses[0].reason || '';
+    .filter(
+      (p: TfLApiResult) => p.lineStatuses[0].statusSeverityDescription !== STATUS_GOOD_SERVICE,
+    )
+    .reduce((acc, p: TfLApiResult): LineData[] => {
+      let reason = p.lineStatuses[0].reason || '';
       if (reason?.length > MAX_REASON_LENGTH) {
         reason = reason?.substring(0, MAX_REASON_LENGTH - 4) + '...';
       }
 
-      return [
-        ...acc,
-        {
-          id: obj.id,
-          status: obj.lineStatuses[0].statusSeverityDescription || '?',
-          reason,
-        },
-      ];
+      const item = {
+        id: p.id,
+        status: p.lineStatuses[0].statusSeverityDescription || '?',
+        reason,
+      };
+      // console.log(item);
+      return [...acc, item];
     }, []);
 };
 
@@ -90,8 +72,8 @@ const sendNextLine = async (lines: LineData[], index: number) => {
   // Everything is awesome!
   if (lines.length === 0) {
     const dict = {
-      FlagIsComplete: 1,
-      FlagLineCount: 0,
+      FLAG_IS_COMPLETE: 1,
+      FLAG_LINE_COUNT: 0,
     };
     await PebbleTS.sendAppMessage(dict);
     return;
@@ -107,12 +89,11 @@ const sendNextLine = async (lines: LineData[], index: number) => {
   if (!lineData) throw new Error(`No lineData for ${index}`);
 
   const dict = {
-    LineIndex: index,
-    LineType: LINE_TYPE_MAP[lineData.id as LineId],
-    LineStatus: lineData.status,
-    LineReason: lineData.reason,
-    FlagIsComplete: index === lines.length - 1 ? 1 : 0,
-    FlagLineCount: lines.length,
+    LINE_TYPE: LINE_TYPE_MAP[lineData.id as LineId],
+    LINE_STATUS: lineData.status,
+    LINE_REASON: lineData.reason,
+    FLAG_IS_COMPLETE: index === lines.length - 1 ? 1 : 0,
+    FLAG_LINE_COUNT: lines.length,
   };
   await PebbleTS.sendAppMessage(dict);
   console.log(`Sent item ${index}: ${JSON.stringify(dict)}`);

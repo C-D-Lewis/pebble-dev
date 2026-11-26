@@ -3,7 +3,7 @@
 
 #include <pebble.h>
 
-#include "../../config.h"
+#include "../../modules/comm.h"
 #include "../../modules/data.h"
 
 #include "../common/reason_window.h"
